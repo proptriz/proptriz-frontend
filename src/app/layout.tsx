@@ -25,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`font-Lato antialiased`}
       >
-        {children}
+        <div className=" w-full md:w-[750px] md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
+          {children}
+        </div> 
       </body>
     </html>
   );

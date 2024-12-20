@@ -19,3 +19,12 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+<<<<<<< HEAD
+=======
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+>>>>>>> c227043d7798fe6345edcb8594de0eb3f081b6cc

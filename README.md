@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -34,3 +35,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+=======
+
+
+# E-Rental Hub Frontend
+This project uses ReactJS/NextJS for the development.
+
+To get started:
+- run *git clone https://github.com/e-rental-hub/e-rental-hub-frontend.git* to clone this project.
+- move into the projet directory and run *npm install*.
+- run *npm run build* to check for errors.
+- run *npm run dev* to run the local server.
+>>>>>>> c227043d7798fe6345edcb8594de0eb3f081b6cc

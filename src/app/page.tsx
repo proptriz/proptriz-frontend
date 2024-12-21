@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from "react";
-import Header from "@/components/shared/Header";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Map from "@/components/Map";
 import Footer from "@/components/shared/Footer";

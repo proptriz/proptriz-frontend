@@ -1,6 +1,5 @@
 import React from "react";
 import { FiSearch } from "react-icons/fi";
-import { BsMic } from "react-icons/bs";
 
 const SearchBar: React.FC = () => {
   return (

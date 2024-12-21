@@ -3,7 +3,7 @@
 import React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L, { LatLngExpression, LatLngBounds, LatLngTuple } from 'leaflet';
+import L from 'leaflet';
 
 // Marker icon for other locations
 const customIcon = new L.Icon({

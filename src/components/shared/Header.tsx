@@ -1,5 +1,4 @@
 import React from "react";
-import { FiBell } from "react-icons/fi";
 
 const Header: React.FC = () => {
   return (

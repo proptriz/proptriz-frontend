@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState } from "react";
-import Header from "@/components/shared/Header";
 import NavigationTabs from "@/components/shared/NavigationTabs";
-import Map from "@/components/Map";
+// import Map from "@/components/Map";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import { FaRegBell } from "react-icons/fa6";
 import PropertyListing from "@/components/property/Listing";
+import dynamic from 'next/dynamic';
 
-const HomePage: React.FC = () => {
+const Map = dynamic(() => import('@/components/Map'), { ssr: false });
+
+export default function RootPage() {
   const [ mapOrList, setMapOrList ] = useState<string>('map')
   return (
     <div className="flex flex-col pt-5 pb-32">
@@ -72,4 +74,3 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;

@@ -1,0 +1,33 @@
+import React from "react";
+
+interface ToggleProps {
+  selected: string;
+  options: string[];
+  onChange: (value: string) => void;
+}
+
+const ToggleButtons: React.FC<ToggleProps> = ({
+  selected,
+  options,
+  onChange,
+}) => {
+  return (
+    <div className="flex space-x-2 my-4">
+      {options.map((option) => (
+        <button
+          key={option}
+          className={`px-4 py-2 rounded-md ${
+            selected === option
+              ? "bg-green-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+          onClick={() => onChange(option)}
+        >
+          {option}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+export default ToggleButtons;

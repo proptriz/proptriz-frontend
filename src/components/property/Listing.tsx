@@ -2,6 +2,7 @@
 import Image from "next/image";
 import React from "react";
 import HorizontalCard from "../shared/HorizontalCard";
+import Link from "next/link";
 
 export default function PropertyListing() {
     const topLocation = [
@@ -58,22 +59,24 @@ export default function PropertyListing() {
             <div className="grid grid-cols-2 gap-4 mt-4">
                 
                 {apartments.map(((info, key)=>(
-                    <div className="bg-white p-3 rounded-2xl  shadow-md" key={key}>
-                        <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${info.image})`}}>
-                            <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
-                                N{info.price}
-                                <span className="text-xs">{info.period}</span>
+                    <Link href={'/property/details'} key={key}>
+                        <div className="bg-white p-3 rounded-2xl  shadow-md">
+                            <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${info.image})`}}>
+                                <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
+                                    N{info.price}
+                                    <span className="text-xs">{info.period}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-md font-semibold my-2">{info.name}</p>
+                                <div className="flex space-x-2">
+                                    <span className="text-yellow-500">★</span>
+                                    <span className="text-gray-500 text-sm">{info.rating}</span>
+                                    <p className="text-gray-500 text-sm">{info.address}</p>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <p className="text-md font-semibold my-2">{info.name}</p>
-                            <div className="flex space-x-2">
-                                <span className="text-yellow-500">★</span>
-                                <span className="text-gray-500 text-sm">{info.rating}</span>
-                                <p className="text-gray-500 text-sm">{info.address}</p>
-                            </div>
-                        </div>
-                    </div>
+                    </Link>
                 )))}
             </div>
         </section>

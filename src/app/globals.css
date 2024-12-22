@@ -19,3 +19,15 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.card-bg {
+  background-color: #DCDFD9;
+}
+
+.text-green {
+  color: #61AF74;
+}
+
+.bg-green {
+  background-color: #61AF74;
+}

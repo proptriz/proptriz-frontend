@@ -1,6 +1,7 @@
 
 import Image from "next/image";
 import React from "react";
+import HorizontalCard from "../shared/HorizontalCard";
 
 export default function PropertyListing() {
     const topLocation = [
@@ -17,7 +18,8 @@ export default function PropertyListing() {
             rating: 4.8, 
             address: 'Jimeta, Yola', 
             price: '10k',
-            period: 'month'
+            period: 'month',
+            type: ""
         },
         {
             name: 'Self Contain', 
@@ -25,7 +27,8 @@ export default function PropertyListing() {
             rating: 5.0, 
             address: 'Alagbado, Ilorin', 
             price: '100k',
-            period: 'year'
+            period: 'year',
+            type: ""
         },
         {
             name: 'Single Room', 
@@ -33,7 +36,8 @@ export default function PropertyListing() {
             rating: 4.6, 
             address: 'Jimeta, Yola', 
             price: '250k',
-            period: 'year'
+            period: 'year',
+            type: ""
         },
         {
             name: '2-Bedroom Flat', 
@@ -41,7 +45,8 @@ export default function PropertyListing() {
             rating: 2.9, 
             address: 'Ikorodu, Lagos', 
             price: '250k',
-            period: 'year'
+            period: 'year',
+            type: ""
         },
     ]
 
@@ -77,37 +82,18 @@ export default function PropertyListing() {
         <section className="px-4 mb-10">
             <h2 className="text-lg font-semibold">Featured Properties</h2>
             <div className="flex space-x-4 mt-4 overflow-x-auto">
+
                 {/* Card */}
-                
-                {apartments.map(((info, key)=>(
-                    <div key={key} className="grid grid-cols-2 min-w-[70%] md:min-w-[40%] space-x-3 bg-[#DCDFD9] p-2 rounded-lg shadow-md items-center" >
-                        <Image
-                        src="/home/building1.png"
-                        width={80}
-                        height={100}
-                        alt="Sky Apartment"
-                        className="w-[200px] rounded-lg h-full"
-                        />
-                        <div className="">
-                            <h3 className="text-sm font-semibold mb-2">
-                                {info.name}
-                            </h3>
-                            <div>
-                                <span className="text-red-500 me-1">★</span>
-                                <span className="text-gray-500 text-sm">{info.rating}</span>
-                            </div>
-                            <div className="flex space-x-1">
-                                <Image
-                                    src="/pin.png"
-                                    width={8}
-                                    height={7}
-                                    alt="loc"
-                                />
-                                <p className="text-gray-500 text-sm">{info.address}</p>
-                            </div>
-                            <p className="text-blue-600 font-bold mt-5 text-sm">N{info.price}/{info.period}</p>
-                        </div>
-                    </div>
+                {apartments.slice(0,3).map(((info, key)=>(
+                    <HorizontalCard name={info.name} 
+                        price={30} 
+                        type="" 
+                        address={info.address} 
+                        image={info.image} 
+                        period={info.period} 
+                        rating={info.rating}
+                        key={key}
+                    />
                 )))}
             </div>
         </section>

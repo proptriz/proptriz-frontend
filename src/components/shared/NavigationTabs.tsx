@@ -12,7 +12,7 @@ const tabs = [
 
 const NavigationTabs: React.FC = () => {
   return (
-    <nav className="flex justify-around space-x-4 px-4 py-2 overflow-x-auto">
+    <nav className="flex space-x-4 px-4 py-2 overflow-x-auto">
       {tabs.map((tab, index) => (
         <button
           key={index}

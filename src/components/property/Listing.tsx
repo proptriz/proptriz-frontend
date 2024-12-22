@@ -101,7 +101,7 @@ export default function PropertyListing() {
         {/* Top Locations */}
         <section className="px-4 mb-10">
             <h2 className="text-lg font-semibold">Top Locations</h2>
-            <div className="flex justify-around mt-4 overflow-x-auto space-x-6">
+            <div className="flex mt-4 overflow-x-auto space-x-6">
                 {topLocation.map(((location, key)=>(
                     <div className="flex items-center bg-[#DCDFD9] space-x-2 rounded-full p-2" key={key}>
                         <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center ">

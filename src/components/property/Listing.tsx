@@ -79,6 +79,10 @@ export default function PropertyListing() {
                     </Link>
                 )))}
             </div>
+            <Link href={'/property/list'}>
+            <button className="mt-3 text-green">View all properties</button>
+            </Link>
+            
         </section>
 
         {/* Featured Estates */}

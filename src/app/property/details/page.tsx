@@ -1,8 +1,12 @@
 'use client';
 
+import { VerticalCard } from "@/components/shared/VerticalCard";
+import { apartments } from "@/constant";
+import { count } from "console";
 import Image from "next/image";
 import React from "react";
 import { FaHeart, FaShareAlt, FaStar, FaBed, } from "react-icons/fa";
+import { FaRegStar } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoChatbubbleEllipsesOutline, IoChevronBack } from "react-icons/io5";
 import { TbView360Number } from "react-icons/tb";
@@ -130,22 +134,28 @@ const PropertyDetail = () => {
         {/* Reviews */}
         <div className="px-5 mt-10">
             <h2 className="text-lg font-bold mb-3">Reviews</h2>
-            <div className="card-bg p-3 rounded-lg flex items-center">
-                <FaStar color="yellow" />
-                <span className="ml-2 text-lg font-bold">4.9</span>
+            <div className="bg-gray-700 p-3 rounded-lg flex items-center">
+                <FaStar className="text-yellow-500" />
+                <span className="ml-2 text-lg text-gray-200 font-bold">4.9</span>
                 <span className="ml-2 text-gray-500">(12 reviews)</span>
             </div>
             <div className="mt-3 space-y-3">
             {/* Review Item */}
-            <div className="flex items-start space-x-3">
+            <div className="flex items-start space-x-3 space-y-3 card-bg p-3 text-sm rounded-xl mt-5">
                 <img
                 src="/avatar.png" // Replace with the actual reviewer image URL
                 alt="Reviewer"
                 className="w-10 h-10 rounded-full"
                 />
                 <div>
-                    <h3 className="text-sm font-bold">Kurt Mullins</h3>
-                    <p className="text-sm text-gray-500">Lorem ipsum dolor sit amet...</p>
+                    <div className="flex">
+                        <h3 className="text-sm font-bold">Kurt Mullins</h3>
+                        <div className="flex ml-auto text-yellow-500"><FaStar className="" /><FaStar className="" /><FaRegStar /><FaRegStar /></div>
+                    </div>
+                    
+                    <p className="text-sm text-gray-500">Lorem ipsum dolor sit amet, consectetur 
+                        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    </p>
                 </div>
             </div>
             {/* Add more reviews here */}
@@ -158,15 +168,20 @@ const PropertyDetail = () => {
             <h2 className="text-lg font-bold mb-3">Nearby From this Location</h2>
             <div className="flex space-x-3">
                 {/* Property Card */}
-                <div className="w-36 card-bg p-3 rounded-lg">
-                    <img
-                    src="/apartment.png" // Replace with actual property image URL
-                    alt="Nearby Property"
-                    className="w-full h-20 object-cover rounded-lg"
+                <div className="grid grid-cols-2 w-full space-x-3 ">
+                {apartments.slice(0,2).map(((info, key)=>(
+                    <VerticalCard name={info.name} 
+                        price={30} 
+                        type="" 
+                        address={info.address} 
+                        image={info.image} 
+                        period={info.period} 
+                        rating={info.rating}
+                        key={key}
                     />
-                    <h3 className="text-sm font-bold mt-2">Property 1</h3>
-                    <p className="text-sm text-gray-500">$150/month</p>
+                )))}
                 </div>
+                
             {/* Add more cards here */}
             </div>
         </div>

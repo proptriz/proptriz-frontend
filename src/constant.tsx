@@ -47,3 +47,36 @@ export const apartments = [
 export const reviews = [
     {reviewer: '', image: '/avatar.png', rating: 5.0, comment: ''},
 ]
+
+export const agents = [
+    { id: 1, name: "Amanda", rating: 5.0, sold: 112, image: "/avatar.png" },
+    { id: 2, name: "Anderson", rating: 4.9, sold: 112, image: "/avatar.png" },
+    { id: 3, name: "Samantha", rating: 4.9, sold: 112, image: "/avatar.png" },
+    { id: 4, name: "Andrew", rating: 4.9, sold: 112, image: "/avatar.png" },
+    { id: 5, name: "Michael", rating: 4.9, sold: 112, image: "/avatar.png" },
+    { id: 6, name: "Tobi", rating: 4.9, sold: 112, image: "/avatar.png" },
+  ];
+
+export const agent = {
+    name: "Amanda",
+    email: "amanda.trust@email.com",
+    rating: 5.0,
+    reviews: 235,
+    sold: 112,
+    listings: [
+    {
+        id: 1,
+        name: "Brookvale Villa",
+        price: 320,
+        location: "Jakarta, Indonesia",
+        image: "/home/building1.png",
+    },
+    {
+        id: 2,
+        name: "The Overdale Apartment",
+        price: 290,
+        location: "Jakarta, Indonesia",
+        image: "/home/building2.png",
+    },
+    ],
+};

@@ -80,7 +80,7 @@ export default function PropertyListing() {
                 )))}
             </div>
             <Link href={'/property/list'}>
-            <button className="mt-4 text-green">View all properties</button>
+              <button className="mt-4 text-green">View all properties</button>
             </Link>
             
         </section>

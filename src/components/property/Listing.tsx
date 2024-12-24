@@ -121,6 +121,9 @@ export default function PropertyListing() {
                     </Link>
                 )))}
             </div>
+            <Link href={'/property/list'}>
+            <button className="mt-4 text-green">More locations</button>
+            </Link>
         </section>
 
         {/* Promotions */}
@@ -188,6 +191,9 @@ export default function PropertyListing() {
                     </div>
                 </div>
             </div>
+            <Link href={'/agent/list'}>
+            <button className="mt-4 text-green">View all agents</button>
+            </Link>
             <Link href={'/agent/list'}>
             <button className="mt-4 text-green">View all agents</button>
             </Link>

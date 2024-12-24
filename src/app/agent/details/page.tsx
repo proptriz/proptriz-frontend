@@ -11,13 +11,10 @@ const AgentProfileDetail = () => {
     const [ listOrSold, setListOrSold ] = useState<string>('list');
 
     return (
-        <div className="p-6 pb-24 relative">            
-            <div className="mb-6">
-                <BackButton />                
-                <h1 className="text-2xl font-bold text-center">Profile</h1>
-            </div>
+        <div className="p-6 pb-24 relative">
+            <BackButton />            
             <div className="mb-6 text-center">
-                <h2 className="font-bold text-lg">{agent.name}</h2>
+                <h2 className="font-bold text-2xl">{agent.name}</h2>
                 <p className="text-gray-500">{agent.email}</p>
                 
                 <div className="flex flex-col items-center mb-5">

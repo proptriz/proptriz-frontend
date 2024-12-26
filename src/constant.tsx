@@ -7,38 +7,42 @@ export const topLocation = [
 
 export const apartments = [
     {
+        id: '01pro',
         name: '3-Bedroom Apartment', 
         image: '/home/building1.png', 
         rating: 4.8, 
         address: 'Jimeta, Yola', 
-        price: '10k',
+        price: 10,
         period: 'month',
         type: ""
     },
     {
+        id: '02pro',
         name: 'Self Contain', 
         image: '/home/building2.png', 
         rating: 5.0, 
         address: 'Alagbado, Ilorin', 
-        price: '100k',
+        price: 100,
         period: 'year',
         type: ""
     },
     {
+        id: '03pro',
         name: 'Single Room', 
         image: '/apartment.png', 
         rating: 4.6, 
         address: 'Jimeta, Yola', 
-        price: '250k',
+        price: 250,
         period: 'year',
         type: ""
     },
     {
+        id: '04pro',
         name: '2-Bedroom Flat', 
         image: '/cover-1.png', 
         rating: 2.9, 
         address: 'Ikorodu, Lagos', 
-        price: '250k',
+        price: 250,
         period: 'year',
         type: ""
     },
@@ -58,25 +62,34 @@ export const agents = [
   ];
 
 export const agent = {
+    id: '01',
     name: "Amanda",
     email: "amanda.trust@email.com",
     rating: 5.0,
     reviews: 235,
     sold: 112,
-    listings: [
-    {
-        id: 1,
-        name: "Brookvale Villa",
-        price: 320,
-        location: "Jakarta, Indonesia",
-        image: "/home/building1.png",
-    },
-    {
-        id: 2,
-        name: "The Overdale Apartment",
-        price: 290,
-        location: "Jakarta, Indonesia",
-        image: "/home/building2.png",
-    },
-    ],
+    listing: 140,
+    image: 'https://placehold.co/40',
+    properties: [
+        {
+            id: '04pro',
+            name: '2-Bedroom Flat', 
+            image: '/cover-1.png', 
+            rating: 2.9, 
+            address: 'Ikorodu, Lagos', 
+            price: 250,
+            period: 'year',
+            type: ""
+        },
+        {
+            id: '02pro',
+            name: '2-Bedroom Flat', 
+            image: '/apartment.png', 
+            rating: 2.9, 
+            address: 'Ikorodu, Lagos', 
+            price: 250,
+            period: 'year',
+            type: ""
+        }
+    ]
 };

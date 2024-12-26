@@ -4,6 +4,7 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import Image from "next/image";
 
 interface HorizontalCardProps {
+  id: string,
   image: string; // URL of the property image
   name: string; // Title of the property
   rating: number; // Rating of the property
@@ -14,6 +15,7 @@ interface HorizontalCardProps {
 }
 
 const HorizontalCard: React.FC<HorizontalCardProps> = ({
+  id,
   image,
   name,
   rating,

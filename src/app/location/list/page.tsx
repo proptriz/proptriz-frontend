@@ -17,6 +17,7 @@ const LocationListPage = () => {
                 {apartments.map(((info, key)=>(
                     <Link href={'/location/details'} key={key}>
                         <VerticalCard 
+                            id={info.id}
                             name={''} 
                             price={0} 
                             type="" 

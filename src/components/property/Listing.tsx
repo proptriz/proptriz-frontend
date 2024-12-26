@@ -92,7 +92,9 @@ export default function PropertyListing() {
 
                 {/* Card */}
                 {apartments.slice(0,3).map(((info, key)=>(
-                    <HorizontalCard name={info.name} 
+                    <HorizontalCard 
+                        id={''}
+                        name={info.name} 
                         price={30} 
                         type="" 
                         address={info.address} 
@@ -193,11 +195,7 @@ export default function PropertyListing() {
             </div>
             <Link href={'/agent/list'}>
             <button className="mt-4 text-green">View all agents</button>
-            </Link>
-            <Link href={'/agent/list'}>
-            <button className="mt-4 text-green">View all agents</button>
-            </Link>
-            
+            </Link>            
         </section>
     </div>
   );

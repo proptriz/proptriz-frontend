@@ -65,6 +65,7 @@ const LocationDetailsPage = () => {
                     <div className="space-y-5">
                         {apartments.slice(0,2).map(((info, key)=>(
                             <HorizontalCard name={info.name} 
+                                id={info.id}
                                 price={30} 
                                 type="" 
                                 address={info.address} 

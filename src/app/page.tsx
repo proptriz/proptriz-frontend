@@ -7,6 +7,7 @@ import SearchBar from "@/components/shared/SearchBar";
 import { FaRegBell } from "react-icons/fa6";
 import PropertyListing from "@/components/property/Listing";
 import dynamic from 'next/dynamic';
+import Link from "next/link";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -26,13 +27,16 @@ export default function RootPage() {
         </div>
 
         {/* Notification & Profile Section */}
-        <div className="flex items-center space-x-4 ml-auto">
-          <button className="text-gray-500 text-xl"><FaRegBell /></button>
-          {/* <img
-            src="https://placehold.co/40"
+        <div className="flex items-center space-x-4 ml-auto"> 
+          <Link href="/profile/login">
+          <img
+            src="/avatar.png"
             alt="profile"
             className="rounded-full w-10 h-10"
-          /> */}
+          />
+          </Link>         
+          
+          <button className="text-gray-500 text-xl"><FaRegBell /></button>
         </div>
       </header>
       <div className="px-6 py-3">

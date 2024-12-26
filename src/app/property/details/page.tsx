@@ -171,7 +171,9 @@ const PropertyDetail = () => {
                     {/* Property Card */}
                     <div className="grid grid-cols-2 w-full space-x-3 ">
                     {apartments.slice(0,2).map(((info, key)=>(
-                        <VerticalCard name={info.name} 
+                        <VerticalCard
+                            id={info.id}
+                            name={info.name} 
                             price={30} 
                             type="" 
                             address={info.address} 

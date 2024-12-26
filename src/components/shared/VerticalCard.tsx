@@ -1,6 +1,8 @@
+import { PropertyProps } from "@/definitions";
 
 
 interface VerticalCardProps {
+    id: string;
     image: string; // URL of the property image
     name: string; // Title of the property
     rating: number; // Rating of the property
@@ -11,6 +13,7 @@ interface VerticalCardProps {
   }
 
 export const VerticalCard = ({
+    id,
     image,
     name,
     rating,
@@ -18,7 +21,7 @@ export const VerticalCard = ({
     price,
     type,
     period
-  }: VerticalCardProps ) => {
+  }: PropertyProps ) => {
     return (
         <div className="bg-white p-3 rounded-2xl shadow-md">
             <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${image})`}}>

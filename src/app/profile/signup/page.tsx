@@ -51,7 +51,7 @@ const SignupPage: React.FC = () => {
                     <Link href={'/profile/signup/confirm/phone'}>
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full bg-green text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                         Sign Up
                     </button>

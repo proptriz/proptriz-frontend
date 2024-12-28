@@ -14,15 +14,14 @@ const ProfileTransaction = () => {
 
     return (
         <div className="p-6 pb-24 relative">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-5">
                 <BackButton />            
-                <h1 className="text-2xl font-bold text-center 2xl mb-5">Profile</h1>
-                <button 
-                className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" 
-                // onClick={()=>router.back()}
-                >
-                    <IoSettingsOutline />
-                </button> 
+                <h1 className="text-2xl font-bold 2xl ">Profile</h1>
+                <Link href={'/profile/edit'} >
+                    <button className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" >
+                        <IoSettingsOutline />
+                    </button> 
+                </Link>
             </div>
             
             <div className="mb-6 text-center">

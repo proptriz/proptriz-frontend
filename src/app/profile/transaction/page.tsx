@@ -5,6 +5,7 @@ import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import { agent } from "@/constant";
 import Link from "next/link";
+import { IoSettingsOutline } from "react-icons/io5";
 
 const ProfileTransaction = () => {
 
@@ -13,8 +14,17 @@ const ProfileTransaction = () => {
 
     return (
         <div className="p-6 pb-24 relative">
-            <BackButton />            
-            <h1 className="text-2xl font-bold text-center 2xl mb-5">Profile</h1>
+            <div className="flex items-center justify-between">
+                <BackButton />            
+                <h1 className="text-2xl font-bold text-center 2xl mb-5">Profile</h1>
+                <button 
+                className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" 
+                // onClick={()=>router.back()}
+                >
+                    <IoSettingsOutline />
+                </button> 
+            </div>
+            
             <div className="mb-6 text-center">
                 <div className="flex flex-col items-center mb-2">
                     <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">

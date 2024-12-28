@@ -1,3 +1,4 @@
+import { BackButton } from '@/components/shared/buttons';
 import Image from 'next/image';
 import React from 'react';
 import { FaUser, FaPhone, FaEnvelope, FaArrowLeft, FaFacebookF } from 'react-icons/fa';
@@ -7,9 +8,7 @@ const EditProfile = () => {
     <div className="p-6">
         {/* Header */}
         <div className="flex items-center mb-6">
-            <button>
-            <FaArrowLeft className="text-xl" />
-            </button>
+            <BackButton />
             <h2 className="text-lg font-semibold mx-auto">Edit Profile</h2>
         </div>
 

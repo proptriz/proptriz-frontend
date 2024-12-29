@@ -20,9 +20,9 @@ export default function FAQSupport() {
 
         {/* Title */}
         <div className="mx-auto w-[60%] py-10">
-          <h1 className="mb-1 text-3xl font-bold">
+          <p className="mb-1 text-3xl font-bold">
             FAQ <span className="font-normal">& Support</span>
-          </h1>
+          </p>
           <h4 className="">
             Find answer to your problem using this app.
           </h4>

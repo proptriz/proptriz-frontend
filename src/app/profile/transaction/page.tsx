@@ -11,17 +11,31 @@ const ProfileTransaction = () => {
 
     const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
     const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
+    const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
 
     return (
         <div className="p-6 pb-24 relative">
+            <div className={`fixed top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white ${settingsMenu}`}>  
+                <button className="text-xl hover:card-bg hover:shadow-md block" >
+                    <Link href={'/profile/edit'} >
+                        Edit Profile
+                    </Link>
+                </button> 
+                
+                <button className="text-xl hover:card-bg hover:shadow-md block" >    
+                    <Link href={'/profile/faq'} >
+                        FAQ
+                    </Link>
+                </button>
+            </div>
             <div className="flex items-center justify-between mb-5">
                 <BackButton />            
-                <h1 className="text-2xl font-bold 2xl ">Profile</h1>
-                <Link href={'/profile/edit'} >
-                    <button className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" >
-                        <IoSettingsOutline />
-                    </button> 
-                </Link>
+                <h1 className="text-2xl font-bold 2xl">Profile</h1>
+                <button className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" 
+                onClick={()=>setSettingsMenu('')}>
+                    <IoSettingsOutline />
+                </button> 
+                
             </div>
             
             <div className="mb-6 text-center">
@@ -48,10 +62,12 @@ const ProfileTransaction = () => {
                         <p className="font-bold">{agent.rating}</p>
                         <p className="text-gray-500 ">Rating</p>
                     </div>
+                    <Link href={'/profile/reviews'} >
                     <div className={statusCountStyle}>
                         <p className="font-bold">{agent.reviews}</p>
                         <p className="text-gray-500">Reviews</p>
                     </div>
+                    </Link>
                     <div className={statusCountStyle}>
                         <p className="font-bold">{agent.sold}</p>
                         <p className="text-gray-500">Sold</p>

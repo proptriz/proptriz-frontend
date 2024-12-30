@@ -57,40 +57,40 @@ const LoginPage: React.FC = () => {
                     <div className="flex-grow h-px bg-gray-300"></div>
                 </div>
                 <div className="relative">
-                    <div className="absolute top-0 left-0 right-0 mx-auto z-10">
-                        <Image src={'/icon/spiral.png'} alt={'spiral'} width={300} height={300} className="" />
+                    <div className="absolute top-0 left-0 right-0 mx-auto z-0">
+                        <Image src={'/icon/spiral.png'} alt={'spiral'} width={400} height={300} className="ml-7 " />
                     </div>
-                    <div className="flex justify-center gap-4 z-20">
+                    <div className="flex justify-center gap-4 relative z-20">
                         <button
                             type="button"
                             onClick={() => handleSocialLogin('Facebook')}
-                            className="z-20 bg-blue-600 text-white p-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="bg-blue-600 text-white p-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <FaFacebookF className='text-xl text-white' />
                         </button>
                         <button
                             type="button"
                             onClick={() => handleSocialLogin('Google')}
-                            className="z-20 bg-red-600 text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="bg-red-600 text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                         >
                             <FaGoogle className='text-xl' />
                         </button>
                         <button
                             type="button"
                             onClick={() => handleSocialLogin('Apple')}
-                            className="z-20 bg-black text-white p-4 rounded-full hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            className="bg-black text-white p-4 rounded-full hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
                         >
                             <FaApple className='text-xl'/>
                         </button>
                     </div>
                 </div>
-                <div className="text-center mt-6 z-20">
-                    <p className="text-sm text-gray-500 z-20 mb-2">                        
+                <div className="text-center mt-6 relative z-20">
+                    <p className="text-gray-500 z-20 mb-2">                        
                         Don&apos;t have an account?{' '}
                     </p>
                     <Link
                         href="/profile/signup"
-                        className="z-20"
+                        className=""
                     >
                         <button
                             className="z-20 w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"

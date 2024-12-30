@@ -123,7 +123,7 @@ export default function PropertyListing() {
                     </Link>
                 )))}
             </div>
-            <Link href={'/property/list'}>
+            <Link href={'/location/list'}>
             <button className="mt-4 text-green">More locations</button>
             </Link>
         </section>

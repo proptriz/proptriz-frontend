@@ -51,7 +51,7 @@ const SignupPage: React.FC = () => {
                     <Link href={'/profile/signup/confirm/phone'}>
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full bg-green text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                         Sign Up
                     </button>
@@ -63,42 +63,42 @@ const SignupPage: React.FC = () => {
                     <div className="flex-grow h-px bg-gray-300"></div>
                 </div>
                 <div className="relative">
-                    <div className="absolute top-0 left-0 right-0 mx-auto z-10">
-                        <Image src={'/icon/spiral.png'} alt={'spiral'} width={400} height={300} className="ml-7" />
+                    <div className="absolute top-0 left-0 right-0 mx-auto z-0">
+                        <Image src={'/icon/spiral.png'} alt={'spiral'} width={400} height={300} className="ml-7 z-0" />
                     </div>
-                    <div className="flex justify-center gap-4 z-20">
+                    <div className="flex justify-center gap-4 z-20 relative">
                         <button
                             type="button"
                             onClick={() => handleSocialLogin('Facebook')}
-                            className="z-20 bg-blue-600 text-white p-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="bg-blue-600 text-white p-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <FaFacebookF className='text-xl text-white' />
                         </button>
                         <button
                             type="button"
                             onClick={() => handleSocialLogin('Google')}
-                            className="z-20 bg-red-600 text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="bg-red-600 text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                         >
                             <FaGoogle className='text-xl' />
                         </button>
                         <button
                             type="button"
                             onClick={() => handleSocialLogin('Apple')}
-                            className="z-20 bg-black text-white p-4 rounded-full hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            className="bg-black text-white p-4 rounded-full hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
                         >
                             <FaApple className='text-xl'/>
                         </button>
                     </div>
                 </div>
-                <div className="text-center mt-8 z-20">
-                    <p className="text-sm font-semibold z-20 mb-2">                        
+                <div className="text-center mt-8 relative z-10">
+                    <p className="font-semibold mb-2">                        
                         Already have an account?{' '}
                     
                         <Link
                             href="/profile/login"
                             className="text-green"
                         >
-                            Login
+                          Login                            
                         </Link>
                     </p>
                 </div>

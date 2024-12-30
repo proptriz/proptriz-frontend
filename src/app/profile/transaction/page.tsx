@@ -5,16 +5,39 @@ import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import { agent } from "@/constant";
 import Link from "next/link";
+import { IoSettingsOutline } from "react-icons/io5";
 
 const ProfileTransaction = () => {
 
     const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
     const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
+    const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
 
     return (
         <div className="p-6 pb-24 relative">
-            <BackButton />            
-            <h1 className="text-2xl font-bold text-center 2xl mb-5">Profile</h1>
+            <div className={`fixed top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white ${settingsMenu}`}>  
+                <button className="text-xl hover:card-bg hover:shadow-md block" >
+                    <Link href={'/profile/edit'} >
+                        Edit Profile
+                    </Link>
+                </button> 
+                
+                <button className="text-xl hover:card-bg hover:shadow-md block" >    
+                    <Link href={'/profile/faq'} >
+                        FAQ
+                    </Link>
+                </button>
+            </div>
+            <div className="flex items-center justify-between mb-5">
+                <BackButton />            
+                <h1 className="text-2xl font-bold 2xl">Profile</h1>
+                <button className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" 
+                onClick={()=>setSettingsMenu('')}>
+                    <IoSettingsOutline />
+                </button> 
+                
+            </div>
+            
             <div className="mb-6 text-center">
                 <div className="flex flex-col items-center mb-2">
                     <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
@@ -39,10 +62,12 @@ const ProfileTransaction = () => {
                         <p className="font-bold">{agent.rating}</p>
                         <p className="text-gray-500 ">Rating</p>
                     </div>
+                    <Link href={'/profile/reviews'} >
                     <div className={statusCountStyle}>
                         <p className="font-bold">{agent.reviews}</p>
                         <p className="text-gray-500">Reviews</p>
                     </div>
+                    </Link>
                     <div className={statusCountStyle}>
                         <p className="font-bold">{agent.sold}</p>
                         <p className="text-gray-500">Sold</p>

@@ -1,5 +1,6 @@
 'use client';
 
+import { ReviewCard } from "@/components/shared/Cards";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import { apartments } from "@/constant";
 import Image from "next/image";
@@ -142,23 +143,13 @@ const PropertyDetail = () => {
                 </div>
                 <div className="mt-3 space-y-3">
                 {/* Review Item */}
-                <div className="flex items-start space-x-3 space-y-3 card-bg p-3 text-sm rounded-xl mt-5">
-                    <img
-                    src="/avatar.png" // Replace with the actual reviewer image URL
-                    alt="Reviewer"
-                    className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                        <div className="flex">
-                            <h3 className="text-sm font-bold">Kurt Mullins</h3>
-                            <div className="flex ml-auto text-yellow-500"><FaStar className="" /><FaStar className="" /><FaRegStar /><FaRegStar /></div>
-                        </div>
-                        
-                        <p className="text-sm text-gray-500">Lorem ipsum dolor sit amet, consectetur 
-                            adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                        </p>
-                    </div>
-                </div>
+                <ReviewCard 
+                reviewer="Kurt Mullins" 
+                image="/avatar.png" 
+                ratings={4.0}
+                text="Lorem ipsum dolor sit amet, consectetur 
+                adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                />
                 {/* Add more reviews here */}
                 </div>
                 <button className="mt-3 text-green">View all reviews</button>

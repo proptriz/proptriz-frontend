@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Lato } from 'next/font/google';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +12,8 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const lato = Lato({ weight: '400', subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: "E Rental Hub",
@@ -25,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`font-Lato antialiased`}
+        className={`bg-background text-black ${lato.className} antialiased`}
       >
         <div className=" w-full md:w-[750px] md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
           {children}

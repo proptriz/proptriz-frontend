@@ -46,9 +46,11 @@ const ConfirmCodePage: React.FC = () => {
                         <Link  href={'#'} className='text-green text-sm'>
                             Resend Code
                         </Link>
+                        <Link href={'/profile/signup/select-location'}>
                         <button className="ml-auto p-5 text-xl bg-green rounded-full shadow-md text-white" onClick={()=>router.back()}>
                             <IoChevronForward className='text-3xl'/>
                         </button>
+                        </Link>
                     </div>
                     
                 </form>

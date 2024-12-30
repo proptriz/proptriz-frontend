@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { BackButton } from "./buttons"
 import { AgentProps } from "@/definitions";
+import Link from "next/link";
 
 
 export default function ProfileInfo( {agent, menu}: { agent: AgentProps, menu: string[] } ){
@@ -36,10 +37,12 @@ export default function ProfileInfo( {agent, menu}: { agent: AgentProps, menu: s
                     <p className="font-bold">{agent.rating}</p>
                     <p className="text-gray-500 ">Rating</p>
                 </div>
+                <Link href={'/profile/reviews'}>
                 <div className={statusCountStyle}>
                     <p className="font-bold">{agent.reviews}</p>
                     <p className="text-gray-500">Reviews</p>
                 </div>
+                </Link>
                 <div className={statusCountStyle}>
                     <p className="font-bold">{agent.sold}</p>
                     <p className="text-gray-500">Sold</p>

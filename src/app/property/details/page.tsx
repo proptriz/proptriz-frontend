@@ -1,21 +1,51 @@
 'use client';
 
+import React, { useState } from "react";
 import { ReviewCard } from "@/components/shared/Cards";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import { apartments } from "@/constant";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React from "react";
-import { FaHeart, FaShareAlt, FaStar, FaBed, } from "react-icons/fa";
+import { FaHeart, FaShareAlt, FaStar, FaBed, FaAngleDown, } from "react-icons/fa";
 import { FaRegStar } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoChatbubbleEllipsesOutline, IoChevronBack } from "react-icons/io5";
 import { TbView360Number } from "react-icons/tb";
 
 const PropertyDetail = () => {
-        const router = useRouter()
+    const router = useRouter();
+    const [toggleLocDist, setToggleLocDist] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState({
+        distance: '2.5 km',
+        address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
+      });
+
+    const locations = [
+        {
+            distance: '2.5 km',
+            address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
+        },
+        {
+            distance: '3.2 km',
+            address: 'from Kebon Jeruk, Jakarta 11530',
+        },
+        {
+            distance: '5.0 km',
+            address: 'from Tanah Abang, Central Jakarta 10250',
+        },
+        {
+            distance: '5.0 km',
+            address: 'from Tanah Abang, Central Jakarta 10250',
+        },
+    ];
+
+    const handleLocationSelect = (location: { distance: string; address: string }) => {
+        setSelectedLocation(location);
+        setToggleLocDist(false); // Close the popup after selecting
+    };
+
     return (
-        <div className="flex flex-col pb-16">
+        <div className="flex flex-col pb-16 relative">
             {/* Header Section */}
             <div className="relative">
                 <img
@@ -101,10 +131,16 @@ const PropertyDetail = () => {
             <div className="px-5 mt-10 space-y-3">
                 <h2 className="text-lg font-bold mb-3">Location & Public Facilities</h2>
                 <p className="mt-3 text-gray-500"></p>
-                <select className="card-bg p-4 w-full rounded-full w-[70%] mx-auto">
-                    <option value="1">2.5 km from your location</option>
-                    <option value="1">3.5 km from your location</option>
-                </select>
+                <div
+                    className="card-bg p-4 w-full flex justify-between items-center rounded-full"
+                    onClick={() => setToggleLocDist(!toggleLocDist)}
+                >
+                    <p className="text-gray-500">
+                        <span className="font-bold">{selectedLocation.distance} </span>
+                        {selectedLocation.address}
+                    </p>
+                    <FaAngleDown className={`transform transition-transform ${toggleLocDist ? 'rotate-180' : 'rotate-0'}`} />
+                </div>
 
                 <div className="px-5 py-3 flex overflow-x-auto space-x-4 mt-3">
                     <div className="card-bg flex p-3 rounded-full text-sm text-gray-500 items-center">
@@ -128,7 +164,7 @@ const PropertyDetail = () => {
                     height={200}
                     className="w-full h-[200px] object-contain"
                     />
-                    <button className="w-full py-4 card-bg">View on map</button>
+                    <button className="w-full py-4 card-bg" onClick={()=>router.push('/property/detail-map')}>View on map</button>
                 </div>
                 
             </div>
@@ -144,15 +180,17 @@ const PropertyDetail = () => {
                 <div className="mt-3 space-y-3">
                 {/* Review Item */}
                 <ReviewCard 
+                id='01'
                 reviewer="Kurt Mullins" 
                 image="/avatar.png" 
                 ratings={4.0}
                 text="Lorem ipsum dolor sit amet, consectetur 
                 adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
                 />
                 {/* Add more reviews here */}
                 </div>
-                <button className="mt-3 text-green">View all reviews</button>
+                <button className="mt-3 text-green" onClick={()=>router.push('/property/reviews')}>View all reviews</button>
             </div>
 
             {/* Nearby Properties */}
@@ -179,6 +217,46 @@ const PropertyDetail = () => {
                 {/* Add more cards here */}
                 </div>
             </div>
+
+            {/* Location popup */}
+            <div className={`absolute w-full h-full z-0 ${
+                toggleLocDist ? '' : 'hidden'
+                }`}
+                onClick={()=>setToggleLocDist(false)}   
+            >
+                <div
+                    className={`h-[45%] bg-white fixed bottom-0 w-full rounded-t-3xl p-6 ease-linear transition-transform z-10  ${
+                    toggleLocDist ? 'translate-y-0' : 'translate-y-full'
+                    }`}
+                >
+                    <div className="h-px w-16 mx-auto bg-black"></div>
+
+                    <div className="flex justify-between mt-8 items-center">
+                        <h2 className="text-lg font-bold mb-3">Location Distance</h2>
+                        <button className="bg-green px-4 py-2 text-white rounded-full">Edit</button>
+                    </div>
+                    <div className="h-[80%] overflow-y-auto">
+                        {locations.map((location, index) => (
+                        <div
+                            key={index}
+                            className="rounded-full p-4 border border-[#DCDFD9] my-4 cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleLocationSelect(location)}
+                        >
+                            <div className="flex items-center">
+                                <button className="card-bg rounded-full p-3 mr-2" disabled>
+                                    <HiOutlineLocationMarker />
+                                </button>
+                                <p className="text-gray-500">
+                                    <span className="font-bold">{location.distance} </span>
+                                    {location.address}
+                                </p>
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+            
         </div>
     );
 };

@@ -1,9 +1,34 @@
+import { LocationProps } from "./definitions";
+
 export const topLocation = [
     { image: '/avatar.png', name: 'Idumata Lagos' },
     { image: '/avatar.png', name: 'Tanke Ilorin' },
     { image: '/avatar.png', name: 'Garki Abuja' },
     { image: '/avatar.png', name: 'Jimeta Yola' },
 ]
+
+export const locations: LocationProps[] = [
+    {   
+        id: '01',
+        distance: 2.5,
+        address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
+    },
+    {   
+        id: '02',
+        distance: 3.2,
+        address: 'from Kebon Jeruk, Jakarta 11530',
+    },
+    {   
+        id: '03',
+        distance: 5.0,
+        address: 'from Tanah Abang, Central Jakarta 10250',
+    },
+    {
+        id: '04',
+        distance: 5.0,
+        address: 'from Tanah Abang, Central Jakarta 10250',
+    },
+];
 
 export const apartments = [
     {
@@ -14,7 +39,8 @@ export const apartments = [
         address: 'Jimeta, Yola', 
         price: 10,
         period: 'month',
-        type: ""
+        type: "",
+        // agent: agent,
     },
     {
         id: '02pro',
@@ -24,7 +50,8 @@ export const apartments = [
         address: 'Alagbado, Ilorin', 
         price: 100,
         period: 'year',
-        type: ""
+        type: "",
+        // agent: agent,
     },
     {
         id: '03pro',
@@ -34,7 +61,8 @@ export const apartments = [
         address: 'Jimeta, Yola', 
         price: 250,
         period: 'year',
-        type: ""
+        type: "",
+        // agent: agent,
     },
     {
         id: '04pro',
@@ -44,7 +72,8 @@ export const apartments = [
         address: 'Ikorodu, Lagos', 
         price: 250,
         period: 'year',
-        type: ""
+        type: "",
+        // agent: agent,
     },
 ]
 
@@ -93,3 +122,51 @@ export const agent = {
         }
     ]
 };
+
+
+export const Reviews = [
+    {
+        id: '01',
+        reviewer: "Ekenta Martins",
+        image: "/avatar.png",
+        ratings: 2.5,
+        comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        reviewImages:[
+            "/apartment.png",
+            "/home/building3.png",
+            "/home/building4.png",
+            "/home/house-with-pool.png",
+        ],
+        reviewDate: "2025-01-01T03:04:20Z" // Example ISO 8601 date string
+
+    },
+    {
+        id: '02',
+        reviewer: "Yusuf Adisa",
+        image: "/avatar.png",
+        ratings: 5.0,
+        comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        reviewImages:[
+            "/home/house-with-pool.png",
+            "/apartment.png",
+            "/home/building3.png",
+            "/home/building4.png",            
+        ],
+        reviewDate: "2025-01-01T03:04:20Z" // Example ISO 8601 date string
+    },
+    {
+        id: '03',
+        reviewer: "Aliyu Adam",
+        image: "/avatar.png",
+        ratings: 4.0,
+        comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        reviewImages:[
+            "/home/building3.png",
+            "/apartment.png",
+            "/home/house-with-pool.png",          
+            "/home/building4.png",            
+        ],
+        reviewDate: "2024-01-01T10:04:20Z" // Example ISO 8601 date string
+
+    },
+]

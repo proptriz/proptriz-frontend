@@ -21,10 +21,24 @@ export interface PropertyProps {
     period: string
   }
 
-// export cont agent = {
-//     name: "Amanda",
-//     email: "amanda.trust@email.com",
-//     rating: 5.0,
-//     reviews: 235,
-//     sold: 112,
-//     listings: 
+  export interface ReviewCardProps {
+    id: string;
+    reviewer: string;
+    text: string;
+    ratings: number;
+    image: string;
+    reviewImages?: string[];
+    reviewDate: string; // ISO 8601 date string
+  }
+
+  export interface LocationProps {
+    id: string;
+    distance: number;
+    address: string;
+  }
+
+  export interface LandmarkProps {
+    id: string,
+    image: string,
+    location: string, // derived from LocationProps
+  }

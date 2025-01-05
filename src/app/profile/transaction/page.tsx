@@ -18,7 +18,7 @@ const ProfileTransaction = () => {
             <div className={`fixed top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white ${settingsMenu}`}>  
                 <button className="text-xl hover:card-bg hover:shadow-md block" >
                     <Link href={'/profile/edit'} >
-                        Edit Profile
+                        Edit profile
                     </Link>
                 </button> 
                 <button className="text-xl hover:card-bg hover:shadow-md block" >    

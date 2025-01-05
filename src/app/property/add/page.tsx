@@ -1,113 +1,116 @@
 'use client';
 
-import { useState } from "react";
-import Counter from "@/components/Counter";
+import { BackButton } from "@/components/shared/buttons";
+import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
-import TagSelector from "@/components/TagSelector";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
+import { IoHomeOutline } from "react-icons/io5";
 
-export default function AddListing() {
-  const [sellPrice, setSellPrice] = useState("$ 180,000");
-  const [rentPrice, setRentPrice] = useState("$ 315");
-  const [rentType, setRentType] = useState("Monthly");
-  const [bedroom, setBedroom] = useState(3);
-  const [bathroom, setBathroom] = useState(2);
-  const [balcony, setBalcony] = useState(2);
-  const [totalRooms, setTotalRooms] = useState("< 4");
-  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+export default function AddPropertyPage() {
+  const [propertyTitle, setPropertyTitle] = useState<string>("");
+  const [price, setPrice] = useState<number>(180000);
+  const [rentType, setRentType] = useState<string>("Monthly");
+  const [listedFor, setListedFor] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
 
-  const facilities = [
-    "Parking Lot",
-    "Pet Allowed",
-    "Garden",
-    "Gym",
-    "Park",
-    "Home theatre",
-    "Kid’s Friendly",
+  const categories = [
+    { title: "House", value: "house" },
+    { title: "Land", value: "land" },
+    { title: "Shop", value: "shop" },
+    { title: "Office", value: "office" },
+    { title: "Hotel", value: "hotel" },
   ];
 
-  const handleToggleFacility = (facility: string) => {
-    setSelectedFacilities((prev) =>
-      prev.includes(facility)
-        ? prev.filter((item) => item !== facility)
-        : [...prev, facility]
-    );
-  };
+  const listingTypes = [
+    { title: "Sell", value: "sell" },
+    { title: "Rent", value: "rent" },
+  ];
+
+  useEffect(() => {
+    console.log("Selected value:", listedFor);
+    console.log("Selected value:", category);
+  }, [listedFor, category]);
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">
-        <span className="text-green-600">Almost finish</span>, complete the
-        listing
-      </h1>
+    <div className="p-6 pb-16 min-h-screen">
+      {/* Back button */}
+      <header className="flex w-full mb-16">
+        <BackButton />
+        <h1 className="text-center w-full">Add Property</h1>
+      </header>
 
-      {/* Sell Price */}
-      <div className="my-4">
-        <label className="block text-gray-700 mb-2">Sell Price</label>
-        <input
-          type="text"
-          value={sellPrice}
-          onChange={(e) => setSellPrice(e.target.value)}
-          className="w-full border rounded-md px-4 py-2"
-        />
+      <h2 className="text-3xl mb-7">
+        Hi User, Fill Details of your <span className="font-semibold">property</span>
+      </h2>
+      <div>
+        {/* Property Title */}
+        <div className="flex card-bg p-3 rounded-full shadow-md">
+          <input
+            name="tittle"
+            value={propertyTitle}
+            onChange={(e) => setPropertyTitle(e.target.value)}
+            type="text"
+            placeholder="Property title Here"
+            className="w-full outline-none card-bg"
+          />
+          <button className="text-gray-500 text-lg px-3" disabled>
+            <IoHomeOutline className="font-bold" />
+          </button>
+        </div>
+
+        {/* Listed For */}
+        <h3 className="mt-10 text-lg font-semibold">Listed For</h3>
+        <SelectButton list={listingTypes} setValue={setListedFor} name="listedFor" />
+
+        {/* Listing Price */}
+        <div className="my-4">
+          <label className="block mb-2 mt-10 text-lg font-semibold">
+            {listedFor === "rent" ? "Rent Price" : "Sell Price"}
+          </label>
+          <div className="flex card-bg p-3 rounded-lg shadow-md">
+            <input
+              name="price"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              type="number"
+              placeholder="Property price here"
+              className="w-full outline-none card-bg"
+            />
+            <button className="text-gray-500 text-lg px-3">
+              <FaNairaSign className="font-bold" />
+            </button>
+          </div>
+        </div>
+
+        {listedFor === "rent" && (
+          <div className="my-4">
+            <ToggleButtons
+              options={["Monthly", "Yearly"]}
+              selected={rentType}
+              onChange={setRentType}
+            />
+          </div>
+        )}
+
+        {/* Property Category */}
+        <h3 className="mt-10 text-lg font-semibold">Property Category</h3>
+        <SelectButton list={categories} setValue={setCategory} name="category" />
+
+        {/* Navigation Buttons */}
+        <div className="w-full mx-auto">
+          <div className="flex mt-16 gap-5 bottom-3">
+            <button className="px-2 py-2 bg-white rounded-full flex items-center shadow-md">
+              <FaArrowLeft className="text-xl" />
+            </button>
+            <Link href={'/property/add/location'} className="flex-grow">
+              <button className="px-4 py-2 bg-green text-white rounded-md w-full">Next</button>
+            </Link>
+          </div>
+        </div>
+        
       </div>
-
-      {/* Rent Price */}
-      <div className="my-4">
-        <label className="block text-gray-700 mb-2">Rent Price</label>
-        <input
-          type="text"
-          value={rentPrice}
-          onChange={(e) => setRentPrice(e.target.value)}
-          className="w-full border rounded-md px-4 py-2"
-        />
-        <ToggleButtons
-          options={["Monthly", "Yearly"]}
-          selected={rentType}
-          onChange={setRentType}
-        />
-      </div>
-
-      {/* Property Features */}
-      <h2 className="text-lg font-semibold mb-2">Property Features</h2>
-      <Counter
-        label="Bedroom"
-        value={bedroom}
-        onIncrement={() => setBedroom(bedroom + 1)}
-        onDecrement={() => setBedroom(Math.max(0, bedroom - 1))}
-      />
-      <Counter
-        label="Bathroom"
-        value={bathroom}
-        onIncrement={() => setBathroom(bathroom + 1)}
-        onDecrement={() => setBathroom(Math.max(0, bathroom - 1))}
-      />
-      <Counter
-        label="Balcony"
-        value={balcony}
-        onIncrement={() => setBalcony(balcony + 1)}
-        onDecrement={() => setBalcony(Math.max(0, balcony - 1))}
-      />
-
-      {/* Total Rooms */}
-      <h2 className="text-lg font-semibold mb-2">Total Rooms</h2>
-      <ToggleButtons
-        options={["< 4", "4", "6"]}
-        selected={totalRooms}
-        onChange={setTotalRooms}
-      />
-
-      {/* Facilities */}
-      <h2 className="text-lg font-semibold mb-2">Environment / Facilities</h2>
-      <TagSelector
-        tags={facilities}
-        selectedTags={selectedFacilities}
-        onToggle={handleToggleFacility}
-      />
-
-      {/* Finish Button */}
-      <button className="w-full bg-green-500 text-white py-2 rounded-md mt-6">
-        Finish
-      </button>
     </div>
   );
 }

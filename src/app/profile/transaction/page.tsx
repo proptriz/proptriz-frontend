@@ -21,7 +21,16 @@ const ProfileTransaction = () => {
                         Edit Profile
                     </Link>
                 </button> 
-                
+                <button className="text-xl hover:card-bg hover:shadow-md block" >    
+                    <Link href={'/property/add'} >
+                        List new property
+                    </Link>
+                </button> 
+                <button className="text-xl hover:card-bg hover:shadow-md block" >    
+                    <Link href={'/profile/reviews'} >
+                        Check reviews 
+                    </Link>
+                </button>                
                 <button className="text-xl hover:card-bg hover:shadow-md block" >    
                     <Link href={'/profile/faq'} >
                         FAQ

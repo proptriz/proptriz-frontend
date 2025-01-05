@@ -13,10 +13,25 @@ const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function RootPage() {
   const [ mapOrList, setMapOrList ] = useState<string>('map')
+  const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
+
   return (
     <div className="flex flex-col pt-5 pb-16">
       {/* Header */}
       <header className="p-4 flex justify-between items-center relative">
+        <div className={`fixed top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white ${settingsMenu}`}>  
+            <button className="text-xl hover:card-bg hover:shadow-md block" >
+                <Link href={'/profile/login'} >
+                    Login
+                </Link>
+            </button> 
+            
+            <button className="text-xl hover:card-bg hover:shadow-md block" >    
+                <Link href={'/profile/transaction'} >
+                  Transaction
+                </Link>
+            </button>
+        </div>
         {/* Centered Banner */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <img
@@ -28,13 +43,13 @@ export default function RootPage() {
 
         {/* Notification & Profile Section */}
         <div className="flex items-center space-x-4 ml-auto"> 
-          <Link href="/profile/login">
+          <button onClick={()=>setSettingsMenu('')}>
           <img
             src="/avatar.png"
             alt="profile"
             className="rounded-full w-10 h-10"
           />
-          </Link>         
+          </button>         
           
           <button className="text-gray-500 text-xl"><FaRegBell /></button>
         </div>

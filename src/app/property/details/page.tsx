@@ -14,7 +14,7 @@ import { TbView360Number } from "react-icons/tb";
 
 const PropertyDetail = () => {
     const router = useRouter();
-    const [toggleLocDist, setToggleLocDist] = useState(false);
+    const [togglePopup, setTogglePopup] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState({
         distance: '2.5 km',
         address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
@@ -41,11 +41,16 @@ const PropertyDetail = () => {
 
     const handleLocationSelect = (location: { distance: string; address: string }) => {
         setSelectedLocation(location);
-        setToggleLocDist(false); // Close the popup after selecting
+        setTogglePopup(false); // Close the popup after selecting
     };
 
     return (
         <div className="flex flex-col pb-16 relative">
+            <div className={`absolute top-0 left-0 w-full h-full z-0 bg-blue-200 opacity-75 ${
+          togglePopup ? '' : 'hidden'
+          }`}
+          onClick={()=>setTogglePopup(false)}
+      ></div>
             {/* Header Section */}
             <div className="relative">
                 <img
@@ -133,13 +138,13 @@ const PropertyDetail = () => {
                 <p className="mt-3 text-gray-500"></p>
                 <div
                     className="card-bg p-4 w-full flex justify-between items-center rounded-full"
-                    onClick={() => setToggleLocDist(!toggleLocDist)}
+                    onClick={() => setTogglePopup(!togglePopup)}
                 >
                     <p className="text-gray-500">
                         <span className="font-bold">{selectedLocation.distance} </span>
                         {selectedLocation.address}
                     </p>
-                    <FaAngleDown className={`transform transition-transform ${toggleLocDist ? 'rotate-180' : 'rotate-0'}`} />
+                    <FaAngleDown className={`transform transition-transform ${togglePopup ? 'rotate-180' : 'rotate-0'}`} />
                 </div>
 
                 <div className="px-5 py-3 flex overflow-x-auto space-x-4 mt-3">
@@ -219,14 +224,9 @@ const PropertyDetail = () => {
             </div>
 
             {/* Location popup */}
-            <div className={`absolute w-full h-full z-0 ${
-                toggleLocDist ? '' : 'hidden'
-                }`}
-                onClick={()=>setToggleLocDist(false)}   
-            >
                 <div
                     className={`h-[45%] bg-white fixed bottom-0 w-full rounded-t-3xl p-6 ease-linear transition-transform z-10  ${
-                    toggleLocDist ? 'translate-y-0' : 'translate-y-full'
+                    togglePopup ? 'translate-y-0' : 'translate-y-full'
                     }`}
                 >
                     <div className="h-px w-16 mx-auto bg-black"></div>
@@ -255,7 +255,6 @@ const PropertyDetail = () => {
                         ))}
                     </div>
                 </div>
-            </div>
             
         </div>
     );

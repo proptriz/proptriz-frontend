@@ -18,8 +18,8 @@ const ToggleButtons: React.FC<ToggleProps> = ({
           key={option}
           className={`px-4 py-2 rounded-md ${
             selected === option
-              ? "bg-green-500 text-white"
-              : "bg-gray-200 text-gray-700"
+              ? "bg-green text-white"
+              : "card-bg"
           }`}
           onClick={() => onChange(option)}
         >

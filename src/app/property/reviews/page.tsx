@@ -11,9 +11,9 @@ const PropertyReviews = () => {
     const router = useRouter();
 
     return (
-        <div className="flex flex-col p-6 pb-16">
+        <div className="flex flex-col p-6 pb-7">
             {/* Header Section */}
-            <header className="flex w-full mb-10">
+            <header className="flex w-full mb-7">
                 <BackButton />
                 <h1 className="text-center w-full">Reviews</h1>
             </header>
@@ -46,10 +46,10 @@ const PropertyReviews = () => {
             </div>
 
             {/* Reviews */}
-            <div className="px-5 mt-10">
+            <div className="px-5 mt-7">
                 <h2 className="text-lg font-bold mb-3">User Reviews</h2>
                 
-                <div className="space-y-6 max-h-[500px] overflow-y-auto">
+                <div className="space-y-6 max-h-[470px] overflow-y-auto pb-14">
                     {/* Review Item */}
                     <ReviewCard 
                         id='01'

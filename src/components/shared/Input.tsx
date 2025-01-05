@@ -1,6 +1,7 @@
 'use client';
-import { SetStateAction, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { ImEye, ImEyeBlocked } from "react-icons/im";
+import { IoHomeOutline } from "react-icons/io5";
 interface PasswordInputProps {
     password: string, 
     setPassword: React.Dispatch<SetStateAction<string>>,
@@ -73,3 +74,44 @@ export const TextInput = (props:any )=> {
         </>
     )
 }
+interface ListItem {
+  title: string;
+  value: string;
+}
+
+export const SelectButton: React.FC<{
+  list: ListItem[];
+  setValue: (value: string) => void;
+  name: string;
+}> = ({ list, setValue, name }) => {
+  const [selectedValue, setSelectedValue] = useState<string>(list[0]?.value || "");
+
+  useEffect(() => {
+    // Set the default value as the first item's value
+    setValue(selectedValue);
+  }, [selectedValue, setValue]);
+
+  const handleSelection = (value: string) => {
+    setSelectedValue(value);
+  };
+
+  return (
+    <div className="space-x-4 space-y-5">
+      {list &&
+        list.map((item, index) => (
+          <button
+            key={index}
+            name={name}
+            className={`px-6 py-3 shadow-md rounded-md ${
+              selectedValue === item.value ? "bg-gray-700 text-white" : "card-bg"
+            }`}
+            onClick={() => handleSelection(item.value)}
+          >
+            {item.title}
+          </button>
+        ))}
+    </div>
+  );
+};
+
+

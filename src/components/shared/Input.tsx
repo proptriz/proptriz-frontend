@@ -96,14 +96,14 @@ export const SelectButton: React.FC<{
   };
 
   return (
-    <div className="space-x-4 space-y-5">
+    <div className="space-x-4 space-y-5 text-sm">
       {list &&
         list.map((item, index) => (
           <button
             key={index}
             name={name}
             className={`px-6 py-3 shadow-md rounded-md ${
-              selectedValue === item.value ? "bg-gray-700 text-white" : "card-bg"
+              selectedValue === item.value ? "bg-green text-white" : "card-bg"
             }`}
             onClick={() => handleSelection(item.value)}
           >

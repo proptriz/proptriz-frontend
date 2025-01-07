@@ -45,7 +45,7 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
 
       {/* Details Section */}
       <div className="flex-1">
-        <h3 className="text-lg font-semibold">{name}</h3>
+        <h3 className="font-semibold">{name}</h3>
         <div className="flex items-center space-x-1 text-gray-500 text-sm mt-1">
           <FaStar className="text-yellow-400" />
           <span>{rating}</span>
@@ -54,7 +54,7 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
           <HiOutlineLocationMarker />
           <span>{address}</span>
         </div>
-        <div className="text-green-500 font-bold text-lg mt-2">${price}/{period}</div>
+        <div className="text-green-500 font-bold mt-2">${price}/{period}</div>
       </div>
     </div>
   );

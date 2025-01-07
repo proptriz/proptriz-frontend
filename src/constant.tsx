@@ -170,3 +170,10 @@ export const Reviews = [
 
     },
 ]
+
+
+export const styles = {
+    H2: "font-semibold mt-10 mb-3",
+    GREENBTN: "bg-green",
+    GRAYBUTTON: "card-bg"
+}

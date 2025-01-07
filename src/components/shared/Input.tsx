@@ -96,7 +96,7 @@ export const SelectButton: React.FC<{
   };
 
   return (
-    <div className="space-x-4 space-y-5">
+    <div className="space-x-4 space-y-5 text-sm">
       {list &&
         list.map((item, index) => (
           <button

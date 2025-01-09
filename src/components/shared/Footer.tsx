@@ -10,7 +10,7 @@ const menus = [
 
 const Footer: React.FC = () => {
   return (
-    <footer className="fixed bottom-0 w-full bg-gray-200 p-4 flex justify-around shadow-md max-w-[750px] z-10">
+    <footer className="fixed bottom-0 w-full bg-gray-200 p-4 flex justify-around shadow-md max-w-[650px] z-10">
       {menus.map((menu, index) => (
         <button key={index} className="flex flex-col items-center text-gray-700">
           <div className="text-2xl">{menu.icon}</div>

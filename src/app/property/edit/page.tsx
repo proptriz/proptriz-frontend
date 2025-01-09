@@ -12,6 +12,7 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoClose, IoHomeOutline } from "react-icons/io5";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import Image from "next/image";
+import { categories } from "@/constant";
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function AddPropertyPage() {
@@ -25,14 +26,6 @@ export default function AddPropertyPage() {
   const [photos, setPhotos] = useState<File[]>([]);
   
   const maxPhotos = 5;
-
-  const categories = [
-    { title: "House", value: "house" },
-    { title: "Land", value: "land" },
-    { title: "Shop", value: "shop" },
-    { title: "Office", value: "office" },
-    { title: "Hotel", value: "hotel" },
-  ];
 
   const listingTypes = [
     { title: "Sell", value: "sell" },

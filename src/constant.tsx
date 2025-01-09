@@ -1,5 +1,14 @@
 import { LocationProps } from "./definitions";
 
+export const categories = [
+    { title: "House", value: "house" },
+    { title: "Land", value: "land" },
+    { title: "Shop", value: "shop" },
+    { title: "Office", value: "office" },
+    { title: "Hotel", value: "hotel" },
+  ];
+
+
 export const topLocation = [
     { image: '/avatar.png', name: 'Idumata Lagos' },
     { image: '/avatar.png', name: 'Tanke Ilorin' },
@@ -174,6 +183,6 @@ export const Reviews = [
 
 export const styles = {
     H2: "font-semibold mt-10 mb-3",
-    GREENBTN: "bg-green",
-    GRAYBUTTON: "card-bg"
+    GREENBTN: "bg-green text-white px-5 py-4 rounded-lg",
+    GRAYBUTTON: "card-bg px-5 py-4"
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -10,7 +11,10 @@ const SearchBar: React.FC = () => {
             placeholder="Search House, Apartment, etc"
             className="w-full outline-none text-gray-500"
           />
-          <button className="text-gray-500 text-lg px-3"><FiSearch className="font-bold"/></button>
+          <Link href="/search/result">
+            <button className="text-gray-500 text-lg px-3"><FiSearch className="font-bold"/></button>
+          </Link>
+          
         </div>
     </div>
   );

@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`bg-background text-black ${lato.className} antialiased`}
       >
-        <div className=" w-full md:w-[750px] md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
+        <div className="w-full md:w-[650px] md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
           {children}
         </div> 
       </body>

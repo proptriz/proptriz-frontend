@@ -25,7 +25,7 @@ jobs:
       - name: Merge dev to main
         uses: repo-sync/pull-request@v2
         with:
-          github_token: ${{ secrets._GITHUB_TOKEN }}
+          # github_token: ${{ secrets._GITHUB_TOKEN }}
           source_branch: "dev"
           destination_branch: "main"
           pr_title: "Automated PR to merge dev to main"

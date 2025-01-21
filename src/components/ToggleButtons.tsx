@@ -16,10 +16,10 @@ const ToggleButtons: React.FC<ToggleProps> = ({
       {options.map((option) => (
         <button
           key={option}
-          className={`px-4 py-2 rounded-md ${
+          className={`px-4 py-2 rounded-md text-sm ${
             selected === option
-              ? "bg-green-500 text-white"
-              : "bg-gray-200 text-gray-700"
+              ? "bg-green text-white"
+              : "card-bg"
           }`}
           onClick={() => onChange(option)}
         >

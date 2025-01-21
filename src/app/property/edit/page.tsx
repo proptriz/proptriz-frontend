@@ -1,271 +1,254 @@
 'use client';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import dynamic from 'next/dynamic';
+import { BackButton } from "@/components/shared/buttons";
+import HorizontalCard from "@/components/shared/HorizontalCard";
+import { SelectButton } from "@/components/shared/Input";
+import ToggleButtons from "@/components/ToggleButtons";
+import { apartments } from "@/constant";
+import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
+import { HiOutlineLocationMarker } from "react-icons/hi";
+import { IoClose, IoHomeOutline } from "react-icons/io5";
+import AddPropertyDetails from "@/components/property/AddDetailsSection";
+import Image from "next/image";
+import { categories } from "@/constant";
+const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
-import React, { useState } from "react";
+export default function AddPropertyPage() {
+  const [togglePopup, setTogglePopup] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(true);
+  const [propertyTitle, setPropertyTitle] = useState<string>("");
+  const [price, setPrice] = useState<number>(180000);
+  const [rentType, setRentType] = useState<string>("Monthly");
+  const [listedFor, setListedFor] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [photos, setPhotos] = useState<File[]>([]);
+  
+  const maxPhotos = 5;
 
-const EditProperty = () => {
-  const [listingType, setListingType] = useState("Rent");
-  const [propertyCategory, setPropertyCategory] = useState("House");
-  const [sellPrice, setSellPrice] = useState(150000);
-  const [rentPrice, setRentPrice] = useState(320);
-  const [rentDuration, setRentDuration] = useState("Monthly");
-  const [bedrooms, setBedrooms] = useState(2);
-  const [balconies, setBalconies] = useState(1);
-  const [totalRooms, setTotalRooms] = useState("<4");
-  const [facilities, setFacilities] = useState([
-    "Parking Lot",
-    "Pet Allowed",
-  ]);
+  const listingTypes = [
+    { title: "Sell", value: "sell" },
+    { title: "Rent", value: "rent" },
+  ];
 
-  const toggleFacility = (facility: string) => {
-    setFacilities((prev) =>
-      prev.includes(facility)
-        ? prev.filter((item) => item !== facility)
-        : [...prev, facility]
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return;
+
+    const uploadedFiles = Array.from(event.target.files);
+    const validFiles = uploadedFiles.filter(
+      (file) =>
+        file.type.startsWith("image/") && file.size <= 5 * 1024 * 1024 // Max size 5MB
     );
+
+    if (photos.length + validFiles.length > maxPhotos) {
+      alert(`You can only upload up to ${maxPhotos} photos.`);
+      return;
+    }
+
+    setPhotos((prevPhotos) => [...prevPhotos, ...validFiles]);
   };
 
-  const updateProperty = () => {
-    // Handle property update logic here
-    console.log({
-      listingType,
-      propertyCategory,
-      sellPrice,
-      rentPrice,
-      rentDuration,
-      bedrooms,
-      balconies,
-      totalRooms,
-      facilities,
-    });
+  const removePhoto = (index: number) => {
+    setPhotos((prevPhotos) => prevPhotos.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    console.log("Selected value:", listedFor);
+    console.log("Selected value:", category);
+  }, [listedFor, category]);
+
+  const handleSubmit = () => {
+    // setSelectedFacilities([...selectedFacilities, ...customFacilities])
+    // const extraDetails = {
+    //   negotiable: negotiableToggle,
+    //   features: features,
+    //   facilities: selectedFacilities,
+    // }
+    console.log('submission successfull: ')
+    setSubmitSuccess(true)
+  }
 
   return (
-    <div className="p-6">
-      <header className="mb-4 flex items-center justify-between">
-        <button className="text-blue-500 text-lg">←</button>
-        <h1 className="text-lg font-bold">Edit Listing</h1>
+    <div className="p-6 pb-16 min-h-screen relative">
+      {/* Back button */}
+      <header className="flex w-full mb-16">
+        <BackButton />
+        <h2 className="text-center w-full font-bold">Edit Listing</h2>
       </header>
 
-      {/* Property Info */}
-      <div className="bg-white shadow-md p-4 rounded-lg">
-        <div className="flex items-center mb-4">
-          <img
-            src="/house-thumbnail.jpg" // Replace with actual property image
-            alt="Property"
-            className="w-20 h-20 rounded-md object-cover mr-4"
+      {/* Property Card */}
+      <div className="">
+        {apartments.slice(0, 1).map(((info, key)=>(
+          <HorizontalCard 
+            id={''}
+            name={info.name} 
+            price={30} 
+            type="" 
+            address={info.address} 
+            image={info.image} 
+            period={info.period} 
+            rating={info.rating}
+            key={key}
           />
-          <div>
-            <h2 className="text-lg font-bold">Schoolview House</h2>
-            <p className="text-sm text-gray-500">Semarang, Indonesia</p>
-          </div>
-        </div>
-
-        {/* Listing Title */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">Listing Title</label>
+        )))}
+      </div>
+      
+      <div>
+        {/* Property Title */}
+        <h3 className="mt-10 font-semibold">Listing Title</h3>
+        <div className="flex card-bg p-3 rounded-full shadow-md">
           <input
+            name="tittle"
+            value={propertyTitle}
+            onChange={(e) => setPropertyTitle(e.target.value)}
             type="text"
-            placeholder="Schoolview House"
-            className="w-full border rounded-md px-4 py-2"
+            placeholder="Property title Here"
+            className="w-full outline-none card-bg text-sm"
           />
+          <button className="text-gray-500 text-lg px-3" disabled>
+            <IoHomeOutline className="font-bold" />
+          </button>
         </div>
 
-        {/* Listing Type */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">Listing Type</label>
-          <div className="flex gap-4">
-            {["Rent", "Sell"].map((type) => (
-              <button
-                key={type}
-                className={`px-4 py-2 rounded-md ${
-                  listingType === type ? "bg-blue-500 text-white" : "bg-gray-200"
-                }`}
-                onClick={() => setListingType(type)}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Listed For */}
+        <h3 className="mt-10 font-semibold">Listed For</h3>
+        <SelectButton list={listingTypes} setValue={setListedFor} name="listedFor" />
 
-        {/* Property Category */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">
-            Property Category
+        {/* Listing Price */}
+        <div className="my-4">
+          <label className="block mt-10 font-semibold">
+            {listedFor === "rent" ? "Rent Price" : "Sell Price"}
           </label>
-          <div className="flex gap-2">
-            {["House", "Apartment", "Hotel", "Villa", "Cottage"].map(
-              (category) => (
-                <button
-                  key={category}
-                  className={`px-4 py-2 rounded-md ${
-                    propertyCategory === category
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200"
-                  }`}
-                  onClick={() => setPropertyCategory(category)}
-                >
-                  {category}
-                </button>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Location */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">Location</label>
-          <input
-            type="text"
-            placeholder="Jl. Gerungsari, Bulusan..."
-            className="w-full border rounded-md px-4 py-2"
-          />
-        </div>
-
-        {/* Listing Photos */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">
-            Listing Photos
-          </label>
-          <div className="flex gap-2">
-            {/* Mockup photos */}
-            <div className="relative">
-              <img
-                src="/house-photo-1.jpg"
-                alt="Photo 1"
-                className="w-20 h-20 object-cover rounded-md"
-              />
-              <button className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
-                ✖
-              </button>
-            </div>
-            <button className="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center">
-              +
+          <div className="flex card-bg p-3 rounded-lg shadow-md mt-2">
+            <input
+              name="price"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              type="number"
+              placeholder="Property price here"
+              className="w-full outline-none card-bg text-sm"
+            />
+            <button className="text-gray-500 text-lg px-3">
+              <FaNairaSign className="font-bold" />
             </button>
           </div>
         </div>
 
-        {/* Pricing */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">Sell Price</label>
-          <div className="flex items-center">
-            <input
-              type="number"
-              value={sellPrice}
-              onChange={(e) => setSellPrice(Number(e.target.value))}
-              className="w-full border rounded-md px-4 py-2 mr-2"
+        {listedFor === "rent" && (
+          <div className="my-4">
+            <ToggleButtons
+              options={["Monthly", "Yearly"]}
+              selected={rentType}
+              onChange={setRentType}
             />
-            <span className="text-gray-500">$</span>
           </div>
-        </div>
+        )}
 
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">Rent Price</label>
-          <div className="flex items-center mb-2">
-            <input
-              type="number"
-              value={rentPrice}
-              onChange={(e) => setRentPrice(Number(e.target.value))}
-              className="w-full border rounded-md px-4 py-2 mr-2"
-            />
-            <span className="text-gray-500">$</span>
-          </div>
-          <div className="flex gap-4">
-            {["Monthly", "Yearly"].map((duration) => (
-              <button
-                key={duration}
-                className={`px-4 py-2 rounded-md ${
-                  rentDuration === duration
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200"
-                }`}
-                onClick={() => setRentDuration(duration)}
-              >
-                {duration}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Property Features */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">Property Features</label>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center">
-              <label className="text-sm font-medium mr-2">Bedroom</label>
-              <button
-                className="bg-gray-200 px-2"
-                onClick={() => setBedrooms(Math.max(0, bedrooms - 1))}
-              >
-                -
-              </button>
-              <span className="mx-2">{bedrooms}</span>
-              <button
-                className="bg-gray-200 px-2"
-                onClick={() => setBedrooms(bedrooms + 1)}
-              >
-                +
-              </button>
-            </div>
-            <div className="flex items-center">
-              <label className="text-sm font-medium mr-2">Balcony</label>
-              <button
-                className="bg-gray-200 px-2"
-                onClick={() => setBalconies(Math.max(0, balconies - 1))}
-              >
-                -
-              </button>
-              <span className="mx-2">{balconies}</span>
-              <button
-                className="bg-gray-200 px-2"
-                onClick={() => setBalconies(balconies + 1)}
-              >
-                +
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Facilities */}
-        <div className="mb-4">
-          <label className="text-sm font-medium block mb-2">
-            Environment / Facilities
-          </label>
-          <div className="flex gap-2 flex-wrap">
-            {[
-              "Parking Lot",
-              "Pet Allowed",
-              "Garden",
-              "Gym",
-              "Park",
-              "Home Theatre",
-              "Kid's Friendly",
-            ].map((facility) => (
-              <button
-                key={facility}
-                className={`px-4 py-2 rounded-md ${
-                  facilities.includes(facility)
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200"
-                }`}
-                onClick={() => toggleFacility(facility)}
-              >
-                {facility}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Update Button */}
-        <button
-          className="w-full bg-green-500 text-white rounded-md py-3 font-bold"
-          onClick={updateProperty}
+        {/* Property Category */}
+        <h3 className="mt-10 font-semibold">Property Category</h3>
+        <SelectButton list={categories} setValue={setCategory} name="category" />
+        
+        {/* Proprty Location */}
+        <h3 className="mt-10 font-semibold">Location</h3>
+        <div
+            className="rounded-full p-4 border border-[#DCDFD9] my-4 cursor-pointer hover:bg-gray-100 flex items-center"
         >
+            <button className="card-bg rounded-full p-3 mr-2 text-2xl" disabled>
+                <HiOutlineLocationMarker />
+            </button>
+            <p className="text-gray-700 text-sm">
+                Opposite Gate-04 Jimeta International Market, Yola
+            </p>
+        </div>
+        <div className="relative h-[350px] max-h-[400px] overflow-hidden rounded-lg border border-gray-200">
+            <Map />
+        </div>
+        <button className="w-full py-4 card-bg text-sm rounded-b-lg" disabled>Select on the map</button>
+        
+        <h3 className="mt-10 font-semibold mb-2">Listing photos</h3>
+        <div>
+          {/* Photo Upload Section */}
+          <div className="mb-6">
+            <label
+              htmlFor="photo-upload"
+              className="block w-full h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-green-500"
+            >
+              {photos.length < maxPhotos ? (
+                <span className="text-gray-500 text-xs">Click to upload photos (Max {maxPhotos})</span>
+              ) : (
+                <span className="text-red-500 text-xs">Maximum {maxPhotos} photos reached</span>
+              )}
+            </label>
+            <input
+              type="file"
+              id="photo-upload"
+              accept="image/jpeg, image/png"
+              multiple
+              className="hidden"
+              onChange={handlePhotoUpload}
+              disabled={photos.length >= maxPhotos}
+            />
+          </div>
+    
+          {/* Uploaded Photos Grid */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            {photos.map((photo, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={URL.createObjectURL(photo)}
+                  alt={`Photo ${index + 1}`}
+                  className="w-full h-32 object-cover rounded-lg"
+                />
+                <button
+                  className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-md"
+                  onClick={() => removePhoto(index)}
+                >
+                  <IoClose size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <AddPropertyDetails listingCategory="house"/>
+          
+        </div>
+        {/* Update Button */}
+        <button className="w-full bg-green text-white py-2 rounded-md mt-16" onClick={() => {setTogglePopup(!togglePopup); handleSubmit()}}>
           Update
-        </button>
+        </button>      
+      </div>
+
+      {/* Notification popup */}      
+      <div
+          className={`h-[400px] bg-white fixed bottom-0 left-0 w-full rounded-t-3xl p-6 ease-linear transition-transform z-10  ${
+            togglePopup ? 'translate-y-0' : 'translate-y-full'
+          }`}
+      >
+        <div className="h-px w-16 mx-auto bg-black"></div>
+
+        {submitSuccess ? <div className="w-full mt-3">
+          <Image src={'/icon/alert-success.png'} width={150} height={150} alt="success-icon"className="mx-auto"/>
+          <h2 className="text-3xl mb-7 text-center">
+            Your listing is now <span className="font-semibold text-[#252B5C]">submitted</span>
+          </h2>
+          <div className="flex gap-4">
+            <button className="card-bg p-5 rounded-xl w-full">Add More</button>
+            <button className="bg-green p-5 rounded-xl text-white w-full">Finish</button>
+          </div>          
+        </div> :
+        <div className="w-full mt-3">
+          <Image src={'/icon/alert-danger.png'} width={150} height={150} alt="success-icon"className="mx-auto"/>
+          <h2 className="text-3xl mb-7 text-center">
+            Aw snap, something <span className="font-semibold text-[#252B5C]">error</span> happened
+          </h2>
+          <div className="flex gap-4">
+            <button className="card-bg p-5 rounded-xl w-full">Close</button>
+            <button className="bg-green p-5 rounded-xl text-white w-full">Retry</button>
+          </div>          
+        </div>
+        }
       </div>
     </div>
   );
-};
-
-export default EditProperty;
+}

@@ -1,21 +1,29 @@
+'use client';
+
+import Link from "next/link";
 import React from "react";
-import { FiHome, FiHeart, FiBell, FiSettings } from "react-icons/fi";
+import { FaRegUser } from "react-icons/fa";
+import { FiHome, FiHeart, FiSearch } from "react-icons/fi";
+import { usePathname } from "next/navigation";
 
 const menus = [
-  { name: "Home", icon: <FiHome /> },
-  { name: "Favourite", icon: <FiHeart /> },
-  { name: "Notifications", icon: <FiBell /> },
-  { name: "Settings", icon: <FiSettings /> },
+  { name: "Home", icon: <FiHome />, link: '/' },
+  { name: "Search", icon: <FiSearch />, link: '/profile/signup/select-location' },
+  { name: "Favorite", icon: <FiHeart />, link: '/property/list' },
+  { name: "Settings", icon: <FaRegUser />, link: '/profile/transaction' },
 ];
 
 const Footer: React.FC = () => {
+  const pathname = usePathname();
   return (
-    <footer className="fixed bottom-0 w-full bg-gray-200 p-4 flex justify-around shadow-md max-w-[750px] z-10">
+    <footer className="fixed bottom-0 w-full bg-gray-200 flex justify-around shadow-md max-w-[650px] z-20">
       {menus.map((menu, index) => (
-        <button key={index} className="flex flex-col items-center text-gray-700">
-          <div className="text-2xl">{menu.icon}</div>
-          <p className="text-sm">{menu.name}</p>
-        </button>
+        <Link href={menu.link} key={index}>
+          <button className={`flex flex-col items-center px-6 py-4 w-full ${menu.link===pathname? 'text-[#234F68] card-bg': 'text-gray-700'}`}>
+            <div className="text-2xl">{menu.icon}</div>
+            {/* <p className="text-sm">{menu.name}</p> */}
+          </button>
+        </Link>
       ))}
     </footer>
   );

@@ -13,20 +13,25 @@ const ProfileTransaction = () => {
     const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
     const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
 
+    const menuItems = [
+        {title: 'Edit profile', link: '/profile/edit'},
+        {title: 'List new property', link: '/property/add'},
+        {title: 'Edit Property', link: '/property/edit'},
+        {title: ' Check reviews ', link: '/property/edit'},
+        {title: 'Become an Agent', link: '/'},
+        {title: 'FAQ', link: '/profile/faq'},
+    ]
+
     return (
         <div className="p-6 pb-24 relative">
-            <div className={`fixed top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white ${settingsMenu}`}>  
-                <button className="text-xl hover:card-bg hover:shadow-md block" >
-                    <Link href={'/profile/edit'} >
-                        Edit Profile
+            <div className={`absolute top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
+                {menuItems.map((item, index) => (
+                    <button className="hover:card-bg hover:shadow-md block" key={index}>
+                    <Link href={item.link} >
+                        {item.title}
                     </Link>
-                </button> 
-                
-                <button className="text-xl hover:card-bg hover:shadow-md block" >    
-                    <Link href={'/profile/faq'} >
-                        FAQ
-                    </Link>
-                </button>
+                    </button>
+                )) }                
             </div>
             <div className="flex items-center justify-between mb-5">
                 <BackButton />            
@@ -118,7 +123,7 @@ const ProfileTransaction = () => {
                 </div>
             </section>
 
-            <button className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10 w-[80%] bg-green text-white text-lg font-bold py-3 rounded-xl">
+            <button className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10 w-[80%] bg-green text-white text-lg font-bold py-3 rounded-xl md:w-[500px] md:mx-auto">
                 Start Chat
             </button>
         </div>

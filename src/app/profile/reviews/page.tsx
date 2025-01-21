@@ -59,7 +59,7 @@ const AllReviewsPage = () => {
             <div className="px-5 mt-10">
                 <h2 className="text-lg font-bold mb-3">User Reviews</h2>
                 
-                <div className="space-y-6">
+                <div className="space-y-6 max-h-[500px] overflow-y-auto">
                     {/* Review Item */}
                     <div className="border border-[#DCDFD9] rounded-2xl">
                         <div className="p-3 rounded-lg flex items-center h-16">
@@ -74,12 +74,14 @@ const AllReviewsPage = () => {
                             </div>
                         </div>
 
-                        <ReviewCard 
+                        <ReviewCard
+                            id='01' 
                             reviewer="Kurt Mullins" 
                             image="/avatar.png" 
                             ratings={4.0}
                             text="Lorem ipsum dolor sit amet, consectetur 
                             adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                            reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
                         />
                     </div>
                     <div className="border border-[#DCDFD9] rounded-2xl">
@@ -96,11 +98,13 @@ const AllReviewsPage = () => {
                         </div>
 
                         <ReviewCard 
+                            id='02'
                             reviewer="Kurt Mullins" 
                             image="/avatar.png" 
                             ratings={4.0}
                             text="Lorem ipsum dolor sit amet, consectetur 
                             adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                            reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
                         />
                     </div>
 

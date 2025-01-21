@@ -1,50 +1,33 @@
-name: Auto Merge Quick-Fix to Main
+name: Quick Fix Merge
 
+# Controls when the workflow will execute
 on:
-  push:
-    branches:
-      - quick-fix
-  pull_request:
-    branches:
-      - main
+  # Triggers the workflow when build successfully completes
+  workflow_run:
+    workflows: ["E Rental Hub Build"]
+    types:
+      - completed
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-  auto-merge:
+  merge:
+    name: 🔀 Merge
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'quick-fix' }}
 
+    # The sequence of tasks that will be executed as part of the job
     steps:
-      # Checkout the repository
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Check if build.yml workflow passed
-      - name: Wait for build.yml to pass
-        uses: actions/github-script@v6
+      - name: Merge quick fix to main
+        uses: repo-sync/pull-request@v2
         with:
-          script: |
-            const { data: workflowRuns } = await github.actions.listWorkflowRunsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              branch: "quick-fix",
-              status: "success",
-            });
-
-            const isBuildSuccessful = workflowRuns.workflow_runs.some(run => 
-              run.name === "E Rental Hub Build" && run.conclusion === "success"
-            );
-
-            if (!isBuildSuccessful) {
-              core.setFailed("build.yml workflow has not passed successfully yet.");
-            }
-
-      # Merge quick-fix into main
-      - name: Merge quick-fix into main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git checkout main
-          git merge origin/quick-fix --no-ff -m "Auto-merge quick-fix into main"
-          git push origin main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: "quick-fix"
+          destination_branch: "main"
+          pr_title: "Automated PR to merge quick fix to main"
+          pr_body: ":robot: Automated PR from **quick fix** to **main**; see commits."
+          pr_label: "auto-pr"

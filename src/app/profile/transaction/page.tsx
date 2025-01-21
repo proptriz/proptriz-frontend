@@ -18,6 +18,7 @@ const ProfileTransaction = () => {
         {title: 'List new property', link: '/property/add'},
         {title: 'Edit Property', link: '/property/edit'},
         {title: ' Check reviews ', link: '/property/edit'},
+        {title: 'Become an Agent', link: '/'},
         {title: 'FAQ', link: '/profile/faq'},
     ]
 

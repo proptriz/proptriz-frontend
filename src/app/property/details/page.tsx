@@ -11,10 +11,13 @@ import { FaRegStar } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoChatbubbleEllipsesOutline, IoChevronBack } from "react-icons/io5";
 import { TbView360Number } from "react-icons/tb";
+import Popup from "@/components/shared/Popup";
+import { IoIosArrowForward } from "react-icons/io";
 
 const PropertyDetail = () => {
     const router = useRouter();
     const [togglePopup, setTogglePopup] = useState(false);
+    const [buyPopup, setBuyPopup] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState({
         distance: '2.5 km',
         address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
@@ -47,10 +50,10 @@ const PropertyDetail = () => {
     return (
         <div className="flex flex-col pb-16 relative">
             <div className={`absolute top-0 left-0 w-full h-full z-0 bg-blue-200 opacity-75 ${
-          togglePopup ? '' : 'hidden'
-          }`}
-          onClick={()=>setTogglePopup(false)}
-      ></div>
+                togglePopup ? '' : 'hidden'
+                }`}
+                onClick={()=>setTogglePopup(false)}
+            ></div>
             {/* Header Section */}
             <div className="relative">
                 <img
@@ -94,7 +97,7 @@ const PropertyDetail = () => {
                 <div className="flex items-center justify-between mt-5">
                     <div className="flex items-center space-x-3 text-sm">
                         <button className="px-5 py-3 bg-green text-white rounded-lg">Rent</button>
-                        <button className="px-5 py-3 card-bg rounded-lg">Buy</button>
+                        <button className="px-5 py-3 card-bg rounded-lg" onClick={()=>{setBuyPopup(true)}}>Buy</button>
                     </div>
                     <button className="text-xl font-semibold card-bg p-4 rounded-full"><TbView360Number /></button>                
                 </div>
@@ -224,17 +227,12 @@ const PropertyDetail = () => {
             </div>
 
             {/* Location popup */}
-                <div
-                    className={`h-[45%] bg-white fixed bottom-0 w-full rounded-t-3xl p-6 ease-linear transition-transform z-10  ${
-                    togglePopup ? 'translate-y-0' : 'translate-y-full'
-                    }`}
-                >
-                    <div className="h-px w-16 mx-auto bg-black"></div>
-
-                    <div className="flex justify-between mt-8 items-center">
-                        <h2 className="text-lg font-bold mb-3">Location Distance</h2>
-                        <button className="bg-green px-4 py-2 text-white rounded-full">Edit</button>
-                    </div>
+            <Popup header="Location Distance" 
+                toggle={togglePopup} 
+                setToggle={setTogglePopup} 
+                useMask={true}
+            >     
+                <div>
                     <div className="h-[80%] overflow-y-auto">
                         {locations.map((location, index) => (
                         <div
@@ -255,7 +253,26 @@ const PropertyDetail = () => {
                         ))}
                     </div>
                 </div>
-            
+            </Popup> 
+
+            {/* Buy popup */}
+            <Popup header="Buy" 
+                toggle={buyPopup} 
+                setToggle={setBuyPopup} 
+                useMask={true}
+            >     
+                <div>
+                    <div className="h-[80%] overflow-y-auto mt-5">
+                        <div className="space-y-4 divide-1">
+                            <div className="flex">
+                                <p>Delivery Method</p>
+                                <IoIosArrowForward className="ms-auto" />
+                            </div>
+                        
+                        </div> 
+                    </div>
+                </div>
+            </Popup>
         </div>
     );
 };

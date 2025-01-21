@@ -17,25 +17,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Wait for build.yml workflow to pass
+      # Check if build.yml workflow passed
       - name: Wait for build.yml to pass
         uses: actions/github-script@v6
         with:
           script: |
-            const { data: workflows } = await github.actions.listWorkflowRuns({
+            const { data: workflowRuns } = await github.actions.listWorkflowRunsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: "build.yml",
               branch: "quick-fix",
               status: "success",
             });
 
-            if (workflows.total_count === 0) {
+            const isBuildSuccessful = workflowRuns.workflow_runs.some(run => 
+              run.name === "E Rental Hub Build" && run.conclusion === "success"
+            );
+
+            if (!isBuildSuccessful) {
               core.setFailed("build.yml workflow has not passed successfully yet.");
             }
 
       # Merge quick-fix into main
       - name: Merge quick-fix into main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

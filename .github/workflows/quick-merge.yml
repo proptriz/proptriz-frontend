@@ -25,13 +25,13 @@ jobs:
             const { data: workflows } = await github.actions.listWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: "build.yml",
+              workflow_id: "E Rental Hub Build",
               branch: "quick-fix",
               status: "success",
             });
 
             if (workflows.total_count === 0) {
-              core.setFailed("build.yml workflow has not passed successfully yet.");
+              core.setFailed("E Rental Hub Build workflow has not passed successfully yet.");
             }
 
       # Merge quick-fix into main

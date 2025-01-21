@@ -1,3 +1,5 @@
+'use client';
+
 import Footer from "@/components/shared/Footer"
 import { styles } from "@/constant"
 import Image from "next/image"

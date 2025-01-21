@@ -11,6 +11,7 @@ import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Popup from "@/components/shared/Popup";
 
 const EmptySearch = () => {
     const router = useRouter();
@@ -53,18 +54,8 @@ const EmptySearch = () => {
             </div>
 
             {/* Notification popup */}      
-            <div
-                className={`h-4/6 h-dvh bg-white fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full md:max-w-[650px] md:mx-auto rounded-t-3xl p-6 ease-linear transition-transform z-10 overflow-y-auto ${
-                  togglePopup ? 'translate-y-0' : 'translate-y-full'
-                }`}
-            >
-                <div className="h-px w-16 mx-auto bg-black mb-4"></div>
-                <div className="flex items-center justify-between">
-                    <p className="font-[Raleway] font-bold">Filter</p>
-                    <button className="px-4 py-2 rounded-full bg-[#234F68] text-white text-sm">reset</button>
-                </div>
-
-                <div className="overflow-y-auto">
+            <Popup header="Filter" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
+            <div className="">
                     {/* filter by categories section */}
                     <section>
                         <h2 className={`${styles.H2}`}>Property type</h2>                
@@ -86,7 +77,7 @@ const EmptySearch = () => {
                     <section>
                         <h2 className={`${styles.H2}`}>Location</h2>
                         <Link href={'/property/add/location'}>
-                            <div className="rounded-2xl shadow-md w-full overflow-hidden">
+                            <div className="rounded-2xl w-full overflow-hidden">
                                 <Image
                                 src="/map-image.png" 
                                 alt="Map"
@@ -99,9 +90,7 @@ const EmptySearch = () => {
                     </section>
                     <button className={`${styles.GREENBTN} w-full mt-5`}>Apply filter</button>
                 </div>
-                
-
-            </div>
+            </Popup>
         </div>
     );
 };

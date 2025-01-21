@@ -36,7 +36,7 @@ export default function PropertyMap() {
                 </div>
 
                 {/* Bottom Content */}
-                <div className="fixed bottom-4 w-full px-4 z-10">
+                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full md:max-w-[650px] md:mx-auto px-4 z-10">
                     <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center bg-white p-3 rounded-full text-sm shadow-md">
                             <HiOutlineLocationMarker className="mr-2" />

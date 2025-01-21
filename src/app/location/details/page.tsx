@@ -1,18 +1,11 @@
 'use client';
 
-import { BackButton } from "@/components/shared/buttons";
 import HorizontalCard from "@/components/shared/HorizontalCard";
 import SearchBar from "@/components/shared/SearchBar";
-import { VerticalCard } from "@/components/shared/VerticalCard";
 import { apartments } from "@/constant";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { FaHeart, FaShareAlt, FaStar, FaBed, } from "react-icons/fa";
-import { FaRegStar } from "react-icons/fa6";
-import { HiOutlineLocationMarker } from "react-icons/hi";
-import { IoChatbubbleEllipsesOutline, IoChevronBack } from "react-icons/io5";
-import { TbView360Number } from "react-icons/tb";
+import { IoChevronBack } from "react-icons/io5";
 
 const LocationDetailsPage = () => {
         const router = useRouter()

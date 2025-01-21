@@ -1,0 +1,65 @@
+name: Auto Merge Quick-Fix to Main
+
+on:
+  push:
+    branches:
+      - quick-fix
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Wait for build.yml workflow to pass
+      - name: Wait for build.yml to pass
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: workflows } = await github.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "build.yml",
+              branch: "quick-fix",
+              status: "success",
+            });
+
+            if (workflows.total_count === 0) {
+              core.setFailed("build.yml workflow has not passed successfully yet.");
+            }
+
+      # Merge quick-fix into main
+      - name: Merge quick-fix into main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+
+          # Attempt to merge and handle conflicts
+          if ! git merge origin/quick-fix --no-ff -m "Auto-merge quick-fix into main"; then
+            echo "Merge conflict detected. Manual resolution required."
+            git merge --abort
+            exit 1
+          fi
+
+          git push origin main
+
+      # Notify on merge conflict
+      - name: Notify on conflict
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: "Merge conflict detected while auto-merging `quick-fix` into `main`. Please resolve manually.",
+            });

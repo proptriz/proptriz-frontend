@@ -12,7 +12,7 @@ import Link from "next/link";
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function RootPage() {
-  const [ mapOrList, setMapOrList ] = useState<string>('map')
+  const [ mapOrList, setMapOrList ] = useState<string>('list')
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
 
   const menuItems = [
@@ -67,7 +67,7 @@ export default function RootPage() {
       {/* Map Section */}
       <div className="relative flex-1">
         {/* Centralized Button Tabs */}
-        <div className="fixed top-2 left-1/2 transform -translate-x-1/2 z-10 flex w-[70%] max-w-md bg-gray-100 rounded-full shadow-lg text-white">
+        {/* <div className="fixed top-2 left-1/2 transform -translate-x-1/2 z-10 flex w-[70%] max-w-md bg-gray-100 rounded-full shadow-lg text-white">
           <button className={`w-full py-1 rounded-full text-gray-600 text-center text-sm ${mapOrList==='map'? 'bg-[#61AF74]': 'bg-gray-100' }`}
             onClick={()=>setMapOrList('map')}
           >
@@ -78,7 +78,7 @@ export default function RootPage() {
           >
             Listing
           </button>
-        </div>
+        </div> */}
 
         {/* Map Component or List */}
         {

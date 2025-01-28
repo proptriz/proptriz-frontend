@@ -37,40 +37,22 @@ export interface PropertyProps {
     address: string;
   }
 
-  export interface LandmarkProps {
-    id: string,
-    property_id: string; // Referencing property
-    image: string,
-    distance: number; // how far from referenced property (in km)
-    location: string, // derived from LocationProps
-  }
-
-  export interface CompleteAgentProps { 
-    id: string
-    fullname: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
-    image: string; // URL to user profile pics (optional)
-    email: string; // for notification
+export interface UserType {
+    id: string;
     username: string; // 
     password: string; // Foreing key referencing property under review
-    phone: string; // URLs of reviewer upload (optional)
-    signup_date: Date; // (auto)
-    map_location: {
-      type: 'Point';
-      coordinates: [number, number];
-    };
-    social_links?: string[]; // Agent social handles to share his listing Ads
-    status: string; // (available, unavilable)
-  }
+    fullname?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
+    image?: string; // URL to user profile pics (optional)
+    email?: string; // for notification    
+    phone?: string; // URLs of reviewer upload (optional)
+    created_at: Date; // (auto)
+};
 
-  interface Feature {
-    name: string;
-    quantity: number;
-  }
-
-  export interface CompletePropertyProps {
-    id: string,
+export interface PropertyType {
+    id: string;
     banner: string; // URL of the property image or image with index = 0
     title: string; // Title of the property (e.g. 3 bedroom flat, self contain, )
+    slug: string;
     address: string; // Location of the property
     price: number; // Price per month
     listed_for: string; // (e.g. "sell"/ "rent")
@@ -78,43 +60,69 @@ export interface PropertyProps {
     period?: string; // if is for rent, payment period (e.g monthly, yearly, daily)
     negotiable: boolean; // (true/false)
     images: string[]; //Other property images for gallery
-    agentId: string; //foreign key representing agent that list the property
-    map_location: {
+    agent: string; //foreign key representing agent that list the property
+    map_location?: {
       type: 'Point';
       coordinates: [number, number];
     };
-    features?: Feature;
+    features?: [{
+        name: string;
+        quantity: number;
+    }];
     env_falities?: string[];
     status: string; // (available, sold, unavailable, rented)
+    created_at: Date;
+    updated_at: Date;
   };
 
-  export interface PropertyReview {
-    id: string
+  export interface AgentType { 
+    id: string;
+    user: string; //foreign key 
+    brand_name: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
+    image: string; // URL to user profile pics (optional)
+    fulfillment_terms: string;
+    beacame_agent_date: Date; // (auto)
+    modified_at: Date;
+    address: string;
+    map_location?: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
+    status: string; // (available, unavilable)
+    social_handles: [{}];
+  };
+
+  export interface PropertyReviewType {
+    id: string;
     rating: number; // Rating score (0.0 to 5.0)
     comment?: string; // user review text (optional)
-    reviewer_id: string; // Foreing key referencing userId
-    property_id: string; // Foreing key referencing property under review
-    review_images?: string; // URLs of reviewer upload (optional)
+    review_giver: string; // Foreing key referencing userId
+    property: string; // Foreing key referencing property under review
+    images?: string[]; // URLs of reviewer upload (optional)
     review_date: Date; // (auto)
   };
 
-  export interface AgentReview {
-    id: string
+  export interface AgentReviewType {
+    id: string;
     rating: number; // Rating score (0.0 to 5.0)
     comment?: string; // user review text (optional)
-    reviewer_id: string; // Foreing key referencing userId
-    agent_id: string; // Foreing key referencing agent under review
-    review_images?: string; // URLs of reviewer upload (optional)
+    review_giver: string; // Foreing key referencing userId
+    review_receiver: string; // Foreing key referencing property under review
+    images?: string[]; // URLs of reviewer upload (optional)
     review_date: Date; // (auto)
-  }
+  };
 
-  export interface UserProfile {
-    id: string
-    fullname?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
-    image?: string; // URL to user profile pics (optional)
-    email?: string; // for notification
-    username: string; // 
-    password: string; // Foreing key referencing property under review
-    phone?: string; // URLs of reviewer upload (optional)
-    signup_date: Date; // (auto)
+  export interface LandmarkType {
+    id: string;
+    title: string // what the landmark is called
+    property: string; // Foreing key referencing property
+    image?: string,
+    distance: number; // how far from referenced property (in km)
+    position_description: string, // derived from LocationProps
+    map_location?: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
+    created_at: Date;
+    updated_at: Date
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
@@ -8,12 +8,34 @@ import { FaRegBell } from "react-icons/fa6";
 import PropertyListing from "@/components/property/Listing";
 import dynamic from 'next/dynamic';
 import Link from "next/link";
+import propertyService from "@/services/propertyApi";
+import { PropertyType } from "@/definitions";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function RootPage() {
   const [ mapOrList, setMapOrList ] = useState<string>('list')
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
+  const [properties, setProperties] = useState<PropertyType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const response = await propertyService.getAllProperties();
+      if (response.success) {
+        setProperties(response.data.data);
+        console.log("Listed properties: ", response.data.data)
+      } else {
+        setError(response.message);
+        console.log("error fetching all properties: ", response.message)
+      }
+      setLoading(false);
+    };
+
+    fetchProperties();
+  }, []);
+
 
   const menuItems = [
     {title: 'Login', link: '/profile/login'},
@@ -84,7 +106,7 @@ export default function RootPage() {
         {
           mapOrList==='map'? 
           <Map />:
-          <PropertyListing />
+          <PropertyListing properties={properties.slice(0,6)}/>
         }
         
       </div>

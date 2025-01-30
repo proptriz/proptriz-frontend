@@ -49,7 +49,7 @@ export interface UserType {
 };
 
 export interface PropertyType {
-    id: string;
+    _id: string;
     banner: string; // URL of the property image or image with index = 0
     title: string; // Title of the property (e.g. 3 bedroom flat, self contain, )
     slug: string;
@@ -59,6 +59,7 @@ export interface PropertyType {
     category: string; // The class of property (e.g. house, land, shop, office, hotel )
     period?: string; // if is for rent, payment period (e.g monthly, yearly, daily)
     negotiable: boolean; // (true/false)
+    property_terms?: string // agent's term cond
     images: string[]; //Other property images for gallery
     agent: string; //foreign key representing agent that list the property
     map_location?: {

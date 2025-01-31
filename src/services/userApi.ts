@@ -1,4 +1,6 @@
+import { UserType } from "@/definitions";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1"; // Adjust for production
 
@@ -54,16 +56,23 @@ const userAPI = {
    */
   signup: async (data: SignupData) => {
     const response = await axiosInstance.post("/users/signup", data);
-    return response.data;
+    if (response.status===400) {
+      console.log("Signup error, ", response.data.message)
+    }
+    return response.data.user;
   },
 
   /**
    * User Login
    */
-  login: async (data: LoginData): Promise<{ user: User; token: string } | null> => {
-    return handleRequest(
-      axiosInstance.post<{ user: User; token: string }>("/users/login", data).then((res) => res.data)
-    );
+  login: async (data: LoginData): Promise<{ user: UserType; token: string } | null> => {
+    const response = await axiosInstance.post("/users/login", data);
+    if (response.status===400) {
+      console.log("Signup error, ", response.data.message);
+      toast.error("Signup error, ", response.data.message);
+      return null
+    };
+    return response.data;
   },
 
   /**

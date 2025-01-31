@@ -1,24 +1,46 @@
 'use client';
 
 // components/LoginPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { AppContext } from '../../../../context/AppContextProvider';
 import { useRouter } from 'next/navigation';
 import { ImEye, ImEyeBlocked } from 'react-icons/im';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaApple, FaFacebookF } from 'react-icons/fa6';
 import { FaGoogle } from 'react-icons/fa';
-import { EmailInput, PasswordInput } from '@/components/shared/Input';
+import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
+import userAPI from '@/services/userApi';
+import { toast } from 'react-toastify';
 
 const LoginPage: React.FC = () => {
+
+    const { setAuthUser } = useContext(AppContext);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [username, setUsername] = useState<string>('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Logging in with:', { email, password });
+        setLoading(true);
+
+        try {
+            const userData = { username, password };
+            const data = await userAPI.login(userData);
+            if (data) {
+                toast.success("Signup successful! Redirecting...");
+                setAuthUser(data.user)
+                console.log("authenticated user: ", data.user)
+                router.push('/profile/transaction');
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Signup failed. Try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSocialLogin = (provider: string) => {
@@ -36,7 +58,7 @@ const LoginPage: React.FC = () => {
                 </div>
                 <form onSubmit={handleLogin}>
                     <div className="mb-4">
-                       <EmailInput email={email} setEmail={setEmail} label={'Your Email'}/>
+                       <TextInput username={username} setValue={setUsername} label={'Your Email'}/>
                     </div>
                     <div className="mb-10 relative">
                         <PasswordInput password={password} setPassword={setPassword} />
@@ -45,7 +67,7 @@ const LoginPage: React.FC = () => {
                         type="submit"
                         className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                        Log in
+                        {loading ? "Login..." : "Login"}
                     </button>
                 </form>
                 <div className="text-center mt-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,13 +8,17 @@ import { FaApple, FaFacebookF, FaGoogle } from 'react-icons/fa6';
 import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
 import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
+import { AppContext } from '../../../../context/AppContextProvider';
 
 const SignupPage: React.FC = () => {
+
+    const { setAuthUser } = useContext(AppContext);
+    const router = useRouter();
+
     const [username, setUsername] = useState<string>('');
     const [fullname, setFullname] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,8 +26,10 @@ const SignupPage: React.FC = () => {
 
         try {
             const userData = { username, fullname, password };
-            await userAPI.signup(userData);
+            const user = await userAPI.signup(userData);
             toast.success("Signup successful! Redirecting...");
+            setAuthUser(user)
+            console.log("authenticated user: ", user)
             router.push('/profile/signup/confirm/phone');
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Signup failed. Try again.");
@@ -55,7 +61,7 @@ const SignupPage: React.FC = () => {
                     <div className="mb-4">
                         <TextInput value={fullname} setValue={setFullname} label="Your Full Name (optional)" />
                     </div>
-                    <div className="mb-8">
+                    <div className="mb-8 relative">
                         <PasswordInput password={password} setPassword={setPassword} />
                     </div>
 
@@ -110,7 +116,7 @@ const SignupPage: React.FC = () => {
                 </div>
 
                 {/* Redirect to Login */}
-                <div className="text-center mt-8">
+                <div className="text-center mt-8 relative">
                     <p className="font-semibold">
                         Already have an account?{' '}
                         <Link href="/profile/login" className="text-green">

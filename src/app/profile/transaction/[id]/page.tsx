@@ -1,14 +1,17 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import { agent } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
+import { AppContext } from "../../../../../context/AppContextProvider";
 
-const ProfileTransaction = () => {
-
+export default function ProfileTransaction ({ params }: { params: { id: string } }) {
+    const userId = params.id; //React.use()
+    const { authenticateUser } = useContext(AppContext);
+    const authUser = authenticateUser();
     const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
     const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
     const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
@@ -130,4 +133,3 @@ const ProfileTransaction = () => {
     );
 };
 
-export default ProfileTransaction;

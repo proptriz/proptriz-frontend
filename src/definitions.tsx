@@ -38,7 +38,7 @@ export interface PropertyProps {
   }
 
 export interface UserType {
-    id: string;
+    _id: string;
     username: string; // 
     password: string; // Foreing key referencing property under review
     fullname?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
@@ -66,11 +66,11 @@ export interface PropertyType {
       type: 'Point';
       coordinates: [number, number];
     };
-    features?: [{
+    features?: {
         name: string;
         quantity: number;
-    }];
-    env_falities?: string[];
+    }[];
+    env_facilities?: string[];
     status: string; // (available, sold, unavailable, rented)
     created_at: Date;
     updated_at: Date;
@@ -90,7 +90,7 @@ export interface PropertyType {
       coordinates: [number, number];
     };
     status: string; // (available, unavilable)
-    social_handles: [{}];
+    social_handles: {}[];
   };
 
   export interface PropertyReviewType {

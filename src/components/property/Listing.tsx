@@ -4,6 +4,7 @@ import React from "react";
 import HorizontalCard from "../shared/HorizontalCard";
 import Link from "next/link";
 import { PropertyType } from "@/definitions";
+import formatPrice from "@/utils/formatPrice";
 
 interface PropertyListingProps {
     properties: PropertyType[];
@@ -64,11 +65,11 @@ interface PropertyListingProps {
             <div className="grid grid-cols-2 gap-4 mt-4">
                 
                 {properties.map(((info, key)=>(
-                    <Link href={'/property/details'} key={key}>
+                    <Link href={`/property/details/${info._id}-${info.slug}`} key={key}>
                         <div className="bg-white p-3 rounded-2xl  shadow-md">
                             <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${info.banner})`}}>
                                 <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
-                                    N{info.price}
+                                    N{formatPrice(info.price)}
                                     <span className="text-xs">{info.period}</span>
                                 </div>
                             </div>

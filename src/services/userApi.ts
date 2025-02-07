@@ -2,7 +2,7 @@ import { UserType } from "@/definitions";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1"; // Adjust for production
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1/users"; // Adjust for production
 
 interface SignupData {
   username: string;
@@ -55,7 +55,7 @@ const userAPI = {
    * User Signup
    */
   signup: async (data: SignupData) => {
-    const response = await axiosInstance.post("/users/signup", data);
+    const response = await axiosInstance.post("/signup", data);
     if (response.status===400) {
       console.log("Signup error, ", response.data.message)
     }
@@ -66,7 +66,7 @@ const userAPI = {
    * User Login
    */
   login: async (data: LoginData): Promise<{ user: UserType; token: string } | null> => {
-    const response = await axiosInstance.post("/users/login", data);
+    const response = await axiosInstance.post("/login", data);
     if (response.status===400) {
       console.log("Signup error, ", response.data.message);
       toast.error("Signup error, ", response.data.message);
@@ -78,13 +78,24 @@ const userAPI = {
   /**
    * Get User Profile (Requires Token)
    */
-  getProfile: async (token: string): Promise<User | null> => {
+  getProfile: async (token: string): Promise<UserType | null> => {
     return handleRequest(
-      axiosInstance.get<User>("/users/profile", {
+      axiosInstance.get<UserType>("/profile", {
         headers: { Authorization: `Bearer ${token}` },
       }).then((res) => res.data)
     );
   },
+
+  /**
+   * Verify User token
+   */
+  authenticateUser: async (): Promise<UserType | null> => {
+    return handleRequest(
+      axiosInstance.post<UserType>("/authenticate").then((res) => res.data)
+    );
+  },
 };
+
+
 
 export default userAPI;

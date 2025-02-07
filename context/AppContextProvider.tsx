@@ -24,6 +24,7 @@ interface IAppContextProps {
   setAlertMessage: React.Dispatch<SetStateAction<string | null>>;
   showAlert: (message: string) => void;
   setReload: React.Dispatch<SetStateAction<boolean>>;
+  authenticateUser: () => void;
 }
 
 const initialState: IAppContextProps = {
@@ -35,6 +36,7 @@ const initialState: IAppContextProps = {
   setAlertMessage: () => {},
   showAlert: () => {},
   setReload: () => {},
+  authenticateUser: () => {}
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -67,7 +69,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   };
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, isSigningInUser, reload, setReload, showAlert, alertMessage, setAlertMessage }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, isSigningInUser, reload, setReload, showAlert, alertMessage, setAlertMessage, authenticateUser }}>
       {children}
     </AppContext.Provider>
   );

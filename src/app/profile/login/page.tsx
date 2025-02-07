@@ -4,7 +4,7 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../../../../context/AppContextProvider';
 import { useRouter } from 'next/navigation';
-import { ImEye, ImEyeBlocked } from 'react-icons/im';
+import { ImSpinner2 } from 'react-icons/im';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaApple, FaFacebookF } from 'react-icons/fa6';
@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
                 toast.success("Signup successful! Redirecting...");
                 setAuthUser(data.user)
                 console.log("authenticated user: ", data.user)
-                router.push('/profile/transaction');
+                router.push(`/profile/transaction/${data.user._id}`);
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Signup failed. Try again.");
@@ -67,7 +67,11 @@ const LoginPage: React.FC = () => {
                         type="submit"
                         className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                        {loading ? "Login..." : "Login"}
+                        {loading ? 
+                            <span className='flex items-center justify-center'><ImSpinner2 className="animate-spin mr-2 ml-1" /> {/* Spinner Icon */}
+                                Login...
+                            </span> : "Login"
+                        }
                     </button>
                 </form>
                 <div className="text-center mt-4">

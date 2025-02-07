@@ -10,13 +10,14 @@ import dynamic from 'next/dynamic';
 import Link from "next/link";
 import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/definitions";
+import { mockProperties } from "@/constant";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function RootPage() {
   const [ mapOrList, setMapOrList ] = useState<string>('list')
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
-  const [properties, setProperties] = useState<PropertyType[]>([]);
+  const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

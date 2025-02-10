@@ -5,9 +5,10 @@ import { IoHomeOutline } from "react-icons/io5";
 interface PasswordInputProps {
     password: string, 
     setPassword: React.Dispatch<SetStateAction<string>>,
+    name: string
 }
 
-export const PasswordInput = ({password, setPassword}:PasswordInputProps )=> {
+export const PasswordInput = ({password, setPassword, name}:PasswordInputProps )=> {
     const [showPassword, setShowPassword] = useState(false);
     return (
         <>
@@ -17,6 +18,7 @@ export const PasswordInput = ({password, setPassword}:PasswordInputProps )=> {
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 value={password}
+                name={name}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-2 border-b border-gray-700 focus:outline-none focus:border-green-600 bg-transparent"
@@ -65,6 +67,7 @@ export const TextInput = (props:any )=> {
             <input
                 type="text"
                 id="text"
+                name={props.name}
                 value={props.value}
                 onChange={(e) => props.setValue(e.target.value)}
                 required

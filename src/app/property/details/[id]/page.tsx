@@ -62,8 +62,8 @@ const PropertyDetail = ({id}:{id: string}) => {
             {/* Header Section */}
             <div className="relative">
                     <img
-                    src={property.banner || "/skyscraper.png"} // Replace with the actual property image URL
-                    alt="Property"
+                    src={property.banner || "/skyscraper.png"} 
+                    alt="Property image"
                     className="w-full h-[350px] object-cover rounded-b-xl"
                     /> 
                     <button className=" absolute top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" onClick={()=>router.back()}>
@@ -133,7 +133,7 @@ const PropertyDetail = ({id}:{id: string}) => {
             {/* Property Details */}
             <div className="px-5 py-3 flex overflow-x-auto space-x-6 mt-5">
               {property.features?.map((item, key)=>(
-                <div className="card-bg flex p-3 rounded-full text-sm text-gray-500 items-center">
+                <div className="card-bg flex p-3 rounded-full text-sm text-gray-500 items-center" key={key}>
                   <span className="me-2"><FaBed className="text-green"/></span>
                   <span className="text-nowrap">{item.quantity} {item.name}</span>
                 </div>

@@ -65,7 +65,7 @@ const userAPI = {
   /**
    * User Login
    */
-  login: async (data: LoginData): Promise<{ user: UserType; token: string } | null> => {
+  login: async (data: LoginData): Promise< UserType  | null> => {
     const response = await axiosInstance.post("/login", data);
     if (response.status===400) {
       console.log("Signup error, ", response.data.message);

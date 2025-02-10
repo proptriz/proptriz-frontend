@@ -1,9 +1,9 @@
 'use client';
 
 // components/LoginPage.tsx
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useActionState, Suspense, } from 'react';
 import { AppContext } from '../../../../context/AppContextProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ImSpinner2 } from 'react-icons/im';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,6 +12,8 @@ import { FaGoogle } from 'react-icons/fa';
 import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
 import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
+import { authenticate } from '@/utils/actions';
+import { BsExclamation } from 'react-icons/bs';
 
 const LoginPage: React.FC = () => {
 
@@ -23,18 +25,25 @@ const LoginPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl') || '/profile/transaction';
+    const [errorMessage, formAction, isPending] = useActionState(
+      authenticate,
+      undefined,
+    );
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
             const userData = { username, password };
-            const data = await userAPI.login(userData);
-            if (data) {
+            const user = await userAPI.login(userData);
+            if (user) {
                 toast.success("Signup successful! Redirecting...");
-                setAuthUser(data.user)
-                console.log("authenticated user: ", data.user)
-                router.push(`/profile/transaction/${data.user._id}`);
+                setAuthUser(user)
+                console.log("authenticated user: ", user)
+                router.push(`/profile/transaction/${user._id}`);
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Signup failed. Try again.");
@@ -56,24 +65,40 @@ const LoginPage: React.FC = () => {
                         Welcome back! Sign in using your social account or email to continue.
                     </p>
                 </div>
-                <form onSubmit={handleLogin}>
+                <Suspense>
+                <form action={formAction}>
                     <div className="mb-4">
-                       <TextInput username={username} setValue={setUsername} label={'Your Email'}/>
+                       <TextInput name={'username'} setValue={setUsername} label={'Your Email'}/>
                     </div>
                     <div className="mb-10 relative">
-                        <PasswordInput password={password} setPassword={setPassword} />
+                        <PasswordInput password={password} setPassword={setPassword} name={'password'} />
                     </div>
+                    <input type="hidden" name="redirectTo" value={callbackUrl} />
                     <button
-                        type="submit"
+                        aria-disabled={isPending}
+                        
                         className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                        {loading ? 
+                        {isPending ? 
                             <span className='flex items-center justify-center'><ImSpinner2 className="animate-spin mr-2 ml-1" /> {/* Spinner Icon */}
                                 Login...
                             </span> : "Login"
                         }
                     </button>
                 </form>
+                </Suspense>
+                <div
+                    className="flex h-8 items-end space-x-1"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    >
+                    {errorMessage && (
+                        <>
+                        <BsExclamation className="h-5 w-5 text-red-500" />
+                        <p className="text-sm text-red-500">{errorMessage}</p>
+                        </>
+                    )}
+                </div>
                 <div className="text-center mt-4">
                     <a href="#" className="text-sm text-gray-500 hover:underline">Forgot password?</a>
                 </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,6 +9,8 @@ import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input'
 import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
 import { AppContext } from '../../../../context/AppContextProvider';
+import { ImSpinner2 } from 'react-icons/im';
+import { BsExclamation } from 'react-icons/bs';
 
 const SignupPage: React.FC = () => {
 
@@ -19,6 +21,7 @@ const SignupPage: React.FC = () => {
     const [fullname, setFullname] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState(false);
+    const [errorMessage, seterrorMessage] = useState<string>('')
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,7 +33,7 @@ const SignupPage: React.FC = () => {
             toast.success("Signup successful! Redirecting...");
             setAuthUser(user)
             console.log("authenticated user: ", user)
-            router.push('/profile/signup/confirm/phone');
+            router.push('/profile/login');
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Signup failed. Try again.");
         } finally {
@@ -56,13 +59,13 @@ const SignupPage: React.FC = () => {
                 {/* Signup Form */}
                 <form onSubmit={handleSignup}>
                     <div className="mb-4">
-                        <TextInput username={username} setValue={setUsername} label="Username or Email" />
+                        <TextInput username={username} setValue={setUsername} name="username" label="Username or Email" />
                     </div>
                     <div className="mb-4">
-                        <TextInput value={fullname} setValue={setFullname} label="Your Full Name (optional)" />
+                        <TextInput value={fullname} setValue={setFullname} name="fullname" label="Your Full Name (optional)" />
                     </div>
                     <div className="mb-8 relative">
-                        <PasswordInput password={password} setPassword={setPassword} />
+                        <PasswordInput password={password} setPassword={setPassword} name='password' />
                     </div>
 
                     <p className="text-sm text-gray-500 mb-8">
@@ -74,9 +77,26 @@ const SignupPage: React.FC = () => {
                         className="w-full bg-green text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                         disabled={loading}
                     >
-                        {loading ? "Signing Up..." : "Sign Up"}
+                        {loading ? 
+                            <span className='flex items-center justify-center'><ImSpinner2 className="animate-spin mr-2 ml-1" /> {/* Spinner Icon */}
+                                Signing Up..
+                            </span> : "Sign Up"
+                        }
                     </button>
                 </form>
+
+                <div
+                    className="flex h-8 items-end space-x-1"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    >
+                    {errorMessage && (
+                        <>
+                        <BsExclamation className="h-5 w-5 text-red-500" />
+                        <p className="text-sm text-red-500">{errorMessage}</p>
+                        </>
+                    )}
+                </div>
 
                 {/* Divider */}
                 <div className="flex items-center my-4">

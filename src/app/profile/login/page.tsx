@@ -14,7 +14,6 @@ import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
 import { appleSignin, authenticate, facebookSignin, googleSignin } from '@/utils/actions';
 import { BsExclamation } from 'react-icons/bs';
-import { signIn } from '../../../../auth';
 
 const LoginPage: React.FC = () => {
 
@@ -53,10 +52,6 @@ const LoginPage: React.FC = () => {
         }
     };
 
-    const handleSocialLogin = (provider: string) => {
-        console.log(`Log in with ${provider}`);
-    };
-
     return (
         <div className="flex items-center justify-center min-h-screen overflow-hidden">
             <div className="w-full max-w-md rounded-lg p-8">
@@ -69,7 +64,7 @@ const LoginPage: React.FC = () => {
                 <Suspense>
                 <form action={formAction}>
                     <div className="mb-4">
-                       <TextInput name={'username'} setValue={setUsername} label={'Your Email'}/>
+                       <TextInput name={'username'} setValue={setUsername} label={'Username or Email'}/>
                     </div>
                     <div className="mb-10 relative">
                         <PasswordInput password={password} setPassword={setPassword} name={'password'} />

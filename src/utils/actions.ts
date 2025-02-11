@@ -3,8 +3,6 @@
 import { signIn, signOut } from '../../auth';
 import { AuthError } from 'next-auth';
  
-// ...
- 
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
@@ -24,7 +22,6 @@ export async function authenticate(
     throw error;
   }
 }
-
 
 export async function handleSignOut() {
   // console.log('Signing out...'); // Debugging

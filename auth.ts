@@ -1,11 +1,13 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import Google from "next-auth/providers/google"
+import Facebook from "next-auth/providers/facebook"
+import Apple from "next-auth/providers/apple"
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import userAPI from '@/services/userApi';
  
-export const { auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [Credentials({
     async authorize(credentials) {
@@ -23,6 +25,6 @@ export const { auth, signIn, signOut } = NextAuth({
       console.log('Invalid credentials');
       return null;
     },
-  }), Google],
+  }), Google, Facebook, Apple],
   
 });

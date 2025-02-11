@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-  console.log('Middleware is running for:', req.nextUrl.pathname); // Debugging
+  // console.log('Middleware is running for:', req.nextUrl.pathname); // Debugging
   const session = await auth(); // Get the authenticated user session
-  console.log('Session data:', session); // Debugging
+  // console.log('Session data:', session); // Debugging
 
   const protectedRoutes = ['/profile/transaction', '/profile/edit', '/property/add', '/property/edit', '/property/reviews']; // Add more protected routes if needed
 
@@ -21,5 +21,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/profile/:path*', '/profile/edit', '/property/add', '/property/edit', '/((?!api|_next/static|_next/image|.*\\.png$).*)'] // Apply middleware only to this route
+  matcher: ['/profile/:path*', '/profile/edit', '/property/add', '/property/edit', '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',] // Apply middleware only to this route
 };

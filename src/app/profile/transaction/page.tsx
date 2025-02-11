@@ -29,12 +29,12 @@ export default function ProfileTransaction ({ params }: { params: { id: string }
 
     return (
         <div className="p-6 pb-24 relative">
-            <div className={`absolute top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
+            <div className={`absolute top-5 right-2 divide-y-2 space-y-2 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
                 {menuItems.map((item, index) => (
-                    <button className="hover:card-bg hover:shadow-md block" key={index}>
-                    <Link href={item.link} >
-                        {item.title}
-                    </Link>
+                    <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3" key={index}>
+                        <Link href={item.link} >
+                            {item.title}
+                        </Link>
                     </button>
                 )) } 
                 <form
@@ -42,7 +42,7 @@ export default function ProfileTransaction ({ params }: { params: { id: string }
                     >
                     <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
                         <BsPower className="w-6" />
-                        <div className="hidden md:block">Sign Out</div>
+                        <div className="">Sign Out</div>
                     </button>
                 </form>               
             </div>

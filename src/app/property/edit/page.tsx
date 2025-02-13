@@ -6,7 +6,7 @@ import { BackButton } from "@/components/shared/buttons";
 import HorizontalCard from "@/components/shared/HorizontalCard";
 import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
-import { apartments } from "@/constant";
+import { mockProperties } from "@/constant";
 import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoClose, IoHomeOutline } from "react-icons/io5";
@@ -79,16 +79,16 @@ export default function AddPropertyPage() {
 
       {/* Property Card */}
       <div className="">
-        {apartments.slice(0, 1).map(((info, key)=>(
+        {mockProperties.slice(0, 1).map(((info, key)=>(
           <HorizontalCard 
-            id={''}
-            name={info.name} 
+            id={info._id}
+            name={info.title} 
             price={30} 
             type="" 
             address={info.address} 
-            image={info.image} 
-            period={info.period} 
-            rating={info.rating}
+            image={info.banner} 
+            period={info.period? info.period: ''} 
+            rating={0}
             key={key}
           />
         )))}

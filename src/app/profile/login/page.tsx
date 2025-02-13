@@ -1,53 +1,100 @@
 'use client';
 
 // components/LoginPage.tsx
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ImEye, ImEyeBlocked } from 'react-icons/im';
+import React, { useState, useContext, useActionState, Suspense, } from 'react';
+import { AppContext } from '../../../../context/AppContextProvider';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ImSpinner2 } from 'react-icons/im';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaApple, FaFacebookF } from 'react-icons/fa6';
 import { FaGoogle } from 'react-icons/fa';
-import { EmailInput, PasswordInput } from '@/components/shared/Input';
+import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
+import userAPI from '@/services/userApi';
+import { toast } from 'react-toastify';
+import { appleSignin, authenticate, facebookSignin, googleSignin } from '@/utils/actions';
+import { BsExclamation } from 'react-icons/bs';
 
 const LoginPage: React.FC = () => {
+
+    const { setAuthUser } = useContext(AppContext);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [username, setUsername] = useState<string>('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('Logging in with:', { email, password });
-    };
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl') || '/profile/transaction';
+    const [errorMessage, formAction, isPending] = useActionState(
+      authenticate,
+      undefined,
+    );
 
-    const handleSocialLogin = (provider: string) => {
-        console.log(`Log in with ${provider}`);
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const userData = { username, password };
+            const user = await userAPI.login(userData);
+            if (user) {
+                toast.success("Signup successful! Redirecting...");
+                setAuthUser(user)
+                console.log("authenticated user: ", user)
+                router.push(`/profile/transaction/${user._id}`);
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Signup failed. Try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen overflow-hidden">
             <div className="w-full max-w-md rounded-lg p-8">
                 <div className="text-center mb-16">
-                    <img src="/banner.png" alt="Logo" className="mx-auto h-16 mb-4" />
+                    <Link href={'/'}><img src="/banner.png" alt="Logo" className="mx-auto h-16 mb-4" /></Link>
                     <p className="text-sm text-gray-500">
                         Welcome back! Sign in using your social account or email to continue.
                     </p>
                 </div>
-                <form onSubmit={handleLogin}>
+                <Suspense>
+                <form action={formAction}>
                     <div className="mb-4">
-                       <EmailInput email={email} setEmail={setEmail} label={'Your Email'}/>
+                       <TextInput name={'username'} setValue={setUsername} label={'Username or Email'}/>
                     </div>
                     <div className="mb-10 relative">
-                        <PasswordInput password={password} setPassword={setPassword} />
+                        <PasswordInput password={password} setPassword={setPassword} name={'password'} />
                     </div>
+                    <input type="hidden" name="redirectTo" value={callbackUrl} />
                     <button
-                        type="submit"
+                        aria-disabled={isPending}
+                        
                         className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                        Log in
+                        {isPending ? 
+                            <span className='flex items-center justify-center'><ImSpinner2 className="animate-spin mr-2 ml-1" /> {/* Spinner Icon */}
+                                Login...
+                            </span> : "Login"
+                        }
                     </button>
                 </form>
+                </Suspense>
+                <div
+                    className="flex h-8 items-end space-x-1"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    >
+                    {errorMessage && (
+                        <>
+                        <BsExclamation className="h-5 w-5 text-red-500" />
+                        <p className="text-sm text-red-500">{errorMessage}</p>
+                        </>
+                    )}
+                </div>
                 <div className="text-center mt-4">
                     <a href="#" className="text-sm text-gray-500 hover:underline">Forgot password?</a>
                 </div>
@@ -61,27 +108,36 @@ const LoginPage: React.FC = () => {
                         <Image src={'/icon/spiral.png'} alt={'spiral'} width={400} height={300} className="ml-7 " />
                     </div>
                     <div className="flex justify-center gap-4 relative z-20">
-                        <button
-                            type="button"
-                            onClick={() => handleSocialLogin('Facebook')}
-                            className="bg-blue-600 text-white p-4 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        <form
+                        action={facebookSignin}
                         >
-                            <FaFacebookF className='text-xl text-white' />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handleSocialLogin('Google')}
-                            className="bg-red-600 text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            <button
+                                type="submit"
+                                className="bg-blue-600 text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                                <FaFacebookF className='text-xl text-white' />
+                            </button>
+                        </form>
+                        <form
+                        action={googleSignin}
                         >
-                            <FaGoogle className='text-xl' />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => handleSocialLogin('Apple')}
-                            className="bg-black text-white p-4 rounded-full hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            <button
+                                type="submit"
+                                className="bg-red-600 text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                                <FaGoogle className='text-xl' />
+                            </button>
+                        </form>
+                        <form
+                        action={appleSignin}
                         >
-                            <FaApple className='text-xl'/>
-                        </button>
+                            <button
+                                type="submit"
+                                className="bg-black text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                                <FaApple className='text-xl'/>
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div className="text-center mt-6 relative z-20">

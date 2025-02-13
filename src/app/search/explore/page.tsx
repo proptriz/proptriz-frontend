@@ -1,22 +1,26 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import { FaRegBell } from "react-icons/fa6";
 import dynamic from 'next/dynamic';
 import Link from "next/link";
+import propertyService from "@/services/propertyApi";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function ExplorePage() {
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const menuItems = [
     {title: 'Login', link: '/profile/login'},
     {title: 'Transaction', link: '/profile/transaction'}
-]
+  ]
 
   return (
       <div className="flex flex-col pt-5 pb-16">

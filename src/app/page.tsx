@@ -11,6 +11,7 @@ import Link from "next/link";
 import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/definitions";
 import { mockProperties } from "@/constant";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -20,6 +21,9 @@ export default function RootPage() {
   const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  
+// if(loading) return <Skeleton type="landing" />
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -42,6 +46,9 @@ export default function RootPage() {
     {title: 'Login', link: '/profile/login'},
     {title: 'Transaction', link: '/profile/transaction'}
 ]
+
+if(loading) return <Skeleton type="landing" />
+
 
   return (
       <div className="flex flex-col pt-5 pb-16">

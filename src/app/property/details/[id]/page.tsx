@@ -15,12 +15,14 @@ import Popup from "@/components/shared/Popup";
 import { IoIosArrowForward } from "react-icons/io";
 import { PropertyType } from "@/definitions";
 import formatPrice from "@/utils/formatPrice";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 const PropertyDetail = ({id}:{id: string}) => {
     const router = useRouter();
     const [property, setProperty] = useState<PropertyType | null>(mockProperties[0]);
     const [togglePopup, setTogglePopup] = useState(false);
     const [buyPopup, setBuyPopup] = useState(false);
+    const [loading, setLoading] = useState(false)
     const [selectedLocation, setSelectedLocation] = useState({
         distance: '2.5 km',
         address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
@@ -49,6 +51,8 @@ const PropertyDetail = ({id}:{id: string}) => {
         setSelectedLocation(location);
         setTogglePopup(false); // Close the popup after selecting
     };
+
+    if(loading) <Skeleton type="list-detail" />
 
     return (
       <div>

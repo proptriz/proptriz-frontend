@@ -9,8 +9,10 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../../../context/AppContextProvider";
 import { BsPower } from "react-icons/bs";
 import { handleSignOut } from "@/utils/actions";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 export default function ProfileTransaction ({ params }: { params: { id: string } }) {
+    const [loading, setLoading] = useState(false)
     const userId = params.id; //React.use()
     // const { authenticateUser } = useContext(AppContext);
     // const authUser = authenticateUser();
@@ -26,6 +28,8 @@ export default function ProfileTransaction ({ params }: { params: { id: string }
         {title: 'Become an Agent', link: '/'},
         {title: 'FAQ', link: '/profile/faq'},
     ]
+
+    if(loading) return <Skeleton type="profile" />
 
     return (
         <div className="p-6 pb-24 relative">

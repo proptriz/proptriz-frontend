@@ -8,9 +8,13 @@ import { mockProperties } from "@/constant";
 import Image from "next/image";
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+import Skeleton from "@/components/skeleton/Skeleton";
 
 export default function PropertyListPage() {
+    const [loading, setLoading] = useState(false)
     const router = useRouter()
+
+    if(loading) return <Skeleton type="list" />
 
     return (
         <div className="flex flex-col pt-5 pb-16">

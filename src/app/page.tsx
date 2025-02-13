@@ -11,6 +11,7 @@ import Link from "next/link";
 import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/definitions";
 import { mockProperties } from "@/constant";
+import Image from "next/image";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -18,6 +19,7 @@ export default function RootPage() {
   const [ mapOrList, setMapOrList ] = useState<string>('list')
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
   const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
+  const [ filterBy, setFilterBy ] = useState<string>('house');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,8 +62,10 @@ export default function RootPage() {
       
         {/* Centered Banner */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <img
-            src="banner.png"
+          <Image
+            width={100}
+            height={60}
+            src="/banner.png"
             alt="banner"
             className="h-auto max-w-full"
           />
@@ -85,7 +89,7 @@ export default function RootPage() {
       </div>
       
       {/* Navigation Tabs */}
-      <NavigationTabs />
+      <NavigationTabs setValue={setFilterBy}/>
 
       {/* Map Section */}
       <div className="relative flex-1">

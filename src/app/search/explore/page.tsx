@@ -8,6 +8,7 @@ import { FaRegBell } from "react-icons/fa6";
 import dynamic from 'next/dynamic';
 import Link from "next/link";
 import propertyService from "@/services/propertyApi";
+import Image from "next/image";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -16,6 +17,7 @@ export default function ExplorePage() {
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [ filterBy, setFilterBy ] = useState<string>('house');
 
   const menuItems = [
     {title: 'Login', link: '/profile/login'},
@@ -38,10 +40,12 @@ export default function ExplorePage() {
       
             {/* Centered Banner */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
-            <img
-                src="banner.png"
-                alt="banner"
-                className="h-auto max-w-full"
+            <Image
+              width={100}
+              height={60}
+              src="/banner.png"
+              alt="banner"
+              className="h-auto max-w-full"
             />
             </div>
 
@@ -55,7 +59,7 @@ export default function ExplorePage() {
       </div>
       
       {/* Navigation Tabs */}
-      <NavigationTabs />
+      <NavigationTabs setValue={setFilterBy}/>
 
       {/* Map Section */}
       <div className="relative flex-1">

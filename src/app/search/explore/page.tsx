@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
+import Link from "next/link";
+import Image from "next/image";
+import { FaRegBell } from "react-icons/fa6";
+
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
-import { FaRegBell } from "react-icons/fa6";
-import dynamic from 'next/dynamic';
-import Link from "next/link";
 import propertyService from "@/services/propertyApi";
-import Image from "next/image";
+import { mockProperties } from "@/constant";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -18,6 +20,22 @@ export default function ExplorePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [ filterBy, setFilterBy ] = useState<string>('house');
+
+  useEffect(() => {
+      const fetchProperties = async () => {
+        const response = await propertyService.getAllProperties();
+        if (response.success) {
+          setProperties(response.data.data);
+          console.log("Listed properties: ", response.data.data)
+        } else {
+          setError(response.message);
+          console.log("error fetching all properties: ", response.message)
+        }
+        setLoading(false);
+      };
+  
+    fetchProperties();
+  }, []);
 
   const menuItems = [
     {title: 'Login', link: '/profile/login'},
@@ -63,7 +81,7 @@ export default function ExplorePage() {
 
       {/* Map Section */}
       <div className="relative flex-1">
-        <Map />        
+        <Map properties={properties}/>        
       </div>
 
       {/* Footer Navigation */}

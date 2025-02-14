@@ -19,28 +19,14 @@ const customIcon = new L.Icon({
 
 // Default marker icon for center
 const defaultIcon = new L.Icon.Default();
+interface PropertyListingProps {
+  properties: PropertyType[];
+}
 
-
-const Map: React.FC = () => {
-  const [properties, setProperties] = useState<PropertyType[]>([]);
+const Map: React.FC<PropertyListingProps> = ({ properties }) => {
+  // const [properties, setProperties] = useState<PropertyType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProperties = async () => {
-      const response = await propertyService.getAllProperties();
-      if (response.success) {
-        setProperties(response.data.data);
-        console.log("Listed properties: ", response.data.data)
-      } else {
-        setError(response.message);
-        console.log("error fetching all properties: ", response.message)
-      }
-      setLoading(false);
-    };
-
-    fetchProperties();
-  }, []);
 
 
   const center: [number, number] = [9.0820, 8.6753]; // Nigeria coordinates

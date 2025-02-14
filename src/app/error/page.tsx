@@ -29,7 +29,8 @@ export default function ErrorPage() {
                 <div className="w-full h-full flex items-center mb-5">
                     <Image src={'/error-banner.png'} alt="error banner" width={300} height={150} className="w-full sm:h-[150px] sm:w-auto mx-auto "/>
                 </div>
-                <h1 className="text-4xl text-center">{errorMessages[error || 'Default']}</h1>
+                {/* <h1 className="text-4xl text-center">{errorMessages[error || 'Default']}</h1> */}
+                <h1 className="text-4xl text-center">Page Not Found</h1>
             </div>
 
             <button className={`${styles.GRAYBUTTON} flex items-center rounded-lg bg-white mx-auto mt-auto mb-28`}>

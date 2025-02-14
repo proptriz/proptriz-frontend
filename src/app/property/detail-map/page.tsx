@@ -8,6 +8,7 @@ import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { FaBullseye } from "react-icons/fa";
+import { mockProperties } from "@/constant";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -20,7 +21,7 @@ export default function PropertyMap() {
             <div className="relative flex-1 z-0">
                 {/* Top Buttons */}
                 <div className="absolute z-10 p-4">
-                    <button className="p-4 text-xl card-bg rounded-full shadow-md" onClick={()=>router.push('/property/details')}>
+                    <button className="p-4 text-xl card-bg rounded-full shadow-md" onClick={()=>router.back()}>
                         <IoChevronBack />
                     </button>
                     <div className="flex overflow-x-auto space-x-4 mt-3 px-5">
@@ -65,7 +66,7 @@ export default function PropertyMap() {
                         </div>
                     </div>
                 </div>
-                <Map />
+                <Map properties={mockProperties.slice(0,1)}/>
             </div>
         </div>
     );

@@ -3,8 +3,6 @@
 import { signIn, signOut } from '../../auth';
 import { AuthError } from 'next-auth';
  
-// ...
- 
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
@@ -25,10 +23,22 @@ export async function authenticate(
   }
 }
 
-
 export async function handleSignOut() {
-  console.log('Signing out...'); // Debugging
+  // console.log('Signing out...'); // Debugging
   await signOut({ redirectTo: '/' });
-  // Invalidate session on the client
-  return { success: true };
+}
+
+export async function googleSignin() {
+  // console.log('Signing out...'); // Debugging
+  await signIn("google");
+}
+
+export async function facebookSignin() {
+  // console.log('Signing out...'); // Debugging
+  await signIn("facebook");
+}
+
+export async function appleSignin() {
+  // console.log('Signing out...'); // Debugging
+  await signIn("Apple");
 }

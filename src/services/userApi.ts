@@ -54,10 +54,11 @@ const userAPI = {
   /**
    * User Signup
    */
-  signup: async (data: SignupData) => {
+  signup: async (data: SignupData):  Promise< UserType  | null> => {
     const response = await axiosInstance.post("/signup", data);
     if (response.status===400) {
       console.log("Signup error, ", response.data.message)
+      return null
     }
     return response.data.user;
   },
@@ -68,8 +69,8 @@ const userAPI = {
   login: async (data: LoginData): Promise< UserType  | null> => {
     const response = await axiosInstance.post("/login", data);
     if (response.status===400) {
-      console.log("Signup error, ", response.data.message);
-      toast.error("Signup error, ", response.data.message);
+      console.log("Login error, ", response.data.message);
+      toast.error("Login error, ", response.data.message);
       return null
     };
     return response.data;

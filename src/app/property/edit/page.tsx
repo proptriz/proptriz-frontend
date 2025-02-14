@@ -162,7 +162,7 @@ export default function AddPropertyPage() {
             </p>
         </div>
         <div className="relative h-[350px] max-h-[400px] overflow-hidden rounded-lg border border-gray-200">
-            <Map />
+            <Map properties={mockProperties.slice(0,1)}/>
         </div>
         <button className="w-full py-4 card-bg text-sm rounded-b-lg" disabled>Select on the map</button>
         

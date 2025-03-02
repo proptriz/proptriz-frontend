@@ -43,7 +43,7 @@ export default function AddPropertyLocationPage() {
         </div>
 
         <div className="relative h-[350px] max-h-[400px] overflow-hidden rounded-lg border border-gray-200">
-            <Map />
+            <Map properties={[]} />
         </div>
         <button className="w-full py-4 card-bg" disabled>Select on the map</button>
 

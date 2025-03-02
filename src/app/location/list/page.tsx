@@ -1,6 +1,7 @@
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
-import { agents, apartments } from "@/constant";
+import { agents, mockProperties } from "@/constant";
+import formatPrice from "@/utils/formatPrice";
 import Link from "next/link";
 
 const LocationListPage = () => {
@@ -14,16 +15,16 @@ const LocationListPage = () => {
             </header>
             {/* Property Card */}
             <div className="grid grid-cols-2 w-full gap-4">
-                {apartments.map(((info, key)=>(
+                {mockProperties.map(((property, key)=>(
                     <Link href={'/location/details'} key={key}>
                         <VerticalCard 
-                            id={info.id}
+                            id={property._id}
                             name={''} 
-                            price={0} 
-                            type="" 
-                            address={info.address} 
-                            image={info.image} 
-                            period={""} 
+                            price={formatPrice(property.price)} 
+                            type={property.category} 
+                            address={property.address} 
+                            image={property.banner} 
+                            period={property.period || ''} 
                             rating={0}
                             key={key}
                         />

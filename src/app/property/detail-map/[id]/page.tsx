@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { FaAngleDown, FaRegBell } from "react-icons/fa6";
 import dynamic from 'next/dynamic';
@@ -14,12 +14,14 @@ import { PropertyType } from "@/definitions";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
-export default function PropertyMap({
-    id,
-  }: {
-    id: string;
-  }) {
+export default function PropertyMap({ 
+    params 
+}: {
+    params: Promise< { id: string } >
+}) {
     const router = useRouter();
+    const resolvedParams = use(params);
+    const propertyId = resolvedParams.id; //React.use()
 
     const [property, setProperty] = useState<PropertyType | null>(mockProperties[0]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -27,7 +29,7 @@ export default function PropertyMap({
 
     useEffect(() => {
         const fetchProperty = async () => {
-          const response = await propertyService.getPropertyById(id);
+          const response = await propertyService.getPropertyById(propertyId);
           if (response.success) {
             setProperty(response.data.data);
             console.log("fetched property: ", response.data.data)
@@ -37,10 +39,10 @@ export default function PropertyMap({
           }
           setLoading(false);
         };
-        if (id) {
+        if (propertyId) {
           fetchProperty()
         };
-    }, [id]);
+    }, [propertyId]);
     
     
     return (

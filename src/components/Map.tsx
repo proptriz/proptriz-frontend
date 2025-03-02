@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import L from 'leaflet';
 import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/definitions";
+import formatPrice from "@/utils/formatPrice";
 
 // Marker icon for other locations
 const customIcon = new L.Icon({
@@ -54,7 +55,13 @@ const Map: React.FC<PropertyListingProps> = ({ properties }) => {
 
             {properties.map((marker, idx) => (
             <Marker key={idx} position={[marker.map_location?.coordinates[0], marker.map_location?.coordinates[1]] as [number, number]} icon={customIcon}>
-                <Popup>{marker.price}</Popup>
+                <Popup>
+                  <div>
+                    <p className="">{marker.title}</p>
+                    <p>N{formatPrice(marker.price)}</p>
+                    <p>{marker.listed_for}</p>
+                  </div>
+                </Popup>
             </Marker>
             ))}
         </MapContainer>

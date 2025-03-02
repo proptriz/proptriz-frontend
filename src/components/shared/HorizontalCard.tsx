@@ -9,7 +9,7 @@ interface HorizontalCardProps {
   name: string; // Title of the property
   rating: number; // Rating of the property
   address: string; // Location of the property
-  price: number; // Price per month
+  price: string; // Price per month
   type: string; // Property type (e.g., "Apartment")
   period: string
 }

@@ -1,17 +1,27 @@
 'use client';
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, use } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
-import { agent } from "@/constant";
+import { agent, mockProperties } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../../../context/AppContextProvider";
 import { BsPower } from "react-icons/bs";
 import { handleSignOut } from "@/utils/actions";
+import Skeleton from "@/components/skeleton/Skeleton";
+import formatPrice from "@/utils/formatPrice";
 
-export default function ProfileTransaction ({ params }: { params: { id: string } }) {
-    const userId = params.id; //React.use()
+export default function ProfileTransaction ({ 
+    params 
+}: {
+    params: Promise< { id: string } >
+}) {
+    const resolvedParams = use(params);
+    const userId = resolvedParams.id;
+
+    const [loading, setLoading] = useState(false)
+    
     // const { authenticateUser } = useContext(AppContext);
     // const authUser = authenticateUser();
     const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
@@ -26,6 +36,8 @@ export default function ProfileTransaction ({ params }: { params: { id: string }
         {title: 'Become an Agent', link: '/'},
         {title: 'FAQ', link: '/profile/faq'},
     ]
+
+    if(loading) return <Skeleton type="profile" />
 
     return (
         <div className="p-6 pb-24 relative">
@@ -71,18 +83,22 @@ export default function ProfileTransaction ({ params }: { params: { id: string }
                         </span>
                     </div>
                 </div>
-                <h2 className="font-bold text-2xl">{agent.name}</h2>
-                <p className="text-gray-500 mb-3">{agent.email}</p>
+                <h2 className="font-bold text-2xl">{agent.user.username}</h2>
+                <p className="text-gray-500 mb-3">{agent.user.email}</p>
 
                 {/* Count Status */}
                 <div className="grid grid-cols-3 space-x-6 text-center mb-5">
                     <div className={statusCountStyle}>
-                        <p className="font-bold">{agent.rating}</p>
+                        <p className="font-bold">
+                            {210}{/* {agent.rating} */}
+                        </p>
                         <p className="text-gray-500 ">Rating</p>
                     </div>
                     <Link href={'/profile/reviews'} >
                     <div className={statusCountStyle}>
-                        <p className="font-bold">{agent.reviews}</p>
+                        <p className="font-bold">
+                            310{/* {agent.reviews} */}
+                        </p>
                         <p className="text-gray-500">Reviews</p>
                     </div>
                     </Link>
@@ -119,17 +135,17 @@ export default function ProfileTransaction ({ params }: { params: { id: string }
                     <button className="px-5 py-3 mb-6 rounded-full ml-auto bg-[#234F68] text-white">+</button>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
-                {agent.properties.map((listing, key) => (
+                {mockProperties.map((listing, key) => (
                     <Link href={'/property/details'} key={key}>
                         <VerticalCard
-                            id={listing.id}
-                            name={listing.name}
-                            price={listing.price}
+                            id={listing._id}
+                            name={listing.title}
+                            price={formatPrice(listing.price)}
                             address={listing.address}
                             period={'month'}
                             rating={5.0}
                             type="apartment"
-                            image={listing.image}
+                            image={listing.banner}
                         />
                     </Link>
                 ))}

@@ -1,14 +1,14 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
 import Footer from "@/components/shared/Footer"
 import { styles } from "@/constant"
 import Image from "next/image"
 import { FaArrowRight, FaHome } from "react-icons/fa"
 
 export default function ErrorPage() {
-    const searchParams = useSearchParams();
-  const error = searchParams.get('error');
+//     const searchParams = useSearchParams();
+//   const error = searchParams.get('error');
   const errorMessages: Record<string, string> = {
     CredentialsSignin: 'Invalid username or password. Please try again.',
     OAuthSignin: 'OAuth authentication failed. Try another provider.',

@@ -8,8 +8,15 @@ import { mockProperties } from "@/constant";
 import Image from "next/image";
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+import Skeleton from "@/components/skeleton/Skeleton";
+import { useAllProperties } from "@/services/propertyApi";
+import { PropertyType } from "@/definitions";
+import formatPrice from "@/utils/formatPrice";
+import NavigationTabs from "@/components/shared/NavigationTabs";
 
 export default function PropertyListPage() {
+    const [ filterBy, setFilterBy ] = useState<string>('house');
+    const { properties, isLoading, isError } = useAllProperties();
     const router = useRouter()
 
     return (
@@ -36,35 +43,40 @@ export default function PropertyListPage() {
                 </div>
             </header>
             <div className="px-6 py-3">
-                <SearchBar />
+                <SearchBar disable={isLoading} />
             </div>
 
+            {/* Navigation Tabs */}
+            <NavigationTabs setValue={setFilterBy} disable={isLoading} />
+
             {/* Explore Nearby Property List */}
-            <section className="px-4 my-6">
-                <h2 className="text-lg font-semibold">Properties</h2>
-                <div className="grid grid-cols-2 gap-4 mt-4">                    
-                    {mockProperties.map(((item, key)=>(
-                        <Link href={'/property/details'} key={key}>
-                            <div className="bg-white p-3 rounded-2xl  shadow-md">
-                                <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${item.banner})`}}>
-                                    <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
-                                        N{item.price}
-                                        <span className="text-xs">{item.period}</span>
+            {isLoading? <Skeleton type="list" />:
+                <section className="px-4 my-6">
+                    <h2 className="text-lg font-semibold">Properties</h2>
+                    <div className="grid grid-cols-2 gap-4 mt-4">                    
+                        {properties && properties.length>0 && properties.map(((item:PropertyType, key:any)=>(
+                            <Link href={'/property/details'} key={key}>
+                                <div className="bg-white p-3 rounded-2xl  shadow-md">
+                                    <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${item.banner})`}}>
+                                        <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
+                                            N{formatPrice(item.price)}
+                                            <span className="text-xs"> {item.period}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-md font-semibold my-2">{item.title}</p>
+                                        <div className="flex space-x-2">
+                                            <span className="text-yellow-500">★</span>
+                                            <span className="text-gray-500 text-sm">{0}</span>
+                                            <p className="text-gray-500 text-sm">{item.address}</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-md font-semibold my-2">{item.title}</p>
-                                    <div className="flex space-x-2">
-                                        <span className="text-yellow-500">★</span>
-                                        <span className="text-gray-500 text-sm">{0}</span>
-                                        <p className="text-gray-500 text-sm">{item.address}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    )))}
-                </div>
-            </section>
+                            </Link>
+                        )))}
+                    </div>
+                </section>
+            }
 
         </div>
     );

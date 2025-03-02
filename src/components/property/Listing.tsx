@@ -5,12 +5,13 @@ import HorizontalCard from "../shared/HorizontalCard";
 import Link from "next/link";
 import { PropertyType } from "@/definitions";
 import formatPrice from "@/utils/formatPrice";
+import { mockProperties } from "@/constant";
 
 interface PropertyListingProps {
     properties: PropertyType[];
-  }
+}
   
-  const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
+const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
     const topLocation = [
         { image: '/avatar.png', name: 'Idumata Lagos' },
         { image: '/avatar.png', name: 'Tanke Ilorin' },
@@ -70,7 +71,7 @@ interface PropertyListingProps {
                             <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${info.banner})`}}>
                                 <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
                                     N{formatPrice(info.price)}
-                                    <span className="text-xs">{info.period}</span>
+                                    <span className="text-xs"> {info.period}</span>
                                 </div>
                             </div>
                             <div>
@@ -97,16 +98,16 @@ interface PropertyListingProps {
             <div className="flex space-x-4 mt-4 overflow-x-auto">
 
                 {/* Card */}
-                {apartments.slice(0,3).map(((info, key)=>(
+                {mockProperties.slice(0,3).map(((property, key)=>(
                     <HorizontalCard 
-                        id={''}
-                        name={info.name} 
-                        price={30} 
+                        id={property._id}
+                        name={property.title} 
+                        price={formatPrice(property.price)} 
                         type="" 
-                        address={info.address} 
-                        image={info.image} 
-                        period={info.period} 
-                        rating={info.rating}
+                        address={property.address} 
+                        image={property.banner} 
+                        period={property.period || ''} 
+                        rating={10}
                         key={key}
                     />
                 )))}

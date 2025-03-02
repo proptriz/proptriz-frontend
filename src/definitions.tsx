@@ -16,7 +16,7 @@ export interface PropertyProps {
     name: string; // Title of the property
     rating: number; // Rating of the property
     address: string; // Location of the property
-    price: number; // Price per month
+    price: string; // Price per month
     type: string; // Property type (e.g., "Apartment")
     period: string
   }
@@ -40,12 +40,12 @@ export interface PropertyProps {
 export interface UserType {
     _id: string;
     username: string; // 
-    password: string; // Foreing key referencing property under review
+    // password: string; // Foreing key referencing property under review
     fullname?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
     image?: string; // URL to user profile pics (optional)
     email?: string; // for notification    
     phone?: string; // URLs of reviewer upload (optional)
-    created_at: Date; // (auto)
+    createdAt?: Date; // (auto)
 };
 
 export interface PropertyType {
@@ -77,20 +77,27 @@ export interface PropertyType {
   };
 
   export interface AgentType { 
-    id: string;
-    user: string; //foreign key 
+    _id: string;
+    user: UserType; //foreign key 
     brand_name: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
-    image: string; // URL to user profile pics (optional)
-    fulfillment_terms: string;
-    beacame_agent_date: Date; // (auto)
-    modified_at: Date;
+    image?: string; // URL to user profile pics (optional)
+    fulfillment_terms?: string;
+    createdAt: Date; // (auto)
+    updatedAt: Date;
     address: string;
     map_location?: {
       type: 'Point';
       coordinates: [number, number];
     };
     status: string; // (available, unavilable)
-    social_handles: {}[];
+    social_handles?: {}[];
+  };
+
+  export interface AgentListType extends Pick<AgentType, "_id" | "user"| "image" | "brand_name" > {
+    reviews_count?: number;
+    ratings?: number;
+    properties_count?: number
+    sold?: number
   };
 
   export interface PropertyReviewType {

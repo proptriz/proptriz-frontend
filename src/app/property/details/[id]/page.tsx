@@ -18,6 +18,8 @@ import { PropertyType } from "@/definitions";
 import formatPrice from "@/utils/formatPrice";
 import Link from "next/link";
 import propertyService from "@/services/propertyApi";
+import Skeleton from "@/components/skeleton/Skeleton";
+import { propertyFetcher } from "@/services/propertyApi";
 
 const PropertyDetail = ({
   params
@@ -34,31 +36,28 @@ const PropertyDetail = ({
     const [property, setProperty] = useState<PropertyType | null>(mockProperties[0]);
     const [togglePopup, setTogglePopup] = useState(false);
     const [buyPopup, setBuyPopup] = useState(false);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    // const [error, setError] = useState<string | null>(null);
     const [selectedLocation, setSelectedLocation] = useState({
       distance: '2.5 km',
       address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
     });
 
-    // const { data, error, isLoading } = useSWR(`/property/${propertyId}`, fetcher)
+    const { data, error, isLoading } = useSWR(`${propertyId}`, propertyFetcher);
+    console.log("fetched data with swr: ", data);
+    console.log("fetched data with swr: ", error);
 
     useEffect(() => {
       const fetchProperty = async () => {
-        const response = await propertyService.getPropertyById(propertyId);
-        if (response.success) {
-          setProperty(response.data.data);
-          console.log("fetched property: ", response.data.data)
+        if (data) {
+          setProperty(data);
+          console.log("fetched property: ", data)
         } else {
-          setError(response.message);
-          console.log("error fetching all properties: ", response.message)
+          console.log("no property found: ", data)
         }
-        setLoading(false);
       };
-      if (propertyId) {
-        fetchProperty()
-      };
-    }, [propertyId]);
+      fetchProperty()
+    }, [data]);
   
 
     const locations = [
@@ -84,6 +83,8 @@ const PropertyDetail = ({
         setSelectedLocation(location);
         setTogglePopup(false); // Close the popup after selecting
     };
+
+    if(isLoading) return <Skeleton type="list-detail" />
 
     return (
       <div>
@@ -250,7 +251,7 @@ const PropertyDetail = ({
                         <VerticalCard
                           id={info._id}
                           name={info.title} 
-                          price={30} 
+                          price={formatPrice(30)} 
                           type="" 
                           address={info.address} 
                           image={info.banner} 

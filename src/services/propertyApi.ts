@@ -1,4 +1,5 @@
 import axios from "axios";
+import useSWR from "swr";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1/property";
 
@@ -15,6 +16,8 @@ const handleRequest = async (request: Promise<any>) => {
     };
   }
 };
+
+export const propertyFetcher = (url: string) => axios.get(`${API_BASE_URL}/${url}`).then(res => res.data)
 
 const propertyService = {
   // Create Property
@@ -42,5 +45,19 @@ const propertyService = {
     return handleRequest(axios.delete(`${API_BASE_URL}/${id}`));
   },
 };
+
+export const useAllProperties = (filters = {}) => {
+  const { data, error, isLoading, mutate } = useSWR([`${API_BASE_URL}/all`, filters], ([url, filters]) =>
+    axios.get(url, { params: filters }).then((res) => res.data)
+  );
+
+  return {
+    properties: data,
+    isLoading,
+    isError: error,
+    mutate,
+  };
+};
+
 
 export default propertyService;

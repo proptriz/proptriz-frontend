@@ -13,6 +13,7 @@ import { IoClose, IoHomeOutline } from "react-icons/io5";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import Image from "next/image";
 import { categories } from "@/constant";
+import formatPrice from "@/utils/formatPrice";
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function AddPropertyPage() {
@@ -79,15 +80,15 @@ export default function AddPropertyPage() {
 
       {/* Property Card */}
       <div className="">
-        {mockProperties.slice(0, 1).map(((info, key)=>(
+        {mockProperties.slice(0, 1).map(((property, key)=>(
           <HorizontalCard 
-            id={info._id}
-            name={info.title} 
-            price={30} 
-            type="" 
-            address={info.address} 
-            image={info.banner} 
-            period={info.period? info.period: ''} 
+            id={property._id}
+            name={property.title} 
+            price={formatPrice(property.price)} 
+            type={property.category} 
+            address={property.address} 
+            image={property.banner} 
+            period={property.period || ''} 
             rating={0}
             key={key}
           />

@@ -6,38 +6,37 @@ import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import { FaRegBell } from "react-icons/fa6";
 import PropertyListing from "@/components/property/Listing";
-import dynamic from 'next/dynamic';
 import Link from "next/link";
-import propertyService from "@/services/propertyApi";
-import { PropertyType } from "@/definitions";
-import { mockProperties } from "@/constant";
+import { useAllProperties } from "@/services/propertyApi";
 import Image from "next/image";
-
-const Map = dynamic(() => import('@/components/Map'), { ssr: false });
+import Skeleton from "@/components/skeleton/Skeleton";
+import { FaRegUser } from "react-icons/fa";
+import { useSession } from "next-auth/react"
+import { categories } from "@/constant";
 
 export default function RootPage() {
-  const [ mapOrList, setMapOrList ] = useState<string>('list')
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
-  const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
+  // const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
   const [ filterBy, setFilterBy ] = useState<string>('house');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      const response = await propertyService.getAllProperties();
-      if (response.success) {
-        setProperties(response.data.data);
-        console.log("Listed properties: ", response.data.data)
-      } else {
-        setError(response.message);
-        console.log("error fetching all properties: ", response.message)
-      }
-      setLoading(false);
-    };
+  const { properties, isLoading, isError } = useAllProperties({category: filterBy});
+  const {  data: session } = useSession();
 
-    fetchProperties();
-  }, []);
+  // useEffect(() => {
+  //   const fetchProperties = async () => {
+  //     const response = await propertyService.getAllProperties();
+  //     if (response.data) {
+  //       setProperties(response.data);
+  //       console.log("Listed properties: ", response.data)
+  //     } else {
+  //       setError(response.message);
+  //       console.log("error fetching all properties: ", response.message)
+  //     }
+  //     setLoading(false);
+  //   };
+
+  //   fetchProperties();
+  // }, []);
 
 
   const menuItems = [
@@ -46,9 +45,9 @@ export default function RootPage() {
 ]
 
   return (
-      <div className="flex flex-col pt-5 pb-16">
-        {/* Header */}
-        <header className="p-4 flex justify-between items-center relative">
+    <div className="flex flex-col pt-5 pb-16">
+      {/* Header */}
+      <header className="p-4 flex justify-between items-center relative">
         
         <div className={`absolute top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
           {menuItems.map((item, index) => (
@@ -61,7 +60,7 @@ export default function RootPage() {
         </div>
       
         {/* Centered Banner */}
-        <div className="absolute left-1/2 transform -translate-x-1/2">
+        <div className="absolute left-1/2 transform -translate-x-1/2">         
           <Image
             width={100}
             height={60}
@@ -72,49 +71,35 @@ export default function RootPage() {
         </div>
 
         {/* Notification & Profile Section */}
-        <div className="flex items-center space-x-4 ml-auto"> 
+        <div className="flex items-center space-x-4 ml-auto text-gray-500 text-xl"> 
           <button onClick={()=>setSettingsMenu('')}>
-          <img
-            src="/avatar.png"
-            alt="profile"
-            className="rounded-full w-10 h-10"
-          />
+            {!session?.user ? 
+              <FaRegUser className="" /> :
+              <img
+                src="/avatar.png"
+                alt="profile"
+                className="rounded-full w-10 h-10"
+              />
+            }            
           </button>         
           
-          <button className="text-gray-500 text-xl"><FaRegBell /></button>
+          <button className="text-gray-500 text-xl">{session?.user?.email}<FaRegBell /></button>
         </div>
       </header>
       <div className="px-6 py-3">
-        <SearchBar />
+        <SearchBar disable={isLoading} filter={filterBy} />
       </div>
       
       {/* Navigation Tabs */}
-      <NavigationTabs setValue={setFilterBy}/>
+      <NavigationTabs setValue={setFilterBy} disable={isLoading} />
 
-      {/* Map Section */}
+      {/* Main Section */}
+      { isLoading || isError ? <Skeleton type="landing" />
+      :
       <div className="relative flex-1">
-        {/* Centralized Button Tabs */}
-        {/* <div className="fixed top-2 left-1/2 transform -translate-x-1/2 z-10 flex w-[70%] max-w-md bg-gray-100 rounded-full shadow-lg text-white">
-          <button className={`w-full py-1 rounded-full text-gray-600 text-center text-sm ${mapOrList==='map'? 'bg-[#61AF74]': 'bg-gray-100' }`}
-            onClick={()=>setMapOrList('map')}
-          >
-            Map
-          </button>
-          <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${mapOrList==='list'? 'bg-[#61AF74]': 'bg-gray-100' }`}
-            onClick={()=>setMapOrList('list')}
-          >
-            Listing
-          </button>
-        </div> */}
-
-        {/* Map Component or List */}
-        {
-          mapOrList==='map'? 
-          <Map properties={properties}/>:
-          <PropertyListing properties={properties.slice(0,6)}/>
-        }
-        
-      </div>
+        {/* Recent Listing */}
+        { properties && properties.length>0 && <PropertyListing properties={properties.slice(0,6)}/> }        
+      </div>}
 
       {/* Footer Navigation */}
       <Footer />

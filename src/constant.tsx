@@ -1,4 +1,4 @@
-import { LocationProps, PropertyType } from "./definitions";
+import { AgentListType, AgentType, LocationProps, PropertyType, UserType } from "./definitions";
 
 export const categories = [
     { title: "House", value: "house" },
@@ -208,18 +208,29 @@ export const agents = [
     { id: 4, name: "Andrew", rating: 4.9, sold: 112, image: "/avatar.png" },
     { id: 5, name: "Michael", rating: 4.9, sold: 112, image: "/avatar.png" },
     { id: 6, name: "Tobi", rating: 4.9, sold: 112, image: "/avatar.png" },
-  ];
+];
 
-export const agent = {
-    id: '01',
-    name: "Amanda",
-    email: "amanda.trust@email.com",
-    rating: 5.0,
-    reviews: 235,
-    sold: 112,
-    listing: 140,
+export const MockUser: UserType[] = [
+  {
+  _id: '01',
+  username: "User01", 
+  email: "amanda.trust@email.com", 
+  image: 'https://placehold.co/40',
+},
+]
+
+export const agent:AgentListType = {
+    _id: '01',
+    user: MockUser[0],
+    brand_name: 'Brand Name',
+    ratings: 5.0,
+    reviews_count: 235,
+    properties_count: 112,
+    sold: 140,
     image: 'https://placehold.co/40',
-    properties: [
+}
+    
+  properties: [
         {
             id: '04pro',
             name: '2-Bedroom Flat', 
@@ -240,8 +251,7 @@ export const agent = {
             period: 'year',
             type: ""
         }
-    ]
-};
+  ]
 
 
 export const Reviews = [

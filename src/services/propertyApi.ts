@@ -1,7 +1,7 @@
 import axios from "axios";
 import useSWR from "swr";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1/property";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1";
 
 const handleRequest = async (request: Promise<any>) => {
   try {
@@ -32,22 +32,22 @@ const propertyService = {
 
   // Fetch All Properties with Filters
   getAllProperties: async (filters: any = {}) => {
-    return handleRequest(axios.get(`${API_BASE_URL}/all`, { params: filters }));
+    return handleRequest(axios.get(`${API_BASE_URL}/property/all`, { params: filters }));
   },
 
   // Update Property
   updateProperty: async (id: string, updates: any) => {
-    return handleRequest(axios.put(`${API_BASE_URL}/${id}`, updates));
+    return handleRequest(axios.put(`${API_BASE_URL}/property/${id}`, updates));
   },
 
   // Delete Property
   deleteProperty: async (id: string) => {
-    return handleRequest(axios.delete(`${API_BASE_URL}/${id}`));
+    return handleRequest(axios.delete(`${API_BASE_URL}/property/${id}`));
   },
 };
 
 export const useAllProperties = (filters = {}) => {
-  const { data, error, isLoading, mutate } = useSWR([`${API_BASE_URL}/all`, filters], ([url, filters]) =>
+  const { data, error, isLoading, mutate } = useSWR([`${API_BASE_URL}/property/all`, filters], ([url, filters]) =>
     axios.get(url, { params: filters }).then((res) => res.data)
   );
 

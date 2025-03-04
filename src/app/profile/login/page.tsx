@@ -11,7 +11,7 @@ import { FaGoogle } from 'react-icons/fa';
 import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
 import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
-import { appleSignin, authenticate, facebookSignin, googleSignin } from '@/utils/actions';
+import { appleSignin, login, facebookSignin, googleSignin } from '@/utils/actions';
 import { BsExclamation } from 'react-icons/bs';
 import { SubmitButton } from '@/components/shared/buttons';
 
@@ -25,28 +25,28 @@ const LoginForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/profile/transaction';
   const [errorMessage, formAction, isLoading] = useActionState(
-    authenticate,
+    login,
     undefined,
   );
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // const handleLogin = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setLoading(true);
 
-    try {
-      const userData = { username, password };
-      const user = await userAPI.login(userData);
-      if (user) {
-        toast.success('Login successful! Redirecting...');
-        setAuthUser(user);
-        router.push(`/profile/transaction/${user._id}`);
-      }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Login failed. Try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   try {
+  //     const userData = { username, password };
+  //     const user = await userAPI.login(userData);
+  //     if (user) {
+  //       toast.success('Login successful! Redirecting...');
+  //       setAuthUser(user);
+  //       router.push(`/profile/transaction/${user._id}`);
+  //     }
+  //   } catch (error: any) {
+  //     toast.error(error.response?.data?.message || 'Login failed. Try again.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <form action={formAction}>

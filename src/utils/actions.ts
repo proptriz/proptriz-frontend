@@ -1,9 +1,10 @@
 'use server';
  
-import { signIn, signOut } from '../../auth';
+import { UserType } from '@/definitions';
+import { signIn, signOut, auth } from '../../auth';
 import { AuthError } from 'next-auth';
  
-export async function authenticate(
+export async function login(
   prevState: string | undefined,
   formData: FormData,
 ) {
@@ -41,4 +42,9 @@ export async function facebookSignin() {
 export async function appleSignin() {
   // console.log('Signing out...'); // Debugging
   await signIn("Apple");
+}
+
+export async function isAuthUser(){
+  const authUser = await auth();
+  return authUser || null
 }

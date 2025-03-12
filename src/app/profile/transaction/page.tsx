@@ -21,13 +21,13 @@ export default function ProfileTransaction ({
 }) {
   const resolvedParams = use(params);
   const userId = resolvedParams.id;
+  const {  data: session, status } = useSession();
 
   const [loading, setLoading] = useState(false)
-  const {  data: session, status } = useSession();
   console.log("Auth user: ", session)
   // const { authenticateUser } = useContext(AppContext);
-  const auth = authenticateUser();
-  console.log("Auth user: ", auth.user)
+  // const auth = authenticateUser();
+  // console.log("Auth user: ", auth.user)
   const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
   const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
@@ -41,6 +41,7 @@ export default function ProfileTransaction ({
     {title: 'FAQ', link: '/profile/faq'},
   ]
 
+  if(status === "loading") return <Skeleton type="profile" />
   if(loading) return <Skeleton type="profile" />
 
   return (

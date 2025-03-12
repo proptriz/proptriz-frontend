@@ -44,6 +44,10 @@ export async function appleSignin() {
   await signIn("Apple");
 }
 
+export async function githubSignin() {
+  await signIn("github");
+}
+
 export async function isAuthUser(){
   const authUser = await auth();
   return authUser || null

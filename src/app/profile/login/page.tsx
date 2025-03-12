@@ -11,7 +11,7 @@ import { FaGoogle } from 'react-icons/fa';
 import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
 import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
-import { appleSignin, login, facebookSignin, googleSignin } from '@/utils/actions';
+import { appleSignin, login, facebookSignin, googleSignin, githubSignin } from '@/utils/actions';
 import { BsExclamation } from 'react-icons/bs';
 import { SubmitButton } from '@/components/shared/buttons';
 
@@ -113,6 +113,14 @@ const LoginPage: React.FC = () => {
               className="bg-black text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               <FaApple className="text-xl" />
+            </button>
+          </form>
+          <form action={githubSignin}>
+            <button
+              type="submit"
+              className="bg-black text-white p-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              github
             </button>
           </form>
         </div>

@@ -98,12 +98,12 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
             <div className="flex space-x-4 mt-4 overflow-x-auto">
 
                 {/* Card */}
-                {mockProperties.slice(0,3).map(((property, key)=>(
+                {properties.slice(0,3).map(((property, key)=>(
                     <HorizontalCard 
                         id={property._id}
                         name={property.title} 
                         price={formatPrice(property.price)} 
-                        type="" 
+                        type={property.category} 
                         address={property.address} 
                         image={property.banner} 
                         period={property.period || ''} 

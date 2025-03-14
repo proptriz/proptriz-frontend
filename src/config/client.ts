@@ -4,7 +4,8 @@ const backendURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api
 const axiosClient = axios.create({ 
   baseURL: backendURL, 
   timeout: 20000, 
-  withCredentials: true
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" }
 });
 
 export const setAuthToken = (token: string) => {

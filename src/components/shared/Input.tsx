@@ -1,4 +1,5 @@
 'use client';
+import Image from "next/image";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { ImEye, ImEyeBlocked } from "react-icons/im";
 import { IoHomeOutline } from "react-icons/io5";
@@ -117,4 +118,45 @@ export const SelectButton: React.FC<{
   );
 };
 
+export const FileInput = (props: any) => {
+  const isImageUploaded = props.imageUrl && props.imageUrl.trim() !== ""; // Check if an image has been uploaded
+  const imageLabel = isImageUploaded ? props.label : 'upload pics';
 
+  return (
+    <div className="">
+      {props.label && (
+        <label className="block text-[17px] text-[#333333] font-bold">{imageLabel}</label>
+      )}
+      {props.describe && (
+        <label className="block pb-3 text-sm text-gray-400">{props.describe}</label>
+      )}
+      <div className="flex flex-col items-center justify-center overflow-hidden p-3 rounded-md relative">
+        <div className={`w-full ${props.height? props.height: 'h-[200px]'} relative mb-4`}>
+          <Image
+            src={isImageUploaded ? props.imageUrl : 'https://placehold.co/40'}
+            alt="Upload image"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'contain', maxHeight: '200px', maxWidth: '100%' }}
+          />
+        </div>
+        {!props.hideCaption && !isImageUploaded && (
+          <div className="text-center text-[#828282]">
+            <div>
+              Upload image
+            </div>
+            <span className="text-[11px] mt-1">
+              image for profile pics
+            </span>
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/png, image/jpeg, image/jpg"
+          className={`absolute scale-[5] opacity-0 cursor-pointer`}
+          onChange={(e) => props.handleAddImage(e)}
+        />
+      </div>
+    </div>
+  );
+};

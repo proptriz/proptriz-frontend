@@ -1,6 +1,6 @@
 import { UserType } from "@/definitions";
 import axios from "axios";
-import axiosClient from "@/config/client";
+import axiosClient, { setAuthToken } from "@/config/client";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 
@@ -68,7 +68,7 @@ const userAPI = {
   /**
    * User Login
    */
-  login: async (data: LoginData): Promise< UserType | null> => {
+  login: async (data: LoginData) => {
     const response = await axiosClient.post("/users/login", data);
     if (response.status===401) {
       console.log("Login error, ", response.data.message);
@@ -76,7 +76,8 @@ const userAPI = {
       return null
     };
     if (response.status===200 && response.data.success){
-      return response.data.user;
+      localStorage.setItem('token', response.data.token);
+      return response.data;
     }
     // toast.info("Welcome: ", response.data.user.username);
     return null;
@@ -104,7 +105,7 @@ const userAPI = {
 };
 
 export const authenticateUser = () => {
-  const userFetcher = (url:string) => axios.post(url, {withCredentials: true}).then((res) => {res.data;})
+  const userFetcher = (url:string) => axiosClient.post(url, {withCredentials: true}).then((res) => {res.data;})
   const { data, error, isLoading, mutate } = useSWR(`${API_BASE_URL}/users/authenticate`, userFetcher);
 
   return {
@@ -114,6 +115,31 @@ export const authenticateUser = () => {
     mutate,
   };
 };
+
+// export const aditProfile = async (formData:FormData) => {
+//   const userFetcher = (url:string, formData:FormData) => axiosClient.post(url, { body:formData }).then((res) => {res.data;})
+//   const { data, error, isLoading, mutate } = useSWR(`${API_BASE_URL}/users/edit-profile`, userFetcher);
+
+//   return {
+//     data,
+//     isLoading,
+//     error,
+//     mutate,
+//   };
+// };
+
+export const aditProfile = async (data:FormData) => {
+  try {
+        const jsonData = Object.fromEntries(data.entries());
+        const response = await axiosClient.post("/users/update-profile", jsonData, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return { success: true, data: response.data };
+      } catch (error: any) {
+        console.error("Profile update failed:", error);
+        return { success: false, message: error.message };
+      }
+}
 
 
 export default userAPI;

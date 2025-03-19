@@ -15,6 +15,7 @@ interface SignupData {
 interface LoginData {
   username: string;
   password: string;
+  provider: string
 }
 
 interface User {
@@ -72,11 +73,11 @@ const userAPI = {
     const response = await axiosClient.post("/users/login", data);
     if (response.status===401) {
       console.log("Login error, ", response.data.message);
-      toast.error("Login error, ", response.data.message);
+      // toast.error("Login error, ", response.data.message);
       return null
     };
     if (response.status===200 && response.data.success){
-      localStorage.setItem('token', response.data.token);
+      // localStorage.setItem('token', response.data.token);
       return response.data;
     }
     // toast.info("Welcome: ", response.data.user.username);

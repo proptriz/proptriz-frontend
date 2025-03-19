@@ -21,13 +21,13 @@ export default function ProfileTransaction ({
 }) {
   const resolvedParams = use(params);
   const userId = resolvedParams.id;
+  const {  data: session, status } = useSession();
 
   const [loading, setLoading] = useState(false)
-  const {  data: session, status } = useSession();
-  console.log("Auth user: ", session)
+  console.log("Auth user: ", session?.user)
   // const { authenticateUser } = useContext(AppContext);
-//   const auth = authenticateUser();
-//   console.log("Auth user: ", auth.user)
+  // const auth = authenticateUser();
+  // console.log("Auth user: ", auth.user)
   const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
   const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
@@ -41,6 +41,7 @@ export default function ProfileTransaction ({
     {title: 'FAQ', link: '/profile/faq'},
   ]
 
+  if(status === "loading") return <Skeleton type="profile" />
   if(loading) return <Skeleton type="profile" />
 
   return (
@@ -74,7 +75,7 @@ export default function ProfileTransaction ({
         <div className="flex flex-col items-center mb-2">
           <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
             <img
-              src="https://placehold.co/40"
+              src={session?.user?.image || "https://placehold.co/40"}
               alt="profile"
               className="rounded-full w-full h-full object-cover"
             />                    
@@ -86,7 +87,7 @@ export default function ProfileTransaction ({
           </div>
         </div>
         <h2 className="font-bold text-2xl">{session?.user?.name}</h2>
-        <p className="text-gray-500 mb-3">{session?.user?.id}</p>
+        <p className="text-gray-500 mb-3">{session?.user?.email}</p>
 
         {/* Count Status */}
         <div className="grid grid-cols-3 space-x-6 text-center mb-5">

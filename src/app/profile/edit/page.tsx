@@ -21,15 +21,8 @@ const EditProfile = () => {
   const [state, formAction] = useActionState(
     async () => {
     try {
-      const token = localStorage.getItem('token');
-      if(!token) {
-        toast.warn('no auth token')
-        return
-      }; 
       // const jsonData = Object.fromEntries(formData.entries());
-      const response = await axiosClient.put("/users/update-profile", formData, {
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-      });
+      const response = await axiosClient.put("/users/update-profile", formData );
       return { success: true, data: response.data };
     } catch (error: any) {
       console.error("Profile update failed:", error);

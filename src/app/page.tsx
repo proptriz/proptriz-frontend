@@ -83,7 +83,7 @@ export default function RootPage() {
             }            
           </button>         
           
-          <button className="text-gray-500 text-xl">{session?.user?.email}<FaRegBell /></button>
+          <button className="text-gray-500 text-xl"><FaRegBell /></button>
         </div>
       </header>
       <div className="px-6 py-3">

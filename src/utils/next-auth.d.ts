@@ -6,4 +6,5 @@
 //   interface Session {
 //     user: UserType;
 //   }
+//   interface User extends UserType {} 
 // }

@@ -1,5 +1,5 @@
 import React from "react";
-import "./Skeleton.css";
+import "./skeleton.css";
 import Footer from "../shared/Footer";
 function SkeletonLandingPage() {
   return (

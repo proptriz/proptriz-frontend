@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaApple, FaFacebookF, FaGoogle } from 'react-icons/fa6';
-import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
+import { EmailInput, PasswordInput, TextInput, UsernameInput } from '@/components/shared/Input';
 import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
 import { AppContext } from '../../../../context/AppContextProvider';
@@ -20,6 +20,7 @@ const SignupPage: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [fullname, setFullname] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [isValid, setIsValid] = useState<boolean>(true);
     const [loading, setLoading] = useState(false);
     const [errorMessage, seterrorMessage] = useState<string>('')
 
@@ -59,7 +60,7 @@ const SignupPage: React.FC = () => {
                 {/* Signup Form */}
                 <form onSubmit={handleSignup}>
                     <div className="mb-4">
-                        <TextInput username={username} setValue={setUsername} name="username" label="Username or Email" />
+                        <UsernameInput username={username} setValue={setUsername} name="username" label="Username or Email" setIsValid={setIsValid} />
                     </div>
                     <div className="mb-4">
                         <TextInput value={fullname} setValue={setFullname} name="fullname" label="Your Full Name (optional)" />

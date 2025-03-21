@@ -125,6 +125,25 @@ const EditProfile = () => {
         </button>
       </div>
     </form>
+
+    {/* Social Buttons */}
+    <div className="flex justify-between mt-6 space-x-4">
+      <button className="flex items-center justify-items-center bg-[#234F68] w-full text-white p-5 rounded-lg ">
+        <Image src="/icon/google.svg" alt="google icon" width={20} height={20} className='mr-2'/>
+          Google Unlink
+      </button>
+      <button className="flex items-center justify-items-center card-bg w-full p-5 rounded-lg ">
+        <FaFacebookF className='text-2xl text-blue-600 mr-2' />
+          Facebook Link
+      </button>
+    </div>
+
+    {/* Location Button */}
+    <div className="mt-16">
+      <button className="w-full bg-green text-white py-3 rounded-xl" type='submit'>
+        Submit
+      </button>
+    </div>
   </div>
   );
 };

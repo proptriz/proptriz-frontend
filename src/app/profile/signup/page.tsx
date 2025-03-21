@@ -76,7 +76,7 @@ const SignupPage: React.FC = () => {
                     <button
                         type="submit"
                         className="w-full bg-green text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        disabled={loading}
+                        disabled={loading || !isValid}
                     >
                         {loading ? 
                             <span className='flex items-center justify-center'><ImSpinner2 className="animate-spin mr-2 ml-1" /> {/* Spinner Icon */}

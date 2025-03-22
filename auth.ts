@@ -30,23 +30,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   }), Google, Facebook, Apple, GitHub], 
   callbacks: {
-   async session({ session, token}) {
+    async session({ session, token}) {
     //  console.log("token:", token.email)
     const dbUser = await axiosClient.get(`/users/get-user/${token.email}`);
     const currentUserDetails = dbUser.data.data.data
 
     if(dbUser) {
-      session.user = {
-        id: currentUserDetails._id,
-        email: currentUserDetails.email,
-        name: currentUserDetails.fullname || currentUserDetails.username,
+          session.user = {
+            id: currentUserDetails._id,
+            email: currentUserDetails.email,
+            name: currentUserDetails.fullname || currentUserDetails.username,
         image: currentUserDetails.image,
-        // provider: dbUser.data.provider,
-        // phone: dbUser.data.phone,  
-        emailVerified: token.emailVerified ? new Date(token.emailVerified as string) : null
-      };
-    }
-
+            // provider: dbUser.data.provider,
+            // phone: dbUser.data.phone,  
+            emailVerified: token.emailVerified ? new Date(token.emailVerified as string) : null
+          };
+        }
+      
       return session;
     },
     async signIn({user, account}) {

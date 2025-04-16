@@ -3,8 +3,15 @@ import Image from "next/image";
 import React from "react";
 import HorizontalCard from "../shared/HorizontalCard";
 import Link from "next/link";
+import { PropertyType } from "@/definitions";
+import formatPrice from "@/utils/formatPrice";
+import { mockProperties } from "@/constant";
 
-export default function PropertyListing() {
+interface PropertyListingProps {
+    properties: PropertyType[];
+}
+  
+const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
     const topLocation = [
         { image: '/avatar.png', name: 'Idumata Lagos' },
         { image: '/avatar.png', name: 'Tanke Ilorin' },
@@ -58,20 +65,20 @@ export default function PropertyListing() {
             <h2 className="text-lg font-semibold">Explore Nearby Property</h2>
             <div className="grid grid-cols-2 gap-4 mt-4">
                 
-                {apartments.map(((info, key)=>(
-                    <Link href={'/property/details'} key={key}>
+                {properties.map(((info, key)=>(
+                    <Link href={`/property/details/${info._id}?slug=${info.slug}`} key={key}>
                         <div className="bg-white p-3 rounded-2xl  shadow-md">
-                            <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${info.image})`}}>
+                            <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${info.banner})`}}>
                                 <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
-                                    N{info.price}
-                                    <span className="text-xs">{info.period}</span>
+                                    N{formatPrice(info.price)}
+                                    <span className="text-xs"> {info.period}</span>
                                 </div>
                             </div>
                             <div>
-                                <p className="text-md font-semibold my-2">{info.name}</p>
+                                <p className="text-md font-semibold my-2">{info.title}</p>
                                 <div className="flex space-x-2">
                                     <span className="text-yellow-500">★</span>
-                                    <span className="text-gray-500 text-sm">{info.rating}</span>
+                                    <span className="text-gray-500 text-sm">{5.0}</span>
                                     <p className="text-gray-500 text-sm">{info.address}</p>
                                 </div>
                             </div>
@@ -91,16 +98,16 @@ export default function PropertyListing() {
             <div className="flex space-x-4 mt-4 overflow-x-auto">
 
                 {/* Card */}
-                {apartments.slice(0,3).map(((info, key)=>(
+                {properties.slice(0,3).map(((property, key)=>(
                     <HorizontalCard 
-                        id={''}
-                        name={info.name} 
-                        price={30} 
-                        type="" 
-                        address={info.address} 
-                        image={info.image} 
-                        period={info.period} 
-                        rating={info.rating}
+                        id={property._id}
+                        name={property.title} 
+                        price={formatPrice(property.price)} 
+                        type={property.category} 
+                        address={property.address} 
+                        image={property.banner} 
+                        period={property.period || ''} 
+                        rating={10}
                         key={key}
                     />
                 )))}
@@ -200,3 +207,5 @@ export default function PropertyListing() {
     </div>
   );
 }
+
+export default PropertyListing;

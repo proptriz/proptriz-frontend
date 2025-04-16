@@ -1,23 +1,30 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, use, useEffect } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { FaFilter } from "react-icons/fa";
 import SearchBar from "@/components/shared/SearchBar";
 import { MdCalendarViewDay } from "react-icons/md";
 import { HiViewGrid } from "react-icons/hi";
-import { apartments, categories, styles } from "@/constant";
+import { categories, styles } from "@/constant";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Popup from "@/components/shared/Popup";
+import formatPrice from "@/utils/formatPrice";
+import { useAllProperties } from "@/services/propertyApi";
+import { PropertyType } from "@/definitions";
 
-const EmptySearch = () => {
+const EmptySearch = ({searchParams}:{ searchParams: Promise<{ filter: string, query: string }> }) => {
     const router = useRouter();
-    
+    const resolvedParams = use(searchParams)
+    // console.log('filter parameter: ', resolvedParams)
+
     const [ propCount, setPropCount ] = useState<number>(4);
     const [togglePopup, setTogglePopup] = useState(false);
+    const [filter, setFilter] = useState<any>({category: 'office'});
+    const { properties, isLoading, isError } = useAllProperties({ category: resolvedParams.filter });
 
     return (
         <div className="p-6 pb-24 relative min-h-screen">
@@ -32,22 +39,22 @@ const EmptySearch = () => {
             </div>
             <SearchBar />
             <div className="flex items-center mb-3 sm:mb-5 mt-3">
-                <p className="mb-4 font-[Raleway]">Found<span className="font-bold"> {propCount} </span>properties</p>
+                <p className="mb-4 font-[Raleway]">Found<span className="font-bold"> {properties?.length} </span>properties</p>
                 <button className="px-5 py-3 mb-6 rounded-full ml-auto card-bg flex gap-1"><HiViewGrid /><MdCalendarViewDay /></button>
             </div>
 
             {/* Property Card */}
             <div className="grid grid-cols-2 gap-3">                
-                {apartments.map(((info, key)=>(
+                {properties && properties.map(((item:PropertyType, key:any)=>(
                     <VerticalCard 
-                        id={''}
-                        name={info.name} 
-                        price={30} 
-                        type="" 
-                        address={info.address} 
-                        image={info.image} 
-                        period={info.period} 
-                        rating={info.rating}
+                        id={item._id}
+                        name={item.title} 
+                        price={formatPrice(item.price)} 
+                        type={item.category} 
+                        address={item.address} 
+                        image={item.banner} 
+                        period={item.period? item.period : ''} 
+                        rating={0}
                         key={key}
                     />
                 )))}

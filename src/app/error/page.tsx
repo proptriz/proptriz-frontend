@@ -1,11 +1,20 @@
 'use client';
 
+// import { useSearchParams } from 'next/navigation';
 import Footer from "@/components/shared/Footer"
 import { styles } from "@/constant"
 import Image from "next/image"
 import { FaArrowRight, FaHome } from "react-icons/fa"
 
-const NotFound = () => {
+export default function ErrorPage() {
+//     const searchParams = useSearchParams();
+//   const error = searchParams.get('error');
+  const errorMessages: Record<string, string> = {
+    CredentialsSignin: 'Invalid username or password. Please try again.',
+    OAuthSignin: 'OAuth authentication failed. Try another provider.',
+    OAuthCallbackError: 'Error during OAuth callback.',
+    Default: 'An unknown error occurred. Please try again later.',
+  };
     return (
         <>
         <div className="flex flex-col justify-between min-h-screen items-center bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400">
@@ -20,6 +29,7 @@ const NotFound = () => {
                 <div className="w-full h-full flex items-center mb-5">
                     <Image src={'/error-banner.png'} alt="error banner" width={300} height={150} className="w-full sm:h-[150px] sm:w-auto mx-auto "/>
                 </div>
+                {/* <h1 className="text-4xl text-center">{errorMessages[error || 'Default']}</h1> */}
                 <h1 className="text-4xl text-center">Page Not Found</h1>
             </div>
 
@@ -31,5 +41,3 @@ const NotFound = () => {
         </>
     )
 }
-
-export default NotFound

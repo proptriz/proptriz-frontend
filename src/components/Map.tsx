@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from 'leaflet';
+import propertyService from "@/services/propertyApi";
+import { PropertyType } from "@/definitions";
+import formatPrice from "@/utils/formatPrice";
 
 // Marker icon for other locations
 const customIcon = new L.Icon({
@@ -17,9 +20,16 @@ const customIcon = new L.Icon({
 
 // Default marker icon for center
 const defaultIcon = new L.Icon.Default();
+interface PropertyListingProps {
+  properties: PropertyType[];
+}
+
+const Map: React.FC<PropertyListingProps> = ({ properties }) => {
+  // const [properties, setProperties] = useState<PropertyType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
 
-const Map: React.FC = () => {
   const center: [number, number] = [9.0820, 8.6753]; // Nigeria coordinates
   const markers = [
     { position: [6.5244, 3.3792], price: "200K" }, // Lagos
@@ -43,9 +53,15 @@ const Map: React.FC = () => {
               <Popup>Your locaion</Popup>
             </Marker>
 
-            {markers.map((marker, idx) => (
-            <Marker key={idx} position={marker.position as [number, number]} icon={customIcon}>
-                <Popup>{marker.price}</Popup>
+            {properties.map((marker, idx) => (
+            <Marker key={idx} position={[marker.map_location?.coordinates[0], marker.map_location?.coordinates[1]] as [number, number]} icon={customIcon}>
+                <Popup>
+                  <div>
+                    <p className="">{marker.title}</p>
+                    <p>N{formatPrice(marker.price)}</p>
+                    <p>{marker.listed_for}</p>
+                  </div>
+                </Popup>
             </Marker>
             ))}
         </MapContainer>

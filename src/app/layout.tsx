@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Lato } from 'next/font/google';
 import "./globals.css";
+import AppContextProvider from "../../context/AppContextProvider";
+import { ToastContainer } from "react-toastify";
+import { SessionProvider } from "next-auth/react"
 
 const lato = Lato({ weight: '400', subsets: ['latin'], display: 'swap' });
 
@@ -26,7 +29,12 @@ export default function RootLayout({
         className={`bg-background text-black ${lato.className} antialiased`}
       >
         <div className="w-full md:w-[650px] md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
-          {children}
+          <AppContextProvider>
+            <SessionProvider>
+              {children}
+              <ToastContainer />
+            </SessionProvider>
+          </AppContextProvider>
         </div> 
       </body>
     </html>

@@ -1,5 +1,3 @@
-import { PropertyProps } from "@/definitions";
-
 
 interface VerticalCardProps {
     id: string;
@@ -7,7 +5,7 @@ interface VerticalCardProps {
     name: string; // Title of the property
     rating: number; // Rating of the property
     address: string; // Location of the property
-    price: number; // Price per month
+    price: string; // Price per month
     type: string; // Property type (e.g., "Apartment")
     period: string
   }
@@ -21,13 +19,13 @@ export const VerticalCard = ({
     price,
     type,
     period
-  }: PropertyProps ) => {
+  }: VerticalCardProps ) => {
     return (
         <div className="bg-white p-3 rounded-2xl shadow-md">
             <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${image})`}}>
                 <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
                     N{price}
-                    <span className="text-xs">{period}</span>
+                    <span className="text-xs"> {period}</span>
                 </div>
             </div>
             <div>

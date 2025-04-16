@@ -1,22 +1,29 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
+import Link from "next/link";
+import Image from "next/image";
+import { FaRegBell } from "react-icons/fa6";
+
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
-import { FaRegBell } from "react-icons/fa6";
-import dynamic from 'next/dynamic';
-import Link from "next/link";
+import propertyService, { useAllProperties } from "@/services/propertyApi";
+import { mockProperties } from "@/constant";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function ExplorePage() {
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
+  const [ filterBy, setFilterBy ] = useState<string>('house');
+
+  const { properties, isLoading, isError } = useAllProperties({category: filterBy});
 
   const menuItems = [
     {title: 'Login', link: '/profile/login'},
     {title: 'Transaction', link: '/profile/transaction'}
-]
+  ]
 
   return (
       <div className="flex flex-col pt-5 pb-16">
@@ -34,10 +41,12 @@ export default function ExplorePage() {
       
             {/* Centered Banner */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
-            <img
-                src="banner.png"
-                alt="banner"
-                className="h-auto max-w-full"
+            <Image
+              width={100}
+              height={60}
+              src="/banner.png"
+              alt="banner"
+              className="h-auto max-w-full"
             />
             </div>
 
@@ -51,11 +60,11 @@ export default function ExplorePage() {
       </div>
       
       {/* Navigation Tabs */}
-      <NavigationTabs />
+      <NavigationTabs setValue={setFilterBy}/>
 
       {/* Map Section */}
       <div className="relative flex-1">
-        <Map />        
+        <Map properties={properties && properties.length>0 ?  properties: []}/>        
       </div>
 
       {/* Footer Navigation */}

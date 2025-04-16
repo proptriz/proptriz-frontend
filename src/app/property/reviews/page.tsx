@@ -3,7 +3,8 @@
 import { BackButton } from "@/components/shared/buttons";
 import { ReviewCard } from "@/components/shared/Cards";
 import HorizontalCard from "@/components/shared/HorizontalCard";
-import { apartments } from "@/constant";
+import { mockProperties } from "@/constant";
+import formatPrice from "@/utils/formatPrice";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -19,16 +20,16 @@ const PropertyReviews = () => {
             </header>
             
             {/* Property Card */}
-            {apartments.slice(0,1).map(((info, key)=>(
+            {mockProperties.slice(0,1).map(((property, key)=>(
                 <HorizontalCard 
                     id={''}
-                    name={info.name} 
-                    price={30} 
+                    name={property.title} 
+                    price={formatPrice(property.price)} 
                     type="" 
-                    address={info.address} 
-                    image={info.image} 
-                    period={info.period} 
-                    rating={info.rating}
+                    address={property.address} 
+                    image={property.banner} 
+                    period={property.period || ''} 
+                    rating={23}
                     key={key}
                 />
             )))}

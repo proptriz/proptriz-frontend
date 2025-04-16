@@ -24,10 +24,7 @@ export default function ProfileTransaction ({
   const {  data: session, status } = useSession();
 
   const [loading, setLoading] = useState(false)
-  console.log("Auth user: ", session?.user)
-  // const { authenticateUser } = useContext(AppContext);
-  // const auth = authenticateUser();
-  // console.log("Auth user: ", auth.user)
+  console.log("Auth user: ", session)
   const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
   const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');

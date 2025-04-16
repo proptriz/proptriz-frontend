@@ -1,4 +1,4 @@
-import { UserType } from "@/definitions";
+import { OTPType, UserType } from "@/definitions";
 import axios from "axios";
 import axiosClient, { setAuthToken } from "@/config/client";
 import { toast } from "react-toastify";
@@ -64,6 +64,24 @@ const userAPI = {
       return null
     }
     return response.data.user;
+  },
+
+  verifyOtp: async (data: any):  Promise< OTPType  | null> => {
+    const response = await axiosInstance.post(`/users/verify-otp?email=${data.email}`, data);
+    if (response.data.success === false) {
+      console.log("OTP verification error, ", response.data.message)
+      return null
+    }
+    return response.data;
+  },
+
+  resendOtp: async (data: any):  Promise< OTPType  | null> => {
+    const response = await axiosInstance.post(`/users/resend-otp?email=${data.email}`);
+    if (response.data.success === false) {
+      console.log("Resend OTP failed, ", response.data.message)
+      return null
+    }
+    return response.data;
   },
 
   /**

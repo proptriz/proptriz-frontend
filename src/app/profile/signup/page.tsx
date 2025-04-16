@@ -33,7 +33,8 @@ const SignupPage: React.FC = () => {
             toast.success("Signup successful! Redirecting...");
             setAuthUser(user)
             console.log("authenticated user: ", user)
-            router.push('/profile/login');
+            // router.push('/profile/login');
+            router.push(`/profile/signup/confirm/code?email=${user?.email}`);
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Signup failed. Try again.");
         } finally {

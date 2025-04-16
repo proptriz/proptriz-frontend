@@ -8,6 +8,10 @@ export async function login(
   prevState: string | undefined,
   formData: FormData,
 ) {
+  const username = formData.get('username');
+  const password = formData.get('password');
+  const callbackUrl = formData.get('redirectTo') || '/profile/transaction';
+  
   console.log('authenticate here')
   try {    
     await signIn('credentials', formData);

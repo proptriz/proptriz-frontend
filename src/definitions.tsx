@@ -48,6 +48,11 @@ export interface UserType {
     createdAt?: Date; // (auto)
 };
 
+export interface OTPType {
+  success: boolean,
+  message: string,
+}
+
 export interface PropertyType {
     _id: string;
     banner: string; // URL of the property image or image with index = 0

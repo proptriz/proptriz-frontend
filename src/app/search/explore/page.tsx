@@ -64,7 +64,7 @@ export default function ExplorePage() {
 
       {/* Map Section */}
       <div className="relative flex-1">
-        <Map properties={properties && properties.length>0 ?  properties: []}/>        
+        <Map properties={properties && properties.data.length>0 ?  properties.data: []}/>        
       </div>
 
       {/* Footer Navigation */}

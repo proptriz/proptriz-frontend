@@ -76,20 +76,27 @@ export interface PropertyType {
     updated_at: Date;
   };
 
+  export enum AgentStatus {
+    available = "available",
+    unavailable = "unavailable"
+  }
+
   export interface AgentType { 
-    _id: string;
-    user: UserType; //foreign key 
+    _id?: string;
+    user?: UserType; //foreign key 
     brand_name: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
+    phone?: string;
+    email?: string;
     image?: string; // URL to user profile pics (optional)
     fulfillment_terms?: string;
-    createdAt: Date; // (auto)
-    updatedAt: Date;
+    createdAt?: Date; // (auto)
+    updatedAt?: Date;
     address: string;
     map_location?: {
       type: 'Point';
       coordinates: [number, number];
     };
-    status: string; // (available, unavilable)
+    status: AgentStatus; // (available, unavilable)
     social_handles?: {}[];
   };
 

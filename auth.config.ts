@@ -2,13 +2,13 @@ import { NextAuthConfig } from 'next-auth';
 
 export const authConfig = {
   pages: {
-    signIn: '/profile/login',
+    signIn: '/login',
     error: '/error'
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnProfile = nextUrl.pathname.startsWith('/profile/transaction');
+      const isOnProfile = nextUrl.pathname.startsWith('/home');
 
       if (isOnProfile && !isLoggedIn) {
         return false; // Middleware will handle redirection

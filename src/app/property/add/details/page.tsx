@@ -8,7 +8,7 @@ import { BackButton } from "@/components/shared/buttons";
 import { FaNairaSign, FaPlus } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";
-import AddPropertyDetails from "@/components/property/AddDetailsSection";
+import AddPropertyDetails from "@/components/property1/AddDetailsSection";
 
 interface Feature {
   name: string;

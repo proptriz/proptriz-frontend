@@ -80,7 +80,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: "jwt",
   },
   pages: {
-    signIn: '/profile/login',
+    signIn: '/login',
     error: '/error'
   },
 });

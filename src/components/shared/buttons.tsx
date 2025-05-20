@@ -11,7 +11,7 @@ export const BackButton = ()=> {
     const router = useRouter();
 
     return (
-        <button className="top-5 left-0 text-xl" onClick={()=>router.back()}>
+        <button className="top-0 mb-4 left-0 text-xl" onClick={()=>router.push("/home")}>
             <FaArrowLeft className="text-xl" />
         </button>
     )

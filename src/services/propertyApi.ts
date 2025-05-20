@@ -50,7 +50,7 @@ export const useAllProperties = (filters = {}) => {
   const { data, error, isLoading, mutate } = useSWR([`${API_BASE_URL}/property/all`, filters], ([url, filters]) =>
     axios.get(url, { params: filters }).then((res) => res.data)
   );
-  // console.log(data.data)
+  console.log(data)
 
   return {
     properties: data,

@@ -10,7 +10,7 @@ import { mockProperties } from "@/constant";
 import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoClose, IoHomeOutline } from "react-icons/io5";
-import AddPropertyDetails from "@/components/property/AddDetailsSection";
+import AddPropertyDetails from "@/components/property1/AddDetailsSection";
 import Image from "next/image";
 import { categories } from "@/constant";
 import formatPrice from "@/utils/formatPrice";

@@ -4,6 +4,7 @@ import "./globals.css";
 import AppContextProvider from "../../context/AppContextProvider";
 import { ToastContainer } from "react-toastify";
 import { SessionProvider } from "next-auth/react"
+import { AuthProvider } from "@/context/AuthContext";
 
 const lato = Lato({ weight: '400', subsets: ['latin'], display: 'swap' });
 
@@ -28,13 +29,15 @@ export default function RootLayout({
       <body
         className={`bg-background text-black ${lato.className} antialiased`}
       >
-        <div className="w-full md:w-[650px] md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
-          <AppContextProvider>
-            <SessionProvider>
-              {children}
-              <ToastContainer />
-            </SessionProvider>
-          </AppContextProvider>
+        <div className="w-full md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
+          <SessionProvider>
+            <AuthProvider>
+              <AppContextProvider>        
+                {children}
+                <ToastContainer />              
+              </AppContextProvider>
+            </AuthProvider>
+          </SessionProvider>
         </div> 
       </body>
     </html>

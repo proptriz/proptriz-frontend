@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import React from "react";
-import { FaRegUser } from "react-icons/fa";
+import { FaRegUser, FaMapMarkerAlt } from "react-icons/fa";
 import { FiHome, FiHeart, FiSearch } from "react-icons/fi";
+
 import { usePathname } from "next/navigation";
 
 const menus = [
-  { name: "Home", icon: <FiHome />, link: '/' },
-  { name: "Search", icon: <FiSearch />, link: '/search/explore' },
+  { name: "Home", icon: <FaMapMarkerAlt  />, link: '/' },
+  { name: "Search", icon: <FiHome />, link: '/search/explore' },
   { name: "Favorite", icon: <FiHeart />, link: '/property/list' },
   { name: "Settings", icon: <FaRegUser />, link: '/profile/transaction' },
 ];

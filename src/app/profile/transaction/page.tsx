@@ -1,19 +1,16 @@
 'use client';
 
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import { agent } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
-import { AppContext } from "../../../../context/AppContextProvider";
-import { BsPower } from "react-icons/bs";
-import { handleSignOut } from "@/utils/actions";
+import { AppContext } from "../../../context/AppContextProvider";
 
-export default function ProfileTransaction ({ params }: { params: { id: string } }) {
-    const userId = params.id; //React.use()
-    // const { authenticateUser } = useContext(AppContext);
-    // const authUser = authenticateUser();
+export default function ProfileTransaction () {
+    const { authenticateUser } = useContext(AppContext);
+    const authUser = authenticateUser();
     const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
     const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
     const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
@@ -36,15 +33,7 @@ export default function ProfileTransaction ({ params }: { params: { id: string }
                             {item.title}
                         </Link>
                     </button>
-                )) } 
-                <form
-                    action={handleSignOut}
-                    >
-                    <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-                        <BsPower className="w-6" />
-                        <div className="">Sign Out</div>
-                    </button>
-                </form>               
+                )) }               
             </div>
             <div className="flex items-center justify-between mb-5">
                 <BackButton />            

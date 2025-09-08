@@ -1,4 +1,4 @@
-import { UserType } from "@/definitions";
+import { UserType } from "@/types";
 import axios from "axios";
 import { toast } from "react-toastify";
 

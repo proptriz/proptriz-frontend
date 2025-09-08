@@ -1,4 +1,4 @@
-import { LocationProps, PropertyType } from "./definitions";
+import { LocationProps, PropertyType } from "./types";
 
 export const categories = [
     { title: "House", value: "house" },

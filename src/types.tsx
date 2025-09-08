@@ -1,3 +1,9 @@
+export interface AuthUserType {
+  uid: string;
+  username: string;
+  membership: {class:string, balance:number};
+};
+
 export interface AgentProps { 
     id: string, 
     name: string, 
@@ -127,3 +133,10 @@ export interface PropertyType {
     created_at: Date;
     updated_at: Date
   }
+
+  export type PaymentDataType = {
+  amount: number;
+  memo: string;
+  metadata: {
+  }
+};

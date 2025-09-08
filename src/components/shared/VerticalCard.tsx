@@ -1,4 +1,4 @@
-import { PropertyProps } from "@/definitions";
+import { PropertyProps } from "@/types";
 
 
 interface VerticalCardProps {

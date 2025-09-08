@@ -3,7 +3,7 @@ import Image from "next/image";
 import React from "react";
 import HorizontalCard from "../shared/HorizontalCard";
 import Link from "next/link";
-import { PropertyType } from "@/definitions";
+import { PropertyType } from "@/types";
 import formatPrice from "@/utils/formatPrice";
 
 interface PropertyListingProps {

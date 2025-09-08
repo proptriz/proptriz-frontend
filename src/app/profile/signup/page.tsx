@@ -8,7 +8,7 @@ import { FaApple, FaFacebookF, FaGoogle } from 'react-icons/fa6';
 import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
 import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
-import { AppContext } from '../../../../context/AppContextProvider';
+import { AppContext } from '../../../context/AppContextProvider';
 import { ImSpinner2 } from 'react-icons/im';
 import { BsExclamation } from 'react-icons/bs';
 

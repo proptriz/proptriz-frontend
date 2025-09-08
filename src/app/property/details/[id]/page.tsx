@@ -14,7 +14,7 @@ import { IoChatbubbleEllipsesOutline, IoChevronBack } from "react-icons/io5";
 import { TbView360Number } from "react-icons/tb";
 import Popup from "@/components/shared/Popup";
 import { IoIosArrowForward } from "react-icons/io";
-import { PropertyType } from "@/definitions";
+import { PropertyType } from "@/types";
 import formatPrice from "@/utils/formatPrice";
 import Link from "next/link";
 import propertyService from "@/services/propertyApi";

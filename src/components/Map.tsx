@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from 'leaflet';
 import propertyService from "@/services/propertyApi";
-import { PropertyType } from "@/definitions";
+import { PropertyType } from "@/types";
 
 // Marker icon for other locations
 const customIcon = new L.Icon({

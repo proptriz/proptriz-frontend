@@ -1,4 +1,4 @@
-import { PropertyType } from "@/definitions";
+import { PropertyType } from "@/types";
 import propertyService from "@/services/propertyApi";
 
 export async function fetchProperty(propertyId:string) {

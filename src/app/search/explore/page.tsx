@@ -112,7 +112,7 @@ export default function RootPage() {
         {/* Map Component or List */}
         {
           mapOrList==='map'? 
-          <Map properties={properties}/>:
+          <Map properties={properties} mapCenter={null}/>:
           <PropertyListing properties={properties.slice(0,6)}/>
         }
         

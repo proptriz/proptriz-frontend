@@ -248,10 +248,10 @@ const PropertyDetail = ({
                     <div className="grid grid-cols-2 w-full space-x-3 ">
                       {mockProperties.slice(0,2).map(((info, key)=>(
                         <VerticalCard
-                          id={info._id}
+                          id={info.id}
                           name={info.title} 
                           price={30} 
-                          type="" 
+                          type={info.category} 
                           address={info.address} 
                           image={info.banner} 
                           period={info.period? info.period : ""} 

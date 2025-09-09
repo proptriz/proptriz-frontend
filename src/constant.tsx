@@ -41,8 +41,8 @@ export const locations: LocationProps[] = [
 
 export const mockProperties: PropertyType[] = [
     {
-      _id: "1",
-      banner: "https://example.com/image1.jpg",
+      id: "1",
+      banner: "https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       title: "3 Bedroom Flat in Lekki",
       slug: "3-bedroom-flat-lekki",
       address: "Lekki Phase 1, Lagos, Nigeria",
@@ -53,27 +53,26 @@ export const mockProperties: PropertyType[] = [
       negotiable: true,
       property_terms: "6 months advance payment required",
       images: [
-        "https://example.com/image1a.jpg",
-        "https://example.com/image1b.jpg"
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80",
+        "https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
       agent: "agent_101",
-      map_location: {
-        type: "Point",
-        coordinates: [3.4505, 6.4531]
-      },
+      latitude: 6.4531,
+      longitude: 3.4505,
       features: [
         { name: "Bedroom", quantity: 3 },
         { name: "Bathroom", quantity: 2 },
         { name: "Kitchen", quantity: 1 }
       ],
       env_facilities: ["Swimming Pool", "24/7 Security", "Gym"],
+      rating: 4.0,
       status: "available",
       created_at: new Date(),
       updated_at: new Date()
     },
     {
-      _id: "2",
-      banner: "https://example.com/image2.jpg",
+      id: "2",
+      banner: "https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       title: "Luxury Office Space in Victoria Island",
       slug: "luxury-office-victoria-island",
       address: "Victoria Island, Lagos, Nigeria",
@@ -82,22 +81,20 @@ export const mockProperties: PropertyType[] = [
       category: "office",
       negotiable: false,
       images: [
-        "https://example.com/image2a.jpg",
-        "https://example.com/image2b.jpg"
+        "https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1604014237800-1c9102c219da?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
       agent: "agent_102",
-      map_location: {
-        type: "Point",
-        coordinates: [3.4035, 6.4281]
-      },
+      latitude: 6.4531,
+      longitude: 3.4505,
       env_facilities: ["Elevator", "Underground Parking"],
       status: "available",
       created_at: new Date(),
       updated_at: new Date()
     },
     {
-      _id: "3",
-      banner: "https://example.com/image3.jpg",
+      id: "3",
+      banner: "https://images.unsplash.com/photo-1604014237800-1c9102c219da?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       title: "Self Contain in Yaba",
       slug: "self-contain-yaba",
       address: "Yaba, Lagos, Nigeria",
@@ -106,9 +103,11 @@ export const mockProperties: PropertyType[] = [
       category: "apartment",
       period: "monthly",
       negotiable: true,
+      latitude: 6.4331,
+      longitude: 3.7505,
       images: [
-        "https://example.com/image3a.jpg",
-        "https://example.com/image3b.jpg"
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1332&q=80",
       ],
       agent: "agent_103",
       status: "rented",
@@ -116,8 +115,8 @@ export const mockProperties: PropertyType[] = [
       updated_at: new Date()
     },
     {
-      _id: "4",
-      banner: "https://example.com/image4.jpg",
+      id: "4",
+      banner: "https://images.unsplash.com/photo-1554995207-c18c203602cb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       title: "5 Plots of Land in Ajah",
       slug: "5-plots-land-ajah",
       address: "Ajah, Lagos, Nigeria",
@@ -125,9 +124,11 @@ export const mockProperties: PropertyType[] = [
       listed_for: "sell",
       category: "land",
       negotiable: false,
+      latitude: 6.1531,
+      longitude: 3.2305,
       property_terms: "Outright purchase only",
       images: [
-        "https://example.com/image4a.jpg"
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1332&q=80",
       ],
       agent: "agent_104",
       status: "available",
@@ -135,8 +136,8 @@ export const mockProperties: PropertyType[] = [
       updated_at: new Date()
     },
     {
-      _id: "5",
-      banner: "https://example.com/image5.jpg",
+      id: "5",
+      banner: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2053&q=80",
       title: "Hotel for Sale in Ikeja",
       slug: "hotel-sale-ikeja",
       address: "Ikeja GRA, Lagos, Nigeria",
@@ -144,9 +145,11 @@ export const mockProperties: PropertyType[] = [
       listed_for: "sell",
       category: "hotel",
       negotiable: true,
+      latitude: 6.4631,
+      longitude: 3.3505,
       images: [
-        "https://example.com/image5a.jpg",
-        "https://example.com/image5b.jpg"
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2053&q=80",
       ],
       agent: "agent_105",
       env_facilities: ["Swimming Pool", "Parking Space", "Wi-Fi"],
@@ -155,8 +158,8 @@ export const mockProperties: PropertyType[] = [
       updated_at: new Date()
     },
     {
-      _id: "6",
-      banner: "https://example.com/image6.jpg",
+      id: "6",
+      banner: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       title: "2 Bedroom Apartment in Surulere",
       slug: "2-bedroom-apartment-surulere",
       address: "Surulere, Lagos, Nigeria",
@@ -165,8 +168,10 @@ export const mockProperties: PropertyType[] = [
       category: "apartment",
       period: "yearly",
       negotiable: true,
+      latitude: 6.6531,
+      longitude: 3.6505,
       images: [
-        "https://example.com/image6a.jpg"
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
       agent: "agent_106",
       status: "unavailable",
@@ -174,8 +179,8 @@ export const mockProperties: PropertyType[] = [
       updated_at: new Date()
     },
     {
-      _id: "7",
-      banner: "https://example.com/image7.jpg",
+      id: "7",
+      banner: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       title: "Commercial Shop in Oshodi",
       slug: "commercial-shop-oshodi",
       address: "Oshodi, Lagos, Nigeria",
@@ -184,9 +189,11 @@ export const mockProperties: PropertyType[] = [
       category: "shop",
       period: "monthly",
       negotiable: false,
+      latitude: 6.4531,
+      longitude: 3.4505,
       images: [
-        "https://example.com/image7a.jpg",
-        "https://example.com/image7b.jpg"
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
       agent: "agent_107",
       env_facilities: ["Security", "Good Road Network"],

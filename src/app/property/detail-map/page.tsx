@@ -66,7 +66,7 @@ export default function PropertyMap() {
                         </div>
                     </div>
                 </div>
-                <Map properties={mockProperties.slice(0,1)}/>
+                <Map properties={mockProperties.slice(0,1)} mapCenter={[mockProperties[0].latitude, mockProperties[0].longitude]}/>
             </div>
         </div>
     );

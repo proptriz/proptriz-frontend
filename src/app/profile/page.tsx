@@ -6,11 +6,11 @@ import { VerticalCard } from "@/components/shared/VerticalCard";
 import { agent } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
-import { AppContext } from "../../../context/AppContextProvider";
+import { AppContext } from "../../context/AppContextProvider";
 
 export default function ProfileTransaction () {
-    const { authenticateUser } = useContext(AppContext);
-    const authUser = authenticateUser();
+    // const { authenticateUser } = useContext(AppContext);
+    // const authUser = authenticateUser();
     const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
     const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
     const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');

@@ -55,7 +55,7 @@ export interface UserType {
 };
 
 export interface PropertyType {
-    _id: string;
+    id: string;
     banner: string; // URL of the property image or image with index = 0
     title: string; // Title of the property (e.g. 3 bedroom flat, self contain, )
     slug: string;
@@ -68,15 +68,14 @@ export interface PropertyType {
     property_terms?: string // agent's term cond
     images: string[]; //Other property images for gallery
     agent: string; //foreign key representing agent that list the property
-    map_location?: {
-      type: 'Point';
-      coordinates: [number, number];
-    };
+    latitude: number;
+    longitude: number;
     features?: {
         name: string;
         quantity: number;
     }[];
     env_facilities?: string[];
+    rating?: number;
     status: string; // (available, sold, unavailable, rented)
     created_at: Date;
     updated_at: Date;

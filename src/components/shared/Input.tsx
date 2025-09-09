@@ -117,4 +117,78 @@ export const SelectButton: React.FC<{
   );
 };
 
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
+  options: { value: string; label: string }[];
+}
 
+export const Select: React.FC<SelectProps> = ({
+  label,
+  options,
+  ...props
+}) => (
+  <div>
+    {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+    <select
+      className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
+      {...props}
+    >
+      {options.map(opt => (
+        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      ))}
+    </select>
+  </div>
+);
+
+interface SliderProps {
+  defaultValue: [number, number];
+  max: number;
+  step?: number;
+  className?: string;
+  onChange?: (value: [number, number]) => void;
+}
+
+export const Slider: React.FC<SliderProps> = ({
+  defaultValue,
+  max,
+  step = 1,
+  className,
+  onChange,
+}) => {
+  const [value, setValue] = React.useState<[number, number]>(defaultValue);
+
+  const handleChange = (idx: number, val: number) => {
+    const newValue: [number, number] = idx === 0 ? [val, value[1]] : [value[0], val];
+    setValue(newValue);
+    onChange?.(newValue);
+  };
+
+  return (
+    <div className={className}>
+      <div className="flex space-x-2 items-center">
+        <input
+          type="range"
+          min={0}
+          max={max}
+          step={step}
+          value={value[0]}
+          onChange={e => handleChange(0, Number(e.target.value))}
+          className="flex-1"
+        />
+        <input
+          type="range"
+          min={0}
+          max={max}
+          step={step}
+          value={value[1]}
+          onChange={e => handleChange(1, Number(e.target.value))}
+          className="flex-1"
+        />
+      </div>
+      <div className="flex justify-between text-xs mt-1">
+        <span>₦{value[0].toLocaleString()}</span>
+        <span>₦{value[1].toLocaleString()}</span>
+      </div>
+    </div>
+  );
+};

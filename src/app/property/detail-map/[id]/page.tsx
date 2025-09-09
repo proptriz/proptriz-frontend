@@ -22,7 +22,7 @@ export default function PropertyMap({
     const resolvedParams = use(params);
     const propertyId = resolvedParams.id; //React.use()
 
-    const [property, setProperty] = useState<PropertyType | null>(mockProperties[0]);
+    const [property, setProperty] = useState<PropertyType>(mockProperties[0]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -95,7 +95,7 @@ export default function PropertyMap({
                         </div>
                     </div>
                 </div>
-                <Map properties={property? [property].slice(0,1):[]}/>
+                <Map properties={property? [property].slice(0,1):[]} mapCenter={[property.latitude, property.longitude]}/>
             </div>
         </div>
     );

@@ -1,20 +1,20 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
 import Footer from "@/components/shared/Footer"
 import { styles } from "@/constant"
 import Image from "next/image"
 import { FaArrowRight, FaHome } from "react-icons/fa"
 
 export default function ErrorPage() {
-    const searchParams = useSearchParams();
-  const error = searchParams.get('error');
-  const errorMessages: Record<string, string> = {
-    CredentialsSignin: 'Invalid username or password. Please try again.',
-    OAuthSignin: 'OAuth authentication failed. Try another provider.',
-    OAuthCallbackError: 'Error during OAuth callback.',
-    Default: 'An unknown error occurred. Please try again later.',
-  };
+    // const searchParams = useSearchParams();
+//   const error = searchParams.get('error');
+//   const errorMessages: Record<string, string> = {
+//     CredentialsSignin: 'Invalid username or password. Please try again.',
+//     OAuthSignin: 'OAuth authentication failed. Try another provider.',
+//     OAuthCallbackError: 'Error during OAuth callback.',
+//     Default: 'An unknown error occurred. Please try again later.',
+//   };
     return (
         <>
         <div className="flex flex-col justify-between min-h-screen items-center bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400">

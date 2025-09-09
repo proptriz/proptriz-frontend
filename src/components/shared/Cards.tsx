@@ -3,7 +3,7 @@ import { FaStar } from "react-icons/fa";
 import { FaRegStar } from "react-icons/fa6";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { ReviewCardProps } from "@/definitions";
+import { ReviewCardProps } from "@/types";
 
 // Enable the relativeTime plugin
 dayjs.extend(relativeTime);

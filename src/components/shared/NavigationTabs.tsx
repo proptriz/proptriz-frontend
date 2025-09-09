@@ -1,24 +1,35 @@
-import React from "react";
+import React, { useEffect, useState }  from "react";
 import { FiHome, FiGrid, FiMap, FiBriefcase, FiMoreHorizontal } from "react-icons/fi";
 
 const tabs = [
-  { name: "House", icon: <FiHome /> },
-  { name: "Land", icon: < FiMap/> },
-  { name: "Office", icon: <FiBriefcase /> },
-  { name: "Shop", icon: <FiGrid /> },
-  { name: "Hotel", icon: <FiGrid /> },
-  { name: "Others", icon: <FiMoreHorizontal /> },
+  { name: "House", value:'house', icon: <FiHome /> },
+  { name: "Land", value:'land', icon: < FiMap/> },
+  { name: "Office", value:'office', icon: <FiBriefcase /> },
+  { name: "Shop", value:'shop', icon: <FiGrid /> },
+  { name: "Hotel", value:'hotel', icon: <FiGrid /> },
+  { name: "Others", value:'others', icon: <FiMoreHorizontal /> },
 ];
 
-const NavigationTabs: React.FC = () => {
+const NavigationTabs: React.FC<{setValue: (value: string) => void}> = ({ setValue }) => {
+  const [selectedValue, setSelectedValue] = useState<string>(tabs[0]?.value || "");
+  
+    useEffect(() => {
+      // Set the default value as the first item's value
+      setValue(selectedValue);
+    }, [selectedValue, setValue]);
+  
+    const handleSelection = (value: string) => {
+      setSelectedValue(value);
+    };
   return (
     <nav className="flex space-x-4 px-4 py-2 overflow-x-auto">
       {tabs.map((tab, index) => (
         <button
           key={index}
           className={`flex items-center px-4 py-2 rounded-lg ${
-            tab.name === "House" ? "bg-[#61AF74] text-white" : "bg-gray-100"
+            selectedValue === tab.value ? "bg-[#61AF74] text-white" : "bg-gray-100"
           }`}
+          onClick={()=>setSelectedValue(tab.value)}
         >
           {/* <span>{tab.icon}</span> */}
           <span>{tab.name}</span>

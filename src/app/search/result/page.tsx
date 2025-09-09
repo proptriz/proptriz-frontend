@@ -6,7 +6,8 @@ import { FaFilter } from "react-icons/fa";
 import SearchBar from "@/components/shared/SearchBar";
 import { MdCalendarViewDay } from "react-icons/md";
 import { HiViewGrid } from "react-icons/hi";
-import { apartments, categories, styles } from "@/constant";
+import { categories, styles } from "@/constant";
+import { mockProperties } from "@/data/mockData";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -37,7 +38,7 @@ const EmptySearch = () => {
             </div>
 
             {/* Property Card */}
-            <div className="grid grid-cols-2 gap-3">                
+            {/* <div className="grid grid-cols-2 gap-3">                
                 {apartments.map(((info, key)=>(
                     <VerticalCard 
                         id={''}
@@ -51,7 +52,7 @@ const EmptySearch = () => {
                         key={key}
                     />
                 )))}
-            </div>
+            </div> */}
 
             {/* Notification popup */}      
             <Popup header="Filter" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>

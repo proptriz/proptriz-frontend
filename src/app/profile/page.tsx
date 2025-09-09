@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import { agent } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
+import { AppContext } from "../../context/AppContextProvider";
 
-const ProfileTransaction = () => {
-
+export default function ProfileTransaction () {
+    // const { authenticateUser } = useContext(AppContext);
+    // const authUser = authenticateUser();
     const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
     const [ listOrSold, setListOrSold ] = useState<string>('Transaction');
     const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
@@ -24,14 +26,14 @@ const ProfileTransaction = () => {
 
     return (
         <div className="p-6 pb-24 relative">
-            <div className={`absolute top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
+            <div className={`absolute top-5 right-2 divide-y-2 space-y-2 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
                 {menuItems.map((item, index) => (
-                    <button className="hover:card-bg hover:shadow-md block" key={index}>
-                    <Link href={item.link} >
-                        {item.title}
-                    </Link>
+                    <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3" key={index}>
+                        <Link href={item.link} >
+                            {item.title}
+                        </Link>
                     </button>
-                )) }                
+                )) }               
             </div>
             <div className="flex items-center justify-between mb-5">
                 <BackButton />            
@@ -130,4 +132,3 @@ const ProfileTransaction = () => {
     );
 };
 
-export default ProfileTransaction;

@@ -6,7 +6,7 @@ import { BackButton } from "@/components/shared/buttons";
 import HorizontalCard from "@/components/shared/HorizontalCard";
 import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
-import { apartments } from "@/constant";
+import { mockProperties } from "@/constant";
 import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoClose, IoHomeOutline } from "react-icons/io5";
@@ -79,16 +79,16 @@ export default function AddPropertyPage() {
 
       {/* Property Card */}
       <div className="">
-        {apartments.slice(0, 1).map(((info, key)=>(
+        {mockProperties.slice(0, 1).map(((info, key)=>(
           <HorizontalCard 
-            id={''}
-            name={info.name} 
+            id={info.id}
+            name={info.title} 
             price={30} 
-            type="" 
+            type={info.category} 
             address={info.address} 
-            image={info.image} 
-            period={info.period} 
-            rating={info.rating}
+            image={info.banner} 
+            period={info.period? info.period: ''} 
+            rating={0}
             key={key}
           />
         )))}
@@ -152,17 +152,17 @@ export default function AddPropertyPage() {
         {/* Proprty Location */}
         <h3 className="mt-10 font-semibold">Location</h3>
         <div
-            className="rounded-full p-4 border border-[#DCDFD9] my-4 cursor-pointer hover:bg-gray-100 flex items-center"
+          className="rounded-full p-4 border border-[#DCDFD9] my-4 cursor-pointer hover:bg-gray-100 flex items-center"
         >
-            <button className="card-bg rounded-full p-3 mr-2 text-2xl" disabled>
-                <HiOutlineLocationMarker />
-            </button>
-            <p className="text-gray-700 text-sm">
-                Opposite Gate-04 Jimeta International Market, Yola
-            </p>
+          <button className="card-bg rounded-full p-3 mr-2 text-2xl" disabled>
+            <HiOutlineLocationMarker />
+          </button>
+          <p className="text-gray-700 text-sm">
+              Opposite Gate-04 Jimeta International Market, Yola
+          </p>
         </div>
         <div className="relative h-[350px] max-h-[400px] overflow-hidden rounded-lg border border-gray-200">
-            <Map />
+            <Map properties={mockProperties.slice(0,1)} mapCenter={null}/>
         </div>
         <button className="w-full py-4 card-bg text-sm rounded-b-lg" disabled>Select on the map</button>
         

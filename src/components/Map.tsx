@@ -1,56 +1,102 @@
+
 "use client";
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import * as L from 'leaflet';
+import type { LatLngExpression } from 'leaflet';
+import { PropertyType } from '@/types'
+import Link from 'next/link';
 
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from 'leaflet';
-
-// Marker icon for other locations
-const customIcon = new L.Icon({
-  iconUrl: '/pin.png',
-  iconSize: [20, 36], // Size of the icon
-  iconAnchor: [12, 41], // Anchor point of the icon
-  popupAnchor: [1, -34], // Popup position relative to the icon
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-  shadowSize: [41, 41],
+const propertyIcon = L.icon({
+  iconUrl: 'pin.png',
+  shadowUrl: 'location/location-banner.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
 
-// Default marker icon for center
-const defaultIcon = new L.Icon.Default();
+interface MapUpdaterProps {
+  center: LatLngExpression;
+  zoom: number;
+}
 
+// This component updates the map view
+const MapUpdater = ({ center, zoom }: MapUpdaterProps) => {
+  const map = useMap();
+  
+  React.useEffect(() => {
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
+  
+  return null;
+};
 
-const Map: React.FC = () => {
-  const center: [number, number] = [9.0820, 8.6753]; // Nigeria coordinates
-  const markers = [
-    { position: [6.5244, 3.3792], price: "200K" }, // Lagos
-    { position: [9.0579, 7.4951], price: "210K" }, // Abuja
-    { position: [7.3775, 3.9470], price: "300K" }  // Ibadan
-  ];
+interface MapProps {
+  properties: PropertyType[];
+  mapCenter: [number, number] | null;
+  initialZoom?: number;
+  searchLabel?: string;
+}
+
+const Map: React.FC<MapProps> = ({ 
+  properties, 
+  mapCenter,
+  initialZoom = 13,
+  searchLabel="Search properties..."
+}) => {
+  const [selectedProperty, setSelectedProperty] = useState<PropertyType | null>(null);
+
+  const handleMarkerClick = (property: PropertyType) => {
+    setSelectedProperty(property);
+  };
 
   return (
-    <div className="relative flex-1 h-full w-full" style={{ height: '100vh', width: '100%' }}>
-        <MapContainer
-            center={center}
-            zoom={6}
-            style={{ height: "100%", width: "100%", zIndex: 5 }}
-        >
-            <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-
-            {/* Center marker */}
-            <Marker position={center} icon={defaultIcon}>
-              <Popup>Your locaion</Popup>
-            </Marker>
-
-            {markers.map((marker, idx) => (
-            <Marker key={idx} position={marker.position as [number, number]} icon={customIcon}>
-                <Popup>{marker.price}</Popup>
-            </Marker>
-            ))}
-        </MapContainer>
+    <div className="relative h-full w-full" style={{ minHeight: 400, height: '100%', overflow: 'hidden' }}>
+      
+      {/* Map Container */}
+      <MapContainer
+        zoomControl={false}
+        className="w-full flex-1 fixed bottom-0 h-[calc(100vh-80.19px)] left-0 right-0 z-[0]"
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {/* Update map view to user location */}
+        {mapCenter && <MapUpdater center={mapCenter as LatLngExpression} zoom={initialZoom} />}
+        {properties.map(property => (
+          <Marker
+            key={property.id}
+            position={[property.latitude, property.longitude]  as LatLngExpression}
+            icon={propertyIcon as any}
+            eventHandlers={{ click: () => handleMarkerClick(property) }}
+          >
+            <Popup>
+              <div className="p-2 min-w-[200px]">
+                <div className="mb-2">
+                  <img
+                    src={property.banner}
+                    alt={property.title}
+                    className="w-full h-24 object-cover rounded-sm"
+                  />
+                </div>
+                <h4 className="font-medium text-estate-primary">{property.title}</h4>
+                <p className="text-sm text-gray-600 mb-1">{property.address}</p>
+                <p className="font-semibold mb-2">₦{property.price.toLocaleString()}</p>
+                <Link
+                  href={`/property/details/${'2'}`}
+                  className="text-sm text-estate-primary hover:underline"
+                >
+                  View Details
+                </Link>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
     </div>
-
   );
 };
 

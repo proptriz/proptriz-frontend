@@ -2,7 +2,7 @@
 
 import HorizontalCard from "@/components/shared/HorizontalCard";
 import SearchBar from "@/components/shared/SearchBar";
-import { apartments } from "@/constant";
+import { mockProperties } from "@/constant";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { IoChevronBack } from "react-icons/io5";
@@ -56,15 +56,15 @@ const LocationDetailsPage = () => {
                     <p className="text-lg mb-4 font-[Raleway]">Found <span className="font-bold">140</span> Properties</p>
                     {/* Property Card */}
                     <div className="space-y-5">
-                        {apartments.slice(0,2).map(((info, key)=>(
-                            <HorizontalCard name={info.name} 
+                        {mockProperties.slice(0,2).map(((info, key)=>(
+                            <HorizontalCard name={info.title} 
                                 id={info.id}
                                 price={30} 
                                 type="" 
                                 address={info.address} 
-                                image={info.image} 
-                                period={info.period} 
-                                rating={info.rating}
+                                image={info.banner} 
+                                period={info.period?? 'yearly'} 
+                                rating={info.rating ?? 5.0}
                                 key={key}
                             />
                         )))}

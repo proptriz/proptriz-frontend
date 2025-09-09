@@ -3,7 +3,7 @@
 import { BackButton } from "@/components/shared/buttons";
 import { ReviewCard } from "@/components/shared/Cards";
 import { VerticalCard } from "@/components/shared/VerticalCard";
-import { apartments } from "@/constant";
+import { mockProperties } from "@/constant";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";

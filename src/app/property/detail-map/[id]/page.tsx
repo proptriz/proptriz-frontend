@@ -1,19 +1,48 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { FaAngleDown, FaRegBell } from "react-icons/fa6";
 import dynamic from 'next/dynamic';
-import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { FaBullseye } from "react-icons/fa";
 import { mockProperties } from "@/constant";
+import propertyService from "@/services/propertyApi";
+import { PropertyType } from "@/types";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
-export default function PropertyMap() {
+export default function PropertyMap({ 
+    params 
+}: {
+    params: Promise< { id: string } >
+}) {
     const router = useRouter();
+    const resolvedParams = use(params);
+    const propertyId = resolvedParams.id; //React.use()
+
+    const [property, setProperty] = useState<PropertyType>(mockProperties[0]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchProperty = async () => {
+          const response = await propertyService.getPropertyById(propertyId);
+          if (response.success) {
+            setProperty(response.data.data);
+            console.log("fetched property: ", response.data.data)
+          } else {
+            setError(response.message);
+            console.log("error fetching all properties: ", response.message)
+          }
+          setLoading(false);
+        };
+        if (propertyId) {
+          fetchProperty()
+        };
+    }, [propertyId]);
+    
     
     return (
         <div className="flex flex-col">
@@ -25,14 +54,14 @@ export default function PropertyMap() {
                         <IoChevronBack />
                     </button>
                     <div className="flex overflow-x-auto space-x-4 mt-3 px-5">
-                        {['2 Hospitals', '4 Gas Stations', '2 Schools'].map((item, index) => (
-                        <div
-                            key={index}
-                            className="bg-white flex p-3 rounded-full text-sm text-gray-500 items-center shadow-md"
-                        >
-                            <span className="whitespace-nowrap">{item}</span>
-                        </div>
-                        ))}
+                        {property?.features? property?.features.map((item, index) => (
+                            <div
+                                key={index}
+                                className="bg-white flex p-3 rounded-full text-sm text-gray-500 items-center shadow-md"
+                            >
+                                <span className="whitespace-nowrap">{item.quantity} {item.name}</span>
+                            </div>
+                        )): []}
                     </div>
                 </div>
 
@@ -41,7 +70,7 @@ export default function PropertyMap() {
                     <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center bg-white p-3 rounded-full text-sm shadow-md">
                             <HiOutlineLocationMarker className="mr-2" />
-                            <span>Yola Adamawa, Nigeria</span>
+                            <span>{property?.address}</span>
                             <FaAngleDown />
                         </div>
                         <button className="p-3 rounded-full bg-gray-800 text-white text-2xl shadow-md">
@@ -60,13 +89,13 @@ export default function PropertyMap() {
                                     <HiOutlineLocationMarker />
                                 </button>
                                 <p className="text-gray-500">
-                                    Opposite Gate-04 Jimeta International Market, Yola
+                                    {property?.address}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <Map properties={mockProperties.slice(0,1)} mapCenter={[mockProperties[0].latitude, mockProperties[0].longitude]}/>
+                <Map properties={property? [property].slice(0,1):[]} mapCenter={[property.latitude, property.longitude]}/>
             </div>
         </div>
     );

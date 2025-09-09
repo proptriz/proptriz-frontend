@@ -1,7 +1,7 @@
 'use clint';
 import { useState } from "react";
 import { BackButton } from "./buttons"
-import { AgentProps } from "@/definitions";
+import { AgentProps } from "@/types";
 import Link from "next/link";
 
 

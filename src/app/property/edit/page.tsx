@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
@@ -7,23 +8,29 @@ import HorizontalCard from "@/components/shared/HorizontalCard";
 import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
 import { mockProperties } from "@/constant";
-import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
+import { FaNairaSign } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoClose, IoHomeOutline } from "react-icons/io5";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import Image from "next/image";
 import { categories } from "@/constant";
+import { toast } from 'react-toastify';
+import getUserPosition from "@/utils/getUserPosition";
+import LocationPickerMap from "@/components/LocationPickerMap ";
+import handleLocationSelect from "@/utils/handleLocationSelect";
+
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
-export default function AddPropertyPage() {
+export default function EditPropertyPage() {
   const [togglePopup, setTogglePopup] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(true);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [propertyTitle, setPropertyTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(180000);
   const [rentType, setRentType] = useState<string>("Monthly");
   const [listedFor, setListedFor] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [photos, setPhotos] = useState<File[]>([]);
+  const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
   
   const maxPhotos = 5;
 
@@ -31,6 +38,16 @@ export default function AddPropertyPage() {
     { title: "Sell", value: "sell" },
     { title: "Rent", value: "rent" },
   ];
+
+  // Get user location
+  useEffect(() => {
+  const fetchLocation = async () => {
+    const [lat, lng] = await getUserPosition();
+    console.log("User location:", lat, lng);
+    setUserCoordinates([lat, lng]);
+  };
+  fetchLocation();
+  }, []);
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
@@ -161,10 +178,10 @@ export default function AddPropertyPage() {
               Opposite Gate-04 Jimeta International Market, Yola
           </p>
         </div>
-        <div className="relative h-[350px] max-h-[400px] overflow-hidden rounded-lg border border-gray-200">
-            <Map properties={mockProperties.slice(0,1)} mapCenter={null}/>
+        <div className="max-h-[280px] overflow-hidden rounded-lg border border-gray-200 relative map-container-fix">
+          <LocationPickerMap initialCenter={userCoordinates || [mockProperties[0].latitude, mockProperties[0].longitude]} onLocationSelect={handleLocationSelect}/>
         </div>
-        <button className="w-full py-4 card-bg text-sm rounded-b-lg" disabled>Select on the map</button>
+        <button className="w-full py-4 card-bg text-sm rounded-b-lg" disabled>Set & Save Location</button>
         
         <h3 className="mt-10 font-semibold mb-2">Listing photos</h3>
         <div>

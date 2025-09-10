@@ -11,6 +11,7 @@ import SearchBar from "@/components/shared/SearchBar";
 import propertyService from "@/services/propertyApi";
 import { mockProperties } from "@/constant";
 import { PropertyType } from "@/types";
+import getUserPosition from "@/utils/getUserPosition";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -24,17 +25,12 @@ export default function ExplorePage() {
 
   // Get user location
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserCoordinates([latitude, longitude]);
-        },
-        () => {
-          setUserCoordinates([9.0820, 8.6753]); // Nigeria fallback
-        }
-      );
-    }
+  const fetchLocation = async () => {
+    const [lat, lng] = await getUserPosition();
+    console.log("User location:", lat, lng);
+    setUserCoordinates([lat, lng]);
+  };
+  fetchLocation();
   }, []);
 
   useEffect(() => {

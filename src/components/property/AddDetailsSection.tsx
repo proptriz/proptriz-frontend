@@ -7,6 +7,7 @@ import TagSelector from "@/components/TagSelector";
 import { FaPlus } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import { styles } from "@/constant";
+import ToggleCollapse from "../shared/ToggleCollapse";
 
 interface Feature {
   name: string;
@@ -113,7 +114,7 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
   };
 
   return (
-    <div className="">
+    <ToggleCollapse header="Other Details" open={false}>
       {/* Property Features */}
       <h3 className={`${styles.H2}`}>Property Features</h3>
       <div className="mt-4 mb-7">
@@ -184,6 +185,6 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
           className="w-full border rounded-md p-2 mt-2 text-sm"
         />
       ))}
-    </div>
+    </ToggleCollapse>
   );
 }

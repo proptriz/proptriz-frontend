@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-// import { Lato } from 'next/font/google';
+import { Lato } from 'next/font/google';
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import AppContextProvider from "../context/AppContextProvider";
 import { ToastContainer } from "react-toastify";
 
-// const lato = Lato({ weight: '400', subsets: ['latin'], display: 'swap' });
+const lato = Lato({ weight: '400', subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: "Proptriz Hub",
@@ -20,6 +20,55 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="font-src 'self' https://cdnjs.cloudflare.com/ajax/libs/font-awesome/https://fonts.gstatic.com/;"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet"
+        />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
+        />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+        />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SVNC88Q13K"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-SVNC88Q13K');
+          `,
+        }} />
         <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet"
@@ -30,7 +79,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`bg-background text-black antialiased`}
+        className={`bg-background text-black ${lato.className} antialiased`}
       >
         <div className="w-full md:w-[650px] md:mx-auto min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300" >
           <AppContextProvider>

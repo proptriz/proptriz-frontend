@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import dynamic from 'next/dynamic';
 import { BackButton } from "@/components/shared/buttons";
 import HorizontalCard from "@/components/shared/HorizontalCard";
@@ -9,16 +8,13 @@ import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
 import { mockProperties } from "@/constant";
 import { FaNairaSign } from "react-icons/fa6";
-import { HiOutlineLocationMarker } from "react-icons/hi";
-import { IoClose, IoHomeOutline } from "react-icons/io5";
+import { IoHomeOutline } from "react-icons/io5";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import Image from "next/image";
 import { categories } from "@/constant";
 import { toast } from 'react-toastify';
 import getUserPosition from "@/utils/getUserPosition";
-import LocationPickerMap from "@/components/LocationPickerMap ";
 import handleLocationSelect from "@/utils/handleLocationSelect";
-import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 
@@ -191,7 +187,7 @@ export default function EditPropertyPage() {
           Update
         </button>      
       </div>
-
+      
       {/* Notification popup */}      
       <div
           className={`h-[400px] bg-white fixed bottom-0 left-0 w-full rounded-t-3xl p-6 ease-linear transition-transform z-10  ${

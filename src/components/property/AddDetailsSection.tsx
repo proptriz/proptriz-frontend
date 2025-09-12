@@ -116,7 +116,7 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
   return (
     <ToggleCollapse header="Other Details" open={false}>
       {/* Property Features */}
-      <h3 className={`${styles.H2}`}>Property Features</h3>
+      <h3 className={`${styles.H2} `}>Property Features</h3>
       <div className="mt-4 mb-7">
         <ToggleButtons
           options={["Negotiable", "Non-negotiable"]}

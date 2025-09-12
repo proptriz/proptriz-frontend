@@ -18,7 +18,6 @@ const PropertyLocationSection: React.FC<PropertyLocationSectionProps> = ({
 }) => {
   return (
     <ToggleCollapse header="Property Location" open={false}>
-      <h3 className="mt-10 font-semibold">Location</h3>
       <div className="rounded-full p-4 border border-[#DCDFD9] my-4 cursor-pointer hover:bg-gray-100 flex items-center">
         <button className="card-bg rounded-full p-3 mr-2 text-2xl" disabled>
           <HiOutlineLocationMarker />

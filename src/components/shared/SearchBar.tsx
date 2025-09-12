@@ -32,8 +32,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ query = "", type = "", city = "" 
 
   return (
     <>
-      <div className="px-4 mt-2 relative px-6">
-        <div className="flex w-full">
+      <div className="relative w-full md:max-w-[75%] lg:max-w-[50%] mx-auto lg:ml-0">
+        <div className="flex mx-auto">
           <div className="flex bg-white rounded-l-full shadow-md p-2 w-full">
             <input
               type="text"

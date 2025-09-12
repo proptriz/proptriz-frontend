@@ -22,7 +22,7 @@ const NavigationTabs: React.FC<{setValue: (value: string) => void}> = ({ setValu
       setSelectedValue(value);
     };
   return (
-    <nav className="flex space-x-4 px-4 py-2 overflow-x-auto">
+    <nav className="flex sm:justify-center gap-4 overflow-x-auto w-full">
       {tabs.map((tab, index) => (
         <button
           key={index}

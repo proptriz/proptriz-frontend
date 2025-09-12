@@ -17,8 +17,7 @@ const PhotoUploadSection: React.FC<PhotoUploadSectionProps> = ({
   removePhoto,
 }) => {
   return (
-    <ToggleCollapse header="Upload Photos" open={false}>
-      <h3 className="mt-10 font-semibold mb-2">Listing photos</h3>
+    <ToggleCollapse header="Upload photos" open={false}>
       <div className="mb-6">
         <label
           htmlFor="photo-upload"

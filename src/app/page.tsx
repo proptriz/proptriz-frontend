@@ -11,6 +11,7 @@ import SearchBar from "@/components/shared/SearchBar";
 import propertyService from "@/services/propertyApi";
 import { mockProperties } from "@/constant";
 import { PropertyType } from "@/types";
+import getUserPosition from "@/utils/getUserPosition";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -24,17 +25,12 @@ export default function ExplorePage() {
 
   // Get user location
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserCoordinates([latitude, longitude]);
-        },
-        () => {
-          setUserCoordinates([9.0820, 8.6753]); // Nigeria fallback
-        }
-      );
-    }
+  const fetchLocation = async () => {
+    const [lat, lng] = await getUserPosition();
+    console.log("User location:", lat, lng);
+    setUserCoordinates([lat, lng]);
+  };
+  fetchLocation();
   }, []);
 
   useEffect(() => {
@@ -59,21 +55,12 @@ export default function ExplorePage() {
   ]
 
   return (
-    <div className="flex flex-col pt-5 pb-16">
+    <div className="flex flex-col w-full h-screen">
       {/* Header */}
-      <header className="p-4 flex justify-between items-center sticky top-0 z-50">        
-        <div className={`absolute top-5 right-2 divide-y-2 space-y-5 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
-          {menuItems.map((item, index) => (
-            <button className="hover:card-bg hover:shadow-md block" key={index}>
-              <Link href={item.link} >
-                {item.title}
-              </Link>
-            </button>
-          )) }                
-        </div>
+      <header className="p-6 flex justify-between items-center w-full z-50 shadow-md">        
       
         {/* Centered Banner */}
-        <div className="absolute left-1/2 transform -translate-x-1/2">
+        <div className="">
           <Image
             width={100}
             height={60}
@@ -83,12 +70,13 @@ export default function ExplorePage() {
           />
         </div>
 
-        {/* Notification & Profile Section */}
-        <div className="flex items-center space-x-4 ml-auto">           
-          <button className="text-gray-500 text-xl"><SlMenu /></button>
+        {/* Menu icon*/}
+        <div className="ml-auto">           
+          <button className="text-gray-500 text-xl "><SlMenu /></button>
         </div>
+
       </header>
-      <div className="px-6 py-3 z-10">
+      <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
         <SearchBar />
         <NavigationTabs setValue={setFilterBy}/>
       </div>

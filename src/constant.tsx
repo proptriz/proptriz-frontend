@@ -300,7 +300,7 @@ export const Reviews = [
 
 
 export const styles = {
-    H2: "font-semibold mt-10 mb-3",
+    H2: "mt-8 mb-1 border-gray-300",
     GREENBTN: "bg-green text-white px-5 py-4 rounded-lg",
     GRAYBUTTON: "card-bg px-5 py-4"
 }

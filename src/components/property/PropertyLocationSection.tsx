@@ -1,9 +1,12 @@
 "use client";
+
 import React from "react";
+import dynamic from 'next/dynamic';
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
-import LocationPickerMap from "@/components/LocationPickerMap ";
 import type { LatLngExpression } from "leaflet";
+
+const LocationPickerMap = dynamic(() => import("@/components/LocationPickerMap"), { ssr: false });
 
 interface PropertyLocationSectionProps {
   userCoordinates: LatLngExpression | null;

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import dynamic from 'next/dynamic';
-import { BackButton } from "@/components/shared/buttons";
 import HorizontalCard from "@/components/shared/HorizontalCard";
 import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
@@ -12,7 +11,6 @@ import { IoHomeOutline } from "react-icons/io5";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import Image from "next/image";
 import { categories } from "@/constant";
-import { toast } from 'react-toastify';
 import getUserPosition from "@/utils/getUserPosition";
 import handleLocationSelect from "@/utils/handleLocationSelect";
 import PropertyLocationSection from "@/components/property/PropertyLocationSection";

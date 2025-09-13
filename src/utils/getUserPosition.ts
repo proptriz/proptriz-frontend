@@ -1,7 +1,7 @@
 const getUserPosition = (): Promise<[number, number]> => {
   return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      // Geolocation not supported → fallback to Nigeria
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      // Running on server or geolocation not supported → fallback to Nigeria
       resolve([9.0820, 8.6753]);
       return;
     }
@@ -15,7 +15,7 @@ const getUserPosition = (): Promise<[number, number]> => {
         // Error (e.g., denied permission) → fallback to Nigeria
         resolve([9.0820, 8.6753]);
       },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 } // performance tuning
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
   });
 };

@@ -32,9 +32,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ query = "", type = "", city = "" 
 
   return (
     <>
-      <div className="px-4 mt-2 relative px-6 py-3">
-        <div className="flex w-full">
-          <div className="flex bg-white rounded-l-full shadow-md p-3 w-full">
+      <div className="relative w-full md:max-w-[75%] lg:max-w-[50%] mx-auto lg:ml-0">
+        <div className="flex mx-auto">
+          <div className="flex bg-white rounded-l-full shadow-md p-2 w-full">
             <input
               type="text"
               placeholder="Search House, Apartment, etc"
@@ -42,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ query = "", type = "", city = "" 
               className="w-full outline-none text-gray-500"
             />
             <button
-              className="text-gray-500 text-lg p-2 rounded bg-gray-100"
+              className="text-gray-500 text-lg p-1 rounded bg-gray-100"
               onClick={() => setTogglePopup(!togglePopup)}
             >
               <AiOutlineMenuUnfold className="font-bold" />

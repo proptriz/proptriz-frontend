@@ -1,8 +1,52 @@
+'use client';
+
+import { useState, useContext } from "react";
 import Image from "next/image";
 import { FaPhone, FaCommentDots } from "react-icons/fa";
+import { AppContext } from "@/context/AppContextProvider";
+import { toast } from "react-toastify";
+import { PaymentDataType } from "@/types";
+import { payWithPi } from "@/config/payment";
+import Splash from "@/components/shared/Splash"
+import { BackButton } from "@/components/shared/buttons";
 
 export default function FeaturePage() {
+  const { authUser, isSigningInUser } = useContext(AppContext);
+  const [isSaveLoading, setIsSaveLoading] = useState<boolean>(false);
+
+  const onPaymentComplete = async (data:any) => {
+    // setIsSaveLoading(false);  
+    toast.success("Payment successfull")
+    // reset();
+  }
+  
+  const onPaymentError = (error: Error) => {
+    toast.error('Payment error');
+    // setIsSaveLoading(false);
+  }
+  
+  const handleSend = async () => {
+    if (!authUser?.pi_uid) {
+      toast.error('SCREEN.MEMBERSHIP.VALIDATION.USER_NOT_LOGGED_IN_PAYMENT_MESSAGE')
+      return 
+    }
+    setIsSaveLoading(true)
+  
+    const paymentData: PaymentDataType = {
+      amount: 1,
+      memo: `Proptriz payment for property`,
+      metadata: { 
+        seller_uid: '478d3238-86dd-47ca-a1b5-8f18326189d1',
+        property_id: '0543',
+      },        
+    };
+    await payWithPi(paymentData, onPaymentComplete, onPaymentError);
+  }
+
   return (
+    <>
+    { !authUser ? 
+    <Splash /> :
     <div className="">
       <div className="relative">
         <Image
@@ -13,7 +57,7 @@ export default function FeaturePage() {
           className="w-full h-80 object-cover"
         />
         <div className="absolute top-4 left-4 text-white">
-          <button className="bg-black bg-opacity-50 rounded-full p-2">Back</button>
+          <BackButton />
         </div>
       </div>
       <div className="p-6 space-y-4">
@@ -57,10 +101,14 @@ export default function FeaturePage() {
             garage that fits up to four cars...
           </p>
         </div>
-        <button className="w-full bg-green-500 text-white py-2 rounded">
+        <button 
+        onClick={()=>handleSend()}
+        className="w-full bg-green-500 text-white py-2 rounded"
+        >
           Buy Now
         </button>
       </div>
-    </div>
+    </div> }
+    </>
   );
 }

@@ -18,25 +18,25 @@ import { onIncompletePaymentFound } from '@/config/payment';
 interface IAppContextProps {
   authUser: AuthUserType | null;
   setAuthUser: React.Dispatch<SetStateAction<AuthUserType | null>>;
+  autoLoginUser: () => void;
   isSigningInUser: boolean;
   reload: boolean;
   alertMessage: string | null;
   setAlertMessage: React.Dispatch<SetStateAction<string | null>>;
   showAlert: (message: string) => void;
   setReload: React.Dispatch<SetStateAction<boolean>>;
-  authenticateUser: () => void;
 }
 
 const initialState: IAppContextProps = {
   authUser: null,
   setAuthUser: () => {},
+  autoLoginUser: () => {},
   isSigningInUser: false,
   reload: false,
   alertMessage: null,
   setAlertMessage: () => {},
   showAlert: () => {},
   setReload: () => {},
-  authenticateUser: () => {}
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -63,6 +63,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
    /* Register User via Pi SDK */
   const registerUser = async () => {
     logger.info('Starting user registration.');
+    if (isSigningInUser || authUser) return
 
     if (typeof window !== 'undefined' && window.Pi?.initialized) {
       try {
@@ -73,6 +74,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
           'wallet_address'
         ], onIncompletePaymentFound);
 
+        logger.info('Pioneer details:', pioneerAuth);
         // Send accessToken to backend
         const res = await axiosClient.post(
           "/users/authenticate", 
@@ -137,8 +139,8 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
   useEffect(() => {
     logger.info('AppContextProvider mounted.');
-
-    autoLoginUser();
+    if (isSigningInUser || authUser) return
+    // autoLoginUser();
 
     // attempt to load and initialize Pi SDK in parallel
     loadPiSdk()
@@ -149,16 +151,9 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
       .catch(err => logger.error('Pi SDK load/ init error:', err));
   }, []);
 
-  const authenticateUser = async () => {
-    if (!authUser) {
-      toast.warn("user not login");
-      return router.push("/profile/login")
-    }
-    return authUser
-  };
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, isSigningInUser, reload, setReload, showAlert, alertMessage, setAlertMessage, authenticateUser }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, isSigningInUser, reload, setReload, showAlert, alertMessage, setAlertMessage, autoLoginUser }}>
       {children}
     </AppContext.Provider>
   );

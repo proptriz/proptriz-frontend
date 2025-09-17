@@ -1,5 +1,5 @@
 export interface AuthUserType {
-  uid: string;
+  pi_uid: string;
   username: string;
   membership: {class:string, balance:number};
 };

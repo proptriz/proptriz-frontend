@@ -18,13 +18,27 @@ export const BackButton = ()=> {
     )
 }
 
-export const Button = (isLoading:boolean)=> {
+interface SubmitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "outline" | "ghost" | "toggle";
+  active?: boolean;
+  fullWidth?: boolean;
+  isLoading:boolean
+}
+export const SubmitButton:React.FC<SubmitButtonProps> = ({
+  variant = "primary",
+  active = false,
+  fullWidth = false,
+  isLoading=false,
+  className,
+  ...props
+})=> {
   const router = useRouter();
 
   return (
     <button
     type="submit"
-    className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+    {...props}
+    className="bg-green-600 text-white p-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
     >
       {isLoading ? 
       <span className='flex items-center justify-center'>

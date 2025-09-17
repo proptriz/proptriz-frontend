@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import dynamic from 'next/dynamic';
 import Link from "next/link";
 import Image from "next/image";
@@ -12,10 +12,12 @@ import propertyService from "@/services/propertyApi";
 import { mockProperties } from "@/constant";
 import { PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
+import { AppContext } from "@/context/AppContextProvider";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function ExplorePage() {
+  const { authUser } = useContext(AppContext);
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
   const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,6 +36,7 @@ export default function ExplorePage() {
   }, []);
 
   useEffect(() => {
+    if (!authUser) return
     const fetchProperties = async () => {
       const response = await propertyService.getAllProperties();
       if (response.success) {

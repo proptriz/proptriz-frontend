@@ -136,12 +136,14 @@ const PropertyDetail = ({
                     
                     <div className="flex items-center justify-between mt-5">
                         <div className="flex items-center space-x-3 text-sm">
+                          <Link href={'/transaction/buy'}>
                             <button 
                             className="px-5 py-3 bg-green text-white rounded-lg"
                             onClick={()=>{setBuyPopup(true)}}
                             > 
                               { property.listed_for }
                             </button>
+                          </Link>
                         </div>
                         <button className="text-xl font-semibold card-bg p-4 rounded-full">
                           <TbView360Number />

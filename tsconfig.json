@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -18,16 +21,12 @@
       {
         "name": "next"
       }
-    ],
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["*"]
-    }
+    ]
   },
   "include": [
-    "next-env.d.ts", 
-    "**/*.ts", 
-    "**/*.tsx", 
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
     "build/e-landlord/types/**/*.ts"
   ],

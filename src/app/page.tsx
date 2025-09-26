@@ -13,49 +13,78 @@ import { mockProperties } from "@/constant";
 import { PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
+import logger from "../../logger.config.mjs"
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function ExplorePage() {
   const { authUser } = useContext(AppContext);
-  const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
-  const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
+  const [properties, setProperties] = useState<PropertyType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [ filterBy, setFilterBy ] = useState<string>('house');
-  const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
+  const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
 
   // Get user location
   useEffect(() => {
   const fetchLocation = async () => {
     const [lat, lng] = await getUserPosition();
-    console.log("User location:", lat, lng);
-    setUserCoordinates([lat, lng]);
+    // logger.debug("User location:", lat, lng);
+    setMapCenter([lat, lng]);
   };
   fetchLocation();
-  }, []);
+  }, [authUser]);
+
+  
 
   useEffect(() => {
-    if (!authUser) return
+    if (!mapBounds) return
+    
     const fetchProperties = async () => {
-      const response = await propertyService.getAllProperties();
+      setLoading(true);
+
+      const ne = mapBounds.getNorthEast(); // top-right
+      const sw = mapBounds.getSouthWest(); // bottom-left
+
+      const query = new URLSearchParams({
+        page: "1",
+        limit: "50",
+        category: filterBy,
+        listed_for: "",
+        ne_lat: ne.lat.toString(),
+        ne_lng: ne.lng.toString(),
+        sw_lat: sw.lat.toString(),
+        sw_lng: sw.lng.toString()
+        // Add other filters as needed
+      }).toString();
+
+      const response = await propertyService.getAllProperties(query);
       if (response.success) {
-        setProperties(response.data.data);
-        console.log("Listed properties: ", response.data.data)
+        setProperties(response.data);
+        logger.info("Listed properties: ", response.data)
       } else {
         setError(response.message);
-        console.log("error fetching all properties: ", response.message)
+        logger.error("error fetching all properties: ", response.message)
       }
       setLoading(false);
     };
   
     fetchProperties();
-  }, []);
+  }, [filterBy, mapBounds]);
 
-  const menuItems = [
-    {title: 'Login', link: '/profile/login'},
-    {title: 'Transaction', link: '/profile/transaction'}
-  ]
+  const handleLocationButtonClick = async () => {
+    // clear previous map state when findme option is changed
+    sessionStorage.removeItem('prevMapCenter');
+    sessionStorage.removeItem('prevMapZoom');
+    const userloc = await getUserPosition();
+    if (userloc) {
+      setMapCenter(userloc);
+      logger.info('User location obtained successfully on button click:', {userloc});
+    } else {
+      setMapCenter(null);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full h-screen">
@@ -86,7 +115,12 @@ export default function ExplorePage() {
 
       {/* Map Section */}
       <div className="relative flex-1">
-        <Map properties={properties} mapCenter={userCoordinates} />        
+        <Map 
+          properties={properties} 
+          mapCenter={mapCenter} 
+          mapBounds={mapBounds}
+          setMapBounds={setMapBounds} 
+        />        
       </div>
 
       {/* Footer Navigation */}

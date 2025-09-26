@@ -54,6 +54,27 @@ export interface UserType {
   created_at: Date; // (auto)
 };
 
+export enum CategoryEnum {
+  house = "house",
+  hotel = "hotel",
+  office = "office",
+  land = "land",
+  shop = "shop",
+  others = "others"
+}
+
+export enum ListForEnum {
+  rent = "rent",
+  sale = "sele"
+}
+
+export enum RenewalEnum {
+    monthly = "monthly",
+    yearly = "yearly",
+    daily = "dsily",
+    weekely = "weekely"
+}
+
 export interface PropertyType {
   id: string;
   banner: string; // URL of the property image or image with index = 0
@@ -62,12 +83,12 @@ export interface PropertyType {
   address: string; // Location of the property
   price: number; // Price per month
   listed_for: string; // (e.g. "sell"/ "rent")
-  category: string; // The class of property (e.g. house, land, shop, office, hotel )
-  period?: string; // if is for rent, payment period (e.g monthly, yearly, daily)
+  category: CategoryEnum; // The class of property (e.g. house, land, shop, office, hotel )
+  period?: RenewalEnum; // if is for rent, payment period (e.g monthly, yearly, daily)
   negotiable: boolean; // (true/false)
   property_terms?: string // agent's term cond
   images: string[]; //Other property images for gallery
-  agent: string; //foreign key representing agent that list the property
+  user: string; //foreign key representing agent that list the property
   latitude: number;
   longitude: number;
   features?: {

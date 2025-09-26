@@ -12,6 +12,7 @@ import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/types";
 import { mockProperties } from "@/constant";
 import Image from "next/image";
+import logger from "../../../../logger.config.mjs"
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -25,13 +26,13 @@ export default function RootPage() {
 
   useEffect(() => {
     const fetchProperties = async () => {
-      const response = await propertyService.getAllProperties();
-      if (response.success) {
-        setProperties(response.data.data);
-        console.log("Listed properties: ", response.data.data)
+      const data = await propertyService.getAllProperties();
+      if (data.success) {
+        setProperties(data.data);
+        logger.info("Listed properties: ", properties)
       } else {
-        setError(response.message);
-        console.log("error fetching all properties: ", response.message)
+        setError(data.message);
+        logger.info("error fetching all properties: ", data.message)
       }
       setLoading(false);
     };
@@ -113,7 +114,7 @@ export default function RootPage() {
         {
           mapOrList==='map'? 
           <Map properties={properties} mapCenter={null}/>:
-          <PropertyListing properties={properties.slice(0,6)}/>
+          <PropertyListing properties={properties.slice(0,6) ?? []}/>
         }
         
       </div>

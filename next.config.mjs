@@ -15,7 +15,19 @@ const nextConfig = {
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '8001',
+        port: '8002',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'loremflickr.com',
+        port: '',
         pathname: '/**',
       },
       {

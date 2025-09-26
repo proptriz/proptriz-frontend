@@ -1,20 +1,27 @@
 
 "use client";
-import React, { useState } from 'react';
+import React, { SetStateAction, useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { PropertyType } from '@/types'
 import Link from 'next/link';
+import debounce from "lodash.debounce";
 
 const propertyIcon = L.icon({
   iconUrl: 'pin.png',
-  shadowUrl: 'location/location-banner.png',
+  // shadowUrl: 'location/location-banner.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
+});
+
+const locationIcon = L.icon({
+  iconUrl: 'location/location-banner.png',
+  iconSize: [35, 41],
+  iconAnchor: [12, 41],
 });
 
 interface MapUpdaterProps {
@@ -26,10 +33,64 @@ interface MapUpdaterProps {
 const MapUpdater = ({ center, zoom }: MapUpdaterProps) => {
   const map = useMap();
   
-  React.useEffect(() => {
-    map.setView(center, zoom);
+  useEffect(() => {
+    // ✅ Restore state on mount
+    const savedCenter = sessionStorage.getItem('prevMapCenter');
+    const savedZoom = sessionStorage.getItem('prevMapZoom');
+    
+    if (savedCenter && savedZoom) {
+      const [lat, lng] = JSON.parse(savedCenter);
+      map.setView([lat, lng], parseInt(savedZoom, 10));
+      
+    } else {
+      map.setView(center, zoom);
+    }
   }, [center, zoom, map]);
   
+  return null;
+};
+
+interface MapBoundsUpdaterProps {
+  onBoundsChange: (bounds: L.LatLngBounds) => void;
+}
+
+const MapBoundsUpdater: React.FC<MapBoundsUpdaterProps> = ({ onBoundsChange }) => {
+  const map = useMap();
+
+  const debouncedUpdateBounds = useMemo(
+    () =>
+      debounce(() => {
+        const currentCenter = map.getCenter();
+        const currentZoom = map.getZoom();
+
+        // Persist into sessionStorage
+        sessionStorage.setItem(
+          'prevMapCenter',
+          JSON.stringify([currentCenter.lat, currentCenter.lng])
+        );
+        sessionStorage.setItem('prevMapZoom', currentZoom.toString());
+
+        const bounds = map.getBounds();
+        onBoundsChange(bounds);
+      }, 500),
+    [map, onBoundsChange]
+  );
+
+  React.useEffect(() => {
+    // listen to map events
+    map.on("moveend", debouncedUpdateBounds);
+    map.on("zoomend", debouncedUpdateBounds);
+
+    // trigger on mount
+    debouncedUpdateBounds();
+
+    return () => {
+      map.off("moveend", debouncedUpdateBounds);
+      map.off("zoomend", debouncedUpdateBounds);
+      debouncedUpdateBounds.cancel(); // ✅ cleanup debounce
+    };
+  }, [map, debouncedUpdateBounds]);
+
   return null;
 };
 
@@ -37,6 +98,8 @@ interface MapProps {
   properties: PropertyType[];
   mapCenter: [number, number] | null;
   initialZoom?: number;
+  mapBounds?: L.LatLngBounds | null;
+  setMapBounds?: React.Dispatch<SetStateAction<L.LatLngBounds | null>>;
   searchLabel?: string;
 }
 
@@ -44,9 +107,12 @@ const Map: React.FC<MapProps> = ({
   properties, 
   mapCenter,
   initialZoom = 13,
+  mapBounds = null,
+  setMapBounds  = () => {},
   searchLabel="Search properties..."
 }) => {
   const [selectedProperty, setSelectedProperty] = useState<PropertyType | null>(null);
+  // const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
 
   const handleMarkerClick = (property: PropertyType) => {
     setSelectedProperty(property);
@@ -66,6 +132,15 @@ const Map: React.FC<MapProps> = ({
         />
         {/* Update map view to user location */}
         {mapCenter && <MapUpdater center={mapCenter as LatLngExpression} zoom={initialZoom} />}
+
+        {/* Capture bounds */}
+        {mapCenter && <MapBoundsUpdater onBoundsChange={setMapBounds} />}
+
+        {/* User Location Marker */}
+        {mapCenter && (
+          <Marker position={mapCenter as LatLngExpression} icon={locationIcon as any} />
+        )}
+
         {properties.map(property => (
           <Marker
             key={property.id}

@@ -52,6 +52,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [isSigningInUser, setIsSigningInUser] = useState(false);
   const [reload, setReload] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [adsSupported, setAdsSupported] = useState<boolean>(false);
 
   const showAlert = (message: string) => {
     setAlertMessage(message);
@@ -63,7 +64,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
    /* Register User via Pi SDK */
   const registerUser = async () => {
     logger.info('Starting user registration.');
-    if (isSigningInUser || authUser) return
+    // if (isSigningInUser || authUser) return
 
     if (typeof window !== 'undefined' && window.Pi?.initialized) {
       try {
@@ -141,15 +142,16 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   useEffect(() => {
     logger.info('AppContextProvider mounted.');
     // if (isSigningInUser || authUser) return
-    autoLoginUser();
-
     // attempt to load and initialize Pi SDK in parallel
     loadPiSdk()
       .then(Pi => {
         Pi.init({ version: '2.0', sandbox: process.env.NODE_ENV === 'development' });
         return Pi.nativeFeaturesList();
       })
+      .then(features => setAdsSupported(features.includes("ad_network")))
       .catch(err => logger.error('Pi SDK load/ init error:', err));
+
+    autoLoginUser();
   }, []);
 
 

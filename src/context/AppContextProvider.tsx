@@ -117,7 +117,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
       } else {
         logger.warn('Auto-login failed.');
         setAuthUser(null);
-        autoLoginUser();
+        await registerUser();
       }
     } catch (error) {
       logger.error('Auto login unresolved; attempting Pi SDK authentication:', error);
@@ -140,7 +140,8 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
   useEffect(() => {
     logger.info('AppContextProvider mounted.');
-    if (isSigningInUser || authUser) return
+    // if (isSigningInUser || authUser) return
+    autoLoginUser();
 
     // attempt to load and initialize Pi SDK in parallel
     loadPiSdk()
@@ -149,9 +150,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
         return Pi.nativeFeaturesList();
       })
       .catch(err => logger.error('Pi SDK load/ init error:', err));
-
-      autoLoginUser();
-  }, [isSigningInUser]);
+  }, []);
 
 
   return (

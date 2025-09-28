@@ -14,11 +14,12 @@ import { PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../logger.config.mjs"
+import Splash from "@/components/shared/Splash";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function ExplorePage() {
-  const { authUser } = useContext(AppContext);
+  const { authUser, isSigningInUser, autoLoginUser, registerUser } = useContext(AppContext);
   const [properties, setProperties] = useState<PropertyType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +36,6 @@ export default function ExplorePage() {
   };
   fetchLocation();
   }, [authUser]);
-
-  
 
   useEffect(() => {
     if (!mapBounds) return
@@ -88,43 +87,49 @@ export default function ExplorePage() {
 
   return (
     <div className="flex flex-col w-full h-screen">
-      {/* Header */}
-      <header className="p-6 flex justify-between items-center w-full z-50 shadow-md">        
-      
-        {/* Centered Banner */}
-        <div className="">
-          <Image
-            width={100}
-            height={60}
-            src="/banner.png"
-            alt="banner"
-            className="h-auto max-w-full"
-          />
+      {
+      isSigningInUser ? 
+      <Splash /> :
+      <div>
+        {/* Header */}
+        <header className="p-6 flex justify-between items-center w-full z-50 shadow-md">        
+        
+          {/* Centered Banner */}
+          <div className="">
+            <Image
+              width={100}
+              height={60}
+              src="/banner.png"
+              alt="banner"
+              className="h-auto max-w-full"
+            />
+          </div>
+
+          {/* Menu icon*/}
+          <div className="ml-auto">           
+            <button className="text-gray-500 text-xl "><SlMenu /></button>
+          </div>
+
+        </header>
+        <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
+          <SearchBar />
+          <NavigationTabs setValue={setFilterBy}/>
         </div>
 
-        {/* Menu icon*/}
-        <div className="ml-auto">           
-          <button className="text-gray-500 text-xl "><SlMenu /></button>
+        {/* Map Section */}
+        <div className="relative flex-1">
+          <Map 
+            properties={properties} 
+            mapCenter={mapCenter} 
+            mapBounds={mapBounds}
+            setMapBounds={setMapBounds} 
+          />        
         </div>
 
-      </header>
-      <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
-        <SearchBar />
-        <NavigationTabs setValue={setFilterBy}/>
+        {/* Footer Navigation */}
+        <Footer />
       </div>
-
-      {/* Map Section */}
-      <div className="relative flex-1">
-        <Map 
-          properties={properties} 
-          mapCenter={mapCenter} 
-          mapBounds={mapBounds}
-          setMapBounds={setMapBounds} 
-        />        
-      </div>
-
-      {/* Footer Navigation */}
-      <Footer />
+      }
     </div>
   );
 };

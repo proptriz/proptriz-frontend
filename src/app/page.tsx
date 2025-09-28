@@ -87,10 +87,6 @@ export default function ExplorePage() {
 
   return (
     <div className="flex flex-col w-full h-screen">
-      {
-      isSigningInUser ? 
-      <Splash /> :
-      <div>
         {/* Header */}
         <header className="p-6 flex justify-between items-center w-full z-50 shadow-md">        
         
@@ -128,8 +124,6 @@ export default function ExplorePage() {
 
         {/* Footer Navigation */}
         <Footer />
-      </div>
-      }
     </div>
   );
 };

@@ -23,67 +23,72 @@ export default function ExplorePage() {
   const [properties, setProperties] = useState<PropertyType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [ searchQuery, setSearchQuery ] = useState<string>('');
   const [ filterBy, setFilterBy ] = useState<string>('house');
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(13);
 
   // Get user location
-  useEffect(() => {
   const fetchLocation = async () => {
+    sessionStorage.removeItem('prevMapCenter');
+    sessionStorage.removeItem('prevMapZoom');
     const [lat, lng] = await getUserPosition();
     // logger.debug("User location:", lat, lng);
     setMapCenter([lat, lng]);
+    setZoomLevel(13);
   };
-  fetchLocation();
-  }, [authUser]);
 
   useEffect(() => {
+    fetchLocation();
+
+  }, [authUser]);
+
+  const fetchProperties = async () => {
     if (!mapBounds) return
-    
-    const fetchProperties = async () => {
-      setLoading(true);
+    setLoading(true);
+    setProperties([]);
 
-      const ne = mapBounds.getNorthEast(); // top-right
-      const sw = mapBounds.getSouthWest(); // bottom-left
+    const ne = mapBounds.getNorthEast(); // top-right
+    const sw = mapBounds.getSouthWest(); // bottom-left
 
-      const query = new URLSearchParams({
-        page: "1",
-        limit: "50",
-        category: filterBy,
-        listed_for: "",
-        ne_lat: ne.lat.toString(),
-        ne_lng: ne.lng.toString(),
-        sw_lat: sw.lat.toString(),
-        sw_lng: sw.lng.toString()
-        // Add other filters as needed
-      }).toString();
+    const query = new URLSearchParams({
+      query: searchQuery,
+      page: "1",
+      limit: "50",
+      category: filterBy,
+      listed_for: "",
+      ne_lat: ne.lat.toString(),
+      ne_lng: ne.lng.toString(),
+      sw_lat: sw.lat.toString(),
+      sw_lng: sw.lng.toString()
+      // Add other filters as needed
+    }).toString();
 
-      const response = await propertyService.getAllProperties(query);
-      if (response.success) {
-        setProperties(response.data);
-        logger.info("Listed properties: ", response.data)
-      } else {
-        setError(response.message);
-        logger.error("error fetching all properties: ", response.message)
-      }
-      setLoading(false);
-    };
-  
+    const response = await propertyService.getAllProperties(query);
+
+    if (response.success) {
+      setProperties(response.data);
+      logger.info("Listed properties: ", response.data)
+
+    } else {
+      setError(response.message);
+      logger.error("error fetching all properties: ", response.message)
+
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchProperties();
+
   }, [filterBy, mapBounds]);
 
-  const handleLocationButtonClick = async () => {
-    // clear previous map state when findme option is changed
-    sessionStorage.removeItem('prevMapCenter');
-    sessionStorage.removeItem('prevMapZoom');
-    const userloc = await getUserPosition();
-    if (userloc) {
-      setMapCenter(userloc);
-      logger.info('User location obtained successfully on button click:', {userloc});
-    } else {
-      setMapCenter(null);
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      fetchProperties();
     }
-  };
+  }, [searchQuery]);
 
   return (
     <div className="flex flex-col w-full h-screen">
@@ -108,7 +113,7 @@ export default function ExplorePage() {
 
         </header>
         <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
-          <SearchBar />
+          <SearchBar setQuery={setSearchQuery} onSearch={fetchProperties} />
           <NavigationTabs setValue={setFilterBy}/>
         </div>
 
@@ -117,9 +122,55 @@ export default function ExplorePage() {
           <Map 
             properties={properties} 
             mapCenter={mapCenter} 
+            initialZoom={zoomLevel}
             mapBounds={mapBounds}
             setMapBounds={setMapBounds} 
           />        
+        </div>
+
+        <div className="absolute bottom-12 z-10 right-0 left-0 m-auto pointer-events-none">
+          <div className="w-[90%] lg:w-full lg:px-6 mx-auto flex items-center justify-between">
+            {/* Add Seller Button */}
+            <div className="pointer-events-auto">
+              <Link href={`/seller/registration`}>
+                <button
+                  style={{
+                    height: '55px',
+                    fontSize: '20px',
+                    borderRadius: '10px',
+                    color: '#ffc153',
+                    paddingLeft: '45px',
+                    paddingRight: '45px',
+                  }}
+                  disabled={isSigningInUser}
+                >
+                  Agent
+                </button>
+              </Link>
+            </div>
+            {/* Location Button */}
+            <div >
+              <button
+                className="bg-primary mx-auto"
+                style={{
+                  borderRadius: '50%',
+                  width: '55px',
+                  height: '55px',
+                  padding: '0px',
+                }}
+                onClick={()=>fetchLocation()}
+                disabled={isSigningInUser}
+              >
+                <Image
+                  className="mx-auto"
+                  src="/icon/my_location.png"
+                  width={40}
+                  height={40}
+                  alt="my location"
+                />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Footer Navigation */}

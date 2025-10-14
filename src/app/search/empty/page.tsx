@@ -10,6 +10,7 @@ import Image from "next/image";
 
 const EmptySearch = () => {
   const [propCount, setPropCount] = useState<number>(4);
+  const [ searchQuery, setSearchQuery ] = useState<string>('');
 
   return (
     <div className="flex flex-col justify-between p-6 min-h-screen">
@@ -22,7 +23,9 @@ const EmptySearch = () => {
                     <FaFilter />
                 </button>
             </div>
-            <SearchBar />
+
+            <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
+
             <div className="flex items-center justify-between mt-4 mb-6">
                 <p className="font-[Raleway]">
                     Found <span className="font-bold">{propCount}</span> properties

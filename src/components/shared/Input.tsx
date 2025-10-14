@@ -1,4 +1,5 @@
 'use client';
+import { styles } from "@/constant";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { ImEye, ImEyeBlocked } from "react-icons/im";
 import { IoHomeOutline } from "react-icons/io5";
@@ -82,23 +83,25 @@ interface ListItem {
   value: string;
 }
 
-export const SelectButton: React.FC<{
+interface SelectButtonProps<T> {
+  label?: string;
   list: ListItem[];
-  setValue: (value: string) => void;
+  setValue: React.Dispatch<React.SetStateAction<T>>;
+  value: string;
   name: string;
-}> = ({ list, setValue, name }) => {
-  const [selectedValue, setSelectedValue] = useState<string>(list[0]?.value || "");
+}
 
-  useEffect(() => {
-    // Set the default value as the first item's value
-    setValue(selectedValue);
-  }, [selectedValue, setValue]);
-
-  const handleSelection = (value: string) => {
-    setSelectedValue(value);
-  };
+export function SelectButton<T extends string>({
+  label,
+  list,
+  setValue,
+  value,
+  name,
+}: SelectButtonProps<T>) {
 
   return (
+    <>
+    {label && <h3 className={styles.H2}>{label}</h3>}
     <div className="space-x-4 space-y-5 text-sm">
       {list &&
         list.map((item, index) => (
@@ -106,14 +109,15 @@ export const SelectButton: React.FC<{
             key={index}
             name={name}
             className={`px-6 py-3 shadow-md rounded-md ${
-              selectedValue === item.value ? "bg-green text-white" : "card-bg"
+              value === item.value ? "bg-green text-white" : "card-bg"
             }`}
-            onClick={() => handleSelection(item.value)}
+            onClick={() => setValue(item.value as T)}
           >
             {item.title}
           </button>
         ))}
     </div>
+    </>
   );
 };
 

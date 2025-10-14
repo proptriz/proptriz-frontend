@@ -65,7 +65,7 @@ export enum CategoryEnum {
 
 export enum ListForEnum {
   rent = "rent",
-  sale = "sele"
+  sale = "sale"
 }
 
 export enum RenewalEnum {
@@ -88,7 +88,7 @@ export interface PropertyType {
   negotiable: boolean; // (true/false)
   property_terms?: string // agent's term cond
   images: string[]; //Other property images for gallery
-  user: string; //foreign key representing agent that list the property
+  user: string | null; //foreign key representing agent that list the property
   latitude: number;
   longitude: number;
   features?: {

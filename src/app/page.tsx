@@ -31,8 +31,8 @@ export default function ExplorePage() {
 
   // Get user location
   const fetchLocation = async () => {
-    sessionStorage.removeItem('prevMapCenter');
-    sessionStorage.removeItem('prevMapZoom');
+    // sessionStorage.removeItem('prevMapCenter');
+    // sessionStorage.removeItem('prevMapZoom');
     const [lat, lng] = await getUserPosition();
     // logger.debug("User location:", lat, lng);
     setMapCenter([lat, lng]);

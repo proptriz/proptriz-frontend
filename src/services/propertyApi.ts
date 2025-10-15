@@ -1,5 +1,6 @@
 import axiosClient from "@/config/client";
 import logger from "../../logger.config.mjs"
+import { PropertyType } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1";
 
@@ -42,6 +43,19 @@ const propertyService = {
   deleteProperty: async (id: string) => {
     return handleRequest(axiosClient.delete(`${API_BASE_URL}/property/${id}`));
   },
+};
+
+
+export const createProperty = async (formData: FormData): Promise<PropertyType> => {
+  // ✅ Log FormData before sending
+  console.log("📦 FormData contents:");
+  for (const [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+  }
+  const response = await axiosClient.post("/property/add", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
 };
 
 export default propertyService;

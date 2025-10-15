@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import HorizontalCard from "@/components/shared/HorizontalCard";
 import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
-import { mockProperties } from "@/constant";
+import { mockProperties, styles } from "@/constant";
 import { FaNairaSign } from "react-icons/fa6";
 import { IoHomeOutline } from "react-icons/io5";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
@@ -16,6 +16,8 @@ import handleLocationSelect from "@/utils/handleLocationSelect";
 import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 import { ScreenName } from "@/components/shared/LabelCards";
+import { CategoryEnum, ListForEnum } from "@/types";
+import { toast } from "react-toastify";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -25,10 +27,11 @@ export default function EditPropertyPage() {
   const [propertyTitle, setPropertyTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(180000);
   const [rentType, setRentType] = useState<string>("Monthly");
-  const [listedFor, setListedFor] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
-  const [photos, setPhotos] = useState<File[]>([]);
+  const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
+  const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
+  const [propCoordinates, setPropCoordinates] = useState<[number, number]  | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
   
   const maxPhotos = 5;
 
@@ -84,6 +87,14 @@ export default function EditPropertyPage() {
     setSubmitSuccess(true)
   }
 
+  const handleLocationSelect = (lat: number, lng: number,) => {
+      // Save to form state, API, etc.
+      setPropCoordinates([lat, lng])
+      toast.success(`Location selected: (${lat}, ${lng})`, { position: "top-right" });
+      console.log("Selected coordinates:", lat, lng);
+    };
+  
+
   return (
     <div className="pb-16 min-h-screen relative">
       {/* Back button */}
@@ -125,9 +136,13 @@ export default function EditPropertyPage() {
           </div>
 
           {/* Listed For */}
-          <h3 className="mt-10 font-semibold">Listed For</h3>
-          <SelectButton list={listingTypes} setValue={setListedFor} name="listedFor" />
-
+          <SelectButton<ListForEnum> 
+            list={listingTypes} 
+            setValue={setListedFor} 
+            name="listedFor" 
+            value={listedFor} 
+            label="Listed For" 
+          />
           {/* Listing Price */}
           <div className="my-4">
             <label className="block mt-10 font-semibold">
@@ -159,8 +174,8 @@ export default function EditPropertyPage() {
           )}
 
           {/* Property Category */}
-          <h3 className="mt-10 font-semibold">Property Category</h3>
-          <SelectButton list={categories} setValue={setCategory} name="category" />
+          <h3 className={styles.H2}>Property Category</h3>
+          <SelectButton<CategoryEnum> list={categories} setValue={setCategory} name="category" value={category} />
           
           {/* Proprty Location */}
           <PropertyLocationSection

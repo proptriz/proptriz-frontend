@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import SearchBar from "@/components/shared/SearchBar";
 import { FaRegBell } from "react-icons/fa6";
@@ -8,9 +8,13 @@ import { mockProperties } from "@/constant";
 import Image from "next/image";
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+import NavigationTabs from "@/components/shared/NavigationTabs";
 
 export default function PropertyListPage() {
   const router = useRouter();
+
+  const [ searchQuery, setSearchQuery ] = useState<string>('');
+  const [ filterBy, setFilterBy ] = useState<string>('house');
 
   return (
     <div className="flex flex-col pt-5 pb-16">
@@ -42,8 +46,9 @@ export default function PropertyListPage() {
         </div>
       </header>
 
-      <div className="px-6 py-3">
-        <SearchBar />
+      <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
+        <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
+        <NavigationTabs setValue={setFilterBy}/>
       </div>
 
       {/* Explore Nearby Property List */}

@@ -20,6 +20,7 @@ export default function RootPage() {
   const [ mapOrList, setMapOrList ] = useState<string>('list')
   const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
   const [properties, setProperties] = useState<PropertyType[]>(mockProperties);
+  const [ searchQuery, setSearchQuery ] = useState<string>('');
   const [ filterBy, setFilterBy ] = useState<string>('house');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +89,7 @@ export default function RootPage() {
         </div>
       </header>
       <div className="px-6 py-3">
-        <SearchBar />
+        <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
       </div>
       
       {/* Navigation Tabs */}

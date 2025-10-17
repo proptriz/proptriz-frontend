@@ -161,7 +161,7 @@ const Map: React.FC<MapProps> = ({
                 <p className="text-sm text-gray-600 mb-1">{property.address}</p>
                 <p className="font-semibold mb-2">₦{property.price.toLocaleString()}</p>
                 <Link
-                  href={`/property/details/${'2'}`}
+                  href={`/property/details/${property.id}`}
                   className="text-sm text-estate-primary hover:underline"
                 >
                   View Details

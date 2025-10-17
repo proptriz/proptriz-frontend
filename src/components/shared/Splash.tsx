@@ -7,7 +7,7 @@ export default function Splash() {
   const { authUser, isSigningInUser, registerUser } = useContext(AppContext);
   return (
     <div className="flex flex-col items-center justify-start h-screen pt-24 gap-3">
-      <Image src="/splash_image.svg" alt="EscrowPi" width={180} height={180} priority />
+      <Image src="/splash.png" alt="EscrowPi" width={180} height={180} priority />
       <SubmitButton 
       isLoading={isSigningInUser} 
       onClick={()=>registerUser()}

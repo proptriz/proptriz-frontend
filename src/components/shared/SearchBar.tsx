@@ -46,7 +46,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setQuery, onSearch }) => {
           </div>
 
           <button 
-          className="ml-1 text-white bg-[#61AF74] px-6 rounded-r-full" 
+          className="ml-1 text-secondary bg-primary px-6 rounded-r-full" 
           onClick={()=>onSearch()}
           >
             <FiSearch className="text-xl" />

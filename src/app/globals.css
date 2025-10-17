@@ -3,11 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --default-primary-color: #386f4f;
+  --default-primary-color: #164e66;
   --default-secondary-color: #f6c367;
   --default-tertiary-color: #808080;
   --default-bg-color: #ebf1ed;
 }
+
+html, body, #__next { height: 100%; }
 
 * {
   box-sizing: border-box;
@@ -31,16 +33,48 @@ h4 {
   color: gray;
 }
 
+.nav_item {
+  width: 35px;
+  height: 35px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav_item:active {
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 50%;
+  background-color: #d0d0d086;
+}
+
+.badge_dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #ff3b30; /* iOS red tone */
+  border-radius: 50%;
+  /* Gold border ring around the badge */
+  box-shadow: 0 0 0 2px var(--default-tertiary-color);
+}
+
+
 .card-bg {
   background-color: #DCDFD9;
 }
 
 .text-green {
-  color: #61AF74;
+  color: var(--default-primary-color);
 }
 
 .bg-green {
-  background-color: #61AF74;
+  background-color: var(--default-primary-color);
 }
 
 p .count-label {

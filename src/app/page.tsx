@@ -96,14 +96,14 @@ export default function ExplorePage() {
         <header className="p-6 flex justify-between items-center w-full z-50 shadow-md">        
         
           {/* Centered Banner */}
-          <div className="">
-            <Image
-              width={100}
-              height={60}
-              src="/banner.png"
-              alt="banner"
-              className="h-auto max-w-full"
-            />
+          <div className={`nav_item disabled`}>
+            <Link href="/" aria-label="Home" >
+              <Image src="/logo.png" alt="proptriz" width={104} height={64} />
+            </Link>
+          </div>
+
+          <div>
+            roTriz
           </div>
 
           {/* Menu icon*/}

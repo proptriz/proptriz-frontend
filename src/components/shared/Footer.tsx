@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
         <Link 
         href={menu.link} 
         key={index} 
-        className={`flex items-center px-6 py-4 w-full ${menu.link===pathname? 'text-[#234F68] card-bg': 'text-gray-700'}`}
+        className={`flex items-center px-6 py-4 w-full ${menu.link===pathname? 'text-primary card-bg': 'text-tertiary'}`}
         >
           <button className={"mx-auto"}>
             <div className="text-2xl mx-auto">{menu.icon}</div>

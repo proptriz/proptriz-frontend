@@ -27,7 +27,7 @@ const NavigationTabs: React.FC<{setValue: (value: string) => void}> = ({ setValu
         <button
           key={index}
           className={`flex items-center px-4 py-2 rounded-lg ${
-            selectedValue === tab.value ? "bg-[#61AF74] text-white" : "bg-gray-100"
+            selectedValue === tab.value ? "bg-primary text-secondary" : "bg-gray-100"
           }`}
           onClick={()=>setSelectedValue(tab.value)}
         >

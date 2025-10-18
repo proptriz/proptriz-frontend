@@ -57,7 +57,7 @@ export const mockProperties: PropertyType[] = [
         "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80",
         "https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
-      user: "agent_101",
+      user: {username: "agent_101", _id:"", pi_uid: ""},
       latitude: 6.4531,
       longitude: 3.4505,
       features: [
@@ -85,7 +85,7 @@ export const mockProperties: PropertyType[] = [
         "https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
         "https://images.unsplash.com/photo-1604014237800-1c9102c219da?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
-      user: "agent_102",
+      user: {username: "agent_102", _id:"", pi_uid: ""},
       latitude: 6.4531,
       longitude: 3.4505,
       env_facilities: ["Elevator", "Underground Parking"],
@@ -110,7 +110,7 @@ export const mockProperties: PropertyType[] = [
         "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
         "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1332&q=80",
       ],
-      user: "agent_103",
+      user: {username: "agent_103", _id:"", pi_uid: ""},
       status: "rented",
       created_at: new Date(),
       updated_at: new Date()
@@ -131,7 +131,7 @@ export const mockProperties: PropertyType[] = [
       images: [
         "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1332&q=80",
       ],
-      user: "agent_104",
+      user: {username: "agent_104", _id:"", pi_uid: ""},
       status: "available",
       created_at: new Date(),
       updated_at: new Date()
@@ -152,7 +152,7 @@ export const mockProperties: PropertyType[] = [
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
         "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2053&q=80",
       ],
-      user: "agent_105",
+      user: {username: "agent_105", _id:"", pi_uid: ""},
       env_facilities: ["Swimming Pool", "Parking Space", "Wi-Fi"],
       status: "available",
       created_at: new Date(),
@@ -174,7 +174,7 @@ export const mockProperties: PropertyType[] = [
       images: [
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
-      user: "agent_106",
+      user: {username: "agent_106", _id:"", pi_uid: ""},
       status: "unavailable",
       created_at: new Date(),
       updated_at: new Date()
@@ -196,7 +196,7 @@ export const mockProperties: PropertyType[] = [
         "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
         "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
       ],
-      user: "agent_107",
+      user: {username: "agent_107", _id:"", pi_uid: ""},
       env_facilities: ["Security", "Good Road Network"],
       status: "available",
       created_at: new Date(),

@@ -25,9 +25,9 @@ const propertyService = {
   },
 
   // Fetch Single Property
-  getPropertyById: async (id: string) => {
-    return handleRequest(axiosClient.get(`${API_BASE_URL}/property/${id}`));
-  },
+  // getPropertyById: async (id: string) => {
+  //   return handleRequest(axiosClient.get(`${API_BASE_URL}/property/${id}`));
+  // },
 
   // Fetch All Properties with Filters
   getAllProperties: async (filters: any = {}) => {
@@ -47,15 +47,26 @@ const propertyService = {
 
 
 export const createProperty = async (formData: FormData): Promise<PropertyType> => {
-  // ✅ Log FormData before sending
-  console.log("📦 FormData contents:");
-  for (const [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
+  // ✅ Log Property before sending
+  // console.log("📦 FormData contents:");
+  // for (const [key, value] of response.data) {
+  //   console.log(`${key}:`, value);
+  // }
   const response = await axiosClient.post("/property/add", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return response.data;
+};
+
+export const getPropertyById = async (propertyId: string): Promise<PropertyType> => {
+  const response = await axiosClient.get(`/property/${propertyId}`);
+  console.log(response.data);
+  return {
+    ...response.data,
+    id: response.data._id,
+    longitude: response.data.map_location?.coordinates[0] || 0.0,
+    latitude: response.data.map_location?.coordinates[1] || 0.0,
+  };
 };
 
 export default propertyService;

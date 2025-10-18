@@ -36,7 +36,7 @@ const PropertyDetail = ({
   const [property, setProperty] = useState<PropertyType | null>(null);
   const [togglePopup, setTogglePopup] = useState(false);
   const [buyPopup, setBuyPopup] = useState(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState({
     distance: '2.5 km',
@@ -47,16 +47,24 @@ const PropertyDetail = ({
   useEffect(() => {
     if (!propertyId || property) return
     setLoading(true);
+    setError(null);
     const fetchProperty = async () => {
-      const property = await getPropertyById(propertyId);
-      if (property.id) {
-        setProperty(property);
-        logger.info("fetched property: ", property);
-      } else {
-        setError('Failed to get property with ');
-        logger.info("error fetching all property ");
+      try {
+        const property = await getPropertyById(propertyId);
+        if (property.id) {
+          setProperty(property);
+          logger.info("fetched property: ", property);
+        } else {
+          setError('Failed to get property with ');
+          logger.info("error fetching all property ");
+        }
+      } catch (error:any){
+
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
+      
+      
     };
       
     fetchProperty()
@@ -86,6 +94,18 @@ const PropertyDetail = ({
     setSelectedLocation(location);
       setTogglePopup(false); // Close the popup after selecting
   };
+
+  if (loading){
+    return (
+      <div>Loading property details</div>
+    )
+  }
+
+  if (error){
+    return (
+      <div>Error Loading property details</div>
+    )
+  }
 
   return (
     <div>
@@ -123,35 +143,35 @@ const PropertyDetail = ({
 
             {/* Title & Price */}
             <div className="p-5">
-                    <div className="flex items-center justify-between mt-3">
-                        <div>
-                            <h1 className="text-2xl font-bold">{ property.title }</h1>
-                            <div  className="flex">
-                                <HiOutlineLocationMarker />
-                                <p className="text-gray-500 text-sm"> { property.address }</p>
-                            </div>
-                        </div>
-                        <div>
-                            <p className="text-2xl text-right font-semibold text-green">{ formatPrice(property.price) } pi</p>
-                            <p className="text-gray-500 text-sm"> { property.period }</p>
-                        </div>                
-                    </div>
+              <div className="flex items-center justify-between mt-3">
+                <div>
+                  <h1 className="text-2xl font-bold">{ property.title }</h1>
+                  <div  className="flex">
+                      <HiOutlineLocationMarker />
+                      <p className="text-gray-500 text-sm"> { property.address }</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-2xl text-right font-semibold text-green">{ formatPrice(property.price) } pi</p>
+                  <p className="text-gray-500 text-sm"> { property.period }</p>
+                </div>                
+              </div>
                     
-                    <div className="flex items-center justify-between mt-5">
-                        <div className="flex items-center space-x-3 text-sm">
-                          <Link href={'/transaction/buy'}>
-                            <button 
-                            className="px-5 py-3 bg-green text-white rounded-lg"
-                            onClick={()=>{setBuyPopup(true)}}
-                            > 
-                              { property.listed_for }
-                            </button>
-                          </Link>
-                        </div>
-                        <button className="text-xl font-semibold card-bg p-4 rounded-full">
-                          <TbView360Number />
-                        </button>                
-                    </div>
+              <div className="flex items-center justify-between mt-5">
+                <div className="flex items-center space-x-3 text-sm">
+                  <Link href={'/transaction/buy'}>
+                    <button 
+                    className="px-5 py-3 bg-green text-white rounded-lg"
+                    onClick={()=>{setBuyPopup(true)}}
+                    > 
+                      { property.listed_for }
+                    </button>
+                  </Link>
+                </div>
+                <button className="text-xl font-semibold card-bg p-4 rounded-full">
+                  <TbView360Number />
+                </button>                
+              </div>
             </div>
 
             {/* Agent Info */}
@@ -223,9 +243,9 @@ const PropertyDetail = ({
           <div className="px-5 mt-10">
             <h2 className="text-lg font-bold mb-3">Reviews</h2>
             <div className="bg-gray-700 p-3 rounded-lg flex items-center">
-                    <FaStar className="text-yellow-500" />
-                    <span className="ml-2 text-lg text-gray-200 font-bold">4.9</span>
-                    <span className="ml-2 text-gray-500">(12 reviews)</span>
+              <FaStar className="text-yellow-500" />
+              <span className="ml-2 text-lg text-gray-200 font-bold">4.9</span>
+              <span className="ml-2 text-gray-500">(12 reviews)</span>
             </div>
             <div className="mt-3 space-y-3">
                     {/* Review Item */}

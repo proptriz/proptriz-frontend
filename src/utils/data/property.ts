@@ -1,12 +1,12 @@
 import { PropertyType } from "@/types";
-import propertyService from "@/services/propertyApi";
+import propertyService, { getPropertyById } from "@/services/propertyApi";
 
 export async function fetchProperty(propertyId:string) {
   try {
     // We artificially delay a response for demo purposes.
     // Don't do this in production :)
     console.log('Fetching revenue data...');
-    const property = await propertyService.getPropertyById(propertyId);
+    const property = await getPropertyById(propertyId);
     if (!property){
       return null
     } 

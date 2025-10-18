@@ -30,34 +30,25 @@ export default function PropertyMap({
   const [propLoc, setPropLoc] = useState<[number, number]>([0.0, 0.0]);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(13);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!propertyId || property) return
-    setLoading(true);
-    const fetchProperty = async () => {
-      try {
+      if (!propertyId || property) return
+    //   setLoading(true);
+      const fetchProperty = async () => {
         const property = await getPropertyById(propertyId);
         if (property.id) {
           setProperty(property);
           setPropLoc([property.latitude, property.longitude])
           logger.info("fetched property: ", property);
         } else {
-          setError('Failed to get property with ');
+        //   setError('Failed to get property with ');
           logger.info("error fetching all property ");
         }
-      } catch (error: any) {
-        setError('Failed to get property with ');
-        logger.info("error fetching all property ");
-      } finally {
-        setLoading(false);
-      }
-      
-    };
+        // setLoading(false);
+      };
         
-    fetchProperty()
-  }, [propertyId]);
+      fetchProperty()
+    }, [propertyId]);
 
   // Get user location
   const fetchLocation = async () => {    

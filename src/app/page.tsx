@@ -49,44 +49,34 @@ export default function ExplorePage() {
     setLoading(true);
     setProperties([]);
 
-    try {
-      const ne = mapBounds.getNorthEast(); // top-right
-      const sw = mapBounds.getSouthWest(); // bottom-left
+    const ne = mapBounds.getNorthEast(); // top-right
+    const sw = mapBounds.getSouthWest(); // bottom-left
 
-      const query = new URLSearchParams({
-        query: searchQuery,
-        page: "1",
-        limit: "50",
-        category: filterBy,
-        listed_for: "",
-        ne_lat: ne.lat.toString(),
-        ne_lng: ne.lng.toString(),
-        sw_lat: sw.lat.toString(),
-        sw_lng: sw.lng.toString()
-        // Add other filters as needed
-      }).toString();
+    const query = new URLSearchParams({
+      query: searchQuery,
+      page: "1",
+      limit: "50",
+      category: filterBy,
+      listed_for: "",
+      ne_lat: ne.lat.toString(),
+      ne_lng: ne.lng.toString(),
+      sw_lat: sw.lat.toString(),
+      sw_lng: sw.lng.toString()
+      // Add other filters as needed
+    }).toString();
 
-      const response = await propertyService.getAllProperties(query);
+    const response = await propertyService.getAllProperties(query);
 
-      if (response.success) {
-        setProperties(response.data);
-        logger.info("Listed properties: ", response.data);
+    if (response.success) {
+      setProperties(response.data);
+      logger.info("Listed properties: ", response.data)
 
-      } else {
-        setError(response.message);
-        logger.error("error fetching all properties: ", response.message);
+    } else {
+      setError(response.message);
+      logger.error("error fetching all properties: ", response.message)
 
-      }
-      setLoading(false);
-    } catch (error:any) {
-      setError(error.message);
-      logger.error("error fetching all properties: ", error.message)
-
-    } finally {
-      setLoading(false);
     }
-
-    
+    setLoading(false);
   };
 
   useEffect(() => {

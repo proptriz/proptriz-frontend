@@ -4,6 +4,17 @@ export interface AuthUserType {
   membership: {class:string, balance:number};
 };
 
+export interface IUser {
+  _id: string;
+  username: string; // unique identifyer
+  pi_uid: string; // hashed user password
+  fullname?: string; // User Legal Name (e.g. Tony Adeola Ezenwa) (optional)
+  image?: string; // URL to user profile pics (optional)
+  email?: string; // for notification
+  phone?: string; // user phone number (optional)
+  provider?: string; // URLs of reviewer upload (optional)
+};
+
 export interface AgentProps { 
   id: string, 
   name: string, 
@@ -88,7 +99,7 @@ export interface PropertyType {
   negotiable: boolean; // (true/false)
   property_terms?: string // agent's term cond
   images: string[]; //Other property images for gallery
-  user: string | null; //foreign key representing agent that list the property
+  user: IUser; //foreign key representing agent that list the property
   latitude: number;
   longitude: number;
   features?: {

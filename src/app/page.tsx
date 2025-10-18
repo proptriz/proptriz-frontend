@@ -30,9 +30,7 @@ export default function ExplorePage() {
   const [zoomLevel, setZoomLevel] = useState<number>(13);
 
   // Get user location
-  const fetchLocation = async () => {
-    // sessionStorage.removeItem('prevMapCenter');
-    // sessionStorage.removeItem('prevMapZoom');
+  const fetchLocation = async () => {    
     const [lat, lng] = await getUserPosition();
     // logger.debug("User location:", lat, lng);
     setMapCenter([lat, lng]);
@@ -40,6 +38,8 @@ export default function ExplorePage() {
   };
 
   useEffect(() => {
+    // sessionStorage.removeItem('prevMapCenter');
+    // sessionStorage.removeItem('prevMapZoom');
     fetchLocation();
 
   }, [authUser]);
@@ -102,8 +102,8 @@ export default function ExplorePage() {
             </Link>
           </div>
 
-          <div className=" text-xl text-bold">
-            roTriz
+          <div className="text-xl font-bold">
+            ropTriz
           </div>
 
           {/* Menu icon*/}

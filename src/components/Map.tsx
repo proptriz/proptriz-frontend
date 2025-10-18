@@ -10,8 +10,8 @@ import Link from 'next/link';
 import debounce from "lodash.debounce";
 
 const propertyIcon = L.icon({
-  iconUrl: 'pin.png',
-  // shadowUrl: 'location/location-banner.png',
+  iconUrl: '/pin.png',
+  // shadowUrl: '/pin.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -19,7 +19,7 @@ const propertyIcon = L.icon({
 });
 
 const locationIcon = L.icon({
-  iconUrl: 'location/location-banner.png',
+  iconUrl: '/location/location-banner.png',
   iconSize: [35, 41],
   iconAnchor: [12, 41],
 });

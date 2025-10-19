@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 
 const menus = [
   { name: "Home", icon: <FaMapMarkerAlt  />, link: '/' },
-  { name: "Search", icon: <FiHome />, link: '/search/explore' },
+  { name: "Explore", icon: <FiHome />, link: '/explore' },
   { name: "Favorite", icon: <FiHeart />, link: '/property/list' },
   { name: "Settings", icon: <FaRegUser />, link: '/profile' },
 ];

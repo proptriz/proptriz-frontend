@@ -34,6 +34,11 @@ const propertyService = {
     return handleRequest(axiosClient.get(`${API_BASE_URL}/property/all?${filters}`));
   },
 
+  // Fetch All Properties with Filters
+  getNearestProperties: async (propertyId: string) => {
+    return handleRequest(axiosClient.get(`${API_BASE_URL}/property/nearest-prop?${propertyId}`));
+  },
+
   // Update Property
   updateProperty: async (id: string, updates: any) => {
     return handleRequest(axiosClient.put(`${API_BASE_URL}/property/${id}`, updates));
@@ -67,6 +72,12 @@ export const getPropertyById = async (propertyId: string): Promise<PropertyType>
     longitude: response.data.map_location?.coordinates[0] || 0.0,
     latitude: response.data.map_location?.coordinates[1] || 0.0,
   };
+};
+
+export const getNearestProperties = async (propertyId: string): Promise<PropertyType[]> => {
+  const response = await axiosClient.get(`/property/nearest-prop/${propertyId}`);
+  console.log(response.data);
+  return response.data.properties;
 };
 
 export default propertyService;

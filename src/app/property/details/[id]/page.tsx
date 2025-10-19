@@ -3,22 +3,21 @@
 import React, { useState, useEffect, use } from "react";
 import { ReviewCard } from "@/components/shared/Cards";
 import { VerticalCard } from "@/components/shared/VerticalCard";
-import { mockProperties } from "@/constant";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaHeart, FaShareAlt, FaStar, FaBed, FaAngleDown, } from "react-icons/fa";
-import { FaRegStar } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { IoChatbubbleEllipsesOutline, IoChevronBack } from "react-icons/io5";
+import { IoChatbubbleEllipsesOutline, IoChevronBack, IoClose } from "react-icons/io5";
 import { TbView360Number } from "react-icons/tb";
 import Popup from "@/components/shared/Popup";
 import { IoIosArrowForward } from "react-icons/io";
 import { PropertyType } from "@/types";
-import formatPrice from "@/utils/formatPrice";
 import Link from "next/link";
-import { getPropertyById } from "@/services/propertyApi";
+import { getNearestProperties, getPropertyById } from "@/services/propertyApi";
 import dynamic from "next/dynamic";
 import logger from '../../../../../logger.config.mjs';
+import Price from "@/components/shared/Price";
+import GalleryModal from "@/components/shared/GalleryModal";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -34,6 +33,8 @@ const PropertyDetail = ({
 
   // console.log("property slug: ", propertySlug)
   const [property, setProperty] = useState<PropertyType | null>(null);
+  const [nearestProperty, setNearestProperty] = useState<PropertyType[]>([]);
+  const [showGallery, setShowGallery] = useState(false);
   const [togglePopup, setTogglePopup] = useState(false);
   const [buyPopup, setBuyPopup] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -65,6 +66,26 @@ const PropertyDetail = ({
       }
       
       
+    };
+      
+    fetchProperty()
+  }, [propertyId]);
+
+
+  useEffect(() => {
+    if (!propertyId || nearestProperty.length>0) return
+    const fetchProperty = async () => {
+      try {
+        const properties = await getNearestProperties(propertyId);
+        if (properties && properties.length>0) {
+          setNearestProperty(properties);
+          logger.info("fetched properties: ", properties);
+        } else {
+          logger.info("unable to fetch nearest properties ");
+        }
+      } catch (error:any){
+        logger.info("error fetching nearest properties ");
+      }
     };
       
     fetchProperty()
@@ -119,27 +140,52 @@ const PropertyDetail = ({
 
             {/* Header Section */}
             <div className="relative">
-              <img
-              src={property.banner || "/skyscraper.png"} 
-              alt="Property image"
-              className="w-full h-[350px] object-cover rounded-b-xl"
+              <Image
+                // loader={customImageLoader}
+                src={property.banner || "/skyscraper.png"} 
+                alt="Property image"
+                width={1000}
+                height={700}
+                className="w-full h-[400px] object-cover rounded-b-xl"
               /> 
-              <button className=" absolute top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" onClick={()=>router.back()}>
+
+              <button
+                className="absolute top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md"
+                onClick={() => router.back()}
+              >
                 <IoChevronBack />
               </button>           
                     
               <div className="absolute top-5 right-5 flex space-x-3">                
-                  <button className="p-2 bg-white rounded-full shadow-md">
-                      <FaShareAlt />
-                  </button>
-                  <button className="p-2 bg-white rounded-full shadow-md">
-                      <FaHeart color="green" />
-                  </button>
+                <button className="p-2 bg-white rounded-full shadow-md">
+                  <FaShareAlt />
+                </button>
+                <button className="p-2 bg-white rounded-full shadow-md">
+                  <FaHeart color="green" />
+                </button>
               </div>
+
+              {/* Bottom-left rating and category */}
               <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 text-white px-4 py-1 rounded-full">
                 <span>4.9</span> | <span>{property?.category}</span>
               </div>
+
+              {/* Thumbnail link (replaces bottom-right overlay) */}
+              <div
+                className="absolute bottom-5 right-5 cursor-pointer"
+                onClick={() => setShowGallery(true)} // assuming you’ll use state to open a modal/gallery
+              >
+                <img
+                  src={property?.images?.[1] || "/placeholder-thumb.jpg"}
+                  alt="View more images"
+                  className="w-16 h-16 object-cover rounded-lg border-2 border-white shadow-lg hover:opacity-90 transition"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded-lg text-white text-sm font-medium">
+                  +{property?.images?.length || 0}
+                </div>
+              </div>
             </div>
+
 
             {/* Title & Price */}
             <div className="p-5">
@@ -147,14 +193,11 @@ const PropertyDetail = ({
                 <div>
                   <h1 className="text-2xl font-bold">{ property.title }</h1>
                   <div  className="flex">
-                      <HiOutlineLocationMarker />
-                      <p className="text-gray-500 text-sm"> { property.address }</p>
+                    <HiOutlineLocationMarker />
+                    <p className="text-gray-500 text-sm"> { property.address }</p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-2xl text-right font-semibold text-green">{ formatPrice(property.price) } pi</p>
-                  <p className="text-gray-500 text-sm"> { property.period }</p>
-                </div>                
+                <Price price={property.price} tenancyPeriod={property.period} />               
               </div>
                     
               <div className="flex items-center justify-between mt-5">
@@ -242,23 +285,23 @@ const PropertyDetail = ({
           {/* Reviews */}
           <div className="px-5 mt-10">
             <h2 className="text-lg font-bold mb-3">Reviews</h2>
-            <div className="bg-gray-700 p-3 rounded-lg flex items-center">
-              <FaStar className="text-yellow-500" />
+            <div className="bg-primary p-3 rounded-lg flex items-center">
+              <FaStar className="text-secondary" />
               <span className="ml-2 text-lg text-gray-200 font-bold">4.9</span>
-              <span className="ml-2 text-gray-500">(12 reviews)</span>
+              <span className="ml-2 text-gray-400">(12 reviews)</span>
             </div>
             <div className="mt-3 space-y-3">
-                    {/* Review Item */}
-                    <ReviewCard 
-                    id='01'
-                    reviewer="Kurt Mullins" 
-                    image="/avatar.png" 
-                    ratings={4.0}
-                    text="Lorem ipsum dolor sit amet, consectetur 
+              {/* Review Item */}
+              <ReviewCard 
+              id='01'
+              reviewer="Kurt Mullins" 
+              image="/avatar.png" 
+              ratings={4.0}
+              text="Lorem ipsum dolor sit amet, consectetur 
                     adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                    reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
-                    />
-                    {/* Add more reviews here */}
+              reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
+              />
+              {/* Add more reviews here */}
             </div>
             <button className="mt-3 text-green" onClick={()=>router.push('/property/reviews')}>
               View all reviews
@@ -266,29 +309,30 @@ const PropertyDetail = ({
           </div>
 
           {/* Nearby Properties */}
-          <div className="px-5 mt-10">
-                  <h2 className="text-lg font-bold mb-3">Nearby From this Location</h2>
-                  <div className="flex space-x-3">
-                    {/* Property Card */}
-                    <div className="grid grid-cols-2 w-full space-x-3 ">
-                      {mockProperties.slice(0,2).map(((info, key)=>(
-                        <VerticalCard
-                          id={info.id}
-                          name={info.title} 
-                          price={30} 
-                          type={info.category} 
-                          address={info.address} 
-                          image={info.banner} 
-                          period={info.period? info.period : ""} 
-                          rating={20}
-                          key={key}
-                        />
-                      )))}
-                    </div>
-                        
-                    {/* Add more cards here */}
-                  </div>
-          </div>
+          {nearestProperty && nearestProperty.length>0 && <div className="px-5 mt-10">
+            <h2 className="text-lg font-bold mb-3">Nearby From this Location</h2>
+            <div className="flex space-x-3">
+              {/* Property Card */}
+              <div className="grid grid-cols-2 w-full gap-3 ">
+                {nearestProperty.slice(0,4).map(((item, key)=>(
+                  <Link href={`/property/details/${item.id}`} key={key}>
+                    <VerticalCard
+                      id={item.id}
+                      name={item.title} 
+                      price={item.price} 
+                      type={item.category} 
+                      address={item.address} 
+                      image={item.banner} 
+                      period={item.period? item.period : ""} 
+                      rating={20}                      
+                    />
+                  </Link>
+                )))}
+              </div>
+                  
+              {/* Add more cards here */}
+            </div>
+          </div>}
 
           {/* Location popup */}
           <Popup header="Location Distance" 
@@ -338,6 +382,17 @@ const PropertyDetail = ({
           </Popup>
         </div>
       } 
+      
+      {/* Gallery Modal */}
+      {property &&  (
+        <GalleryModal
+          images={property.images}
+          show={showGallery}
+          startIndex={0}
+          onClose={() => setShowGallery(false)}
+        />
+      )}
+
     </div>
   );
 };

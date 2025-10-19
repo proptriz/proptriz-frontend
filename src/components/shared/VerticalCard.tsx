@@ -1,16 +1,6 @@
 import { PropertyProps } from "@/types";
-
-
-interface VerticalCardProps {
-    id: string;
-    image: string; // URL of the property image
-    name: string; // Title of the property
-    rating: number; // Rating of the property
-    address: string; // Location of the property
-    price: number; // Price per month
-    type: string; // Property type (e.g., "Apartment")
-    period: string
-  }
+import formatPrice from "@/utils/formatPrice";
+import { LuPi } from "react-icons/lu";
 
 export const VerticalCard = ({
     id,
@@ -25,9 +15,11 @@ export const VerticalCard = ({
     return (
         <div className="bg-white p-3 rounded-2xl shadow-md">
             <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${image})`}}>
-                <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
-                    N{price}
-                    <span className="text-xs">{period}</span>
+                <div className="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-xl">
+                    <p className="flex items-center text-lg">
+                        <LuPi className="text-sm"/> <span className="font-semibold"> {formatPrice(price)}</span>
+                        <span className="text-xs ms-1">{period}</span>
+                    </p>                    
                 </div>
             </div>
             <div>

@@ -14,6 +14,7 @@ import { mockProperties, styles } from "@/constant";
 import { createProperty } from "@/services/propertyApi";
 import { CategoryEnum, Feature, ListForEnum, NegotiableEnum, RenewalEnum } from "@/types";
 import { toast } from "react-toastify";
+import logger from "../../../../logger.config.mjs"
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
@@ -50,7 +51,7 @@ export default function AddPropertyPage() {
     // Save to form state, API, etc.
     setPropCoordinates([lat, lng])
     toast.success(`Location selected: (${lat}, ${lng})`, { position: "top-right" });
-    console.log("Selected coordinates:", lat, lng);
+    logger.info("Selected coordinates:", lat, lng);
   };
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +147,7 @@ export default function AddPropertyPage() {
         {/* Price */}
         <div>
           <h3 className={styles.H2}>
-            {listedFor === "rent" ? "Rent Price" : "Sell Price"}
+            {listedFor === ListForEnum.rent ? "Rent Price" : "Sell Price"}
           </h3>
           <div className="flex card-bg p-3 rounded-lg shadow-md">
             <input
@@ -197,7 +198,6 @@ export default function AddPropertyPage() {
             selected={renewPeriod}
             onChange={setRenewPeriod}
           />
-
         )}
 
         {/* Property Category */}
@@ -234,7 +234,7 @@ export default function AddPropertyPage() {
               <FaArrowLeft className="text-xl" />
             </button>
 
-            { authUser? <button
+            { authUser ? <button
               onClick={handleSubmit}
               disabled={isLoading}
               className={`px-4 py-2 rounded-md w-full text-white ${

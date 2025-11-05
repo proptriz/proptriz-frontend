@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 import HorizontalCard from "@/components/shared/HorizontalCard";
@@ -9,7 +8,6 @@ import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import PropertyLocationSection from "@/components/property/PropertyLocationSection";
-import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 import { ScreenName } from "@/components/shared/LabelCards";
 
 import { mockProperties, categories, styles } from "@/constant";
@@ -23,10 +21,8 @@ import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import ImageManager from "@/components/ImageManager";
 
 export default function EditPropertyPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
   const resolvedParams = React.use(params); // same pattern you used
   const propertyId = resolvedParams.id;
-  logger.info("EditPropertyPage property id:", propertyId);
 
   // UI state
   const [loading, setLoading] = useState<boolean>(false);
@@ -101,7 +97,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
         setListedFor((res.listed_for as ListForEnum) ?? ListForEnum.rent);
         setRenewPeriod((res.period  as RenewalEnum)  ?? RenewalEnum.yearly);
         setPropertyAddress(res.address || "");
-        
+
         // Coordinates
         if (typeof res.latitude === "number" && typeof res.longitude === "number") {
           setPropCoordinates([res.latitude, res.longitude]);
@@ -113,7 +109,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
         // Negotiable, features, facilities
         setNegotiable(res.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
         setFeatures(Array.isArray(res.features) ? res.features : []);
-        setFacilities(Array.isArray(res.env_facilities) ? res.env_facilities : []);
+        setFacilities(res.env_facilities || []);
         // images (only urls)
         const imgs = Array.isArray(res.images) ? res.images.filter(Boolean) : [];
         setExistingImages(imgs);
@@ -356,12 +352,11 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           </div>          
 
           {/* Listed For */}
-          <SelectButton<ListForEnum> 
-            list={listingTypes} 
-            setValue={setListedFor} 
-            name="listedFor" 
-            value={listedFor} 
-            label="Listed For" 
+          <ToggleButtons<ListForEnum>
+            label="Listed For"
+            options={[ListForEnum.sale, ListForEnum.rent]}
+            selected={listedFor}
+            onChange={setListedFor}
           />
 
           {listedFor === ListForEnum.rent && (
@@ -397,8 +392,8 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           {/* Property Details - controlled via callbacks */}
           <AddPropertyDetails
             listingCategory={category}
-            selectedFeatures={features}
-            setSelectedFeatures={setFeatures}
+            existingFeatures={features}
+            existingFacilities={facilities}
             onNegotiableChange={setNegotiable}
             onFeaturesChange={setFeatures}
             onFacilitiesChange={setFacilities}

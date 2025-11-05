@@ -80,10 +80,15 @@ export enum ListForEnum {
 }
 
 export enum RenewalEnum {
-    monthly = "monthly",
-    yearly = "yearly",
-    daily = "dsily",
-    weekely = "weekely"
+  monthly = "monthly",
+  yearly = "yearly",
+  daily = "daily",
+  weekely = "weekely"
+}
+
+export enum NegotiableEnum {
+  Negotiable = "negotiable",
+  NonNegotiable = "Non-negotiable",
 }
 
 export interface PropertyType {
@@ -112,6 +117,11 @@ export interface PropertyType {
   created_at: Date;
   updated_at: Date;
 };
+
+export interface Feature {
+  name: string;
+  quantity: number;
+}
 
 export interface AgentType { 
   id: string;

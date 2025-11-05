@@ -22,7 +22,6 @@ export default function ProfileTransaction () {
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
     {title: 'List new property', link: '/property/add'},
-    {title: 'Edit Property', link: '/property/edit'},
     {title: ' Check reviews ', link: '/property/edit'},
     {title: 'Become an Agent', link: '/profile/become-agent'},
     {title: 'FAQ', link: '/profile/faq'},

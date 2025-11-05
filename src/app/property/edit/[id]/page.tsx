@@ -19,6 +19,8 @@ import { getPropertyById, updateProperty } from "@/services/propertyApi";
 import { CategoryEnum, ListForEnum, NegotiableEnum, PropertyType, Feature, RenewalEnum } from "@/types";
 import { IoHomeOutline } from "react-icons/io5";
 import { FaNairaSign } from "react-icons/fa6";
+import ToggleCollapse from "@/components/shared/ToggleCollapse";
+import ImageManager from "@/components/ImageManager";
 
 export default function EditPropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -46,6 +48,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
 
   // images: existing remote urls + new Files
   const [existingImages, setExistingImages] = useState<string[]>([]); // remote URLs already saved
+  const [replacedImages, setReplacedImages] = useState<{ [index: number]: File }>({});
   const [newPhotos, setNewPhotos] = useState<File[]>([]); // newly selected files
   const maxPhotos = 5;
 
@@ -97,6 +100,12 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
         setCategory((res.category as CategoryEnum) ?? CategoryEnum.house);
         setListedFor((res.listed_for as ListForEnum) ?? ListForEnum.rent);
         setRenewPeriod((res.period  as RenewalEnum)  ?? RenewalEnum.yearly);
+        setPropertyAddress(res.address || "");
+        
+        // Coordinates
+        if (typeof res.latitude === "number" && typeof res.longitude === "number") {
+          setPropCoordinates([res.latitude, res.longitude]);
+        }
         // Map coordinates may be returned as longitude & latitude (your pipeline)
         if (typeof res.latitude === "number" && typeof res.longitude === "number") {
           setPropCoordinates([res.latitude, res.longitude]);
@@ -130,19 +139,70 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
     setNewPhotos(prev => [...prev, ...uploaded]);
   }, [existingImages.length, newPhotos.length]);
 
-  const removeNewPhoto = useCallback((i: number) => {
-    setNewPhotos(prev => prev.filter((_, idx) => idx !== i));
-  }, []);
-
-  const removeExistingImage = useCallback((idx: number) => {
-    setExistingImages(prev => prev.filter((_, i) => i !== idx));
-  }, []);
 
   // location select callback
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setPropCoordinates([lat, lng]);
     toast.success(`Location selected: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
   }, []);
+
+  // 🗑️ Remove existing image from the list
+  const removeExistingImage = (index: number) => {
+    if (!property) return;
+    const updated = property.images.filter((_: string, i: number) => i !== index);
+    setProperty((prev: any) => ({ ...prev, images: updated }));
+    toast.success("Image removed");
+  };
+
+  // 🔁 Replace existing image with a new file
+  const replaceExistingImage = (index: number, file: File) => {
+    setReplacedImages((prev) => ({ ...prev, [index]: file })); // track the replaced one
+    toast.success(`Image ${index + 1} replaced`);
+  };
+
+  // ➕ Add new uploaded photo (filling up remaining slots)
+  const handleNewPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const total = newPhotos.length + (property?.images?.length || 0) + files.length;
+    if (total > 5) {
+      toast.error("You can only upload up to 5 images total");
+      return;
+    }
+
+    setNewPhotos((prev) => [...prev, ...files]);
+  };
+
+
+  // 🧾 Gather all image data to send to API on save
+  // const handleSubmit = async () => {
+  //   const formData = new FormData();
+
+  //   // Append other fields (example)
+  //   formData.append("title", property.title);
+  //   formData.append("price", property.price);
+
+  //   // Include existing image URLs (minus deleted ones)
+  //   formData.append("existing_images", JSON.stringify(property.images));
+
+  //   // Include replaced images (by index)
+  //   Object.entries(replacedImages).forEach(([index, file]) => {
+  //     formData.append(`replace_images[${index}]`, file);
+  //   });
+
+  //   // Append new photos
+  //   newPhotos.forEach((file) => formData.append("images", file));
+
+  //   // Submit to API
+  //   try {
+  //     // example: await updateProperty(property.id, formData)
+  //     toast.success("Property updated successfully!");
+  //   } catch (err) {
+  //     toast.error("Failed to update property");
+  //   }
+  // };
+
 
   // const handleSubmit = useCallback(async () => {
   //   if (
@@ -325,15 +385,14 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           />
 
           {/* Photo upload / previews */}
-          {/* <PhotoUploadSection
-            photos={[ ...existingImages.map(url => ({ url, existing: true })), ...newPhotoPreviews.map(p => ({ url: p.url, existing: false })) ]}
-            maxPhotos={maxPhotos}
-            handlePhotoUpload={handlePhotoUpload}
-            removePhoto={(index: number, isExisting: boolean) => {
-              if (isExisting) removeExistingImage(index);
-              else removeNewPhoto(index - existingImages.length);
-            }}
-          /> */}
+          <ImageManager
+            property={property}
+            removeExistingImage={removeExistingImage}
+            replaceExistingImage={replaceExistingImage}
+            handleNewPhotoUpload={handleNewPhotoUpload}
+            newPhotos={newPhotos}
+            setNewPhotos={setNewPhotos}
+          />
 
           {/* Property Details - controlled via callbacks */}
           <AddPropertyDetails

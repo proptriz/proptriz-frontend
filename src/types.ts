@@ -34,8 +34,9 @@ export interface PropertyProps {
   rating: number; // Rating of the property
   address: string; // Location of the property
   price: number; // Price per month
-  type: string; // Property type (e.g., "Apartment")
-  period: string
+  category: string; // Property type (e.g., "Apartment")
+  period: string;
+  listed_for: string;
 }
 
 export interface ReviewCardProps {

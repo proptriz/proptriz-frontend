@@ -19,16 +19,17 @@ const PropertyReviews = () => {
             </header>
             
             {/* Property Card */}
-            {mockProperties.slice(0,1).map(((info, key)=>(
+            {mockProperties.slice(0,1).map(((item, key)=>(
                 <HorizontalCard 
                     id={''}
-                    name={info.title} 
+                    name={item.title} 
                     price={30} 
-                    type="" 
-                    address={info.address} 
-                    image={info.banner} 
-                    period={info.period ?? 'monthly'} 
-                    rating={info.rating ?? 5.0}
+                    category={item.category} 
+                    listed_for={item.listed_for}
+                    address={item.address} 
+                    image={item.banner} 
+                    period={item.period ?? 'monthly'} 
+                    rating={item.rating ?? 5.0}
                     key={key}
                 />
             )))}

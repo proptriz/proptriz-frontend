@@ -229,24 +229,26 @@ export const agent = {
     image: 'https://placehold.co/40',
     properties: [
         {
-            id: '04pro',
-            name: '2-Bedroom Flat', 
-            image: '/cover-1.png', 
-            rating: 2.9, 
-            address: 'Ikorodu, Lagos', 
-            price: 250,
-            period: 'year',
-            type: ""
+          id: '04pro',
+          name: '2-Bedroom Flat', 
+          image: '/cover-1.png', 
+          rating: 2.9, 
+          address: 'Ikorodu, Lagos', 
+          price: 250,
+          period: 'year',
+          category: "",
+          listed_for:ListForEnum.rent
         },
         {
-            id: '02pro',
-            name: '2-Bedroom Flat', 
-            image: '/apartment.png', 
-            rating: 2.9, 
-            address: 'Ikorodu, Lagos', 
-            price: 250,
-            period: 'year',
-            type: ""
+          id: '02pro',
+          name: '2-Bedroom Flat', 
+          image: '/apartment.png', 
+          rating: 2.9, 
+          address: 'Ikorodu, Lagos', 
+          price: 250,
+          period: 'year',
+          category: "",
+          listed_for:ListForEnum.rent
         }
     ]
 };

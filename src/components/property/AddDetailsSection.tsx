@@ -16,8 +16,8 @@ export interface IPropFeatures {
 
 interface AddPropertyDetailsProps {
   listingCategory: string;
-  selectedFeatures?: Feature[];
-  setSelectedFeatures?: React.Dispatch<SetStateAction<Feature[]>>;
+  existingFeatures?: Feature[];
+  existingFacilities?: string[];
   onNegotiableChange?: (value: NegotiableEnum) => void;
   onFeaturesChange?: (features: Feature[]) => void;
   onFacilitiesChange?: (facilities: string[]) => void;
@@ -25,6 +25,8 @@ interface AddPropertyDetailsProps {
 
 export default function AddPropertyDetails({
   listingCategory,
+  existingFeatures = [],
+  existingFacilities =[],
   onNegotiableChange,
   onFeaturesChange,
   onFacilitiesChange,
@@ -143,7 +145,7 @@ export default function AddPropertyDetails({
 
       {/* Property Features */}
       <h3 className={styles.H2}>Property Features</h3>
-      {features.map((feature, index) => (
+      {[...existingFeatures, ...features].map((feature, index) => (
         <div key={index} className="flex gap-4 items-center mt-4">
           <div className="flex card-bg px-3 rounded-lg shadow-md w-full">
             <input
@@ -177,7 +179,7 @@ export default function AddPropertyDetails({
       <h2 className={styles.H2}>Environment / Facilities</h2>
       <TagSelector
         tags={facilities}
-        selectedTags={selectedFacilities}
+        selectedTags={[...existingFacilities, ...selectedFacilities]}
         onToggle={handleToggleFacility}
       />
 

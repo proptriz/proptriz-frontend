@@ -283,13 +283,14 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
         {/* Property preview card */}
         <div>
           <HorizontalCard
-            id={property?.id ?? mockProperties[0].id}
-            name={property?.title ?? mockProperties[0].title}
+            id={property?.id ?? ''}
+            name={property?.title ?? ''}
             price={property?.price ?? 0}
-            type={property?.category ?? mockProperties[0].category}
-            address={property?.address ?? mockProperties[0].address}
-            image={existingImages[0] ?? mockProperties[0].banner}
-            period={property?.period ?? mockProperties[0].period ?? ''}
+            category={property?.category ?? ''}
+            address={property?.address ?? ''}
+            image={existingImages[0] ?? ''}
+            period={property?.period ?? ''}
+            listed_for={property?.listed_for ?? ''}
             rating={0}
           />
         </div>

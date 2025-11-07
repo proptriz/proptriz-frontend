@@ -75,7 +75,7 @@ return (
           </span>
         </div>
       </div>
-      <h2 className="font-bold text-2xl">{agent.name}</h2>
+      <h2 className="font-bold text-2xl">{authUser?.username}</h2>
       <p className="text-gray-500 mb-3">{agent.email}</p>
 
       {/* Count Status */}
@@ -138,10 +138,11 @@ return (
             id={item.id}
             name={item.title}
             price={item.price}
-            type={item.category}
+            category={item.category || ""}
             address={item.address}
             image={item.banner}
             period={item.period || ""}
+            listed_for={item.listed_for || ""}
             rating={20}
           />
 

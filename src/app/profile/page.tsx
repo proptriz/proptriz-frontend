@@ -8,9 +8,10 @@ import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../context/AppContextProvider";
 import { PropertyType } from "@/types";
-import { getUserListedProp } from "@/services/propertyApi";
+import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
@@ -37,7 +38,20 @@ export default function ProfileTransaction () {
         }
     }
     fetchListedProp()
-  }, [])
+  }, [authUser])
+
+  const handleDelete = async (id: string) => {
+    const res = await deleteUserProperty(id);
+    if (!res.success) {
+      logger.error("Error deleting property:", res.message);
+      toast.error("Failed to delete property");
+      return;
+    }
+    const updatedProperties = listedProperties.filter(prop => prop.id !== id);
+    setListedProperties(updatedProperties);
+    toast.success("Property deleted successfully");
+    return
+  }
 
 return (
   <div className="p-6 pb-24 relative">
@@ -127,7 +141,7 @@ return (
         </p>
         <button className="px-5 py-3 mb-6 rounded-full ml-auto bg-[#234F68] text-white">+</button>
       </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {listedProperties.map((item: any) => (
         <div
           key={item.id}
@@ -170,7 +184,7 @@ return (
               {/* Delete */}
               <button
                 aria-label="Delete Property"
-                // onClick={() => onDelete?.(item.id)}
+                onClick={() => handleDelete(item.id)}
                 className="p-3 rounded-full text-red-600 hover:bg-gray-100 hover:text-red-700 transition-all duration-200"
               >
                 <FaTrash size={18} />

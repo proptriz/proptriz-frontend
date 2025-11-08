@@ -36,7 +36,7 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
               category={info.category}
               address={info.address}
               image={info.banner}
-              period={info.period ?? 'monthly'}
+              period={info.period ?? ''}
               listed_for={info.listed_for ?? ''}
               rating={info.rating ?? 5.0}
             />
@@ -64,7 +64,7 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
             listed_for={info.listed_for}
             address={info.address} 
             image={info.banner} 
-            period={info.period ?? 'monthly'} 
+            period={info.period ?? ''} 
             rating={info.rating ?? 5.0}
             key={key}
           />

@@ -20,7 +20,7 @@ export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
   const [propertyTitle, setPropertyTitle] = useState<string>("");
   const [propertyAddress, setPropertyAddress] = useState<string>("");
-  const [price, setPrice] = useState<number>(180000);
+  const [price, setPrice] = useState<string>("0.00");
   const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
   const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
   const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
@@ -47,6 +47,19 @@ export default function AddPropertyPage() {
     { title: "Rent", value: "rent" },
   ];
 
+  const reset = () => {
+    setPropertyTitle("");
+    setPropertyAddress("");
+    setPrice("0.00");
+    setListedFor(ListForEnum.rent);
+    setCategory(CategoryEnum.house);
+    setRenewPeriod(RenewalEnum.yearly);
+    setNegotiable(NegotiableEnum.Negotiable);
+    setPhotos([]);
+    setFeatures([]);
+    setFacilities([]);
+    setPropCoordinates(null);
+  }
   const handleLocationSelect = (lat: number, lng: number,) => {
     // Save to form state, API, etc.
     setPropCoordinates([lat, lng])
@@ -95,7 +108,7 @@ export default function AddPropertyPage() {
     formData.append("features", JSON.stringify(features)); // Array of { name, quantity }
     formData.append("env_facilities", JSON.stringify(facilities)); // Array of strings
 
-    if (listedFor === "rent") {
+    if (listedFor === ListForEnum.rent) {
       formData.append("period", renewPeriod.toLowerCase()); // monthly/yearly
     }
 
@@ -106,11 +119,11 @@ export default function AddPropertyPage() {
     try {
       setIsLoading(true);
       const response = await createProperty(formData);
-      console.log("Property created:", response);
-      alert("Property successfully added!");
-      // You can redirect to property list page or clear form
+      logger.info("Property created:", {response});
+      toast.success("Property successfully added!");
+      reset();
     } catch (error: any) {
-      console.error(error);
+      logger.error(error);
       toast.error(error.response?.data?.message || "Failed to add property.");
     } finally {
       setIsLoading(false);
@@ -153,7 +166,7 @@ export default function AddPropertyPage() {
             <input
               name="price"
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={(e) => setPrice(e.target.value)}
               type="number"
               placeholder="Property price here"
               className="w-full outline-none card-bg"
@@ -191,7 +204,7 @@ export default function AddPropertyPage() {
           label="Listed For" 
         />
 
-        {listedFor === "rent" && (
+        {listedFor === ListForEnum.rent && (
           <ToggleButtons<RenewalEnum>
             label="Tenancy Period"
             options={[RenewalEnum.monthly, RenewalEnum.yearly]}

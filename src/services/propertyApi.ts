@@ -140,4 +140,10 @@ export const getUserListedProp = async (): Promise<PropertyType[]> => {
   return response.data.properties;
 };
 
+export const deleteUserProperty = async (propertyId: string) => {
+  const response = await axiosClient.delete(`/property/delete/${propertyId}`);
+  logger.info(response.data);
+  return response.data
+};
+
 export default propertyService;

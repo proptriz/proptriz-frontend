@@ -31,7 +31,7 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
       {/* Image Section */}
       <div className="relative w-32 h-32 rounded-lg overflow-hidden">
         <img
-          src={image}
+          src={image || "/logo.png"}
           alt={name}
           className="w-full h-full object-cover"
         />

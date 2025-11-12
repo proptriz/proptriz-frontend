@@ -14,11 +14,13 @@ import { mockProperties, categories, styles } from "@/constant";
 import getUserPosition from "@/utils/getUserPosition";
 import logger from "../../../../../logger.config.mjs";
 import { getPropertyById, updateProperty } from "@/services/propertyApi";
-import { CategoryEnum, ListForEnum, NegotiableEnum, PropertyType, Feature, RenewalEnum } from "@/types";
+import { CategoryEnum, ListForEnum, NegotiableEnum, PropertyType, Feature, RenewalEnum, CurrencyEnum } from "@/types";
 import { IoHomeOutline } from "react-icons/io5";
 import { FaNairaSign } from "react-icons/fa6";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import ImageManager from "@/components/ImageManager";
+import { IoMdArrowDropdown } from "react-icons/io";
+import Popup from "@/components/shared/Popup";
 
 export default function EditPropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = React.use(params); // same pattern you used
@@ -37,7 +39,8 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
   const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
   const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
   const [propertyAddress, setPropertyAddress] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<string>("0.00");
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
   const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
   const [propCoordinates, setPropCoordinates] = useState<[number, number] | null>(null);
@@ -92,7 +95,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
         setProperty(res);
         // Prefill local form state
         setPropertyTitle(res.title || "");
-        setPrice(res.price ?? 0);
+        setPrice(res.price.toString() ?? '0.00');
         setCategory((res.category as CategoryEnum) ?? CategoryEnum.house);
         setListedFor((res.listed_for as ListForEnum) ?? ListForEnum.rent);
         setRenewPeriod((res.period  as RenewalEnum)  ?? RenewalEnum.yearly);
@@ -277,6 +280,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
   }
 
   return (
+    <>
     <div className="pb-16 min-h-screen relative">
       <ScreenName title="Edit Property" />
       <div className="p-6 max-w-4xl mx-auto">
@@ -323,13 +327,18 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
               <input
                 name="price"
                 value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
+                onChange={(e) => setPrice(e.target.value)}
                 type="number"
                 placeholder="Property price here"
                 className="w-full outline-none card-bg"
               />
-              <button className="text-gray-500 text-lg px-3">
-                <FaNairaSign className="font-bold" />
+              <button 
+                className="text-gray-500 text-lg px-3 flex items-center gap-1"
+                onClick={() => setTogglePopup(!togglePopup)}
+              >
+                {/* <FaNairaSign className="font-bold" />     */}
+                {currency}
+                <IoMdArrowDropdown />          
               </button>
             </div>
           </div>
@@ -363,7 +372,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           {listedFor === ListForEnum.rent && (
             <ToggleButtons<RenewalEnum>
               label="renewPeriod Period"
-              options={[RenewalEnum.monthly, RenewalEnum.yearly]}
+              options={[RenewalEnum.yearly, RenewalEnum.monthly, RenewalEnum.weekely, RenewalEnum.daily]}
               selected={renewPeriod}
               onChange={setRenewPeriod}
             />
@@ -430,5 +439,24 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
         )}
       </div>
     </div>
+    {/* Currency popup */}
+      <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
+        <div className="my-3">
+          {Object.entries(CurrencyEnum).map(([key, value]) => (
+            <button
+              key={value}
+              onClick={() => {
+                setCurrency(value);
+                setTogglePopup(false);
+              }}
+              className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition-colors cursor-pointer"
+            >
+              {key.charAt(0).toUpperCase() + key.slice(1)} ({value})
+            </button>
+          ))}
+
+        </div>
+      </Popup>
+    </>
   );
 }

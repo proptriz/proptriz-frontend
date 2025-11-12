@@ -18,12 +18,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
+        <meta charSet="utf-8" />
+        <title>Proptriz</title>
+        <base href="/" />
+        <meta
+          property="og:title"
+          content="Map of Pi, Searchable places accepting Pi on a map"
+        />
+        <meta property="og:type" content="website" />
+        {/* <meta property="og:url" content="https://mapofpi.concretecode.ch" /> */}
+        {/* <meta
+          property="og:image"
+          content="https://mapofpi.concretecode.ch/assets/images/logo.svg"
+        /> */}
+        <meta
+          name="description"
+          content="Proptriz introduce transparency into real estate through blockchain to while helping users to easily discover trusted properties for rent, sale and investment opportunities."
+        />
+        <meta name="keywords" content="property, properties, rent, sale, pi, land, apartment, real estate" />
+        <meta name="author" content="Proptriz Team" />
         <meta
           httpEquiv="Content-Security-Policy"
           content="font-src 'self' https://cdnjs.cloudflare.com/ajax/libs/font-awesome/https://fonts.gstatic.com/;"

@@ -10,11 +10,14 @@ import PropertyLocationSection from "@/components/property/PropertyLocationSecti
 import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import { AppContext } from "@/context/AppContextProvider";
-import { mockProperties, styles } from "@/constant";
+import { categories, mockProperties, styles } from "@/constant";
 import { createProperty } from "@/services/propertyApi";
-import { CategoryEnum, Feature, ListForEnum, NegotiableEnum, RenewalEnum } from "@/types";
+import { CategoryEnum, CurrencyEnum, Feature, ListForEnum, NegotiableEnum, RenewalEnum } from "@/types";
 import { toast } from "react-toastify";
 import logger from "../../../../logger.config.mjs"
+import Popup from "@/components/shared/Popup";
+import { IoMdArrowDropdown } from "react-icons/io";
+import ToggleCollapse from "@/components/shared/ToggleCollapse";
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
@@ -23,6 +26,7 @@ export default function AddPropertyPage() {
   const [price, setPrice] = useState<string>("0.00");
   const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
   const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
   const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
   const [photos, setPhotos] = useState<File[]>([]);
   const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
@@ -31,16 +35,9 @@ export default function AddPropertyPage() {
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]  | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [togglePopup, setTogglePopup] = useState(false);
 
   const maxPhotos = 1;
-  const categories = [
-    { title: "House", value: CategoryEnum.house },
-    { title: "Land", value: CategoryEnum.land },
-    { title: "Shop", value: CategoryEnum.shop },
-    { title: "Office", value: CategoryEnum.office },
-    { title: "Hotel", value: CategoryEnum.hotel },
-    { title: "Others", value: CategoryEnum.others },
-  ];
 
   const listingTypes = [
     { title: "Sale", value: "sale" },
@@ -51,6 +48,7 @@ export default function AddPropertyPage() {
     setPropertyTitle("");
     setPropertyAddress("");
     setPrice("0.00");
+    setCurrency(CurrencyEnum.naira);
     setListedFor(ListForEnum.rent);
     setCategory(CategoryEnum.house);
     setRenewPeriod(RenewalEnum.yearly);
@@ -97,6 +95,7 @@ export default function AddPropertyPage() {
     const formData = new FormData();
     formData.append("title", propertyTitle);
     formData.append("price", price.toString());
+    formData.append("currency", currency);
     formData.append("address", propertyAddress);
     formData.append("listed_for", listedFor);
     formData.append("category", category);
@@ -131,6 +130,7 @@ export default function AddPropertyPage() {
   };
 
   return (
+    <>
     <div className="pb-16 mx-auto w-full">
       <ScreenName title="Add Property" />
 
@@ -171,8 +171,13 @@ export default function AddPropertyPage() {
               placeholder="Property price here"
               className="w-full outline-none card-bg"
             />
-            <button className="text-gray-500 text-lg px-3">
-              <FaNairaSign className="font-bold" />
+            <button 
+              className="text-gray-500 text-lg px-3 flex items-center gap-1"
+              onClick={() => setTogglePopup(!togglePopup)}
+            >
+              {/* <FaNairaSign className="font-bold" />     */}
+              {currency}
+              <IoMdArrowDropdown />          
             </button>
           </div>
         </div>
@@ -207,7 +212,7 @@ export default function AddPropertyPage() {
         {listedFor === ListForEnum.rent && (
           <ToggleButtons<RenewalEnum>
             label="Tenancy Period"
-            options={[RenewalEnum.monthly, RenewalEnum.yearly]}
+            options={[RenewalEnum.yearly, RenewalEnum.monthly, RenewalEnum.weekely, RenewalEnum.daily]}
             selected={renewPeriod}
             onChange={setRenewPeriod}
           />
@@ -223,6 +228,14 @@ export default function AddPropertyPage() {
           fallbackCoordinates={[mockProperties[0].latitude, mockProperties[0].longitude]}
           onLocationSelect={handleLocationSelect}
         />
+
+        <ToggleCollapse header="Description & Special terms" open={false}>
+          <div className="flex flex-col gap-3">
+            <textarea name="description" id="" placeholder="Enter property description"></textarea>
+            <textarea name="property_terms" id="" placeholder="Enter property Special terms"></textarea>
+          </div>
+          
+        </ToggleCollapse>
 
         {/* Photo Upload */}
         <PhotoUploadSection
@@ -266,5 +279,24 @@ export default function AddPropertyPage() {
         </div>
       </div>
     </div>
+    {/* Currency popup */}
+      <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
+        <div className="my-3">
+          {Object.entries(CurrencyEnum).map(([key, value]) => (
+            <button
+              key={value}
+              onClick={() => {
+                setCurrency(value);
+                setTogglePopup(false);
+              }}
+              className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition-colors cursor-pointer"
+            >
+              {key.charAt(0).toUpperCase() + key.slice(1)} ({value})
+            </button>
+          ))}
+
+        </div>
+      </Popup>
+    </>
   );
 }

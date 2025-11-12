@@ -9,12 +9,10 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import propertyService from "@/services/propertyApi";
-import { mockProperties } from "@/constant";
 import { PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../logger.config.mjs"
-import Splash from "@/components/shared/Splash";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 

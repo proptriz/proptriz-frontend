@@ -32,13 +32,13 @@ export default function ImageManager({
 
       {/* Existing Images */}
       <div className="flex flex-wrap gap-4">
-        {property?.images?.map((imgUrl: string, idx: number) => (
+        {property && property.images>0 && property?.images?.map((imgUrl: string, idx: number) => (
           <div key={idx} className="relative w-32 h-32">
-            <img
+            {imgUrl && <img
               src={imgUrl}
               alt={`Existing ${idx + 1}`}
               className="w-full h-full object-cover rounded-md border border-gray-300"
-            />
+            />}
 
             {/* Delete Button */}
             <button
@@ -80,7 +80,7 @@ export default function ImageManager({
 
           <div className="flex flex-wrap gap-3">
             {/* Show previews of newly selected photos */}
-            {newPhotos.map((file, idx) => (
+            {newPhotos && newPhotos.length > 0 && newPhotos.map((file, idx) => (
               <div key={idx} className="relative w-32 h-32">
                 <img
                   src={URL.createObjectURL(file)}

@@ -7,6 +7,7 @@ const tabs = [
   { name: "Office", value:'office', icon: <FiBriefcase /> },
   { name: "Shop", value:'shop', icon: <FiGrid /> },
   { name: "Hotel", value:'hotel', icon: <FiGrid /> },
+  { name: "Shortlet", value:'shortlet', icon: <FiHome /> },
   { name: "Others", value:'others', icon: <FiMoreHorizontal /> },
 ];
 

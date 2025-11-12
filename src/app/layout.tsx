@@ -29,7 +29,7 @@ export default function RootLayout({
         <base href="/" />
         <meta
           property="og:title"
-          content="Map of Pi, Searchable places accepting Pi on a map"
+          content="Proptriz, Searchable trusted properties"
         />
         <meta property="og:type" content="website" />
         {/* <meta property="og:url" content="https://mapofpi.concretecode.ch" /> */}
@@ -39,7 +39,7 @@ export default function RootLayout({
         /> */}
         <meta
           name="description"
-          content="Proptriz introduce transparency into real estate through blockchain to while helping users to easily discover trusted properties for rent, sale and investment opportunities."
+          content="Proptriz introduce transparency into real estate through blockchain by helping users to easily discover trusted properties for rent, sale and investment opportunities."
         />
         <meta name="keywords" content="property, properties, rent, sale, pi, land, apartment, real estate" />
         <meta name="author" content="Proptriz Team" />

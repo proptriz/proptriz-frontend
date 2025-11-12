@@ -66,8 +66,16 @@ export interface UserType {
   created_at: Date; // (auto)
 };
 
+export enum CurrencyEnum {
+  naira = "NGN",
+  dollars="USD",
+  pounds = "GBP",
+  euros = "EUR",
+}
+
 export enum CategoryEnum {
   house = "house",
+  shortlet="shortlet",
   hotel = "hotel",
   office = "office",
   land = "land",

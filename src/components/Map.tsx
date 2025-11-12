@@ -113,12 +113,8 @@ const Map: React.FC<MapProps> = ({
   setMapBounds  = () => {},
   searchLabel="Search properties..."
 }) => {
-  const [selectedProperty, setSelectedProperty] = useState<PropertyType | null>(null);
-  // const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
 
-  const handleMarkerClick = (property: PropertyType) => {
-    setSelectedProperty(property);
-  };
+  // const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: 400, height: '100%', overflow: 'hidden' }}>
@@ -148,9 +144,14 @@ const Map: React.FC<MapProps> = ({
             key={property.id}
             position={[property.latitude, property.longitude]  as LatLngExpression}
             icon={propertyIcon as any}
-            eventHandlers={{ click: () => handleMarkerClick(property) }}
           >
-            <Popup>
+            <Popup 
+              closeButton={true}
+              minWidth={200}
+              maxWidth={250}
+              className="custom-popup"
+              offset={L.point(0, -3)}
+            >
               <div className="min-w-[200px]">
                 <div className="mb-2">
                   <img

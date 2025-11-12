@@ -1,12 +1,13 @@
 import { ListForEnum, LocationProps, PropertyType, RenewalEnum } from "./types";
 import { CategoryEnum } from "./types";
 
-export const categories = [
-    { title: "House", value: "house" },
-    { title: "Land", value: "land" },
-    { title: "Shop", value: "shop" },
-    { title: "Office", value: "office" },
-    { title: "Hotel", value: "hotel" },
+  export const categories = [
+    { title: "House", value: CategoryEnum.house },
+    { title: "Land", value: CategoryEnum.land },
+    { title: "Shop", value: CategoryEnum.shop },
+    { title: "Office", value: CategoryEnum.office },
+    { title: "Hotel", value: CategoryEnum.hotel },
+    { title: "Others", value: CategoryEnum.others },
   ];
 
 

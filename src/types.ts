@@ -34,8 +34,9 @@ export interface PropertyProps {
   rating: number; // Rating of the property
   address: string; // Location of the property
   price: number; // Price per month
-  type: string; // Property type (e.g., "Apartment")
-  period: string
+  category: string; // Property type (e.g., "Apartment")
+  period: string;
+  listed_for: string;
 }
 
 export interface ReviewCardProps {
@@ -65,8 +66,16 @@ export interface UserType {
   created_at: Date; // (auto)
 };
 
+export enum CurrencyEnum {
+  naira = "NGN",
+  dollars="USD",
+  pounds = "GBP",
+  euros = "EUR",
+}
+
 export enum CategoryEnum {
   house = "house",
+  shortlet="shortlet",
   hotel = "hotel",
   office = "office",
   land = "land",
@@ -80,10 +89,15 @@ export enum ListForEnum {
 }
 
 export enum RenewalEnum {
-    monthly = "monthly",
-    yearly = "yearly",
-    daily = "dsily",
-    weekely = "weekely"
+  monthly = "monthly",
+  yearly = "yearly",
+  daily = "daily",
+  weekely = "weekely"
+}
+
+export enum NegotiableEnum {
+  Negotiable = "negotiable",
+  NonNegotiable = "Non-negotiable",
 }
 
 export interface PropertyType {
@@ -112,6 +126,11 @@ export interface PropertyType {
   created_at: Date;
   updated_at: Date;
 };
+
+export interface Feature {
+  name: string;
+  quantity: number;
+}
 
 export interface AgentType { 
   id: string;

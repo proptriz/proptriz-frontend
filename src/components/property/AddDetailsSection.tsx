@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Counter from "@/components/Counter";
 import ToggleButtons from "@/components/ToggleButtons";
 import TagSelector from "@/components/TagSelector";
@@ -8,19 +8,31 @@ import { FaPlus } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import { styles } from "@/constant";
 import ToggleCollapse from "../shared/ToggleCollapse";
+import { Feature, NegotiableEnum } from "@/types";
 
-interface Feature {
-  name: string;
-  quantity: number;
+export interface IPropFeatures {
+  [key: string]: Feature[];
 }
 
-interface CategoryFeatures {
-  [key: string]: Feature[]; // Updated to include quantity
+interface AddPropertyDetailsProps {
+  listingCategory: string;
+  existingFeatures?: Feature[];
+  existingFacilities?: string[];
+  onNegotiableChange?: (value: NegotiableEnum) => void;
+  onFeaturesChange?: (features: Feature[]) => void;
+  onFacilitiesChange?: (facilities: string[]) => void;
 }
 
-export default function AddPropertyDetails({listingCategory}:{listingCategory: string}) {
-  
-  const categoryFeatures: CategoryFeatures = {
+export default function AddPropertyDetails({
+  listingCategory,
+  existingFeatures = [],
+  existingFacilities =[],
+  onNegotiableChange,
+  onFeaturesChange,
+  onFacilitiesChange,
+}: AddPropertyDetailsProps) {
+
+  const categoryFeatures: IPropFeatures = {
     house: [
       { name: "Garage", quantity: 1 },
       { name: "Swimming Pool", quantity: 1 },
@@ -37,9 +49,12 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
       { name: "Fenced", quantity: 1 },
       { name: "Survey Plan", quantity: 1 },
       { name: "Registered Title", quantity: 1 },
-    ], // Added land category features
+    ],
   };
-  const [negotiableToggle, setNegotiableToggle] = useState<string>("Negotiable");
+
+  const [negotiableToggle, setNegotiableToggle] = useState<NegotiableEnum>(
+    NegotiableEnum.Negotiable
+  );
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [customFacilities, setCustomFacilities] = useState<string[]>([]);
   const [features, setFeatures] = useState<Feature[]>(categoryFeatures[listingCategory]);
@@ -58,6 +73,21 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
     "Security Services",
   ];
 
+  // 🚀 Notify parent when states change
+  useEffect(() => {
+    onNegotiableChange?.(negotiableToggle);
+  }, [negotiableToggle]);
+
+  useEffect(() => {
+    onFeaturesChange?.(features);
+  }, [features]);
+
+  useEffect(() => {
+    const allFacilities = [...selectedFacilities, ...customFacilities];
+    onFacilitiesChange?.(allFacilities);
+  }, [selectedFacilities, customFacilities]);
+
+  // --- Handlers ---
   const handleToggleFacility = (facility: string): void => {
     setSelectedFacilities((prev) =>
       prev.includes(facility)
@@ -70,33 +100,22 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
     setCustomFacilities((prev) => [...prev, ""]);
   };
 
-  const handleCustomFacilityChange = (
-    index: number,
-    value: string
-  ): void => {
+  const handleCustomFacilityChange = (index: number, value: string): void => {
     setCustomFacilities((prev) => {
       const updated = [...prev];
       updated[index] = value;
       return updated;
     });
-    // console.log('custom facility: ', customFacilities)
   };
 
   const handleAddFeature = (): void => {
     setFeatures((prev) => [...prev, { name: "", quantity: 1 }]);
   };
 
-  const handleFeatureChange = (
-    index: number,
-    key: keyof Feature,
-    value: string | number
-  ): void => {
+  const handleFeatureChange = (index: number, key: keyof Feature, value: string | number): void => {
     setFeatures((prev) => {
       const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        [key]: value as Feature[typeof key],
-      };
+      updated[index] = { ...updated[index], [key]: value };
       return updated;
     });
   };
@@ -115,25 +134,25 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
 
   return (
     <ToggleCollapse header="Other Details" open={false}>
-      {/* Property Features */}
-      <h3 className={`${styles.H2} `}>Property Features</h3>
+      {/* Negotiable Toggle */}
       <div className="mt-4 mb-7">
         <ToggleButtons
-          options={["Negotiable", "Non-negotiable"]}
+          options={[NegotiableEnum.Negotiable, NegotiableEnum.NonNegotiable]}
           selected={negotiableToggle}
           onChange={setNegotiableToggle}
         />
       </div>
-      {features.map((feature, index) => (
-        <div key={index} className="flex gap-4 items-center mt-4"> 
+
+      {/* Property Features */}
+      <h3 className={styles.H2}>Property Features</h3>
+      {[...existingFeatures, ...features].map((feature, index) => (
+        <div key={index} className="flex gap-4 items-center mt-4">
           <div className="flex card-bg px-3 rounded-lg shadow-md w-full">
             <input
               type="text"
               placeholder="Feature Name"
               value={feature.name}
-              onChange={(e) =>
-                handleFeatureChange(index, "name", e.target.value)
-              }
+              onChange={(e) => handleFeatureChange(index, "name", e.target.value)}
               className="flex-1 outline-none card-bg text-sm"
             />
             <Counter
@@ -143,10 +162,7 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
               onDecrement={() => decrementFeatureQuantity(index)}
             />
           </div>
-          <button
-            onClick={() => handleRemoveFeature(index)}
-            className="text-red-500"
-          >
+          <button onClick={() => handleRemoveFeature(index)} className="text-red-500">
             <IoClose size={24} />
           </button>
         </div>
@@ -159,12 +175,11 @@ export default function AddPropertyDetails({listingCategory}:{listingCategory: s
         <FaPlus /> Add new
       </button>
 
-
       {/* Facilities */}
-      <h2 className={`${styles.H2}`}>Environment / Facilities</h2>
+      <h2 className={styles.H2}>Environment / Facilities</h2>
       <TagSelector
         tags={facilities}
-        selectedTags={selectedFacilities}
+        selectedTags={[...existingFacilities, ...selectedFacilities]}
         onToggle={handleToggleFacility}
       />
 

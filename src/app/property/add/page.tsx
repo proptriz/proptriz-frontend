@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useState, useContext } from "react";
 import { IoHomeOutline } from "react-icons/io5";
 import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
 import { ScreenName } from "@/components/shared/LabelCards";
@@ -9,42 +9,60 @@ import ToggleButtons from "@/components/ToggleButtons";
 import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
-import { mockProperties, styles } from "@/constant";
+import { AppContext } from "@/context/AppContextProvider";
+import { categories, mockProperties, styles } from "@/constant";
 import { createProperty } from "@/services/propertyApi";
-import { CategoryEnum, ListForEnum, RenewalEnum } from "@/types";
+import { CategoryEnum, CurrencyEnum, Feature, ListForEnum, NegotiableEnum, RenewalEnum } from "@/types";
 import { toast } from "react-toastify";
+import logger from "../../../../logger.config.mjs"
+import Popup from "@/components/shared/Popup";
+import { IoMdArrowDropdown } from "react-icons/io";
+import ToggleCollapse from "@/components/shared/ToggleCollapse";
 
 export default function AddPropertyPage() {
+  const { authUser } = useContext(AppContext);
   const [propertyTitle, setPropertyTitle] = useState<string>("");
   const [propertyAddress, setPropertyAddress] = useState<string>("");
-  const [price, setPrice] = useState<number>(180000);
+  const [price, setPrice] = useState<string>("0.00");
   const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
   const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
   const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [facilities, setFacilities] = useState<string[]>([]);
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]  | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [togglePopup, setTogglePopup] = useState(false);
 
-  const maxPhotos = 5;
-  const categories = [
-    { title: "House", value: "house" },
-    { title: "Land", value: "land" },
-    { title: "Shop", value: "shop" },
-    { title: "Office", value: "office" },
-    { title: "Hotel", value: "hotel" },
-  ];
+  const maxPhotos = 1;
 
   const listingTypes = [
     { title: "Sale", value: "sale" },
     { title: "Rent", value: "rent" },
   ];
 
+  const reset = () => {
+    setPropertyTitle("");
+    setPropertyAddress("");
+    setPrice("0.00");
+    setCurrency(CurrencyEnum.naira);
+    setListedFor(ListForEnum.rent);
+    setCategory(CategoryEnum.house);
+    setRenewPeriod(RenewalEnum.yearly);
+    setNegotiable(NegotiableEnum.Negotiable);
+    setPhotos([]);
+    setFeatures([]);
+    setFacilities([]);
+    setPropCoordinates(null);
+  }
   const handleLocationSelect = (lat: number, lng: number,) => {
     // Save to form state, API, etc.
     setPropCoordinates([lat, lng])
     toast.success(`Location selected: (${lat}, ${lng})`, { position: "top-right" });
-    console.log("Selected coordinates:", lat, lng);
+    logger.info("Selected coordinates:", lat, lng);
   };
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,16 +95,19 @@ export default function AddPropertyPage() {
     const formData = new FormData();
     formData.append("title", propertyTitle);
     formData.append("price", price.toString());
+    formData.append("currency", currency);
     formData.append("address", propertyAddress);
-    formData.append("banner", '/apartment.png');
     formData.append("listed_for", listedFor);
     formData.append("category", category);
-    formData.append("negotiable", "false");
+    formData.append("negotiable", negotiable === NegotiableEnum.Negotiable ? "true" : "false");
     formData.append("status", "available");
     formData.append("latitude", String(propCoordinates?.[0] || mockProperties[0].latitude));
     formData.append("longitude", String(propCoordinates?.[1] || mockProperties[0].longitude));
+    // ✅ Properly serialize structured data
+    formData.append("features", JSON.stringify(features)); // Array of { name, quantity }
+    formData.append("env_facilities", JSON.stringify(facilities)); // Array of strings
 
-    if (listedFor === "rent") {
+    if (listedFor === ListForEnum.rent) {
       formData.append("period", renewPeriod.toLowerCase()); // monthly/yearly
     }
 
@@ -97,11 +118,11 @@ export default function AddPropertyPage() {
     try {
       setIsLoading(true);
       const response = await createProperty(formData);
-      console.log("Property created:", response);
-      alert("Property successfully added!");
-      // You can redirect to property list page or clear form
+      logger.info("Property created:", {response});
+      toast.success("Property successfully added!");
+      reset();
     } catch (error: any) {
-      console.error(error);
+      logger.error(error);
       toast.error(error.response?.data?.message || "Failed to add property.");
     } finally {
       setIsLoading(false);
@@ -109,12 +130,13 @@ export default function AddPropertyPage() {
   };
 
   return (
+    <>
     <div className="pb-16 mx-auto w-full">
       <ScreenName title="Add Property" />
 
       <div className="p-6">
         <h2 className="text-xl mb-7">
-          Hi User, Fill Details of your <span className="font-semibold">property</span>
+          Hi {authUser?.username || "User"}, Fill Details of your <span className="font-semibold">property</span>
         </h2>
 
         {/* Property Title */}
@@ -138,19 +160,24 @@ export default function AddPropertyPage() {
         {/* Price */}
         <div>
           <h3 className={styles.H2}>
-            {listedFor === "rent" ? "Rent Price" : "Sell Price"}
+            {listedFor === ListForEnum.rent ? "Rent Price" : "Sell Price"}
           </h3>
           <div className="flex card-bg p-3 rounded-lg shadow-md">
             <input
               name="price"
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={(e) => setPrice(e.target.value)}
               type="number"
               placeholder="Property price here"
               className="w-full outline-none card-bg"
             />
-            <button className="text-gray-500 text-lg px-3">
-              <FaNairaSign className="font-bold" />
+            <button 
+              className="text-gray-500 text-lg px-3 flex items-center gap-1"
+              onClick={() => setTogglePopup(!togglePopup)}
+            >
+              {/* <FaNairaSign className="font-bold" />     */}
+              {currency}
+              <IoMdArrowDropdown />          
             </button>
           </div>
         </div>
@@ -182,14 +209,13 @@ export default function AddPropertyPage() {
           label="Listed For" 
         />
 
-        {listedFor === "rent" && (
+        {listedFor === ListForEnum.rent && (
           <ToggleButtons<RenewalEnum>
             label="Tenancy Period"
-            options={[RenewalEnum.monthly, RenewalEnum.yearly]}
+            options={[RenewalEnum.yearly, RenewalEnum.monthly, RenewalEnum.weekely, RenewalEnum.daily]}
             selected={renewPeriod}
             onChange={setRenewPeriod}
           />
-
         )}
 
         {/* Property Category */}
@@ -203,6 +229,14 @@ export default function AddPropertyPage() {
           onLocationSelect={handleLocationSelect}
         />
 
+        <ToggleCollapse header="Description & Special terms" open={false}>
+          <div className="flex flex-col gap-3">
+            <textarea name="description" id="" placeholder="Enter property description"></textarea>
+            <textarea name="property_terms" id="" placeholder="Enter property Special terms"></textarea>
+          </div>
+          
+        </ToggleCollapse>
+
         {/* Photo Upload */}
         <PhotoUploadSection
           photos={photos}
@@ -212,7 +246,12 @@ export default function AddPropertyPage() {
         />
 
         {/* Property Details */}
-        <AddPropertyDetails listingCategory="house" />
+        <AddPropertyDetails 
+          listingCategory={category} 
+          onNegotiableChange={setNegotiable}
+          onFeaturesChange={setFeatures}
+          onFacilitiesChange={setFacilities}
+        />
 
         {/* Submit Buttons */}
         <div className="w-full mx-auto">
@@ -221,7 +260,7 @@ export default function AddPropertyPage() {
               <FaArrowLeft className="text-xl" />
             </button>
 
-            <button
+            { authUser ? <button
               onClick={handleSubmit}
               disabled={isLoading}
               className={`px-4 py-2 rounded-md w-full text-white ${
@@ -229,10 +268,35 @@ export default function AddPropertyPage() {
               }`}
             >
               {isLoading ? "Adding..." : "Add"}
+            </button> : <button
+              disabled
+              className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 
+            >
+              Add (Login on Pi Browser)
             </button>
+            }
           </div>
         </div>
       </div>
     </div>
+    {/* Currency popup */}
+      <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
+        <div className="my-3">
+          {Object.entries(CurrencyEnum).map(([key, value]) => (
+            <button
+              key={value}
+              onClick={() => {
+                setCurrency(value);
+                setTogglePopup(false);
+              }}
+              className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition-colors cursor-pointer"
+            >
+              {key.charAt(0).toUpperCase() + key.slice(1)} ({value})
+            </button>
+          ))}
+
+        </div>
+      </Popup>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import HorizontalCard from "../shared/HorizontalCard";
 import Link from "next/link";
 import { PropertyType } from "@/types";
 import formatPrice from "@/utils/formatPrice";
+import { VerticalCard } from "../shared/VerticalCard";
 
 interface PropertyListingProps {
   properties: PropertyType[];
@@ -28,22 +29,17 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
                 
         {properties.map(((info, key)=>(
           <Link href={`/property/details/${info.id}?slug=${info.slug}`} key={key}>
-            <div className="bg-white p-3 rounded-2xl  shadow-md">
-              <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${info.banner})`}}>
-                <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
-                  N{formatPrice(info.price)}
-                  <span className="text-xs">{info.period}</span>
-                </div>
-              </div>
-              <div>
-                <p className="text-md font-semibold my-2">{info.title}</p>
-                <div className="flex space-x-2">
-                  <span className="text-yellow-500">★</span>
-                  <span className="text-gray-500 text-sm">{5.0}</span>
-                  <p className="text-gray-500 text-sm">{info.address}</p>
-                </div>
-              </div>
-            </div>
+            <VerticalCard
+              id={info.id}
+              name={info.title} 
+              price={info.price}
+              category={info.category}
+              address={info.address}
+              image={info.banner}
+              period={info.period ?? ''}
+              listed_for={info.listed_for ?? ''}
+              rating={info.rating ?? 5.0}
+            />
           </Link>
         )))}
       </div>
@@ -64,10 +60,11 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
             id={''}
             name={info.title} 
             price={30} 
-            type={info.category} 
+            category={info.category} 
+            listed_for={info.listed_for}
             address={info.address} 
             image={info.banner} 
-            period={info.period ?? 'monthly'} 
+            period={info.period ?? ''} 
             rating={info.rating ?? 5.0}
             key={key}
           />

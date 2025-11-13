@@ -102,7 +102,7 @@ export function SelectButton<T extends string>({
   return (
     <>
     {label && <h3 className={styles.H2}>{label}</h3>}
-    <div className="space-x-4 space-y-5 text-sm">
+    <div className="space-x-4 space-y-5 text-sm overflow-x-auto whitespace-nowrap">
       {list &&
         list.map((item, index) => (
           <button

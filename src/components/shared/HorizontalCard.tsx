@@ -10,8 +10,9 @@ interface HorizontalCardProps {
   rating: number; // Rating of the property
   address: string; // Location of the property
   price: number; // Price per month
-  type: string; // Property type (e.g., "Apartment")
-  period: string
+  category: string; // Property type (e.g., "Apartment")
+  period: string;
+  listed_for: string;
 }
 
 const HorizontalCard: React.FC<HorizontalCardProps> = ({
@@ -21,25 +22,26 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
   rating,
   address,
   price,
-  type,
-  period
+  category,
+  period,
+  listed_for
 }) => {
   return (
     <div className="flex items-center card-bg rounded-2xl shadow-md p-2 space-x-4 min-w-[70%] md:min-w-[40%] max-w-lg">
       {/* Image Section */}
       <div className="relative w-32 h-32 rounded-lg overflow-hidden">
         <img
-          src={image}
+          src={image || "/logo.png"}
           alt={name}
           className="w-full h-full object-cover"
         />
-        {/* Favorite Icon */}
-        <button className="absolute top-2 left-2 bg-white p-1 rounded-full shadow">
-          <FaHeart className="text-green-500" />
-        </button>
+        {/* Listed For */}
+        <div className="absolute top-2 left-2 font-bold text-primary text-sm px-2 py-1 rounded-lg">
+          For {listed_for}
+        </div>
         {/* Property Type */}
         <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded-lg">
-          {type}
+          {category}
         </div>
       </div>
 
@@ -54,7 +56,7 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
           <HiOutlineLocationMarker />
           <span>{address}</span>
         </div>
-        <div className="text-green-500 font-bold mt-2">${price}/{period}</div>
+        <div className="text-primary font-bold mt-2">${price} {period}</div>
       </div>
     </div>
   );
@@ -69,7 +71,7 @@ export const HorizontalCard2 = ({
     rating,
     address,
     price,
-    type,
+    category,
     period
   }: HorizontalCardProps)=>{
     return(

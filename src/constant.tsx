@@ -1,12 +1,13 @@
 import { ListForEnum, LocationProps, PropertyType, RenewalEnum } from "./types";
 import { CategoryEnum } from "./types";
 
-export const categories = [
-    { title: "House", value: "house" },
-    { title: "Land", value: "land" },
-    { title: "Shop", value: "shop" },
-    { title: "Office", value: "office" },
-    { title: "Hotel", value: "hotel" },
+  export const categories = [
+    { title: "House", value: CategoryEnum.house },
+    { title: "Land", value: CategoryEnum.land },
+    { title: "Shop", value: CategoryEnum.shop },
+    { title: "Office", value: CategoryEnum.office },
+    { title: "Hotel", value: CategoryEnum.hotel },
+    { title: "Others", value: CategoryEnum.others },
   ];
 
 
@@ -229,24 +230,26 @@ export const agent = {
     image: 'https://placehold.co/40',
     properties: [
         {
-            id: '04pro',
-            name: '2-Bedroom Flat', 
-            image: '/cover-1.png', 
-            rating: 2.9, 
-            address: 'Ikorodu, Lagos', 
-            price: 250,
-            period: 'year',
-            type: ""
+          id: '04pro',
+          name: '2-Bedroom Flat', 
+          image: '/cover-1.png', 
+          rating: 2.9, 
+          address: 'Ikorodu, Lagos', 
+          price: 250,
+          period: 'year',
+          category: "",
+          listed_for:ListForEnum.rent
         },
         {
-            id: '02pro',
-            name: '2-Bedroom Flat', 
-            image: '/apartment.png', 
-            rating: 2.9, 
-            address: 'Ikorodu, Lagos', 
-            price: 250,
-            period: 'year',
-            type: ""
+          id: '02pro',
+          name: '2-Bedroom Flat', 
+          image: '/apartment.png', 
+          rating: 2.9, 
+          address: 'Ikorodu, Lagos', 
+          price: 250,
+          period: 'year',
+          category: "",
+          listed_for:ListForEnum.rent
         }
     ]
 };

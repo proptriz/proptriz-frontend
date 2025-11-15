@@ -9,7 +9,7 @@ const lato = Lato({ weight: '400', subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: "Proptriz Hub",
-  description: "Easy search and list of apartment, house, shop, land etc. for sale and rent.",
+  description: "Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
         <base href="/" />
         <meta
           property="og:title"
-          content="Map of Pi, Searchable places accepting Pi on a map"
+          content="Proptriz Hub, Connecting you with trusted properties"
         />
         <meta property="og:type" content="website" />
         {/* <meta property="og:url" content="https://mapofpi.concretecode.ch" /> */}
@@ -39,7 +39,7 @@ export default function RootLayout({
         /> */}
         <meta
           name="description"
-          content="Proptriz introduce transparency into real estate through blockchain to while helping users to easily discover trusted properties for rent, sale and investment opportunities."
+          content="Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities."
         />
         <meta name="keywords" content="property, properties, rent, sale, pi, land, apartment, real estate" />
         <meta name="author" content="Proptriz Team" />

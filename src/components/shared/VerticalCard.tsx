@@ -9,6 +9,7 @@ export const VerticalCard = ({
   rating,
   address,
   price,
+  currency,
   category,
   period,
   listed_for
@@ -30,7 +31,7 @@ export const VerticalCard = ({
         <p className="flex text-primary items-center text-lg">
           <LuPi className="text-sm"/> 
           <span className="font-semibold"> 
-            {formatPrice(price)}
+            {currency}{formatPrice(price)}
           </span>
           <span className="text-xs ms-1">{period}</span>
         </p>                    

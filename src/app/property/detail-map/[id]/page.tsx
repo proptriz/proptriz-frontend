@@ -2,13 +2,9 @@
 
 import React, { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaAngleDown, FaRegBell } from "react-icons/fa6";
+import { FaAngleDown } from "react-icons/fa6";
 import dynamic from 'next/dynamic';
-import Link from "next/link";
-import { IoChevronBack } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { FaBullseye } from "react-icons/fa";
-import { mockProperties } from "@/constant";
 import { getPropertyById } from "@/services/propertyApi";
 import { PropertyType } from "@/types";
 import logger from "logger.config.mjs";

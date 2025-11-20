@@ -319,6 +319,7 @@ const PropertyDetail = ({
                     <VerticalCard
                       id={item.id}
                       name={item.title} 
+                      currency={item.currency}
                       price={item.price} 
                       category={item.category} 
                       listed_for={item.listed_for}

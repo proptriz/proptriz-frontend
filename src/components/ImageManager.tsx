@@ -1,27 +1,76 @@
+'use client';
+
+import { deletePropertyImage, updatePropertyImage } from "@/services/propertyApi";
+import { PropertyType } from "@/types";
+import { useState } from "react";
 import { FaSyncAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import logger from "../../logger.config.mjs";
 
 const MAX_IMAGES = 5;
 
 export default function ImageManager({
-  property,
-  removeExistingImage,
-  replaceExistingImage,
-  handleNewPhotoUpload,
+  propertyId,
+  images,
   newPhotos,
   setNewPhotos,
 }: {
-  property: any;
-  removeExistingImage: (index: number) => void;
-  replaceExistingImage: (index: number, file: File) => void;
-  handleNewPhotoUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  propertyId: string;
+  images: string[];
   newPhotos: File[];
   setNewPhotos: React.Dispatch<React.SetStateAction<File[]>>;
 }) {
-  const existingCount = property?.images?.length || 0;
+  const existingCount = images?.length || 0;
   const newCount = newPhotos.length;
   const remainingSlots = Math.max(0, MAX_IMAGES - (existingCount + newCount));
 
+  const [replacedImages, setReplacedImages] = useState<{ [index: number]: File }>({});
+  const [existingImages, setExistingImages] = useState<string[]>(images || []);
   
+  // 🗑️ Remove existing image from the list
+  const removeExistingImage = async (index: number, imageUrl: string) => {
+    if (images.length === 0) return;
+    const res = await deletePropertyImage(propertyId, imageUrl);
+    if (!res.success) {
+      toast.error(res.message || "Failed to remove image");
+      return;
+    }
+    const updated = existingImages.filter((_: string, i: number) => i !== index);
+    setExistingImages(updated);
+    toast.success("Image removed");
+  };
+
+  // 🔁 Replace existing image with a new file
+  const replaceExistingImage = async (index: number, file: File) => {
+    const res = await updatePropertyImage(propertyId, file, index.toString());
+    if (!res.success) {
+      logger.info("replace image failed")
+    }
+    setReplacedImages((prev) => ({ ...prev, [index]: file })); // track the replaced one
+    toast.success(`Image ${index + 1} replaced`);
+  };
+
+  // ➕ Add new uploaded photo (filling up remaining slots)
+  const handleNewPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const res = await updatePropertyImage(propertyId, files[0]);
+    if (!res.success) {
+      logger.info("replace image failed")
+    }
+
+    setExistingImages((prev) => ([...prev, res.image]));
+
+    const total = newPhotos.length + (existingImages?.length || 0) + files.length;
+    if (total > 5) {
+      toast.error("You can only upload up to 5 images total");
+      return;
+    }
+
+    setNewPhotos((prev) => [...prev, ...files]);
+  };
+
   const removeNewPhoto = (index: number) => {
     setNewPhotos((prev) => prev.filter((_, i) => i !== index));
   };
@@ -32,7 +81,7 @@ export default function ImageManager({
 
       {/* Existing Images */}
       <div className="flex flex-wrap gap-4">
-        {property && property.images>0 && property?.images?.map((imgUrl: string, idx: number) => (
+        {existingImages.length > 0 && existingImages?.map((imgUrl: string, idx: number) => (
           <div key={idx} className="relative w-32 h-32">
             {imgUrl && <img
               src={imgUrl}
@@ -42,7 +91,7 @@ export default function ImageManager({
 
             {/* Delete Button */}
             <button
-              onClick={() => removeExistingImage(idx)}
+              onClick={() => removeExistingImage(idx, imgUrl)}
               className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
               title="Remove Image"
             >

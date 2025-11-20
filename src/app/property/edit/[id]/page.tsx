@@ -10,13 +10,12 @@ import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import { ScreenName } from "@/components/shared/LabelCards";
 
-import { mockProperties, categories, styles } from "@/constant";
+import { categories, styles } from "@/constant";
 import getUserPosition from "@/utils/getUserPosition";
 import logger from "../../../../../logger.config.mjs";
 import { getPropertyById, updateProperty } from "@/services/propertyApi";
 import { CategoryEnum, ListForEnum, NegotiableEnum, PropertyType, Feature, RenewalEnum, CurrencyEnum } from "@/types";
 import { IoHomeOutline } from "react-icons/io5";
-import { FaNairaSign } from "react-icons/fa6";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import ImageManager from "@/components/ImageManager";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -42,12 +41,11 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
   const [price, setPrice] = useState<string>("0.00");
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
   const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
-  const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
-  const [propCoordinates, setPropCoordinates] = useState<[number, number] | null>(null);
+  const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
 
   // images: existing remote urls + new Files
   const [existingImages, setExistingImages] = useState<string[]>([]); // remote URLs already saved
-  const [replacedImages, setReplacedImages] = useState<{ [index: number]: File }>({});
   const [newPhotos, setNewPhotos] = useState<File[]>([]); // newly selected files
   const maxPhotos = 5;
 
@@ -144,34 +142,6 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
     setPropCoordinates([lat, lng]);
     toast.success(`Location selected: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
   }, []);
-
-  // 🗑️ Remove existing image from the list
-  const removeExistingImage = (index: number) => {
-    if (!property) return;
-    const updated = property.images.filter((_: string, i: number) => i !== index);
-    setProperty((prev: any) => ({ ...prev, images: updated }));
-    toast.success("Image removed");
-  };
-
-  // 🔁 Replace existing image with a new file
-  const replaceExistingImage = (index: number, file: File) => {
-    setReplacedImages((prev) => ({ ...prev, [index]: file })); // track the replaced one
-    toast.success(`Image ${index + 1} replaced`);
-  };
-
-  // ➕ Add new uploaded photo (filling up remaining slots)
-  const handleNewPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    const total = newPhotos.length + (property?.images?.length || 0) + files.length;
-    if (total > 5) {
-      toast.error("You can only upload up to 5 images total");
-      return;
-    }
-
-    setNewPhotos((prev) => [...prev, ...files]);
-  };
 
 
   // 🧾 Gather all image data to send to API on save
@@ -290,11 +260,12 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
             id={property?.id ?? ''}
             name={property?.title ?? ''}
             price={property?.price ?? 0}
-            category={property?.category ?? ''}
+            currency={property?.currency ?? CurrencyEnum.naira}
+            category={property?.category ?? CategoryEnum.house}
             address={property?.address ?? ''}
             image={existingImages[0] ?? ''}
-            period={property?.period ?? ''}
-            listed_for={property?.listed_for ?? ''}
+            period={property?.period ?? RenewalEnum.yearly}
+            listed_for={property?.listed_for ?? ListForEnum.rent}
             rating={0}
           />
         </div>
@@ -385,19 +356,17 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           {/* Location Section */}
           <PropertyLocationSection
             userCoordinates={userCoordinates}
-            fallbackCoordinates={[mockProperties[0].latitude, mockProperties[0].longitude]}
+            fallbackCoordinates={userCoordinates}
             onLocationSelect={handleLocationSelect}
           />
 
           {/* Photo upload / previews */}
-          <ImageManager
-            property={property}
-            removeExistingImage={removeExistingImage}
-            replaceExistingImage={replaceExistingImage}
-            handleNewPhotoUpload={handleNewPhotoUpload}
+          {property && <ImageManager
+            propertyId={property.id}
+            images={property.images || []}
             newPhotos={newPhotos}
             setNewPhotos={setNewPhotos}
-          />
+          />}
 
           {/* Property Details - controlled via callbacks */}
           <AddPropertyDetails

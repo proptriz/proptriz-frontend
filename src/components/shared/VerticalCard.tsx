@@ -29,9 +29,11 @@ export const VerticalCard = ({
       </div>
       <div className="mt-3 gap-1">
         <p className="flex text-primary items-center text-lg">
-          <LuPi className="text-sm"/> 
+          <span className="text-sm"> 
+            {currency}
+          </span> 
           <span className="font-semibold"> 
-            {currency}{formatPrice(price)}
+            {formatPrice(price)}
           </span>
           <span className="text-xs ms-1">{period}</span>
         </p>                    

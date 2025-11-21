@@ -189,6 +189,12 @@ const PropertyDetail = ({
 
             {/* Title & Price */}
             <div className="p-5">
+              <p>
+                {new Date(property.updatedAt).toLocaleString(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </p>
               <div className="flex items-center justify-between mt-3">
                 <div>
                   <h1 className="text-2xl font-bold">{ property.title }</h1>
@@ -196,8 +202,9 @@ const PropertyDetail = ({
                     <HiOutlineLocationMarker />
                     <p className="text-gray-500 text-sm"> { property.address }</p>
                   </div>
+                  
                 </div>
-                <Price price={property.price} tenancyPeriod={property.period} />               
+                <Price price={property.price} currency={property.currency} tenancyPeriod={property.period} />               
               </div>
                     
               <div className="flex items-center justify-between mt-5">

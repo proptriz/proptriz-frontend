@@ -34,7 +34,8 @@ export interface PropertyProps {
   rating: number; // Rating of the property
   address: string; // Location of the property
   price: number; // Price per month
-  category: string; // Property type (e.g., "Apartment")
+  currency: CurrencyEnum;
+  category: CategoryEnum; // Property type (e.g., "Apartment")
   period: string;
   listed_for: string;
 }
@@ -107,6 +108,7 @@ export interface PropertyType {
   slug: string;
   address: string; // Location of the property
   price: number; // Price per month
+  currency: CurrencyEnum; // Currency type (e.g. NGN, USD, GBP)
   listed_for: string; // (e.g. "sell"/ "rent")
   category: CategoryEnum; // The class of property (e.g. house, land, shop, office, hotel )
   period?: RenewalEnum; // if is for rent, payment period (e.g monthly, yearly, daily)
@@ -123,8 +125,8 @@ export interface PropertyType {
   env_facilities?: string[];
   rating?: number;
   status: string; // (available, sold, unavailable, rented)
-  created_at: Date;
-  updated_at: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export interface Feature {

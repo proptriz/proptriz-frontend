@@ -146,4 +146,27 @@ export const deleteUserProperty = async (propertyId: string) => {
   return response.data
 };
 
+export const deletePropertyImage = async (property_id: string, image_url: string) => {
+  const response = await axiosClient.post(`/property/image/delete`, {
+    property_id, image_url
+  });
+  logger.info(response.data);
+  return response.data;
+};
+
+export const updatePropertyImage = async (propertyId: string, image: File, imageIndex?: string): Promise<{success: boolean, image: string}> => {
+  const formData = new FormData();
+  formData.append("image", image);
+  formData.append("property_id", propertyId);
+  formData.append("image_index", imageIndex? imageIndex : "");
+
+  const response = await axiosClient.put(
+    `/property/image/update`,
+    formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }); 
+  logger.info(`replace image response, ${response.data}`);
+  return response.data;
+};
+
 export default propertyService;

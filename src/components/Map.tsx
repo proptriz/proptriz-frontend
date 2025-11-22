@@ -10,6 +10,8 @@ import Link from 'next/link';
 import debounce from "lodash.debounce";
 import { LuPi } from 'react-icons/lu';
 import formatPrice from '@/utils/formatPrice';
+import Image from 'next/image';
+import MapMarkerPopup from './MapMarkerPopup';
 
 const propertyIcon = L.icon({
   iconUrl: '/pin.png',
@@ -152,29 +154,7 @@ const Map: React.FC<MapProps> = ({
               className="custom-popup"
               offset={L.point(0, -3)}
             >
-              <div className="min-w-[200px]">
-                <div className="mb-2">
-                  <img
-                    src={property.banner}
-                    alt={property.title}
-                    className="w-full h-24 object-cover rounded-sm"
-                  />
-                </div>
-                <div className='p-2'>
-                  <h4 className="font-medium text-estate-primary">{property.title}</h4>
-                  <p className="text-sm text-gray-600 mb-1">{property.address}</p>
-                  <p className="font-semibold flex items-center text-lg">
-                    <LuPi className="text-sm"/> {formatPrice(property.price)}
-                  </p>
-                  {property.period && <p className=''>{property.period}</p>}
-                </div>                
-                <Link
-                  href={`/property/details/${property.id}`}
-                  className="text-sm text-estate-primary hover:underline mt-2"
-                >
-                  View Details
-                </Link>
-              </div>
+              <MapMarkerPopup property={property} />
             </Popup>
           </Marker>
         ))}

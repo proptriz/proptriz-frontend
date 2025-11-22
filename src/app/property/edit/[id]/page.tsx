@@ -10,13 +10,12 @@ import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import { ScreenName } from "@/components/shared/LabelCards";
 
-import { mockProperties, categories, styles } from "@/constant";
+import { categories, styles } from "@/constant";
 import getUserPosition from "@/utils/getUserPosition";
 import logger from "../../../../../logger.config.mjs";
 import { getPropertyById, updateProperty } from "@/services/propertyApi";
 import { CategoryEnum, ListForEnum, NegotiableEnum, PropertyType, Feature, RenewalEnum, CurrencyEnum } from "@/types";
 import { IoHomeOutline } from "react-icons/io5";
-import { FaNairaSign } from "react-icons/fa6";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import ImageManager from "@/components/ImageManager";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -42,25 +41,13 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
   const [price, setPrice] = useState<string>("0.00");
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
   const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
-  const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
-  const [propCoordinates, setPropCoordinates] = useState<[number, number] | null>(null);
-
-  // images: existing remote urls + new Files
-  const [existingImages, setExistingImages] = useState<string[]>([]); // remote URLs already saved
-  const [replacedImages, setReplacedImages] = useState<{ [index: number]: File }>({});
-  const [newPhotos, setNewPhotos] = useState<File[]>([]); // newly selected files
-  const maxPhotos = 5;
+  const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
 
   // controlled child values from AddPropertyDetails
   const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features, setFeatures] = useState<Feature[]>([]);
   const [facilities, setFacilities] = useState<string[]>([]);
-
-  // listing types (local)
-  const listingTypes = useMemo(() => [
-    { title: "Sell", value: "sell" },
-    { title: "Rent", value: "rent" },
-  ], []);
 
   // get user location once
   useEffect(() => {
@@ -113,9 +100,6 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
         setNegotiable(res.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
         setFeatures(Array.isArray(res.features) ? res.features : []);
         setFacilities(res.env_facilities || []);
-        // images (only urls)
-        const imgs = Array.isArray(res.images) ? res.images.filter(Boolean) : [];
-        setExistingImages(imgs);
       } catch (err: any) {
         logger.error("error fetching property:", err?.message ?? err);
         setError(err?.message ?? "Failed to fetch property");
@@ -127,149 +111,70 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
     return () => { mounted = false; };
   }, [propertyId]);
 
-  // Photo upload handlers
-  const handlePhotoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const uploaded = Array.from(e.target.files).filter(f => f.type.startsWith("image/") && f.size <= 5 * 1024 * 1024);
-    if (existingImages.length + newPhotos.length + uploaded.length > maxPhotos) {
-      toast.error(`You can only upload up to ${maxPhotos} photos`);
-      return;
-    }
-    setNewPhotos(prev => [...prev, ...uploaded]);
-  }, [existingImages.length, newPhotos.length]);
-
-
   // location select callback
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setPropCoordinates([lat, lng]);
     toast.success(`Location selected: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
   }, []);
 
-  // 🗑️ Remove existing image from the list
-  const removeExistingImage = (index: number) => {
-    if (!property) return;
-    const updated = property.images.filter((_: string, i: number) => i !== index);
-    setProperty((prev: any) => ({ ...prev, images: updated }));
-    toast.success("Image removed");
-  };
-
-  // 🔁 Replace existing image with a new file
-  const replaceExistingImage = (index: number, file: File) => {
-    setReplacedImages((prev) => ({ ...prev, [index]: file })); // track the replaced one
-    toast.success(`Image ${index + 1} replaced`);
-  };
-
-  // ➕ Add new uploaded photo (filling up remaining slots)
-  const handleNewPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    const total = newPhotos.length + (property?.images?.length || 0) + files.length;
-    if (total > 5) {
-      toast.error("You can only upload up to 5 images total");
+  const handleSubmit = useCallback(async () => {
+    if (
+      !propertyTitle ||
+      !listedFor ||
+      !category ||
+      !price 
+    ) {
+      toast.error("Please fill required fields and include at least one photo.");
       return;
     }
 
-    setNewPhotos((prev) => [...prev, ...files]);
-  };
+    setSubmitLoading(true);
+    try {
+      // Prepare plain object for data
+      const updateData: Partial<PropertyType> = {
+        title: propertyTitle,
+        price: Number(price),
+        address: property?.address ?? "",
+        listed_for: listedFor,
+        category,
+        negotiable: negotiable === NegotiableEnum.Negotiable,
+        status: property?.status ?? "available",
+        latitude: propCoordinates?.[0],
+        longitude: propCoordinates?.[1],
+        features: features || [],
+        env_facilities: facilities || [],
+        period: listedFor === ListForEnum.rent ? renewPeriod : undefined,
+      };
 
+      // Call update API
+      const response = await updateProperty(propertyId, updateData);
 
-  // 🧾 Gather all image data to send to API on save
-  // const handleSubmit = async () => {
-  //   const formData = new FormData();
+      if (response?.success) {
+        setSubmitSuccess(true);
+        toast.success("Property updated successfully");
+      } else {
+        toast.error(response?.message || "Failed to update property");
+      }
+    } catch (err: any) {
+      logger.error("Update property failed:", err?.message ?? err);
+      toast.error(err?.message ?? "Unexpected error");
+    } finally {
+      setSubmitLoading(false);
+    }
+  }, [
+    propertyId,
+    propertyTitle,
+    listedFor,
+    category,
+    price,
+    propCoordinates,
+    features,
+    facilities,
+    negotiable,
+    renewPeriod,
+    property,
+  ]);
 
-  //   // Append other fields (example)
-  //   formData.append("title", property.title);
-  //   formData.append("price", property.price);
-
-  //   // Include existing image URLs (minus deleted ones)
-  //   formData.append("existing_images", JSON.stringify(property.images));
-
-  //   // Include replaced images (by index)
-  //   Object.entries(replacedImages).forEach(([index, file]) => {
-  //     formData.append(`replace_images[${index}]`, file);
-  //   });
-
-  //   // Append new photos
-  //   newPhotos.forEach((file) => formData.append("images", file));
-
-  //   // Submit to API
-  //   try {
-  //     // example: await updateProperty(property.id, formData)
-  //     toast.success("Property updated successfully!");
-  //   } catch (err) {
-  //     toast.error("Failed to update property");
-  //   }
-  // };
-
-
-  // const handleSubmit = useCallback(async () => {
-  //   if (
-  //     !propertyTitle ||
-  //     !listedFor ||
-  //     !category ||
-  //     !price ||
-  //     (existingImages.length + newPhotos.length) === 0
-  //   ) {
-  //     toast.error("Please fill required fields and include at least one photo.");
-  //     return;
-  //   }
-
-  //   setSubmitLoading(true);
-  //   try {
-  //     // Prepare plain object for data
-  //     const updateData: Partial<PropertyType> = {
-  //       title: propertyTitle,
-  //       price: Number(price),
-  //       address: property?.address ?? "",
-  //       listed_for: listedFor,
-  //       category,
-  //       negotiable: negotiable === NegotiableEnum.Negotiable,
-  //       status: property?.status ?? "available",
-  //       latitude: propCoordinates?.[0],
-  //       longitude: propCoordinates?.[1],
-  //       features: features || [],
-  //       env_facilities: facilities || [],
-  //       period: listedFor === ListForEnum.rent ? renewPeriod : undefined,
-  //       existing_images: existingImages, // to let backend keep old images
-  //     };
-
-  //     // Call update API
-  //     const response = await updateProperty(propertyId, updateData, newPhotos);
-
-  //     if (response?.success) {
-  //       setSubmitSuccess(true);
-  //       toast.success("Property updated successfully");
-  //       setTimeout(() => router.push("/properties"), 800);
-  //     } else {
-  //       toast.error(response?.message || "Failed to update property");
-  //     }
-  //   } catch (err: any) {
-  //     logger.error("Update property failed:", err?.message ?? err);
-  //     toast.error(err?.message ?? "Unexpected error");
-  //   } finally {
-  //     setSubmitLoading(false);
-  //   }
-  // }, [
-  //   propertyId,
-  //   propertyTitle,
-  //   listedFor,
-  //   category,
-  //   price,
-  //   propCoordinates,
-  //   features,
-  //   facilities,
-  //   existingImages,
-  //   newPhotos,
-  //   negotiable,
-  //   renewPeriod,
-  //   property,
-  //   router,
-  // ]);
-
-
-  // derived previews for rendering
-  const newPhotoPreviews = useMemo(() => newPhotos.map((f) => ({ url: URL.createObjectURL(f), name: f.name })), [newPhotos]);
 
   if (loading) {
     return <div className="p-6">Loading property...</div>;
@@ -281,21 +186,22 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
 
   return (
     <>
-    <div className="pb-16 min-h-screen relative">
+    {property && <div className="pb-16 min-h-screen relative">
       <ScreenName title="Edit Property" />
       <div className="p-6 max-w-4xl mx-auto">
         {/* Property preview card */}
         <div>
           <HorizontalCard
-            id={property?.id ?? ''}
-            name={property?.title ?? ''}
-            price={property?.price ?? 0}
-            category={property?.category ?? ''}
-            address={property?.address ?? ''}
-            image={existingImages[0] ?? ''}
-            period={property?.period ?? ''}
-            listed_for={property?.listed_for ?? ''}
-            rating={0}
+            id={property.id || ''}
+            name={property.title || ''}
+            price={property.price}
+            currency={property.currency}
+            category={property.category}
+            address={property.address || ''}
+            image={property.banner}
+            period={property?.period || ''}
+            listed_for={property.listed_for}
+            rating={4.5}
           />
         </div>
 
@@ -385,18 +291,8 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           {/* Location Section */}
           <PropertyLocationSection
             userCoordinates={userCoordinates}
-            fallbackCoordinates={[mockProperties[0].latitude, mockProperties[0].longitude]}
+            fallbackCoordinates={userCoordinates}
             onLocationSelect={handleLocationSelect}
-          />
-
-          {/* Photo upload / previews */}
-          <ImageManager
-            property={property}
-            removeExistingImage={removeExistingImage}
-            replaceExistingImage={replaceExistingImage}
-            handleNewPhotoUpload={handleNewPhotoUpload}
-            newPhotos={newPhotos}
-            setNewPhotos={setNewPhotos}
           />
 
           {/* Property Details - controlled via callbacks */}
@@ -412,13 +308,19 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           {/* Submit */}
           <div className="mt-6">
             <button
-              className="w-full bg-green text-white py-2 rounded-md"
+              className="w-full bg-primary text-white py-2 rounded-md"
               // onClick={handleSubmit}
               disabled={submitLoading}
             >
               {submitLoading ? "Updating..." : "Update Property"}
             </button>
           </div>
+
+          {/* Photo upload / previews */}
+          {property && <ImageManager
+            propertyId={property.id}
+            images={property.images || []}
+          />}
         </div>
 
         {/* success/error popup (simple) */}
@@ -438,7 +340,7 @@ export default function EditPropertyPage({ params }: { params: Promise<{ id: str
           </div>
         )}
       </div>
-    </div>
+    </div>}
     {/* Currency popup */}
       <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
         <div className="my-3">

@@ -4,7 +4,6 @@ import React, { useContext, useState } from "react";
 import Link from "next/link";
 import SearchBar from "@/components/shared/SearchBar";
 import { FaRegBell } from "react-icons/fa6";
-import { mockProperties } from "@/constant";
 import Image from "next/image";
 import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from "next/navigation";
@@ -13,6 +12,8 @@ import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/types";
 import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../../../logger.config.mjs"
+import Header from "@/components/shared/Header";
+import Footer from "@/components/shared/Footer";
 
 export default function PropertyListPage() {
   const router = useRouter();
@@ -64,32 +65,7 @@ export default function PropertyListPage() {
   return (
     <div className="flex flex-col pt-5 pb-16">
       {/* Header */}
-      <header className="p-4 flex justify-between items-center">
-        <button
-          className="absolute top-5 left-1 p-4 text-xl hover:bg-white"
-          onClick={() => router.back()}
-        >
-          <IoChevronBack />
-        </button>
-
-        {/* Centered Banner */}
-        <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Image
-            src="/banner.png"
-            width={70}
-            height={50}
-            alt="banner"
-            className="h-auto max-w-full"
-          />
-        </div>
-
-        {/* Notification & Profile Section */}
-        <div className="flex items-center space-x-4 ml-auto">
-          <button className="text-gray-500 text-xl">
-            <FaRegBell />
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
         <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
@@ -100,7 +76,7 @@ export default function PropertyListPage() {
       <section className="px-4 my-6">
         <h2 className="text-lg font-semibold">Properties</h2>
         <div className="grid grid-cols-2 gap-4 mt-4">
-          {mockProperties.map((item, key) => (
+          {properties.map((item, key) => (
             <Link href={"/property/details"} key={key}>
               <div className="bg-white p-3 rounded-2xl shadow-md">
                 <div
@@ -125,6 +101,7 @@ export default function PropertyListPage() {
           ))}
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

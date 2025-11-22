@@ -3,12 +3,13 @@
 import { BackButton } from "@/components/shared/buttons";
 import { ReviewCard } from "@/components/shared/Cards";
 import HorizontalCard from "@/components/shared/HorizontalCard";
-import { mockProperties } from "@/constant";
+import { PropertyType } from "@/types";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const PropertyReviews = () => {
     const router = useRouter();
+    const [ properties, setProperties ] = useState<PropertyType[]>([]);
 
     return (
         <div className="flex flex-col p-6 pb-7">
@@ -19,11 +20,12 @@ const PropertyReviews = () => {
             </header>
             
             {/* Property Card */}
-            {mockProperties.slice(0,1).map(((item, key)=>(
+            {properties.length>0 && properties.slice(0,1).map(((item, key)=>(
                 <HorizontalCard 
                     id={''}
                     name={item.title} 
                     price={30} 
+                    currency={item.currency}
                     category={item.category} 
                     listed_for={item.listed_for}
                     address={item.address} 

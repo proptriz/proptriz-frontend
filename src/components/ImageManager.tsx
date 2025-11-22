@@ -1,170 +1,213 @@
-'use client';
+"use client";
 
-import { deletePropertyImage, updatePropertyImage } from "@/services/propertyApi";
-import { PropertyType } from "@/types";
 import { useState } from "react";
-import { FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
+import {
+  deletePropertyImage,
+  updatePropertyImage,
+} from "@/services/propertyApi";
 import logger from "../../logger.config.mjs";
 
 const MAX_IMAGES = 5;
 
+// -----------------------------
+// Correct TypeScript Model
+// -----------------------------
+type ImageSlot = {
+  url: string | null;        // stored image URL
+  preview: string | null;    // local preview while uploading
+  isUploading: boolean;      // spinner overlay
+  failed: boolean;           // upload error state
+};
+
 export default function ImageManager({
   propertyId,
   images,
-  newPhotos,
-  setNewPhotos,
 }: {
   propertyId: string;
   images: string[];
-  newPhotos: File[];
-  setNewPhotos: React.Dispatch<React.SetStateAction<File[]>>;
 }) {
-  const existingCount = images?.length || 0;
-  const newCount = newPhotos.length;
-  const remainingSlots = Math.max(0, MAX_IMAGES - (existingCount + newCount));
+  // -------------------------------------------
+  // Initialize slots (always 5)
+  // -------------------------------------------
+  const [imageSlots, setImageSlots] = useState<ImageSlot[]>(
+    Array.from({ length: MAX_IMAGES }).map((_, i) => ({
+      url: images[i] ?? null,
+      preview: null,
+      isUploading: false,
+      failed: false,
+    }))
+  );
 
-  const [replacedImages, setReplacedImages] = useState<{ [index: number]: File }>({});
-  const [existingImages, setExistingImages] = useState<string[]>(images || []);
-  
-  // 🗑️ Remove existing image from the list
-  const removeExistingImage = async (index: number, imageUrl: string) => {
-    if (images.length === 0) return;
-    const res = await deletePropertyImage(propertyId, imageUrl);
+  // -------------------------------------------
+  // Helper to update a specific slot cleanly
+  // -------------------------------------------
+  const updateSlot = (index: number, updates: Partial<ImageSlot>) => {
+    setImageSlots((prev) =>
+      prev.map((slot, i) => (i === index ? { ...slot, ...updates } : slot))
+    );
+  };
+
+  // -------------------------------------------
+  // REMOVE Existing Image
+  // -------------------------------------------
+  const removeImage = async (index: number) => {
+    const slot = imageSlots[index];
+    if (!slot.url) return;
+
+    const res = await deletePropertyImage(propertyId, slot.url);
+
     if (!res.success) {
-      toast.error(res.message || "Failed to remove image");
+      toast.error("Failed to remove image");
       return;
     }
-    const updated = existingImages.filter((_: string, i: number) => i !== index);
-    setExistingImages(updated);
+
+    updateSlot(index, { url: null });
     toast.success("Image removed");
   };
 
-  // 🔁 Replace existing image with a new file
-  const replaceExistingImage = async (index: number, file: File) => {
-    const res = await updatePropertyImage(propertyId, file, index.toString());
-    if (!res.success) {
-      logger.info("replace image failed")
+  // -------------------------------------------
+  // UPLOAD / REPLACE image with preview overlay
+  // -------------------------------------------
+  const handleUpload = async (file: File, index: number) => {
+    if (!file) return;
+
+    const previewURL = URL.createObjectURL(file);
+
+    // Step 1: show masked preview + spinner
+    updateSlot(index, {
+      preview: previewURL,
+      isUploading: true,
+      failed: false,
+    });
+
+    try {
+      // Determine if replacing or adding new
+      const isReplacing = !!imageSlots[index].url;
+
+      // Only send index if replacing
+      const res = await updatePropertyImage(
+        propertyId,
+        file,
+        isReplacing ? index.toString() : undefined
+      );
+
+      if (!res.success) throw new Error("Upload failed");
+
+      // Step 2: apply final image + remove preview
+      updateSlot(index, {
+        url: res.image,
+        preview: null,
+        isUploading: false,
+        failed: false,
+      });
+
+      toast.success("Image uploaded successfully");
+    } catch (err) {
+      logger.error("Upload error:", err);
+
+      // Step 3: revert preview and keep original URL
+      updateSlot(index, {
+        preview: null,
+        isUploading: false,
+        failed: true,
+      });
+
+      toast.error("Failed to upload image");
     }
-    setReplacedImages((prev) => ({ ...prev, [index]: file })); // track the replaced one
-    toast.success(`Image ${index + 1} replaced`);
   };
 
-  // ➕ Add new uploaded photo (filling up remaining slots)
-  const handleNewPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
 
-    const res = await updatePropertyImage(propertyId, files[0]);
-    if (!res.success) {
-      logger.info("replace image failed")
-    }
-
-    setExistingImages((prev) => ([...prev, res.image]));
-
-    const total = newPhotos.length + (existingImages?.length || 0) + files.length;
-    if (total > 5) {
-      toast.error("You can only upload up to 5 images total");
-      return;
-    }
-
-    setNewPhotos((prev) => [...prev, ...files]);
-  };
-
-  const removeNewPhoto = (index: number) => {
-    setNewPhotos((prev) => prev.filter((_, i) => i !== index));
-  };
-
+  // -------------------------------------------
+  // UI Rendering
+  // -------------------------------------------
   return (
-    <div>
-      <h3 className="font-semibold mb-2">Property Images</h3>
+    <div className="space-y-4">
+      <h3 className="font-semibold">Property Images</h3>
 
-      {/* Existing Images */}
-      <div className="flex flex-wrap gap-4">
-        {existingImages.length > 0 && existingImages?.map((imgUrl: string, idx: number) => (
-          <div key={idx} className="relative w-32 h-32">
-            {imgUrl && <img
-              src={imgUrl}
-              alt={`Existing ${idx + 1}`}
-              className="w-full h-full object-cover rounded-md border border-gray-300"
-            />}
-
-            {/* Delete Button */}
-            <button
-              onClick={() => removeExistingImage(idx, imgUrl)}
-              className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
-              title="Remove Image"
-            >
-              &times;
-            </button>
-
-            {/* Replace Button */}
-            <label
-              htmlFor={`replace-${idx}`}
-              className="absolute bottom-1 right-1 bg-white/80 hover:bg-white text-gray-700 rounded-full p-1.5 cursor-pointer shadow transition"
-              title="Replace Image"
-            >
-              <FaSyncAlt size={14} />
-              <input
-                id={`replace-${idx}`}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) replaceExistingImage(idx, file);
-                }}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {imageSlots.map((slot, index) => (
+          <div
+            key={index}
+            className="
+              relative 
+              aspect-square 
+              w-full 
+              rounded-xl 
+              overflow-hidden 
+              bg-gray-100 
+              border border-gray-300 
+              flex items-center justify-center 
+              cursor-pointer 
+              transition-all 
+              hover:shadow-md 
+              hover:border-blue-500
+            "
+          >
+            {/* Base Image OR empty slot */}
+            {slot.url ? (
+              <img
+                src={slot.url}
+                alt=""
+                className="w-full h-full object-cover"
               />
-            </label>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 pointer-events-none">
+                <span className="text-4xl sm:text-5xl">+</span>
+                <span className="text-[10px] sm:text-xs mt-1">Add Photo</span>
+              </div>
+            )}
+
+            {/* PREVIEW overlay (during upload) */}
+            {slot.preview && (
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <img
+                  src={slot.preview}
+                  className="w-full h-full object-cover opacity-50"
+                  alt="preview"
+                />
+
+                {slot.isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center animate-spin">
+                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full"></div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Invisible File Input (click/tap to upload) */}
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleUpload(file, index);
+              }}
+            />
+
+            {/* DELETE Button */}
+            {slot.url && !slot.isUploading && (
+              <button
+                onClick={() => removeImage(index)}
+                className="
+                  absolute top-1 right-1 
+                  bg-red-600 
+                  text-white 
+                  text-xs 
+                  rounded-full 
+                  p-1 
+                  shadow-md
+                  hover:bg-red-700
+                "
+              >
+                &times;
+              </button>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Upload New Photos */}
-      {(newPhotos.length < MAX_IMAGES) && (
-        <div className="mt-4">
-          <p className="text-sm text-gray-600 mb-2">
-            Upload up to {remainingSlots} more {remainingSlots === 1 ? "image" : "images"} (max 5 total)
-          </p>
-
-          <div className="flex flex-wrap gap-3">
-            {/* Show previews of newly selected photos */}
-            {newPhotos && newPhotos.length > 0 && newPhotos.map((file, idx) => (
-              <div key={idx} className="relative w-32 h-32">
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt={`New upload ${idx + 1}`}
-                  className="w-full h-full object-cover rounded-md border border-gray-300"
-                />
-                <button
-                  onClick={() => removeNewPhoto(idx)}
-                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
-                  title="Remove"
-                >
-                  &times;
-                </button>
-              </div>
-            ))}
-
-            {/* Empty upload boxes for remaining slots */}
-            {[...Array(remainingSlots)].map((_, i) => (
-              <label
-                key={i}
-                className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-indigo-400 hover:text-indigo-500 transition"
-              >
-                <span className="text-3xl">+</span>
-                <span className="text-xs">Add Photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleNewPhotoUpload}
-                />
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

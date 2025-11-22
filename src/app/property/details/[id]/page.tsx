@@ -190,7 +190,7 @@ const PropertyDetail = ({
             {/* Title & Price */}
             <div className="p-5">
               <p>
-                {new Date(property.updatedAt).toLocaleString(undefined, {
+                {property.updatedAt && new Date(property.updatedAt).toLocaleString(undefined, {
                   dateStyle: "medium",
                   timeStyle: "short",
                 })}

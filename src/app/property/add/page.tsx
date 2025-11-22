@@ -2,7 +2,7 @@
 
 import { useState, useContext } from "react";
 import { IoHomeOutline } from "react-icons/io5";
-import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa6";
 import { ScreenName } from "@/components/shared/LabelCards";
 import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";

@@ -125,8 +125,8 @@ export interface PropertyType {
   env_facilities?: string[];
   rating?: number;
   status: string; // (available, sold, unavailable, rented)
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export interface Feature {

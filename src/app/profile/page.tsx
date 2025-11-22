@@ -152,6 +152,7 @@ return (
             id={item.id}
             name={item.title}
             price={item.price}
+            currency={item.currency}
             category={item.category || ""}
             address={item.address}
             image={item.banner}

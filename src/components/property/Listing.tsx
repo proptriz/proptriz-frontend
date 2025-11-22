@@ -33,6 +33,7 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
               id={info.id}
               name={info.title} 
               price={info.price}
+              currency={info.currency}
               category={info.category}
               address={info.address}
               image={info.banner}
@@ -60,6 +61,7 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
             id={''}
             name={info.title} 
             price={30} 
+            currency={info.currency}
             category={info.category} 
             listed_for={info.listed_for}
             address={info.address} 

@@ -13,6 +13,7 @@ import { PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../logger.config.mjs"
+import Header from "@/components/shared/Header";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -101,25 +102,7 @@ export default function ExplorePage() {
   return (
     <div className="flex flex-col w-full h-screen">
         {/* Header */}
-        <header className="p-6 flex justify-between items-center w-full z-50 shadow-md">        
-        
-          {/* Centered Banner */}
-          <div className={`nav_item disabled`}>
-            <Link href="/" aria-label="Home" >
-              <Image src="/logo.png" alt="proptriz" width={104} height={64} />
-            </Link>
-          </div>
-
-          <div className="text-xl font-bold">
-            ropTriz
-          </div>
-
-          {/* Menu icon*/}
-          <div className="ml-auto">           
-            <button className="text-gray-500 text-xl "><SlMenu /></button>
-          </div>
-
-        </header>
+        <Header />
         <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
           <SearchBar setQuery={setSearchQuery} onSearch={fetchProperties} />
           <NavigationTabs setValue={setFilterBy}/>

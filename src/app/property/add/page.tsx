@@ -2,7 +2,7 @@
 
 import { useState, useContext } from "react";
 import { IoHomeOutline } from "react-icons/io5";
-import { FaArrowLeft, FaNairaSign } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa6";
 import { ScreenName } from "@/components/shared/LabelCards";
 import { SelectButton } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
@@ -10,7 +10,7 @@ import PropertyLocationSection from "@/components/property/PropertyLocationSecti
 import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import { AppContext } from "@/context/AppContextProvider";
-import { categories, mockProperties, styles } from "@/constant";
+import { categories, styles } from "@/constant";
 import { createProperty } from "@/services/propertyApi";
 import { CategoryEnum, CurrencyEnum, Feature, ListForEnum, NegotiableEnum, RenewalEnum } from "@/types";
 import { toast } from "react-toastify";
@@ -32,8 +32,8 @@ export default function AddPropertyPage() {
   const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features, setFeatures] = useState<Feature[]>([]);
   const [facilities, setFacilities] = useState<string[]>([]);
-  const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
-  const [propCoordinates, setPropCoordinates] = useState<[number, number]  | null>(null);
+  const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [togglePopup, setTogglePopup] = useState(false);
 
@@ -56,7 +56,7 @@ export default function AddPropertyPage() {
     setPhotos([]);
     setFeatures([]);
     setFacilities([]);
-    setPropCoordinates(null);
+    setPropCoordinates(userCoordinates);
   }
   const handleLocationSelect = (lat: number, lng: number,) => {
     // Save to form state, API, etc.
@@ -101,8 +101,8 @@ export default function AddPropertyPage() {
     formData.append("category", category);
     formData.append("negotiable", negotiable === NegotiableEnum.Negotiable ? "true" : "false");
     formData.append("status", "available");
-    formData.append("latitude", String(propCoordinates?.[0] || mockProperties[0].latitude));
-    formData.append("longitude", String(propCoordinates?.[1] || mockProperties[0].longitude));
+    formData.append("latitude", String(propCoordinates?.[0] || userCoordinates[0]));
+    formData.append("longitude", String(propCoordinates?.[1] || userCoordinates[1]));
     // ✅ Properly serialize structured data
     formData.append("features", JSON.stringify(features)); // Array of { name, quantity }
     formData.append("env_facilities", JSON.stringify(facilities)); // Array of strings
@@ -225,7 +225,7 @@ export default function AddPropertyPage() {
         {/* Property Location */}
         <PropertyLocationSection
           userCoordinates={userCoordinates}
-          fallbackCoordinates={[mockProperties[0].latitude, mockProperties[0].longitude]}
+          fallbackCoordinates={userCoordinates}
           onLocationSelect={handleLocationSelect}
         />
 

@@ -55,7 +55,7 @@ export const createProperty = async (formData: FormData): Promise<PropertyType> 
   // ✅ Log Property before sending
   console.log("📦 FormData contents:");
   for (const [key, value] of formData) {
-    console.log(`${key}:`, value);
+    logger.info(`${key}:`, value);
   }
   const response = await axiosClient.post("/property/add", formData, {
     headers: { "Content-Type": "multipart/form-data" },

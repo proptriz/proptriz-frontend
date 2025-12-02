@@ -3,17 +3,92 @@
 import { ScreenName } from '@/components/shared/LabelCards';
 import { AppContext } from '@/context/AppContextProvider';
 import Image from 'next/image';
-import React, { useContext, useState } from 'react';
-import { FaUser, FaPhone, FaEnvelope, FaFacebookF } from 'react-icons/fa';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { FaUser, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { FaPencil } from 'react-icons/fa6';
 import { toast } from 'react-toastify';
 import logger from '../../../../logger.config.mjs';
 import { styles } from '@/constant';
 import { BsWhatsapp } from 'react-icons/bs';
+import { UserSettingsType } from '@/types';
+import ToggleCollapse from '@/components/shared/ToggleCollapse';
+import { addOrUpdateUserSettings } from '@/services/settingsApi';
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
   const [photo, setPhoto] = useState<File>();
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+  const [formData, setFormData] = useState<Partial<UserSettingsType>>({});
+
+  useEffect(() => {
+    // Fetch existing user settings if needed
+    const fetchUserSettings = async () => {
+      try {
+        // Placeholder for fetching user settings logic
+        // const settings = await getUserSettings(authUser.id);
+        // setFormData(settings);
+      } catch (err) {
+        logger.error('Error fetching user settings', err);
+      }
+    };
+
+    if (authUser) {
+      fetchUserSettings();
+    }
+  }, [authUser]);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+  
+  // Submit handler
+  // const handleSubmit = useCallback(async () => {
+  
+  //   if (!formData.title || !formData.listed_for || !formData.category || !formData.price) {
+  //     toast.error("Please fill required fields.");
+  //     return;
+  //   }
+
+  //   setSubmitLoading(true);
+  
+  //   try {
+  //     const updateData: Partial<UserType> = {
+  //       ...formData,
+  //       currency,
+  //       negotiable: negotiable === NegotiableEnum.Negotiable,
+  //       latitude: propCoordinates?.[0],
+  //       longitude: propCoordinates?.[1],
+  //       features,
+  //       env_facilities: facilities,
+  //       period: formData.listed_for === ListForEnum.rent ? formData.period : undefined
+  //     };
+
+  //     const res = await updateProperty(propertyId, updateData);
+
+  //     if (res?.success) {
+  //       toast.success("Property updated successfully");
+  //       setSubmitSuccess(true);
+  //       setShowStatusPopup(true);
+  //     } else {
+  //       toast.error(res?.message ?? "Failed to update property");
+  //     }
+
+  //   } catch (err: any) {
+  //     logger.error("Update failed:", err?.message ?? err);
+  //     toast.error("Unexpected error occurred");
+  //   } finally {
+  //     setSubmitLoading(false);
+  //   }
+
+  // }, [
+  //   formData,
+  //   negotiable,
+  //   propCoordinates,
+  //   features,
+  //   facilities,
+  //   propertyId
+  // ]);
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -43,6 +118,20 @@ const EditProfile = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    try {
+      setSubmitLoading(true);
+      const updatedSettings = addOrUpdateUserSettings(formData, photo);
+      toast.success('Profile updated successfully');
+      logger.info('User profile updated', updatedSettings);
+    } catch (err) {
+      logger.error('Error updating profile', err);
+      toast.error('Failed to update profile.');
+    } finally {
+      setSubmitLoading(false);
+    }
+  }
+
   return (
     <div className="p-6">
       <ScreenName title="Update Profile" />
@@ -69,66 +158,80 @@ const EditProfile = () => {
       </div>
 
       {/* Form Fields */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div> 
-          <h3 className={styles.H2}>Full Name:</h3>
-          <div className="flex items-center card-bg rounded-xl px-3 py-5">                
+          <h3 className={styles.H2}>Full name or Brand:</h3>
+          <div className="flex items-center card-bg rounded-xl p-3">                
             <input
-              name='full_name'
+              name='brand'
               type="text"
-              placeholder='Enter your full name'
+              value={formData.brand || ""}
+              onChange={onChange}
+              placeholder='Enter your full name or brand'
               className="w-full bg-transparent outline-none"
             />
               <FaUser className="text-gray-500 ms-auto" />
           </div>
         </div>
         
-        <div> 
-          <h3 className={styles.H2}>Email (optional):</h3> 
-          <div className="flex items-center card-bg rounded-xl px-3 py-5">           
-            <input
-              name='email'
-              type="email"
-              placeholder='Enter your email'
-              className="w-full bg-transparent outline-none"
-            />
-              <FaEnvelope className="text-gray-500 ms-auto" />
+        <ToggleCollapse header="Contact Details" open={true} >
+          <div> 
+            <h3 className={styles.H2}>Email (optional):</h3> 
+            <div className="flex items-center card-bg rounded-xl p-3">           
+              <input
+                name='email'
+                type="email"
+                value={formData.email || ""}
+                onChange={onChange}
+                placeholder='Enter your email'
+                className="w-full bg-transparent outline-none"
+              />
+                <FaEnvelope className="text-gray-500 ms-auto" />
+            </div>
           </div>
-        </div>
-        <div>
-          <h3 className={styles.H2}>Phone number (optional):</h3> 
-          <div className="flex items-center card-bg rounded-xl px-3 py-5">             
-            <input
-              type="tel"
-              placeholder='Enter your phone number (+234 080-3288-9111)'
-              className="w-full bg-transparent outline-none"
-            />
-            <FaPhone className="text-gray-500 ms-auto" />
+          <div>
+            <h3 className={styles.H2}>Phone number (optional):</h3> 
+            <div className="flex items-center card-bg rounded-xl p-3">             
+              <input
+                type="tel"
+                name='phone'
+                value={formData.phone || ""}
+                onChange={onChange}
+                placeholder='Enter your phone number (+234 080-3288-9111)'
+                className="w-full bg-transparent outline-none"
+              />
+              <FaPhone className="text-gray-500 ms-auto" />
+            </div>
           </div>
-        </div>
-        <div>
-          <h3 className={styles.H2}>Whatsapp number (optional):</h3>          
-          <div className="flex items-center card-bg rounded-xl px-3 py-5">
-            <input
-              type="tel"
-              placeholder='Enter your Whatsapp number (+234 080-3288-9111)'
-              className="w-full bg-transparent outline-none"
-            />
-            <BsWhatsapp className="text-gray-500 ms-auto" />
+          <div>
+            <h3 className={styles.H2}>Whatsapp number (optional):</h3>          
+            <div className="flex items-center card-bg rounded-xl p-3">
+              <input
+                type="tel"
+                name='whatsapp'
+                value={formData.whatsapp || ""}
+                onChange={onChange}
+                placeholder='Enter your Whatsapp number (+234 080-3288-9111)'
+                className="w-full bg-transparent outline-none"
+              />
+              <BsWhatsapp className="text-gray-500 ms-auto" />
+            </div>
           </div>
-        </div>
+        </ToggleCollapse>
+        
       </div>
 
-      {/* Social Buttons */}
-      <div className="flex justify-between mt-6 space-x-4">
-        <button className="flex items-center justify-items-center bg-[#234F68] w-full text-white p-5 rounded-lg ">
-          <Image src="/icon/google.svg" alt="google icon" width={20} height={20} className='mr-2'/>
-            Google Unlink
-        </button>
-        <button className="flex items-center justify-items-center card-bg w-full p-5 rounded-lg ">
-          <FaFacebookF className='text-2xl text-blue-600 mr-2' />
-          Facebook Link
-        </button>
+      {/* Submit Button */}
+      <div className="mt-16 bottom-3">
+        { <button
+            disabled={submitLoading}
+            onClick={handleSubmit}
+            className={`px-4 py-2 rounded-md w-full text-white ${
+              submitLoading ? "bg-gray-400" : "bg-green"
+            }`}
+          >
+            {submitLoading ? "Updating..." : "Update Profile"}
+          </button> }
       </div>
     </div>
   );

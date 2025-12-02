@@ -1,14 +1,12 @@
-import { CurrencyEnum, ListForEnum, LocationProps, PropertyType, RenewalEnum } from "./types";
-import { CategoryEnum } from "./types";
+import { ListForEnum, LocationProps, CategoryEnum } from "./types";
 
-  export const categories = [
-    { title: "House", value: CategoryEnum.house },
-    { title: "Land", value: CategoryEnum.land },
-    { title: "Shop", value: CategoryEnum.shop },
-    { title: "Office", value: CategoryEnum.office },
-    { title: "Hotel", value: CategoryEnum.hotel },
-    { title: "Others", value: CategoryEnum.others },
-  ];
+export const categories: { title: string; value: CategoryEnum }[] =
+    Object.entries(CategoryEnum)
+        .filter(([key]) => isNaN(Number(key)))
+        .map(([key, value]) => ({
+            title: key.charAt(0).toUpperCase() + key.slice(1),
+            value: value as CategoryEnum,
+        }));
 
 
 export const topLocation = [
@@ -139,7 +137,7 @@ export const Reviews = [
 
 
 export const styles = {
-    H2: "mt-8 mb-1 border-gray-300",
+    H2: "mt-4 mb-1 border-gray-300",
     GREENBTN: "bg-green text-white px-5 py-4 rounded-lg",
     GRAYBUTTON: "card-bg px-5 py-4"
 }

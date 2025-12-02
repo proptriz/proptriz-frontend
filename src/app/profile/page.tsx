@@ -12,13 +12,14 @@ import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import Popup from "@/components/shared/Popup";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
   const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
   const [ listOrSold, setListOrSold ] = useState<string>('Listings');
   const [ listedProperties, setListedProperties ] = useState<PropertyType[]>([]);
-  const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
+  const [ showSettingsMenu, setShowSettingsMenu ] = useState<boolean>(false);
 
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
@@ -54,21 +55,13 @@ export default function ProfileTransaction () {
   }
 
 return (
+  <>
   <div className="p-6 pb-24 relative">
-    <div className={`absolute top-5 right-2 divide-y-2 space-y-2 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
-      {menuItems.map((item, index) => (
-        <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3" key={index}>
-            <Link href={item.link} >
-                {item.title}
-            </Link>
-        </button>
-      )) }               
-    </div>
     <div className="flex items-center justify-between mb-5">
       <BackButton />            
       <h1 className="text-2xl font-bold 2xl">Profile</h1>
       <button className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" 
-      onClick={()=>setSettingsMenu('')}>
+      onClick={()=>setShowSettingsMenu(!showSettingsMenu)}>
         <IoSettingsOutline />
       </button> 
                 
@@ -196,11 +189,59 @@ return (
         ))}
         </div>
     </section>
-
-    <button className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10 w-[80%] bg-green text-white text-lg font-bold py-3 rounded-xl md:w-[500px] md:mx-auto">
-      Start Chat
-    </button>
   </div>
+
+  {/* User Admin Popup */}
+  <Popup
+    header="User Administration"
+    toggle={showSettingsMenu}
+    setToggle={setShowSettingsMenu}
+    useMask={true}
+    hideReset={true}
+  >
+    <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md">
+      {/* Menu */}
+      <nav role="menu" aria-label="User settings" className="divide-y">
+        <ul className="px-2 py-2 space-y-1">
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <Link
+                href={item.link}
+                role="menuitem"
+                tabIndex={0}
+                onClick={() => setShowSettingsMenu(false)}
+                className="block w-full text-left px-3 py-2 rounded-md text-primary hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
+              >
+                {item.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {/* Actions */}
+        <div className="px-3 py-3 bg-gray-50 flex items-center gap-3 justify-end">
+          <Link
+            href="/profile/edit"
+            onClick={() => setShowSettingsMenu(false)}
+            className="px-3 py-2 rounded-md bg-white border text-sm hover:text-white hover:bg-primary"
+          >
+            Manage account
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setShowSettingsMenu(false)}
+            className="px-3 py-2 rounded-md bg-red-600 text-sm text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            Close
+          </button>
+        </div>
+      </nav>
+    </div>
+
+  </Popup>
+  </>
+  
 );
 };
 

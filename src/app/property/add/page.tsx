@@ -216,7 +216,7 @@ export default function AddPropertyPage() {
         {/* Availability status */}
         <ToggleButtons<PropertyStatusEnum>
           label="Availability status"
-          options={Object.values(PropertyStatusEnum) as PropertyStatusEnum[]}
+          options={Object.values(PropertyStatusEnum).filter(status => status !== PropertyStatusEnum.expired)}
           selected={propertyStatus}
           onChange={setPropertStatus}
         />

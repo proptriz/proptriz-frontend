@@ -67,6 +67,16 @@ export interface UserType {
   created_at: Date; // (auto)
 };
 
+export interface UserSettingsType {
+  _id?: string;
+  brand?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
+  image?: string; // URL to user profile pics (optional)
+  email?: string; // for notification    
+  phone?: string; // URLs of reviewer upload (optional)
+  whatsapp?: string; // User whatsapp number
+  social_handles?: {platform: string; handle: string}[]; // e.g [{platform: 'facebook', handle: 'fb.com/username'}]
+};
+
 export enum CurrencyEnum {
   naira = "NGN",
   dollars="USD",
@@ -93,12 +103,20 @@ export enum RenewalEnum {
   monthly = "monthly",
   yearly = "yearly",
   daily = "daily",
-  weekely = "weekely"
+  weekely = "weekly"
 }
 
 export enum NegotiableEnum {
   Negotiable = "negotiable",
   NonNegotiable = "Non-negotiable",
+}
+
+export enum PropertyStatusEnum {
+  available = "available",
+  sold = "sold",
+  rented = "rented",
+  unavailable = "unavailable",
+  expired = "expired",
 }
 
 export interface PropertyType {
@@ -124,7 +142,7 @@ export interface PropertyType {
   }[];
   env_facilities?: string[];
   rating?: number;
-  status: string; // (available, sold, unavailable, rented)
+  status: PropertyStatusEnum; // (available, sold, unavailable, rented)
   createdAt?: Date;
   updatedAt?: Date;
 };

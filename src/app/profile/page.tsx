@@ -7,19 +7,21 @@ import { agent } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../context/AppContextProvider";
-import { PropertyType } from "@/types";
+import { PropertyType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Popup from "@/components/shared/Popup";
+import { getUserSettings } from "@/services/settingsApi";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
   const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
-  const [ listOrSold, setListOrSold ] = useState<string>('Listings');
-  const [ listedProperties, setListedProperties ] = useState<PropertyType[]>([]);
-  const [ showSettingsMenu, setShowSettingsMenu ] = useState<boolean>(false);
+  const [listOrSold, setListOrSold] = useState<string>('Listings');
+  const [listedProperties, setListedProperties] = useState<PropertyType[]>([]);
+  const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
+  const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
 
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
@@ -28,6 +30,30 @@ export default function ProfileTransaction () {
     {title: 'Become an Agent', link: '/profile/become-agent'},
     {title: 'FAQ', link: '/profile/faq'},
   ]
+
+  
+    useEffect(() => {
+      // Fetch existing user settings if needed
+      const fetchUserSettings = async () => {
+        try {
+          // fetching user settings logic
+          const settings = await getUserSettings();
+          if (!settings) {
+            logger.warn("unable to fetch user settings")
+            return;
+          }
+  
+          setUserSettings(settings);          
+  
+        } catch (err) {
+          logger.error('Error fetching user settings', err);
+        }
+      };
+  
+      if (authUser) {
+        fetchUserSettings();
+      }
+    }, [authUser]);
 
   useEffect(() => {
     const fetchListedProp = async () => {
@@ -71,7 +97,7 @@ return (
       <div className="flex flex-col items-center mb-2">
         <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
           <img
-            src="https://placehold.co/40"
+            src={userSettings?.image || "/logo.png"}
             alt="profile"
             className="rounded-full w-full h-full object-cover"
           />                    
@@ -82,8 +108,8 @@ return (
           </span>
         </div>
       </div>
-      <h2 className="font-bold text-2xl">{authUser?.username}</h2>
-      <p className="text-gray-500 mb-3">{agent.email}</p>
+      <h2 className="font-bold text-2xl">{userSettings?.brand || authUser?.username}</h2>
+      <p className="text-gray-500 mb-3">{userSettings?.email}</p>
 
       {/* Count Status */}
       <div className="grid grid-cols-3 space-x-6 text-center mb-5">

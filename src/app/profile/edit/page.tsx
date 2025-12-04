@@ -12,11 +12,12 @@ import { styles } from '@/constant';
 import { BsWhatsapp } from 'react-icons/bs';
 import { UserSettingsType } from '@/types';
 import ToggleCollapse from '@/components/shared/ToggleCollapse';
-import { addOrUpdateUserSettings } from '@/services/settingsApi';
+import { addOrUpdateUserSettings, getUserSettings } from '@/services/settingsApi';
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
   const [photo, setPhoto] = useState<File>();
+  const [existingPhotoUrl, setExistingPhotoUrl] = useState<string>("/logo.png");
   const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<Partial<UserSettingsType>>({});
 
@@ -24,9 +25,17 @@ const EditProfile = () => {
     // Fetch existing user settings if needed
     const fetchUserSettings = async () => {
       try {
-        // Placeholder for fetching user settings logic
-        // const settings = await getUserSettings(authUser.id);
-        // setFormData(settings);
+        // fetching user settings logic
+        const settings = await getUserSettings();
+        if (!settings) {
+          logger.warn("unable to fetch user settings")
+          return;
+        }
+
+        setFormData(settings);
+        setExistingPhotoUrl(settings.image || '');
+        
+
       } catch (err) {
         logger.error('Error fetching user settings', err);
       }
@@ -122,8 +131,9 @@ const EditProfile = () => {
     try {
       setSubmitLoading(true);
       const updatedSettings = addOrUpdateUserSettings(formData, photo);
-      toast.success('Profile updated successfully');
-      logger.info('User profile updated', updatedSettings);
+      if (updatedSettings) {
+        logger.info('User profile updated', updatedSettings);
+      }      
     } catch (err) {
       logger.error('Error updating profile', err);
       toast.error('Failed to update profile.');
@@ -147,7 +157,7 @@ const EditProfile = () => {
           />
 
           <img 
-            src={photo ? URL.createObjectURL(photo) : "/logo.png"}
+            src={photo ? URL.createObjectURL(photo) : existingPhotoUrl}
             alt="profile"
             className="rounded-full w-full h-full object-cover"
           />
@@ -223,7 +233,7 @@ const EditProfile = () => {
 
       {/* Submit Button */}
       <div className="mt-16 bottom-3">
-        { <button
+        {authUser? <button
             disabled={submitLoading}
             onClick={handleSubmit}
             className={`px-4 py-2 rounded-md w-full text-white ${
@@ -231,7 +241,14 @@ const EditProfile = () => {
             }`}
           >
             {submitLoading ? "Updating..." : "Update Profile"}
-          </button> }
+          </button> :
+          <button
+            disabled
+            className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 
+          >
+            Update (Login on Pi Browser)
+          </button>
+        }
       </div>
     </div>
   );

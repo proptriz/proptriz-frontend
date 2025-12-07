@@ -1,1 +1,6 @@
-
+[[CURRENCIES]]
+code="prophub"
+issuer="GCLINSOVTS3XVBT2KWOVVL3ETLLXZPUOP2QTODE7GS5T5NDW2GFQKO5F"
+name="Pi Core Team"
+desc="This is a test token for Proptriz investment."
+image="https://proptriz-test.netlify.app/logo.png"

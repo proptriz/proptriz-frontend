@@ -88,6 +88,11 @@ export const updateProperty = async (
       photos.forEach((file) => formData.append("images", file));
     }
 
+    console.log("📦 FormData contents:");
+    for (const [key, value] of formData) {
+      logger.info(`${key}:`, value);
+    }
+
     const response = await axiosClient.put(
       `${API_BASE_URL}/property/update/${id}`,
       formData,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { use, useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import HorizontalCard from "@/components/shared/HorizontalCard";
@@ -39,8 +39,13 @@ import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import { FaArrowLeft } from "react-icons/fa";
 import { AppContext } from "@/context/AppContextProvider";
 
-export default function EditPropertyPage({ params }: { params: { id: string } }) {
-  const propertyId = params.id;
+export default function EditPropertyPage({
+  params
+}: {
+  params: Promise<{ id: string }> 
+}) {
+  const resolvedParams = use(params);
+  const propertyId = resolvedParams.id;
   const { authUser } = useContext(AppContext);
 
   // UI State
@@ -311,45 +316,29 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
             {/* Extra Details */}
             <AddPropertyDetails
               listingCategory={formData.category as CategoryEnum}
-              existingFeatures={features}
-              existingFacilities={facilities}
+              existingFeatures={features ?? []}
+              existingFacilities={facilities ?? []}
               onNegotiableChange={setNegotiable}
               onFeaturesChange={setFeatures}
               onFacilitiesChange={setFacilities}
             />
 
             {/* Submit */}
-            {/* Submit Buttons */}
-            <div className="w-full mx-auto">
-              <div className="flex mt-16 gap-5 bottom-3">
-                <button className="px-2 py-2 bg-white rounded-full flex items-censhadow-md">
-                  <FaArrowLeft className="text-xl" />
-                </button>
-    
-                { authUser ? <button
-                  disabled={submitLoading}
-                  onClick={handleSubmit}
-                  className={`px-4 py-2 rounded-md w-full text-white ${
-                    submitLoading ? "bg-gray-400" : "bg-green"
-                  }`}
-                >
-                  {submitLoading ? "Updating..." : "Update Property"}
-                </button> : <button
-                  disabled
-                  className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 
-                >
-                  Update (Login on Pi Browser)
-                </button>
-                }
-              </div>
-            </div>
-            <button
+            { authUser ? <button
               disabled={submitLoading}
               onClick={handleSubmit}
-              className="w-full bg-primary text-white py-2 rounded-md"
+              className={`px-4 py-2 rounded-md w-full text-white ${
+                submitLoading ? "bg-gray-400" : "bg-green"
+              }`}
             >
               {submitLoading ? "Updating..." : "Update Property"}
+            </button> : <button
+              disabled
+              className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 
+            >
+              Update (Login on Pi Browser)
             </button>
+            }
 
             {/* Image Manager */}
             {formData.id && (

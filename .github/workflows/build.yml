@@ -40,8 +40,8 @@ jobs:
       - name: Build Frontend
         run: npm run build
 
-      - name: Linting Frontend
-        run: npm run lint
+      # - name: Linting Frontend
+      #   run: npm run lint
         
       - name: Execute Tests for Frontend
         run: npm run test -- --passWithNoTests

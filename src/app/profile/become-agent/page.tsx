@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaApple, FaFacebookF, FaGoogle } from 'react-icons/fa6';
 import { EmailInput, PasswordInput, TextInput } from '@/components/shared/Input';
-import userAPI from '@/services/userApi';
 import { toast } from 'react-toastify';
 import { AppContext } from '../../../context/AppContextProvider';
 import { ImSpinner2 } from 'react-icons/im';
@@ -29,10 +28,10 @@ const SignupPage: React.FC = () => {
 
         try {
             const userData = { username, fullname, password };
-            const user = await userAPI.signup(userData);
+            // const user = await userAPI.signup(userData);
             toast.success("Signup successful! Redirecting...");
             // setAuthUser(user)
-            console.log("authenticated user: ", user)
+            // console.log("authenticated user: ", user)
             router.push('/profile/login');
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Signup failed. Try again.");

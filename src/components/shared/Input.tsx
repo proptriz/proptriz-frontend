@@ -61,22 +61,22 @@ export const EmailInput = (props:any )=> {
 
 export const TextInput = (props:any )=> {
 
-    return (
-        <>
-        <div className="mb-4">
-            {props.label && <label htmlFor="text" className="block text-green font-medium mb-1">{props.label}</label>}
-            <input
-                type="text"
-                id="text"
-                name={props.name}
-                value={props.value}
-                onChange={(e) => props.setValue(e.target.value)}
-                required
-                className="w-full px-4 py-2 border-b border-gray-700 focus:outline-none focus:border-green-600 bg-transparent"
-            />
-        </div>
-        </>
-    )
+  return (
+    <>
+      <div className="mb-4">
+        {props.label && <label htmlFor="text" className="block text-green font-medium mb-1">{props.label}</label>}
+        <input
+          type="text"
+          id="text"
+          name={props.name}
+          value={props.value}
+          onChange={(e) => props.setValue(e.target.value)}
+          required
+          className="w-full px-4 py-2 border-b border-gray-700 focus:outline-none focus:border-green-600 bg-transparent"
+        />
+      </div>
+    </>
+  )
 }
 interface ListItem {
   title: string;

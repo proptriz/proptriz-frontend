@@ -17,16 +17,18 @@ const PhotoUploadSection: React.FC<PhotoUploadSectionProps> = ({
   removePhoto,
 }) => {
   return (
-    <ToggleCollapse header="Upload photos" open={false}>
+    <ToggleCollapse header="Upload photo" open={false}>
       <div className="mb-6">
         <label
           htmlFor="photo-upload"
-          className="block w-full h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-green-500"
+          className="block w-1/2 h-40 border-2 border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-green-500 mx-auto bg-gray-100 "
         >
           {photos.length < maxPhotos ? (
-            <span className="text-gray-500 text-xs">
-              Click to upload photos (Max {maxPhotos})
-            </span>
+            <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 pointer-events-none">
+                <span className="text-4xl sm:text-5xl">+</span>
+                <span className="text-[10px] sm:text-xs mt-1">Add property image (max {maxPhotos})</span>
+              </div>
+            
           ) : (
             <span className="text-red-500 text-xs">
               Maximum {maxPhotos} photos reached

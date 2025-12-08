@@ -1,4 +1,4 @@
-name: E Rental Hub Build
+name: Proptriz Build
 
 # Controls when the workflow will execute
 on:
@@ -6,11 +6,13 @@ on:
   push:
     branches: 
       - main
+      - staging
       - dev
       - quick-fix
   pull_request:
     branches:
       - main
+      - staging
       - dev
       - quick-fix
 

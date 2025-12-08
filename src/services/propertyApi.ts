@@ -55,7 +55,7 @@ export const createProperty = async (formData: FormData): Promise<PropertyType> 
   // ✅ Log Property before sending
   console.log("📦 FormData contents:");
   for (const [key, value] of formData) {
-    console.log(`${key}:`, value);
+    logger.info(`${key}:`, value);
   }
   const response = await axiosClient.post("/property/add", formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -86,6 +86,11 @@ export const updateProperty = async (
     // 🖼️ Append new photos
     if (photos && photos.length > 0) {
       photos.forEach((file) => formData.append("images", file));
+    }
+
+    console.log("📦 FormData contents:");
+    for (const [key, value] of formData) {
+      logger.info(`${key}:`, value);
     }
 
     const response = await axiosClient.put(

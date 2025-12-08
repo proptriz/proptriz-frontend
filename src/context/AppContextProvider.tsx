@@ -10,7 +10,6 @@ import {
 import { useRouter } from "next/navigation";
 import axiosClient, {setAuthToken} from '@/config/client';
 import { AuthUserType,  } from '../types';
-import { toast } from 'react-toastify';
 import logger from '../../logger.config.mjs';
 import { AuthResult } from '@/config/pi';
 import { onIncompletePaymentFound } from '@/config/payment';
@@ -70,6 +69,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
     if (typeof window !== 'undefined' && window.Pi?.initialized) {
       try {
+        logger.info('interacting with Pi SDK for authentication.');
         setIsSigningInUser(true);
         const pioneerAuth: AuthResult = await window.Pi.authenticate([
           'username', 

@@ -7,18 +7,21 @@ import { agent } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../context/AppContextProvider";
-import { PropertyType } from "@/types";
+import { PropertyType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import Popup from "@/components/shared/Popup";
+import { getUserSettings } from "@/services/settingsApi";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
   const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
-  const [ listOrSold, setListOrSold ] = useState<string>('Listings');
-  const [ listedProperties, setListedProperties ] = useState<PropertyType[]>([]);
-  const [ settingsMenu, setSettingsMenu ] = useState<string>('hidden');
+  const [listOrSold, setListOrSold] = useState<string>('Listings');
+  const [listedProperties, setListedProperties] = useState<PropertyType[]>([]);
+  const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
+  const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
 
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
@@ -27,6 +30,30 @@ export default function ProfileTransaction () {
     {title: 'Become an Agent', link: '/profile/become-agent'},
     {title: 'FAQ', link: '/profile/faq'},
   ]
+
+  
+    useEffect(() => {
+      // Fetch existing user settings if needed
+      const fetchUserSettings = async () => {
+        try {
+          // fetching user settings logic
+          const settings = await getUserSettings();
+          if (!settings) {
+            logger.warn("unable to fetch user settings")
+            return;
+          }
+  
+          setUserSettings(settings);          
+  
+        } catch (err) {
+          logger.error('Error fetching user settings', err);
+        }
+      };
+  
+      if (authUser) {
+        fetchUserSettings();
+      }
+    }, [authUser]);
 
   useEffect(() => {
     const fetchListedProp = async () => {
@@ -54,21 +81,13 @@ export default function ProfileTransaction () {
   }
 
 return (
+  <>
   <div className="p-6 pb-24 relative">
-    <div className={`absolute top-5 right-2 divide-y-2 space-y-2 px-4 py-8 bg-white text-sm ${settingsMenu}`}>  
-      {menuItems.map((item, index) => (
-        <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3" key={index}>
-            <Link href={item.link} >
-                {item.title}
-            </Link>
-        </button>
-      )) }               
-    </div>
     <div className="flex items-center justify-between mb-5">
       <BackButton />            
       <h1 className="text-2xl font-bold 2xl">Profile</h1>
       <button className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" 
-      onClick={()=>setSettingsMenu('')}>
+      onClick={()=>setShowSettingsMenu(!showSettingsMenu)}>
         <IoSettingsOutline />
       </button> 
                 
@@ -78,7 +97,7 @@ return (
       <div className="flex flex-col items-center mb-2">
         <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
           <img
-            src="https://placehold.co/40"
+            src={userSettings?.image || "/logo.png"}
             alt="profile"
             className="rounded-full w-full h-full object-cover"
           />                    
@@ -89,8 +108,8 @@ return (
           </span>
         </div>
       </div>
-      <h2 className="font-bold text-2xl">{authUser?.username}</h2>
-      <p className="text-gray-500 mb-3">{agent.email}</p>
+      <h2 className="font-bold text-2xl">{userSettings?.brand || authUser?.username}</h2>
+      <p className="text-gray-500 mb-3">{userSettings?.email}</p>
 
       {/* Count Status */}
       <div className="grid grid-cols-3 space-x-6 text-center mb-5">
@@ -196,11 +215,59 @@ return (
         ))}
         </div>
     </section>
-
-    <button className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10 w-[80%] bg-green text-white text-lg font-bold py-3 rounded-xl md:w-[500px] md:mx-auto">
-      Start Chat
-    </button>
   </div>
+
+  {/* User Admin Popup */}
+  <Popup
+    header="User Administration"
+    toggle={showSettingsMenu}
+    setToggle={setShowSettingsMenu}
+    useMask={true}
+    hideReset={true}
+  >
+    <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md">
+      {/* Menu */}
+      <nav role="menu" aria-label="User settings" className="divide-y">
+        <ul className="px-2 py-2 space-y-1">
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <Link
+                href={item.link}
+                role="menuitem"
+                tabIndex={0}
+                onClick={() => setShowSettingsMenu(false)}
+                className="block w-full text-left px-3 py-2 rounded-md text-primary hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
+              >
+                {item.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {/* Actions */}
+        <div className="px-3 py-3 bg-gray-50 flex items-center gap-3 justify-end">
+          <Link
+            href="/profile/edit"
+            onClick={() => setShowSettingsMenu(false)}
+            className="px-3 py-2 rounded-md bg-white border text-sm hover:text-white hover:bg-primary"
+          >
+            Manage account
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setShowSettingsMenu(false)}
+            className="px-3 py-2 rounded-md bg-red-600 text-sm text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            Close
+          </button>
+        </div>
+      </nav>
+    </div>
+
+  </Popup>
+  </>
+  
 );
 };
 

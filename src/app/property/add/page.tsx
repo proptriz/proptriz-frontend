@@ -12,12 +12,14 @@ import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import { AppContext } from "@/context/AppContextProvider";
 import { categories, styles } from "@/constant";
 import { createProperty } from "@/services/propertyApi";
-import { CategoryEnum, CurrencyEnum, Feature, ListForEnum, NegotiableEnum, RenewalEnum } from "@/types";
+import { CategoryEnum, CurrencyEnum, Feature, ListForEnum, NegotiableEnum, PropertyStatusEnum, RenewalEnum } from "@/types";
 import { toast } from "react-toastify";
 import logger from "../../../../logger.config.mjs"
 import Popup from "@/components/shared/Popup";
 import { IoMdArrowDropdown } from "react-icons/io";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
+import { HiOutlineLocationMarker } from "react-icons/hi";
+import { set } from "zod/v4";
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
@@ -28,6 +30,7 @@ export default function AddPropertyPage() {
   const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
   const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
+  const [propertyStatus, setPropertStatus] = useState<PropertyStatusEnum>(PropertyStatusEnum.available);
   const [photos, setPhotos] = useState<File[]>([]);
   const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features, setFeatures] = useState<Feature[]>([]);
@@ -53,6 +56,7 @@ export default function AddPropertyPage() {
     setCategory(CategoryEnum.house);
     setRenewPeriod(RenewalEnum.yearly);
     setNegotiable(NegotiableEnum.Negotiable);
+    setPropertStatus(PropertyStatusEnum.available);
     setPhotos([]);
     setFeatures([]);
     setFacilities([]);
@@ -100,7 +104,7 @@ export default function AddPropertyPage() {
     formData.append("listed_for", listedFor);
     formData.append("category", category);
     formData.append("negotiable", negotiable === NegotiableEnum.Negotiable ? "true" : "false");
-    formData.append("status", "available");
+    formData.append("status", propertyStatus);
     formData.append("latitude", String(propCoordinates?.[0] || userCoordinates[0]));
     formData.append("longitude", String(propCoordinates?.[1] || userCoordinates[1]));
     // ✅ Properly serialize structured data
@@ -139,6 +143,15 @@ export default function AddPropertyPage() {
           Hi {authUser?.username || "User"}, Fill Details of your <span className="font-semibold">property</span>
         </h2>
 
+        {/* Property Category */}
+        <h3 className={styles.H2}>Property Category</h3>
+        <SelectButton<CategoryEnum> 
+          list={categories} 
+          setValue={setCategory} 
+          name="category" 
+          value={category} 
+        />
+
         {/* Property Title */}
         <div>
           <h3 className={styles.H2}>Property title</h3>
@@ -156,6 +169,15 @@ export default function AddPropertyPage() {
             </button>
           </div>
         </div>
+
+        {/* Listed For */}
+        <SelectButton<ListForEnum> 
+          list={listingTypes} 
+          setValue={setListedFor} 
+          name="listedFor" 
+          value={listedFor} 
+          label="Listed For" 
+        />
 
         {/* Price */}
         <div>
@@ -180,54 +202,53 @@ export default function AddPropertyPage() {
               <IoMdArrowDropdown />          
             </button>
           </div>
-        </div>
-
-        {/* Property Address */}
-        <div>
-          <h3 className={styles.H2}>Property Address</h3>
-          <div className="flex card-bg p-3 rounded-full shadow-md">
-            <input
-              name="address"
-              value={propertyAddress}
-              onChange={(e) => setPropertyAddress(e.target.value)}
-              type="text"
-              placeholder="Property Address here"
-              className="w-full outline-none card-bg"
-            />
-            <button className="text-gray-500 text-lg px-3" disabled>
-              <IoHomeOutline className="font-bold" />
-            </button>
-          </div>
-        </div>          
-
-        {/* Listed For */}
-        <SelectButton<ListForEnum> 
-          list={listingTypes} 
-          setValue={setListedFor} 
-          name="listedFor" 
-          value={listedFor} 
-          label="Listed For" 
-        />
+        </div>         
 
         {listedFor === ListForEnum.rent && (
           <ToggleButtons<RenewalEnum>
             label="Tenancy Period"
-            options={[RenewalEnum.yearly, RenewalEnum.monthly, RenewalEnum.weekely, RenewalEnum.daily]}
+            options={Object.values(RenewalEnum)}
             selected={renewPeriod}
             onChange={setRenewPeriod}
           />
         )}
 
-        {/* Property Category */}
-        <h3 className={styles.H2}>Property Category</h3>
-        <SelectButton<CategoryEnum> list={categories} setValue={setCategory} name="category" value={category} />
-
-        {/* Property Location */}
-        <PropertyLocationSection
-          userCoordinates={userCoordinates}
-          fallbackCoordinates={userCoordinates}
-          onLocationSelect={handleLocationSelect}
+        {/* Availability status */}
+        <ToggleButtons<PropertyStatusEnum>
+          label="Availability status"
+          options={Object.values(PropertyStatusEnum).filter(status => status !== PropertyStatusEnum.expired)}
+          selected={propertyStatus}
+          onChange={setPropertStatus}
         />
+
+        {/* Property Location & Address */}
+        <ToggleCollapse header="Property Location" open={true}>
+          {/* Address */}
+          <div className="mb-4">
+            <h3 className={styles.H2}>Property Address</h3>
+            <div className="flex card-bg p-3 rounded-full shadow-md">
+              <input
+                name="address"
+                value={propertyAddress}
+                onChange={(e) => setPropertyAddress(e.target.value)}
+                type="text"
+                placeholder="Enter property Address"
+                className="w-full outline-none card-bg"
+              />
+              <button className="text-gray-500 text-lg px-3" disabled>
+                <HiOutlineLocationMarker className="font-bold" />
+              </button>
+            </div>
+          </div> 
+
+          {/* Map */}
+          <PropertyLocationSection
+            userCoordinates={userCoordinates}
+            fallbackCoordinates={userCoordinates}
+            onLocationSelect={handleLocationSelect}
+          />
+        </ToggleCollapse>
+        
 
         <ToggleCollapse header="Description & Special terms" open={false}>
           <div className="flex flex-col gap-3">
@@ -267,7 +288,7 @@ export default function AddPropertyPage() {
                 isLoading ? "bg-gray-400" : "bg-green"
               }`}
             >
-              {isLoading ? "Adding..." : "Add"}
+              {isLoading ? "Adding..." : "Add Property"}
             </button> : <button
               disabled
               className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 

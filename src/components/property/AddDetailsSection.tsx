@@ -8,14 +8,14 @@ import { FaPlus } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import { styles } from "@/constant";
 import ToggleCollapse from "../shared/ToggleCollapse";
-import { Feature, NegotiableEnum } from "@/types";
+import { CategoryEnum, Feature, NegotiableEnum } from "@/types";
 
 export interface IPropFeatures {
   [key: string]: Feature[];
 }
 
 interface AddPropertyDetailsProps {
-  listingCategory: string;
+  listingCategory: CategoryEnum;
   existingFeatures?: Feature[];
   existingFacilities?: string[];
   onNegotiableChange?: (value: NegotiableEnum) => void;
@@ -57,7 +57,7 @@ export default function AddPropertyDetails({
   );
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [customFacilities, setCustomFacilities] = useState<string[]>([]);
-  const [features, setFeatures] = useState<Feature[]>(categoryFeatures[listingCategory]);
+  const [features, setFeatures] = useState<Feature[]>(categoryFeatures[listingCategory] ?? []);
 
   const facilities: string[] = [
     "Parking Lot",

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { use, useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import HorizontalCard from "@/components/shared/HorizontalCard";
@@ -12,351 +12,377 @@ import { ScreenName } from "@/components/shared/LabelCards";
 
 import { categories, styles } from "@/constant";
 import getUserPosition from "@/utils/getUserPosition";
-import logger from "../../../../../logger.config.mjs";
-import { getPropertyById, updateProperty } from "@/services/propertyApi";
-import { CategoryEnum, ListForEnum, NegotiableEnum, PropertyType, Feature, RenewalEnum, CurrencyEnum } from "@/types";
+
+import { 
+  getPropertyById, 
+  updateProperty 
+} from "@/services/propertyApi";
+
+import { 
+  CategoryEnum,
+  ListForEnum,
+  NegotiableEnum,
+  PropertyType,
+  Feature,
+  RenewalEnum,
+  CurrencyEnum,
+  PropertyStatusEnum
+} from "@/types";
+
 import { IoHomeOutline } from "react-icons/io5";
-import ToggleCollapse from "@/components/shared/ToggleCollapse";
-import ImageManager from "@/components/ImageManager";
 import { IoMdArrowDropdown } from "react-icons/io";
+
+import ImageManager from "@/components/ImageManager";
 import Popup from "@/components/shared/Popup";
+import logger from "../../../../../logger.config.mjs";
+import ToggleCollapse from "@/components/shared/ToggleCollapse";
+import { FaArrowLeft } from "react-icons/fa";
+import { AppContext } from "@/context/AppContextProvider";
 
-export default function EditPropertyPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = React.use(params); // same pattern you used
+export default function EditPropertyPage({
+  params
+}: {
+  params: Promise<{ id: string }> 
+}) {
+  const resolvedParams = use(params);
   const propertyId = resolvedParams.id;
+  const { authUser } = useContext(AppContext);
 
-  // UI state
-  const [loading, setLoading] = useState<boolean>(false);
-  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+  // UI State
+  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [showCurrencyPopup, setShowCurrencyPopup] = useState(false);
+  const [showStatusPopup, setShowStatusPopup] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [togglePopup, setTogglePopup] = useState(false);
 
-  // form state (prefilled from API)
-  const [property, setProperty] = useState<PropertyType | null>(null);
-  const [propertyTitle, setPropertyTitle] = useState<string>("");
-  const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
-  const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
-  const [propertyAddress, setPropertyAddress] = useState<string>("");
-  const [price, setPrice] = useState<string>("0.00");
+  // Form Data State
+  const [formData, setFormData] = useState<Partial<PropertyType>>({});
+
+  // Additional state derived from property
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
-  const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
-  const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
-  const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
-
-  // controlled child values from AddPropertyDetails
   const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features, setFeatures] = useState<Feature[]>([]);
   const [facilities, setFacilities] = useState<string[]>([]);
+  const [propCoordinates, setPropCoordinates] = useState<[number, number] | null>(null);
+  const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
 
-  // get user location once
+  // Get user location once
   useEffect(() => {
-    let mounted = true;
     (async () => {
       try {
-        const [lat, lng] = await getUserPosition();
-        if (mounted) setUserCoordinates([lat, lng]);
+        const coords = await getUserPosition();
+        setUserCoordinates(coords);
       } catch (err) {
         logger.warn("getUserPosition failed:", err);
       }
     })();
-    return () => { mounted = false; };
   }, []);
 
-  // fetch property by id and prefill form
+  // Fetch property data
   useEffect(() => {
     if (!propertyId) return;
+
     setLoading(true);
     setError(null);
 
     let mounted = true;
+
     (async () => {
       try {
         const res = await getPropertyById(propertyId);
         if (!mounted) return;
-        if (!res || !res.id) {
+
+        if (!res?.id) {
           setError("Property not found");
-          setLoading(false);
           return;
         }
-        setProperty(res);
-        // Prefill local form state
-        setPropertyTitle(res.title || "");
-        setPrice(res.price.toString() ?? '0.00');
-        setCategory((res.category as CategoryEnum) ?? CategoryEnum.house);
-        setListedFor((res.listed_for as ListForEnum) ?? ListForEnum.rent);
-        setRenewPeriod((res.period  as RenewalEnum)  ?? RenewalEnum.yearly);
-        setPropertyAddress(res.address || "");
 
-        // Coordinates
+        setFormData(res);
+
         if (typeof res.latitude === "number" && typeof res.longitude === "number") {
           setPropCoordinates([res.latitude, res.longitude]);
         }
-        // Map coordinates may be returned as longitude & latitude (your pipeline)
-        if (typeof res.latitude === "number" && typeof res.longitude === "number") {
-          setPropCoordinates([res.latitude, res.longitude]);
-        }
-        // Negotiable, features, facilities
+
+        setCurrency(res.currency);
         setNegotiable(res.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
-        setFeatures(Array.isArray(res.features) ? res.features : []);
-        setFacilities(res.env_facilities || []);
+        setFeatures(res.features ?? []);
+        setFacilities(res.env_facilities ?? []);
+
       } catch (err: any) {
-        logger.error("error fetching property:", err?.message ?? err);
-        setError(err?.message ?? "Failed to fetch property");
+        logger.error("Fetch property error:", err?.message ?? err);
+        setError("Failed to fetch property");
       } finally {
         setLoading(false);
       }
     })();
 
-    return () => { mounted = false; };
+    return () => { mounted = false };
   }, [propertyId]);
 
-  // location select callback
+  // Handle location selection
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setPropCoordinates([lat, lng]);
     toast.success(`Location selected: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
   }, []);
 
+  // Generic form setter
+  const updateForm = (name: string, value: any) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Submit handler
   const handleSubmit = useCallback(async () => {
-    if (
-      !propertyTitle ||
-      !listedFor ||
-      !category ||
-      !price 
-    ) {
-      toast.error("Please fill required fields and include at least one photo.");
+
+    if (!formData.title || !formData.listed_for || !formData.category || !formData.price) {
+      toast.error("Please fill required fields.");
       return;
     }
 
     setSubmitLoading(true);
+
     try {
-      // Prepare plain object for data
       const updateData: Partial<PropertyType> = {
-        title: propertyTitle,
-        price: Number(price),
-        address: property?.address ?? "",
-        listed_for: listedFor,
-        category,
+        ...formData,
+        currency,
         negotiable: negotiable === NegotiableEnum.Negotiable,
-        status: property?.status ?? "available",
         latitude: propCoordinates?.[0],
         longitude: propCoordinates?.[1],
-        features: features || [],
-        env_facilities: facilities || [],
-        period: listedFor === ListForEnum.rent ? renewPeriod : undefined,
+        features,
+        env_facilities: facilities,
+        period: formData.listed_for === ListForEnum.rent ? formData.period : undefined
       };
 
-      // Call update API
-      const response = await updateProperty(propertyId, updateData);
+      const res = await updateProperty(propertyId, updateData);
 
-      if (response?.success) {
-        setSubmitSuccess(true);
+      if (res?.success) {
         toast.success("Property updated successfully");
+        setSubmitSuccess(true);
+        setShowStatusPopup(true);
       } else {
-        toast.error(response?.message || "Failed to update property");
+        toast.error(res?.message ?? "Failed to update property");
       }
+
     } catch (err: any) {
-      logger.error("Update property failed:", err?.message ?? err);
-      toast.error(err?.message ?? "Unexpected error");
+      logger.error("Update failed:", err?.message ?? err);
+      toast.error("Unexpected error occurred");
     } finally {
       setSubmitLoading(false);
     }
+
   }, [
-    propertyId,
-    propertyTitle,
-    listedFor,
-    category,
-    price,
+    formData,
+    negotiable,
     propCoordinates,
     features,
     facilities,
-    negotiable,
-    renewPeriod,
-    property,
+    propertyId
   ]);
 
+  // Render states
+  if (loading) return <div className="p-6">Loading property...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
-  if (loading) {
-    return <div className="p-6">Loading property...</div>;
-  }
-
-  if (error) {
-    return <div className="p-6 text-red-600">Error loading property: {error}</div>;
-  }
 
   return (
     <>
-    {property && <div className="pb-16 min-h-screen relative">
-      <ScreenName title="Edit Property" />
-      <div className="p-6 max-w-4xl mx-auto">
-        {/* Property preview card */}
-        <div>
-          <HorizontalCard
-            id={property.id || ''}
-            name={property.title || ''}
-            price={property.price}
-            currency={property.currency}
-            category={property.category}
-            address={property.address || ''}
-            image={property.banner}
-            period={property?.period || ''}
-            listed_for={property.listed_for}
-            rating={4.5}
-          />
-        </div>
+      <div className="pb-16 min-h-screen relative">
 
-        <div className="mt-8 space-y-6">
-          {/* Title */}
-          <div>
-            <h3 className={styles.H2}>Property title</h3>
-            <div className="flex card-bg p-3 rounded-full shadow-md">
-              <input
-                name="title"
-                value={propertyTitle}
-                onChange={(e) => setPropertyTitle(e.target.value)}
-                type="text"
-                placeholder="Property title here"
-                className="w-full outline-none card-bg"
-              />
-              <button className="text-gray-500 text-lg px-3" disabled>
-                <IoHomeOutline className="font-bold" />
-              </button>
-            </div>
-          </div>
+        <ScreenName title="Edit Property" />
 
-          {/* Price */}
-          <div>
-            <h3 className={styles.H2}>
-              {listedFor === ListForEnum.rent ? "Rent Price" : "Sell Price"}
-            </h3>
-            <div className="flex card-bg p-3 rounded-lg shadow-md">
-              <input
-                name="price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                type="number"
-                placeholder="Property price here"
-                className="w-full outline-none card-bg"
-              />
-              <button 
-                className="text-gray-500 text-lg px-3 flex items-center gap-1"
-                onClick={() => setTogglePopup(!togglePopup)}
-              >
-                {/* <FaNairaSign className="font-bold" />     */}
-                {currency}
-                <IoMdArrowDropdown />          
-              </button>
-            </div>
-          </div>
+        <div className="p-6 max-w-4xl mx-auto">
 
-          {/* Property Address */}
-          <div>
-            <h3 className={styles.H2}>Property Address</h3>
-            <div className="flex card-bg p-3 rounded-full shadow-md">
-              <input
-                name="address"
-                value={propertyAddress}
-                onChange={(e) => setPropertyAddress(e.target.value)}
-                type="text"
-                placeholder="Property Address here"
-                className="w-full outline-none card-bg"
-              />
-              <button className="text-gray-500 text-lg px-3" disabled>
-                <IoHomeOutline className="font-bold" />
-              </button>
-            </div>
-          </div>          
-
-          {/* Listed For */}
-          <ToggleButtons<ListForEnum>
-            label="Listed For"
-            options={[ListForEnum.sale, ListForEnum.rent]}
-            selected={listedFor}
-            onChange={setListedFor}
-          />
-
-          {listedFor === ListForEnum.rent && (
-            <ToggleButtons<RenewalEnum>
-              label="renewPeriod Period"
-              options={[RenewalEnum.yearly, RenewalEnum.monthly, RenewalEnum.weekely, RenewalEnum.daily]}
-              selected={renewPeriod}
-              onChange={setRenewPeriod}
+          {/* Preview Card */}
+          {formData.id && (
+            <HorizontalCard
+              id={formData.id}
+              name={formData.title || "Property"}
+              price={formData.price || 0.00}
+              currency={currency}
+              category={formData.category as CategoryEnum}
+              address={formData.address || ""}
+              image={formData.banner || ""}
+              period={formData.period as RenewalEnum}
+              listed_for={formData.listed_for as ListForEnum}
+              rating={4.5}
             />
           )}
 
-          {/* Property Category */}
-          <h3 className={styles.H2}>Property Category</h3>
-          <SelectButton<CategoryEnum> list={categories} setValue={setCategory} name="category" value={category} />
+          <div className="mt-8 space-y-6">
+            {/* Category */}
+            <h3 className={styles.H2}>Property Category</h3>
+            <SelectButton<CategoryEnum>
+              list={categories}
+              setValue={(val) => updateForm("category", val)}
+              name="category"
+              value={formData.category as CategoryEnum}
+            />
 
-          {/* Location Section */}
-          <PropertyLocationSection
-            userCoordinates={userCoordinates}
-            fallbackCoordinates={userCoordinates}
-            onLocationSelect={handleLocationSelect}
-          />
+            {/* Title */}
+            <div>
+              <h3 className={styles.H2}>Property Title</h3>
+              <div className="flex card-bg p-3 rounded-full shadow-md">
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title || ""}
+                  onChange={(e) => updateForm("title", e.target.value)}
+                  className="w-full outline-none card-bg"
+                  placeholder="Enter title"
+                />
+                <IoHomeOutline className="text-gray-500 text-lg" />
+              </div>
+            </div>
 
-          {/* Property Details - controlled via callbacks */}
-          <AddPropertyDetails
-            listingCategory={category}
-            existingFeatures={features}
-            existingFacilities={facilities}
-            onNegotiableChange={setNegotiable}
-            onFeaturesChange={setFeatures}
-            onFacilitiesChange={setFacilities}
-          />
+            {/* Price */}
+            <div>
+              <h3 className={styles.H2}>
+                {formData.listed_for === ListForEnum.rent ? "Rent Price" : "Sell Price"}
+              </h3>
 
-          {/* Submit */}
-          <div className="mt-6">
-            <button
-              className="w-full bg-primary text-white py-2 rounded-md"
-              // onClick={handleSubmit}
+              <div className="flex card-bg p-3 rounded-lg shadow-md">
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price || ""}
+                  onChange={(e) => updateForm("price", Number(e.target.value))}
+                  className="w-full outline-none card-bg"
+                  placeholder="Enter price"
+                />
+
+                <button
+                  type="button"
+                  className="text-gray-500 text-lg px-3 flex items-center gap-1"
+                  onClick={() => setShowCurrencyPopup(true)}
+                >
+                  {currency}
+                  <IoMdArrowDropdown />
+                </button>
+              </div>
+            </div>
+
+            {/* Listed For */}
+            <ToggleButtons<ListForEnum>
+              label="Listed For"
+              options={Object.values(ListForEnum) as ListForEnum[]}
+              selected={formData.listed_for as ListForEnum}
+              onChange={(value) => updateForm("listed_for", value)}
+            />
+
+            {/* Rent period */}
+            {formData.listed_for === ListForEnum.rent && (
+              <ToggleButtons<RenewalEnum>
+                label="Renewal Period"
+                options={Object.values(RenewalEnum) as RenewalEnum[]}
+                selected={formData.period as RenewalEnum}
+                onChange={(value) => updateForm("period", value)}
+              />
+            )}
+
+            {/* Availability status */}
+            <ToggleButtons<PropertyStatusEnum>
+              label="Availability status"
+              options={Object.values(PropertyStatusEnum).filter(status => status !== PropertyStatusEnum.expired)}
+              selected={formData.status as PropertyStatusEnum}
+              onChange={(value) => updateForm("status", value)}
+            />
+
+            <ToggleCollapse header="Property Location" open={true}>
+              {/* Address */}
+              <div>
+                <h3 className={styles.H2}>Property Address</h3>
+                <div className="flex card-bg p-3 rounded-full shadow-md">
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address || ""}
+                    onChange={(e) => updateForm("address", e.target.value)}
+                    className="w-full outline-none card-bg"
+                    placeholder="Property address"
+                  />
+                  <IoHomeOutline className="text-gray-500 text-lg" />
+                </div>
+              </div>
+
+              {/* Location */}
+              <PropertyLocationSection
+                userCoordinates={userCoordinates}
+                fallbackCoordinates={propCoordinates ? propCoordinates : userCoordinates || [0,0]}
+                onLocationSelect={handleLocationSelect}
+              />
+            </ToggleCollapse>
+
+            {/* Extra Details */}
+            <AddPropertyDetails
+              listingCategory={formData.category as CategoryEnum}
+              existingFeatures={features ?? []}
+              existingFacilities={facilities ?? []}
+              onNegotiableChange={setNegotiable}
+              onFeaturesChange={setFeatures}
+              onFacilitiesChange={setFacilities}
+            />
+
+            {/* Submit */}
+            { authUser ? <button
               disabled={submitLoading}
+              onClick={handleSubmit}
+              className={`px-4 py-2 rounded-md w-full text-white ${
+                submitLoading ? "bg-gray-400" : "bg-green"
+              }`}
             >
               {submitLoading ? "Updating..." : "Update Property"}
+            </button> : <button
+              disabled
+              className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 
+            >
+              Update (Login on Pi Browser)
             </button>
+            }
+
+            {/* Image Manager */}
+            {formData.id && (
+              <ImageManager propertyId={formData.id} images={formData.images || []} />
+            )}
           </div>
 
-          {/* Photo upload / previews */}
-          {property && <ImageManager
-            propertyId={property.id}
-            images={property.images || []}
-          />}
         </div>
 
-        {/* success/error popup (simple) */}
-        {togglePopup && (
+        {/* Status Popup */}
+        {showStatusPopup && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white p-4 rounded shadow">
             {submitSuccess ? (
-              <div>
-                <p className="font-semibold">Property updated</p>
-                <button onClick={() => setTogglePopup(false)} className="mt-2 underline">Close</button>
-              </div>
+              <p className="font-semibold">Property updated successfully</p>
             ) : (
-              <div>
-                <p className="font-semibold text-red-600">Update failed</p>
-                <button onClick={() => setTogglePopup(false)} className="mt-2 underline">Close</button>
-              </div>
+              <p className="font-semibold text-red-600">Update failed</p>
             )}
+            <button onClick={() => setShowStatusPopup(false)} className="mt-2 underline">
+              Close
+            </button>
           </div>
         )}
       </div>
-    </div>}
-    {/* Currency popup */}
-      <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
+
+      {/* Currency Popup */}
+      <Popup
+        header="Select currency"
+        toggle={showCurrencyPopup}
+        setToggle={setShowCurrencyPopup}
+        useMask={true}
+      >
         <div className="my-3">
           {Object.entries(CurrencyEnum).map(([key, value]) => (
             <button
               key={value}
               onClick={() => {
-                setCurrency(value);
-                setTogglePopup(false);
+                updateForm("currency", value);
+                setShowCurrencyPopup(false);
               }}
-              className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition-colors cursor-pointer"
+              className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition"
             >
-              {key.charAt(0).toUpperCase() + key.slice(1)} ({value})
+              {key.toUpperCase()} ({value})
             </button>
           ))}
-
         </div>
       </Popup>
     </>

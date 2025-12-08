@@ -47,7 +47,6 @@ export default function RootLayout({
         />
         <meta charSet="utf-8" />
         <title>Proptriz Hub</title>
-        <base href="/" />
         <meta
           property="og:title"
           content="Proptriz Hub, Connecting you with trusted properties"

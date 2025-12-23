@@ -52,13 +52,6 @@ export default function AddPropertyDetails({
     ],
   };
 
-  const [negotiableToggle, setNegotiableToggle] = useState<NegotiableEnum>(
-    NegotiableEnum.Negotiable
-  );
-  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
-  const [customFacilities, setCustomFacilities] = useState<string[]>([]);
-  const [features, setFeatures] = useState<Feature[]>(categoryFeatures[listingCategory] ?? []);
-
   const facilities: string[] = [
     "Parking Lot",
     "Pet Allowed",
@@ -72,6 +65,13 @@ export default function AddPropertyDetails({
     "Drainage System",
     "Security Services",
   ];
+
+  const [negotiableToggle, setNegotiableToggle] = useState<NegotiableEnum>(
+    NegotiableEnum.Negotiable
+  );
+  const [selectedFacilities, setSelectedFacilities] = useState<string[]>(existingFacilities ?? []);
+  const [customFacilities, setCustomFacilities] = useState<string[]>([]);
+  const [features, setFeatures] = useState<Feature[]>(existingFeatures.length>0 ? existingFeatures : (categoryFeatures[listingCategory] || []));
 
   // 🚀 Notify parent when states change
   useEffect(() => {
@@ -145,7 +145,28 @@ export default function AddPropertyDetails({
 
       {/* Property Features */}
       <h3 className={styles.H2}>Property Features</h3>
-      {[...existingFeatures, ...features].map((feature, index) => (
+      {(existingFeatures && existingFeatures.length>0) ? existingFeatures.map((feature, index) => (
+        <div key={index} className="flex gap-4 items-center mt-4">
+          <div className="flex card-bg px-3 rounded-lg shadow-md w-full">
+            <input
+              type="text"
+              placeholder="Feature Name"
+              value={feature.name}
+              onChange={(e) => handleFeatureChange(index, "name", e.target.value)}
+              className="flex-1 outline-none card-bg text-sm"
+            />
+            <Counter
+              label=""
+              value={feature.quantity}
+              onIncrement={() => incrementFeatureQuantity(index)}
+              onDecrement={() => decrementFeatureQuantity(index)}
+            />
+          </div>
+          <button onClick={() => handleRemoveFeature(index)} className="text-red-500">
+            <IoClose size={24} />
+          </button>
+        </div>
+      )): features.map((feature, index) => (
         <div key={index} className="flex gap-4 items-center mt-4">
           <div className="flex card-bg px-3 rounded-lg shadow-md w-full">
             <input
@@ -178,7 +199,7 @@ export default function AddPropertyDetails({
       {/* Facilities */}
       <h2 className={styles.H2}>Environment / Facilities</h2>
       <TagSelector
-        tags={facilities}
+        tags={[...facilities, ...existingFacilities.filter(f => !facilities.includes(f))]}
         selectedTags={[...existingFacilities, ...selectedFacilities]}
         onToggle={handleToggleFacility}
       />

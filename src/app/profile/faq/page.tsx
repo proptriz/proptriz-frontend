@@ -7,7 +7,6 @@ import { useState } from "react";
 export default function FAQSupport() {
   const [selectedTab, setSelectedTab] = useState("Buyer");
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
-    const [ searchQuery, setSearchQuery ] = useState<string>('');
 
   const toggleAccordion = (item: string) => {
     setOpenAccordion(openAccordion === item ? null : item);
@@ -53,9 +52,9 @@ export default function FAQSupport() {
         
         <div className="md:mx-16">
           {/* Search Input */}
-          <div className="mb-4 mx-auto w-full">
+          {/* <div className="mb-4 mx-auto w-full">
             <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
-          </div> 
+          </div>  */}
 
           {/* Tab Navigation */}
           <div className="flex justify-around items-center bg-gray-300 rounded-full mb-6">

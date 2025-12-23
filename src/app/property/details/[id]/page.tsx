@@ -14,12 +14,9 @@ import { IoIosArrowForward } from "react-icons/io";
 import { PropertyType } from "@/types";
 import Link from "next/link";
 import { getNearestProperties, getPropertyById } from "@/services/propertyApi";
-import dynamic from "next/dynamic";
 import logger from '../../../../../logger.config.mjs';
 import Price from "@/components/shared/Price";
 import GalleryModal from "@/components/shared/GalleryModal";
-
-const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 const PropertyDetail = ({
   params
@@ -71,7 +68,6 @@ const PropertyDetail = ({
     fetchProperty()
   }, [propertyId]);
 
-
   useEffect(() => {
     if (!propertyId || nearestProperty.length>0) return
     const fetchProperty = async () => {
@@ -89,7 +85,7 @@ const PropertyDetail = ({
     };
       
     fetchProperty()
-  }, [propertyId]);
+  }, [propertyId,]);
   
 
   const locations = [

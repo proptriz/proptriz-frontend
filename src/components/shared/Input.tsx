@@ -1,8 +1,7 @@
 'use client';
 import { styles } from "@/constant";
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 import { ImEye, ImEyeBlocked } from "react-icons/im";
-import { IoHomeOutline } from "react-icons/io5";
 interface PasswordInputProps {
     password: string, 
     setPassword: React.Dispatch<SetStateAction<string>>,
@@ -36,10 +35,6 @@ export const PasswordInput = ({password, setPassword, name}:PasswordInputProps )
     )
 }
 
-interface EmailInputProps {
-    email: string, 
-    setEmail: React.Dispatch<SetStateAction<string>>,
-}
 export const EmailInput = (props:any )=> {
 
     return (

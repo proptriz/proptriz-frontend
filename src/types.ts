@@ -8,7 +8,7 @@ export interface IUser {
   _id: string;
   username: string; // unique identifyer
   pi_uid: string; // hashed user password
-  fullname?: string; // User Legal Name (e.g. Tony Adeola Ezenwa) (optional)
+  brand?: string; // User Legal Name (e.g. Tony Adeola Ezenwa) (optional)
   image?: string; // URL to user profile pics (optional)
   email?: string; // for notification
   phone?: string; // user phone number (optional)
@@ -69,6 +69,7 @@ export interface UserType {
 
 export interface UserSettingsType {
   _id?: string;
+  username: string; // 
   brand?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
   image?: string; // URL to user profile pics (optional)
   email?: string; // for notification    

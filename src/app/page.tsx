@@ -112,23 +112,8 @@ export default function ExplorePage() {
 
         <div className="absolute bottom-12 z-10 right-0 left-0 m-auto pointer-events-none">
           <div className="w-[90%] lg:w-full lg:px-6 mx-auto flex items-center justify-between">
-            {/* Add Seller Button */}
-            <div className="pointer-events-auto">
-              <Link href={`/seller/registration`}>
-                <button
-                  style={{
-                    height: '55px',
-                    fontSize: '20px',
-                    borderRadius: '10px',
-                    color: '#ffc153',
-                    paddingLeft: '45px',
-                    paddingRight: '45px',
-                  }}
-                  disabled={isSigningInUser}
-                >
-                  Agent
-                </button>
-              </Link>
+            {/* Add Agent Button */}
+            <div className="">
             </div>
             {/* Location Button */}
             <div >

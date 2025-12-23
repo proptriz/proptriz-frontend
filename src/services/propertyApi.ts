@@ -94,11 +94,20 @@ export const updateProperty = async (id: string, data: Partial<PropertyType>) =>
 export const getPropertyById = async (propertyId: string): Promise<PropertyType> => {
   const response = await axiosClient.get(`/property/${propertyId}`);
   logger.info(response.data);
+  const property = response.data.property;
+  const userDetails = response.data.userDetails;
   return {
-    ...response.data,
-    id: response.data._id,
-    longitude: response.data.map_location?.coordinates[0] || 0.0,
-    latitude: response.data.map_location?.coordinates[1] || 0.0,
+    ...property,
+    id: property._id,
+    user: {
+      username: property.user.username,
+      image: userDetails.image,
+      email: userDetails.email,
+      phone: userDetails.phone,
+      brand: userDetails.brand,
+    },
+    longitude: property.map_location?.coordinates[0] || 0.0,
+    latitude: property.map_location?.coordinates[1] || 0.0,
   };
 };
 

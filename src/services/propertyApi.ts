@@ -1,6 +1,7 @@
 import axiosClient from "@/config/client";
 import logger from "../../logger.config.mjs"
 import { PropertyType } from "@/types";
+import { handleApiError } from "@/utils/errorHandler";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1";
 
@@ -53,7 +54,7 @@ const propertyService = {
 
 export const createProperty = async (formData: FormData): Promise<PropertyType> => {
   // ✅ Log Property before sending
-  console.log("📦 FormData contents:");
+  logger.info("📦 FormData contents:");
   for (const [key, value] of formData) {
     logger.info(`${key}:`, value);
   }
@@ -63,50 +64,18 @@ export const createProperty = async (formData: FormData): Promise<PropertyType> 
   return response.data;
 };
 
-export const updateProperty = async (
-  id: string,
-  data: Partial<PropertyType>,
-  photos?: File[]
-): Promise<any> => {
+export const updateProperty = async (id: string, data: Partial<PropertyType>) => {
   try {
-    const formData = new FormData();
-
-    // 🧩 Append fields
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (Array.isArray(value)) {
-          // Convert arrays (e.g. features) to CSV
-          formData.append(key, value.join(","));
-        } else {
-          formData.append(key, value as any);
-        }
-      }
-    });
-
-    // 🖼️ Append new photos
-    if (photos && photos.length > 0) {
-      photos.forEach((file) => formData.append("images", file));
-    }
-
-    console.log("📦 FormData contents:");
-    for (const [key, value] of formData) {
-      logger.info(`${key}:`, value);
-    }
-
+    logger.info("📦 FormData contents: ", {data});
     const response = await axiosClient.put(
       `${API_BASE_URL}/property/update/${id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      data
     );
 
     return response.data;
   } catch (error: any) {
     logger.error("❌ Error updating property:", error.response?.data || error);
-    throw new Error(error.response?.data?.message || "Failed to update property");
+    handleApiError(error, "Failed to update settings");
   }
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { AiOutlineMenuUnfold } from "react-icons/ai";
 import RecentSearchCard from "../search/RecentSearchCard";

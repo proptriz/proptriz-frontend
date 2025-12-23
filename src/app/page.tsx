@@ -4,7 +4,6 @@ import React, { useState, useEffect, useContext } from "react";
 import dynamic from 'next/dynamic';
 import Link from "next/link";
 import Image from "next/image";
-import { SlMenu } from "react-icons/sl";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
@@ -18,12 +17,10 @@ import Header from "@/components/shared/Header";
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function ExplorePage() {
-  const { authUser, isSigningInUser, autoLoginUser, registerUser } = useContext(AppContext);
+  const { authUser, isSigningInUser } = useContext(AppContext);
   const [properties, setProperties] = useState<PropertyType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [ searchQuery, setSearchQuery ] = useState<string>('');
-  const [ filterBy, setFilterBy ] = useState<string>('house');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterBy, setFilterBy] = useState<string>('house');
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(13);
@@ -45,7 +42,6 @@ export default function ExplorePage() {
 
   const fetchProperties = async () => {
     if (!mapBounds) return
-    setLoading(true);
     setProperties([]);
 
     try {
@@ -72,17 +68,12 @@ export default function ExplorePage() {
         logger.info("Listed properties: ", response.data);
 
       } else {
-        setError(response.message);
         logger.error("error fetching all properties: ", response.message);
 
       }
-      setLoading(false);
     } catch (error:any) {
-      setError(error.message);
       logger.error("error fetching all properties: ", error.message)
 
-    } finally {
-      setLoading(false);
     }
 
     
@@ -94,10 +85,10 @@ export default function ExplorePage() {
   }, [filterBy, mapBounds]);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      fetchProperties();
-    }
-  }, [searchQuery]);
+    if (searchQuery.trim() === '') return;
+
+    fetchProperties();
+  }, [searchQuery,]);
 
   return (
     <div className="flex flex-col w-full h-screen">

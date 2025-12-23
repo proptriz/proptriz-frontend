@@ -4,30 +4,20 @@ import React, { useState, useEffect } from "react";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
-import { FaRegBell } from "react-icons/fa6";
 import PropertyListing from "@/components/property/Listing";
 import dynamic from 'next/dynamic';
-import Link from "next/link";
 import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/types";
-import Image from "next/image";
 import logger from "../../../logger.config.mjs"
-import { SlMenu } from "react-icons/sl";
 import Header from "@/components/shared/Header";
-
-const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function RootPage() {
   const [properties, setProperties] = useState<PropertyType[]>([]);
   const [ searchQuery, setSearchQuery ] = useState<string>('');
   const [ filterBy, setFilterBy ] = useState<string>('house');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchProperties = async () => {
-    setLoading(true);
     setProperties([]);
-
     try {
       const query = new URLSearchParams({
         query: searchQuery,
@@ -45,19 +35,12 @@ export default function RootPage() {
         logger.info("Listed properties: ", response.data);
 
       } else {
-        setError(response.message);
         logger.error("error fetching all properties: ", response.message);
 
       }
-      setLoading(false);
     } catch (error:any) {
-      setError(error.message);
       logger.error("error fetching all properties: ", error.message)
-
-    } finally {
-      setLoading(false);
     }
-
     
   };
 
@@ -67,9 +50,8 @@ export default function RootPage() {
   }, [filterBy]);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      fetchProperties();
-    }
+    if (searchQuery.trim() !== '') return;
+    fetchProperties();
   }, [searchQuery]);
 
   return (

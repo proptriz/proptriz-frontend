@@ -1,5 +1,5 @@
 import React from "react";
-import { FaHeart, FaStar } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import Image from "next/image";
 import formatPrice from "@/utils/formatPrice";
@@ -18,7 +18,7 @@ const HorizontalCard: React.FC<PropertyProps> = ({
   listed_for
 }) => {
   return (
-    <div className="flex items-center card-bg rounded-2xl shadow-md p-2 space-x-4 min-w-[70%] md:min-w-[40%] max-w-lg">
+    <div className="flex items-center card-bg rounded-2xl shadow-md p-2 space-x-4 min-w-[70%] md:min-w-[40%] max-w-lg" key={id}>
       {/* Image Section */}
       <div className="relative w-32 h-32 rounded-lg overflow-hidden">
         <img

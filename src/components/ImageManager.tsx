@@ -123,7 +123,7 @@ export default function ImageManager({
   // -------------------------------------------
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold">Property Images</h3>
+      <h3 className="font-semibold">Upload Property Images</h3>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {imageSlots.map((slot, index) => (

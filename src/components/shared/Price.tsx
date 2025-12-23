@@ -1,4 +1,3 @@
-import { LuPi } from "react-icons/lu"
 import formatPrice from "@/utils/formatPrice"
 import { CurrencyEnum } from "@/types"
 

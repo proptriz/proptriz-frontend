@@ -36,7 +36,6 @@ import ImageManager from "@/components/ImageManager";
 import Popup from "@/components/shared/Popup";
 import logger from "../../../../../logger.config.mjs";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
-import { FaArrowLeft } from "react-icons/fa";
 import { AppContext } from "@/context/AppContextProvider";
 
 export default function EditPropertyPage({
@@ -58,6 +57,7 @@ export default function EditPropertyPage({
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Form Data State
+  const [property, setProperty] = useState<PropertyType | null>(null);
   const [formData, setFormData] = useState<Partial<PropertyType>>({});
 
   // Additional state derived from property
@@ -65,8 +65,8 @@ export default function EditPropertyPage({
   const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features, setFeatures] = useState<Feature[]>([]);
   const [facilities, setFacilities] = useState<string[]>([]);
-  const [propCoordinates, setPropCoordinates] = useState<[number, number] | null>(null);
-  const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
+  const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
 
   // Get user location once
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function EditPropertyPage({
           setError("Property not found");
           return;
         }
-
+        setProperty(res);
         setFormData(res);
 
         if (typeof res.latitude === "number" && typeof res.longitude === "number") {
@@ -141,9 +141,8 @@ export default function EditPropertyPage({
     }
 
     setSubmitLoading(true);
-
     try {
-      const updateData: Partial<PropertyType> = {
+      const updatedData: Partial<PropertyType> = {
         ...formData,
         currency,
         negotiable: negotiable === NegotiableEnum.Negotiable,
@@ -154,16 +153,19 @@ export default function EditPropertyPage({
         period: formData.listed_for === ListForEnum.rent ? formData.period : undefined
       };
 
-      const res = await updateProperty(propertyId, updateData);
+      const updatedProperty = await updateProperty(propertyId, updatedData);
 
-      if (res?.success) {
+      if (updatedProperty) {
         toast.success("Property updated successfully");
-        setSubmitSuccess(true);
-        setShowStatusPopup(true);
-      } else {
-        toast.error(res?.message ?? "Failed to update property");
+        setProperty(updatedProperty);
+        setFormData(updatedProperty);
+        setCurrency(updatedProperty.currency);
+        setNegotiable(updatedProperty.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
+        setFeatures(updatedProperty.features ?? []);
+        setFacilities(updatedProperty.env_facilities ?? []);
+        logger.info("Property updated:", updatedProperty);
       }
-
+      
     } catch (err: any) {
       logger.error("Update failed:", err?.message ?? err);
       toast.error("Unexpected error occurred");
@@ -182,7 +184,7 @@ export default function EditPropertyPage({
 
   // Render states
   if (loading) return <div className="p-6">Loading property...</div>;
-  if (error) return <div className="p-6 text-red-600">{error}</div>;
+  if (error || !property) return <div className="p-6 text-red-600">{error}</div>;
 
 
   return (
@@ -196,15 +198,15 @@ export default function EditPropertyPage({
           {/* Preview Card */}
           {formData.id && (
             <HorizontalCard
-              id={formData.id}
-              name={formData.title || "Property"}
-              price={formData.price || 0.00}
-              currency={currency}
-              category={formData.category as CategoryEnum}
-              address={formData.address || ""}
-              image={formData.banner || ""}
-              period={formData.period as RenewalEnum}
-              listed_for={formData.listed_for as ListForEnum}
+              id={property.id}
+              name={property.title || "Property"}
+              price={property.price || 0.00}
+              currency={property.currency}
+              category={property.category as CategoryEnum}
+              address={property.address}
+              image={property.banner || "/logo.png"}
+              period={property.period as RenewalEnum}
+              listed_for={property.listed_for as ListForEnum}
               rating={4.5}
             />
           )}
@@ -307,15 +309,15 @@ export default function EditPropertyPage({
 
               {/* Location */}
               <PropertyLocationSection
-                userCoordinates={userCoordinates}
-                fallbackCoordinates={propCoordinates ? propCoordinates : userCoordinates || [0,0]}
+                userCoordinates={propCoordinates ? propCoordinates : userCoordinates || [0,0]}
+                fallbackCoordinates={userCoordinates || [0,0]}
                 onLocationSelect={handleLocationSelect}
               />
             </ToggleCollapse>
 
             {/* Extra Details */}
             <AddPropertyDetails
-              listingCategory={formData.category as CategoryEnum}
+              listingCategory={property.category as CategoryEnum}
               existingFeatures={features ?? []}
               existingFacilities={facilities ?? []}
               onNegotiableChange={setNegotiable}
@@ -347,20 +349,6 @@ export default function EditPropertyPage({
           </div>
 
         </div>
-
-        {/* Status Popup */}
-        {showStatusPopup && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white p-4 rounded shadow">
-            {submitSuccess ? (
-              <p className="font-semibold">Property updated successfully</p>
-            ) : (
-              <p className="font-semibold text-red-600">Update failed</p>
-            )}
-            <button onClick={() => setShowStatusPopup(false)} className="mt-2 underline">
-              Close
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Currency Popup */}

@@ -3,9 +3,6 @@
 import React, { useContext, useState } from "react";
 import Link from "next/link";
 import SearchBar from "@/components/shared/SearchBar";
-import { FaRegBell } from "react-icons/fa6";
-import Image from "next/image";
-import { IoChevronBack } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import propertyService from "@/services/propertyApi";
@@ -16,9 +13,6 @@ import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";
 
 export default function PropertyListPage() {
-  const router = useRouter();
-
-    const { authUser, isSigningInUser } = useContext(AppContext);
     const [properties, setProperties] = useState<PropertyType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);

@@ -14,6 +14,7 @@ import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Popup from "@/components/shared/Popup";
 import { getUserSettings } from "@/services/settingsApi";
+import Image from "next/image";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
@@ -96,8 +97,10 @@ return (
     <div className="mb-6 text-center">
       <div className="flex flex-col items-center mb-2">
         <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
-          <img
+          <Image
             src={userSettings?.image || "/logo.png"}
+            height={32}
+            width={32}
             alt="profile"
             className="rounded-full w-full h-full object-cover"
           />                    

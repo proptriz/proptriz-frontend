@@ -41,7 +41,7 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
   initialZoom = 6,
   onLocationSelect,
 }) => {
-  const [position, setPosition] = useState<LatLngExpression | null>(null);
+  const [position, setPosition] = useState<LatLngExpression >(initialCenter);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: 400 }}>

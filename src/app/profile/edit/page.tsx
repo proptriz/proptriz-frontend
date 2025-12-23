@@ -2,8 +2,7 @@
 
 import { ScreenName } from '@/components/shared/LabelCards';
 import { AppContext } from '@/context/AppContextProvider';
-import Image from 'next/image';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FaUser, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { FaPencil } from 'react-icons/fa6';
 import { toast } from 'react-toastify';
@@ -13,6 +12,7 @@ import { BsWhatsapp } from 'react-icons/bs';
 import { UserSettingsType } from '@/types';
 import ToggleCollapse from '@/components/shared/ToggleCollapse';
 import { addOrUpdateUserSettings, getUserSettings } from '@/services/settingsApi';
+import Image from 'next/image';
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
@@ -51,54 +51,6 @@ const EditProfile = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
   
-  // Submit handler
-  // const handleSubmit = useCallback(async () => {
-  
-  //   if (!formData.title || !formData.listed_for || !formData.category || !formData.price) {
-  //     toast.error("Please fill required fields.");
-  //     return;
-  //   }
-
-  //   setSubmitLoading(true);
-  
-  //   try {
-  //     const updateData: Partial<UserType> = {
-  //       ...formData,
-  //       currency,
-  //       negotiable: negotiable === NegotiableEnum.Negotiable,
-  //       latitude: propCoordinates?.[0],
-  //       longitude: propCoordinates?.[1],
-  //       features,
-  //       env_facilities: facilities,
-  //       period: formData.listed_for === ListForEnum.rent ? formData.period : undefined
-  //     };
-
-  //     const res = await updateProperty(propertyId, updateData);
-
-  //     if (res?.success) {
-  //       toast.success("Property updated successfully");
-  //       setSubmitSuccess(true);
-  //       setShowStatusPopup(true);
-  //     } else {
-  //       toast.error(res?.message ?? "Failed to update property");
-  //     }
-
-  //   } catch (err: any) {
-  //     logger.error("Update failed:", err?.message ?? err);
-  //     toast.error("Unexpected error occurred");
-  //   } finally {
-  //     setSubmitLoading(false);
-  //   }
-
-  // }, [
-  //   formData,
-  //   negotiable,
-  //   propCoordinates,
-  //   features,
-  //   facilities,
-  //   propertyId
-  // ]);
-
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = e.target.files?.[0];
@@ -156,8 +108,10 @@ const EditProfile = () => {
             onChange={handleUpload} 
           />
 
-          <img 
+          <Image 
             src={photo ? URL.createObjectURL(photo) : existingPhotoUrl}
+            height={32}
+            width={32}
             alt="profile"
             className="rounded-full w-full h-full object-cover"
           />

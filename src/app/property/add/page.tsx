@@ -19,7 +19,6 @@ import Popup from "@/components/shared/Popup";
 import { IoMdArrowDropdown } from "react-icons/io";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { set } from "zod/v4";
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
@@ -92,7 +91,7 @@ export default function AddPropertyPage() {
   // ✅ Submit Handler
   const handleSubmit = async () => {
     if (!propertyTitle || !listedFor || !category || !price || !photos.length) {
-      alert("Please fill in all required fields and upload at least one photo.");
+      toast.warn("Please fill in all required fields and upload at least one photo.");
       return;
     }
 
@@ -301,23 +300,23 @@ export default function AddPropertyPage() {
       </div>
     </div>
     {/* Currency popup */}
-      <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
-        <div className="my-3">
-          {Object.entries(CurrencyEnum).map(([key, value]) => (
-            <button
-              key={value}
-              onClick={() => {
-                setCurrency(value);
-                setTogglePopup(false);
-              }}
-              className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition-colors cursor-pointer"
-            >
-              {key.charAt(0).toUpperCase() + key.slice(1)} ({value})
-            </button>
-          ))}
+    <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
+      <div className="my-3">
+        {Object.entries(CurrencyEnum).map(([key, value]) => (
+          <button
+            key={value}
+            onClick={() => {
+              setCurrency(value);
+              setTogglePopup(false);
+            }}
+            className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition-colors cursor-pointer"
+          >
+            {key.charAt(0).toUpperCase() + key.slice(1)} ({value})
+          </button>
+        ))}
 
-        </div>
-      </Popup>
+      </div>
+    </Popup>
     </>
   );
 }

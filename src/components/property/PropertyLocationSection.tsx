@@ -2,8 +2,6 @@
 
 import React from "react";
 import dynamic from 'next/dynamic';
-import { HiOutlineLocationMarker } from "react-icons/hi";
-import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import type { LatLngExpression } from "leaflet";
 
 const LocationPickerMap = dynamic(() => import("@/components/LocationPickerMap"), { ssr: false });

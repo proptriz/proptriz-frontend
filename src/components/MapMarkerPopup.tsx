@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import logger from '../../logger.config.mjs';
-import { PropertyType } from '@/types';
+import { CurrencyEnum, PropertyType } from '@/types';
 import Price from './shared/Price';
 import formatPrice from '@/utils/formatPrice';
 
@@ -47,9 +47,9 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
       </h2>
 
       <p className="relative text-2xl font-semibold text-primary flex items-center">
-        <span className="text-sm">{property.currency}</span>
-        { formatPrice(property.price) }
-        <span className="text-gray-600 text-sm text-right"> { property.period}</span>
+        {property.currency===CurrencyEnum.naira ? "₦" : property.currency===CurrencyEnum.dollars ? "$" : property.currency===CurrencyEnum.pounds ? "£" : property.currency===CurrencyEnum.euros ? "€" : ""}
+        { formatPrice(property.price) } 
+        <span className="text-gray-600 text-sm text-right ms-1"> { property.period}</span>
       </p>
       
       {/* Link to Buy button */}

@@ -1,4 +1,4 @@
-import { PropertyProps } from "@/types";
+import { CurrencyEnum, PropertyProps } from "@/types";
 import formatPrice from "@/utils/formatPrice";
 
 export const VerticalCard = ({
@@ -28,10 +28,9 @@ export const VerticalCard = ({
       </div>
       <div className="mt-3 gap-1">
         <p className="flex text-primary items-center text-lg">
-          <span className="text-sm"> 
-            {currency}
-          </span> 
-          <span className="font-semibold"> 
+          <span className=""> 
+            {currency===CurrencyEnum.naira ? "₦" : currency===CurrencyEnum.dollars ? "$" : currency===CurrencyEnum.pounds ? "£" : currency===CurrencyEnum.euros ? "€" : ""}
+          </span> <span className="font-semibold"> 
             {formatPrice(price)}
           </span>
           <span className="text-xs ms-1">{period}</span>

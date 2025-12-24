@@ -194,6 +194,11 @@ const PropertyDetail = ({
               ))}               
             </div>
 
+            <button className="text-xl font-semibold card-bg p-4 rounded-full">
+              {/* {<TbView360Number />} */}
+              {property.status}
+            </button>
+
             {/* Map Section */}
             <div className="px-5 mt-5">
               <Link href={`/property/detail-map/${propertyId}`}>

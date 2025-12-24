@@ -1,6 +1,7 @@
 import axiosClient from "@/config/client";
 import logger from "../../logger.config.mjs"
 import { PropertyType } from "@/types";
+import { handleApiError } from "@/utils/errorHandler";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1";
 
@@ -53,9 +54,9 @@ const propertyService = {
 
 export const createProperty = async (formData: FormData): Promise<PropertyType> => {
   // ✅ Log Property before sending
-  console.log("📦 FormData contents:");
+  logger.info("📦 FormData contents:");
   for (const [key, value] of formData) {
-    console.log(`${key}:`, value);
+    logger.info(`${key}:`, value);
   }
   const response = await axiosClient.post("/property/add", formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -63,45 +64,18 @@ export const createProperty = async (formData: FormData): Promise<PropertyType> 
   return response.data;
 };
 
-export const updateProperty = async (
-  id: string,
-  data: Partial<PropertyType>,
-  photos?: File[]
-): Promise<any> => {
+export const updateProperty = async (id: string, data: Partial<PropertyType>) => {
   try {
-    const formData = new FormData();
-
-    // 🧩 Append fields
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (Array.isArray(value)) {
-          // Convert arrays (e.g. features) to CSV
-          formData.append(key, value.join(","));
-        } else {
-          formData.append(key, value as any);
-        }
-      }
-    });
-
-    // 🖼️ Append new photos
-    if (photos && photos.length > 0) {
-      photos.forEach((file) => formData.append("images", file));
-    }
-
+    logger.info("📦 FormData contents: ", {data});
     const response = await axiosClient.put(
       `${API_BASE_URL}/property/update/${id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      data
     );
 
     return response.data;
   } catch (error: any) {
     logger.error("❌ Error updating property:", error.response?.data || error);
-    throw new Error(error.response?.data?.message || "Failed to update property");
+    handleApiError(error, "Failed to update settings");
   }
 }
 
@@ -120,11 +94,20 @@ export const updateProperty = async (
 export const getPropertyById = async (propertyId: string): Promise<PropertyType> => {
   const response = await axiosClient.get(`/property/${propertyId}`);
   logger.info(response.data);
+  const property = response.data.property;
+  const userDetails = response.data.userDetails;
   return {
-    ...response.data,
-    id: response.data._id,
-    longitude: response.data.map_location?.coordinates[0] || 0.0,
-    latitude: response.data.map_location?.coordinates[1] || 0.0,
+    ...property,
+    id: property._id,
+    user: {
+      username: property.user.username,
+      image: userDetails.image,
+      email: userDetails.email,
+      phone: userDetails.phone,
+      brand: userDetails.brand,
+    },
+    longitude: property.map_location?.coordinates[0] || 0.0,
+    latitude: property.map_location?.coordinates[1] || 0.0,
   };
 };
 
@@ -144,6 +127,29 @@ export const deleteUserProperty = async (propertyId: string) => {
   const response = await axiosClient.delete(`/property/delete/${propertyId}`);
   logger.info(response.data);
   return response.data
+};
+
+export const deletePropertyImage = async (property_id: string, image_url: string) => {
+  const response = await axiosClient.post(`/property/image/delete`, {
+    property_id, image_url
+  });
+  logger.info(response.data);
+  return response.data;
+};
+
+export const updatePropertyImage = async (propertyId: string, image: File, imageIndex?: string): Promise<{success: boolean, image: string}> => {
+  const formData = new FormData();
+  formData.append("image", image);
+  formData.append("property_id", propertyId);
+  formData.append("image_index", imageIndex? imageIndex : "");
+
+  const response = await axiosClient.put(
+    `/property/image/update`,
+    formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }); 
+  logger.info(`replace image response, ${response.data}`);
+  return response.data;
 };
 
 export default propertyService;

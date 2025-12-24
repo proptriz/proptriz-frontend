@@ -2,13 +2,9 @@
 
 import React, { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaAngleDown, FaRegBell } from "react-icons/fa6";
+import { FaAngleDown } from "react-icons/fa6";
 import dynamic from 'next/dynamic';
-import Link from "next/link";
-import { IoChevronBack } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { FaBullseye } from "react-icons/fa";
-import { mockProperties } from "@/constant";
 import { getPropertyById } from "@/services/propertyApi";
 import { PropertyType } from "@/types";
 import logger from "logger.config.mjs";
@@ -30,12 +26,10 @@ export default function PropertyMap({
   const [propLoc, setPropLoc] = useState<[number, number]>([0.0, 0.0]);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(13);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
-    if (!propertyId || property) return
-    setLoading(true);
+    if (!propertyId || property) return;
     const fetchProperty = async () => {
       try {
         const property = await getPropertyById(propertyId);
@@ -44,29 +38,16 @@ export default function PropertyMap({
           setPropLoc([property.latitude, property.longitude])
           logger.info("fetched property: ", property);
         } else {
-          setError('Failed to get property with ');
           logger.info("error fetching all property ");
         }
       } catch (error: any) {
-        setError('Failed to get property with ');
         logger.info("error fetching all property ");
-      } finally {
-        setLoading(false);
       }
       
     };
         
     fetchProperty()
   }, [propertyId]);
-
-  // Get user location
-  const fetchLocation = async () => {    
-    const [lat, lng] = await getUserPosition();
-    // logger.debug("User location:", lat, lng);
-    setMapCenter([lat, lng]);
-    setZoomLevel(13);
-  };
-    
     
   return (
     <div className="flex flex-col">
@@ -136,9 +117,9 @@ export default function PropertyMap({
         </div>
         {property && <div className="relative flex-1">
           <Map 
-          properties={[property]} 
-          mapCenter={propLoc || mapCenter}
-          initialZoom={zoomLevel}
+            properties={[property]} 
+            mapCenter={propLoc || mapCenter}
+            initialZoom={zoomLevel}
           />
         </div>}
       </div>

@@ -19,9 +19,6 @@ const NavigationTabs: React.FC<{setValue: (value: string) => void}> = ({ setValu
       setValue(selectedValue);
     }, [selectedValue, setValue]);
   
-    const handleSelection = (value: string) => {
-      setSelectedValue(value);
-    };
   return (
     <nav className="flex sm:justify-center gap-4 overflow-x-auto w-full">
       {tabs.map((tab, index) => (

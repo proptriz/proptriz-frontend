@@ -1,33 +1,24 @@
 import React from "react";
-import { FaHeart, FaStar } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import Image from "next/image";
+import formatPrice from "@/utils/formatPrice";
+import { PropertyProps } from "@/types";
 
-interface HorizontalCardProps {
-  id: string,
-  image: string; // URL of the property image
-  name: string; // Title of the property
-  rating: number; // Rating of the property
-  address: string; // Location of the property
-  price: number; // Price per month
-  category: string; // Property type (e.g., "Apartment")
-  period: string;
-  listed_for: string;
-}
-
-const HorizontalCard: React.FC<HorizontalCardProps> = ({
+const HorizontalCard: React.FC<PropertyProps> = ({
   id,
   image,
   name,
   rating,
   address,
   price,
+  currency,
   category,
   period,
   listed_for
 }) => {
   return (
-    <div className="flex items-center card-bg rounded-2xl shadow-md p-2 space-x-4 min-w-[70%] md:min-w-[40%] max-w-lg">
+    <div className="flex items-center card-bg rounded-2xl shadow-md p-2 space-x-4 min-w-[70%] md:min-w-[40%] max-w-lg" key={id}>
       {/* Image Section */}
       <div className="relative w-32 h-32 rounded-lg overflow-hidden">
         <img
@@ -56,7 +47,7 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
           <HiOutlineLocationMarker />
           <span>{address}</span>
         </div>
-        <div className="text-primary font-bold mt-2">${price} {period}</div>
+        <div className="text-primary font-bold mt-2">{currency}{formatPrice(price)} {period}</div>
       </div>
     </div>
   );
@@ -71,9 +62,10 @@ export const HorizontalCard2 = ({
     rating,
     address,
     price,
+    currency,
     category,
     period
-  }: HorizontalCardProps)=>{
+  }: PropertyProps)=>{
     return(
         <div className="grid grid-cols-2 min-w-[70%] md:min-w-[40%] space-x-3 bg-[#DCDFD9] p-2 rounded-lg shadow-md items-center" >
             <Image
@@ -100,7 +92,7 @@ export const HorizontalCard2 = ({
                     />
                     <p className="text-gray-500 text-sm">{address}</p>
                 </div>
-                <p className="text-blue-600 font-bold mt-5 text-sm">N{price}/{period}</p>
+                <p className="text-blue-600 font-bold mt-5 text-sm">{currency}{formatPrice(price)} {period}</p>
             </div>
         </div>
     )

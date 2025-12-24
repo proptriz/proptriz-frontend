@@ -1,5 +1,4 @@
 import React, { SetStateAction } from 'react';
-import { FaChevronDown } from 'react-icons/fa6';
 
 interface PopupProps {
   children: React.ReactNode;

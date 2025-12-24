@@ -4,13 +4,34 @@ import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import AppContextProvider from "../context/AppContextProvider";
 import { ToastContainer } from "react-toastify";
+import Script from 'next/script';
 
 const lato = Lato({ weight: '400', subsets: ['latin'], display: 'swap' });
 
-export const metadata: Metadata = {
-  title: "Proptriz Hub",
-  description: "Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Proptriz Hub',
+    description: 'Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.',
+    metadataBase: new URL('https://proptriz.netlify.app'),
+    alternates: { canonical: 'https://proptriz-test.netlify.app'},
+    openGraph: {
+      title: 'Proptriz Hub',
+      description: 'Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.',
+      url: 'https://proptriz.netlify.app',
+      siteName: 'Proptriz Hub',
+      type: 'website',
+      locale: 'en_US',
+      images: [
+        {
+          url: '/logo.png',
+          width: 1200,
+          height: 630,
+          alt: 'Proptriz Logo',
+        },
+      ],
+    }
+  };
+}
 
 export default function RootLayout({
   children,
@@ -25,49 +46,44 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
         <meta charSet="utf-8" />
-        <title>Proptriz</title>
-        <base href="/" />
+        <title>Proptriz Hub</title>
         <meta
           property="og:title"
           content="Proptriz Hub, Connecting you with trusted properties"
         />
         <meta property="og:type" content="website" />
-        {/* <meta property="og:url" content="https://mapofpi.concretecode.ch" /> */}
-        {/* <meta
-          property="og:image"
-          content="https://mapofpi.concretecode.ch/assets/images/logo.svg"
-        /> */}
+        <meta property="og:url" content="https://proptriz.netlify.app" />
         <meta
           name="description"
           content="Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities."
-        />
+         />
         <meta name="keywords" content="property, properties, rent, sale, pi, land, apartment, real estate" />
         <meta name="author" content="Proptriz Team" />
         <meta
           httpEquiv="Content-Security-Policy"
           content="font-src 'self' https://cdnjs.cloudflare.com/ajax/libs/font-awesome/https://fonts.gstatic.com/;"
         />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
+        {/* Google tag (gtag.js) using Next.js Script */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-0T7BSEVRN9"
+          strategy="afterInteractive"
         />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
-        <link
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          rel="stylesheet"
-        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-0T7BSEVRN9');
+          `}
+        </Script>
+
+        {/* Favicons */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/site.webmanifest" />
+
         <link
           rel="stylesheet"
           href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
@@ -76,18 +92,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
         />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SVNC88Q13K"></script>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-SVNC88Q13K');
-          `,
-        }} />
         <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet"

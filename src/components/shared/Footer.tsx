@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import { FaRegUser, FaMapMarkerAlt } from "react-icons/fa";
-import { FiHome, FiHeart, FiSearch } from "react-icons/fi";
+import { FiHome, FiHeart } from "react-icons/fi";
 
 import { usePathname } from "next/navigation";
 

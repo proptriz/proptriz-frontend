@@ -8,7 +8,7 @@ export interface IUser {
   _id: string;
   username: string; // unique identifyer
   pi_uid: string; // hashed user password
-  fullname?: string; // User Legal Name (e.g. Tony Adeola Ezenwa) (optional)
+  brand?: string; // User Legal Name (e.g. Tony Adeola Ezenwa) (optional)
   image?: string; // URL to user profile pics (optional)
   email?: string; // for notification
   phone?: string; // user phone number (optional)
@@ -34,7 +34,8 @@ export interface PropertyProps {
   rating: number; // Rating of the property
   address: string; // Location of the property
   price: number; // Price per month
-  category: string; // Property type (e.g., "Apartment")
+  currency: CurrencyEnum;
+  category: CategoryEnum; // Property type (e.g., "Apartment")
   period: string;
   listed_for: string;
 }
@@ -66,6 +67,17 @@ export interface UserType {
   created_at: Date; // (auto)
 };
 
+export interface UserSettingsType {
+  _id?: string;
+  username: string; // 
+  brand?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
+  image?: string; // URL to user profile pics (optional)
+  email?: string; // for notification    
+  phone?: string; // URLs of reviewer upload (optional)
+  whatsapp?: string; // User whatsapp number
+  social_handles?: {platform: string; handle: string}[]; // e.g [{platform: 'facebook', handle: 'fb.com/username'}]
+};
+
 export enum CurrencyEnum {
   naira = "NGN",
   dollars="USD",
@@ -92,12 +104,20 @@ export enum RenewalEnum {
   monthly = "monthly",
   yearly = "yearly",
   daily = "daily",
-  weekely = "weekely"
+  weekely = "weekly"
 }
 
 export enum NegotiableEnum {
   Negotiable = "negotiable",
   NonNegotiable = "Non-negotiable",
+}
+
+export enum PropertyStatusEnum {
+  available = "available",
+  sold = "sold",
+  rented = "rented",
+  unavailable = "unavailable",
+  expired = "expired",
 }
 
 export interface PropertyType {
@@ -107,6 +127,7 @@ export interface PropertyType {
   slug: string;
   address: string; // Location of the property
   price: number; // Price per month
+  currency: CurrencyEnum; // Currency type (e.g. NGN, USD, GBP)
   listed_for: string; // (e.g. "sell"/ "rent")
   category: CategoryEnum; // The class of property (e.g. house, land, shop, office, hotel )
   period?: RenewalEnum; // if is for rent, payment period (e.g monthly, yearly, daily)
@@ -122,9 +143,9 @@ export interface PropertyType {
   }[];
   env_facilities?: string[];
   rating?: number;
-  status: string; // (available, sold, unavailable, rented)
-  created_at: Date;
-  updated_at: Date;
+  status: PropertyStatusEnum; // (available, sold, unavailable, rented)
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export interface Feature {

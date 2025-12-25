@@ -1,16 +1,12 @@
 
 "use client";
-import React, { SetStateAction, useEffect, useMemo, useState } from 'react';
+import React, { SetStateAction, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { PropertyType } from '@/types'
-import Link from 'next/link';
 import debounce from "lodash.debounce";
-import { LuPi } from 'react-icons/lu';
-import formatPrice from '@/utils/formatPrice';
-import Image from 'next/image';
 import MapMarkerPopup from './MapMarkerPopup';
 
 const propertyIcon = L.icon({
@@ -111,20 +107,16 @@ const Map: React.FC<MapProps> = ({
   properties, 
   mapCenter,
   initialZoom = 13,
-  mapBounds = null,
   setMapBounds  = () => {},
-  searchLabel="Search properties..."
 }) => {
 
-  // const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
-
   return (
-    <div className="relative h-full w-full" style={{ minHeight: 400, height: '100%', overflow: 'hidden' }}>
+    <div className="absolute h-full w-full z-0" style={{ minHeight: 400, height: '100%', overflow: 'hidden' }}>
       
       {/* Map Container */}
       <MapContainer
         zoomControl={false}
-        className="w-full flex-1 fixed bottom-0 h-[calc(100vh-80.19px)] left-0 right-0 z-[0]"
+        className="w-full flex-1 fixed bottom-0 h-full left-0 right-0"
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

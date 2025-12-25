@@ -64,18 +64,25 @@ export const createProperty = async (formData: FormData): Promise<PropertyType> 
   return response.data;
 };
 
-export const updateProperty = async (id: string, data: Partial<PropertyType>) => {
+export const updateProperty = async (id: string, data: Partial<PropertyType>): Promise<PropertyType | undefined> => {
   try {
     logger.info("📦 FormData contents: ", {data});
     const response = await axiosClient.put(
       `${API_BASE_URL}/property/update/${id}`,
       data
     );
+    const property = response.data;
 
-    return response.data;
+    return {
+    ...property,
+    id: property._id,
+    longitude: property.map_location?.coordinates[0],
+    latitude: property.map_location?.coordinates[1]
+  };
   } catch (error: any) {
     logger.error("❌ Error updating property:", error.response?.data || error);
     handleApiError(error, "Failed to update settings");
+    return undefined;
   }
 }
 

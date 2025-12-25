@@ -137,7 +137,7 @@ export const ContactActions = ({
           key={key}
           href={href}
           aria-label={label}
-          className="p-2 rounded-lg hover:bg-gray-200 transition"
+          className="p-2 rounded-lg hover:bg-gray-200 transition caese-in-out card-bg"
         >
           <Icon className="text-2xl hover:scale-110 transition-transform" />
         </a>

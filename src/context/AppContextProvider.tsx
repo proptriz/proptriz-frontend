@@ -24,7 +24,6 @@ interface IAppContextProps {
   isSigningInUser: boolean;
   reload: boolean;
   alertMessage: string | null;
-  setAlertMessage: React.Dispatch<SetStateAction<string | null>>;
   showAlert: (message: string) => void;
   setReload: React.Dispatch<SetStateAction<boolean>>;
 }
@@ -46,7 +45,6 @@ const initialState: IAppContextProps = {
   isSigningInUser: false,
   reload: false,
   alertMessage: null,
-  setAlertMessage: () => {},
   showAlert: () => {},
   setReload: () => {},
 };
@@ -63,9 +61,8 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [isSigningInUser, setIsSigningInUser] = useState(false);
   const [reload, setReload] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [adsSupported, setAdsSupported] = useState<boolean>(false);
 
-    const piSdkLoaded = useRef(false);
+  const piSdkLoaded = useRef(false);
 
   const showAlert = (message: string) => {
     setAlertMessage(message);
@@ -193,19 +190,13 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
     if (authUser) return;
     
     // attempt to load and initialize Pi SDK in parallel
-    ensurePiSdkLoaded()
-      .then(Pi => {
-        Pi.nativeFeaturesList().then((features: string | string[]) => {
-          setAdsSupported(features.includes("ad_network"));
-        })
-      })
-      .catch(err => logger.error('Pi SDK load/ init error:', err));
+    ensurePiSdkLoaded().catch(err => logger.error('Pi SDK load/ init error:', err));
 
     authenticateUser();
   }, [authUser]);
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, setAlertMessage }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage }}>
       {children}
     </AppContext.Provider>
   );

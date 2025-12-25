@@ -51,10 +51,7 @@ export default function EditPropertyPage({
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [showCurrencyPopup, setShowCurrencyPopup] = useState(false);
-  const [showStatusPopup, setShowStatusPopup] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Form Data State
   const [property, setProperty] = useState<PropertyType | null>(null);
@@ -150,7 +147,8 @@ export default function EditPropertyPage({
         longitude: propCoordinates?.[1],
         features,
         env_facilities: facilities,
-        period: formData.listed_for === ListForEnum.rent ? formData.period : undefined
+        period: formData.listed_for === ListForEnum.rent ? formData.period : undefined,
+        user: undefined // prevent updating user field
       };
 
       const updatedProperty = await updateProperty(propertyId, updatedData);

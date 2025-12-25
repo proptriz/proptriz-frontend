@@ -225,7 +225,7 @@ const PropertyDetail = ({
             </div>
 
             {/* Reviews */}
-            <Link href={'/property/reviews'}>
+            <Link href={`/property/reviews/${property.id}`}>
               <div className="px-5 mt-10">
                 <h2 className="text-lg font-bold mb-3">Reviews</h2>
                 <div className="bg-primary p-3 rounded-lg flex items-center">

@@ -84,17 +84,17 @@ export default function ProfileTransaction () {
 return (
   <>
   <div className="p-6 pb-24 relative">
-    <div className="flex items-center justify-between mb-5">
+    <div className="flex items-center justify-between">
       <BackButton />            
       <h1 className="text-2xl font-bold 2xl">Profile</h1>
-      <button className="top-5 left-5 p-4 text-xl card-bg rounded-full shadow-md" 
+      <button className="top-5 left-5 px-4 py-4 text-xl rounded-full" 
       onClick={()=>setShowSettingsMenu(!showSettingsMenu)}>
         <IoSettingsOutline />
       </button> 
                 
     </div>
             
-    <div className="mb-6 text-center">
+    <div className="mb-4 text-center">
       <div className="flex flex-col items-center mb-2">
         <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
           <Image
@@ -115,7 +115,7 @@ return (
       <p className="text-gray-500 mb-3">{userSettings?.email}</p>
 
       {/* Count Status */}
-      <div className="grid grid-cols-3 space-x-6 text-center mb-5">
+      <div className="grid grid-cols-3 space-x-6 text-center mb-2">
         <div className={statusCountStyle}>
             <p className="font-bold">{agent.rating}</p>
             <p className="text-gray-500 ">Rating</p>
@@ -134,7 +134,7 @@ return (
     </div>
 
     {/* List or Sold Toggle button */}
-    <div className="flex bg-gray-200 rounded-full shadow-lg text-white mb-7 p-4 space-x-4">
+    <div className="flex bg-gray-200 rounded-full shadow-lg text-white mb-2 p-4 space-x-4">
       <button className={`w-full py-1 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Listings'? 'bg-white text-[#61AF74]' : '' }`}
         onClick={()=>setListOrSold('Listings')}
       >
@@ -154,14 +154,16 @@ return (
 
     {/* Card List  */}
     <section>
-      <div className="flex items-center">
+      <div className="flex items-center justify-between m-4">
         <p className="text-lg mb-4 font-[Raleway]">
-          <span className="font-bold">
+          <span className="font-bold mr-1">
             {listedProperties.length}
           </span> 
           {listOrSold}
         </p>
-        <button className="px-5 py-3 mb-6 rounded-full ml-auto bg-[#234F68] text-white">+</button>
+        {listOrSold==='Listings' && (<Link href="/property/add">
+          <button className="w-10 h-10 rounded-full bg-primary text-white text-2xl">+</button>
+        </Link>)}
       </div>
     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {listedProperties.map((item: any) => (

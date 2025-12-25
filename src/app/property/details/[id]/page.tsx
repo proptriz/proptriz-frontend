@@ -116,7 +116,7 @@ const PropertyDetail = ({
                 alt="Property image"
                 width={1000}
                 height={700}
-                className="w-full h-[400px] object-cover rounded-b-xl"
+                className="w-full h-[400px] object-cover rounded-b-lg"
               /> 
 
               <button
@@ -156,7 +156,6 @@ const PropertyDetail = ({
                 </div>
               </div>
             </div>
-
 
             {/* Title & Price */}
             <div className="p-5">

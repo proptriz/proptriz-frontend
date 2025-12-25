@@ -20,11 +20,14 @@ const NavigationTabs: React.FC<{setValue: (value: string) => void}> = ({ setValu
     }, [selectedValue, setValue]);
   
   return (
-    <nav className="flex sm:justify-center gap-4 overflow-x-auto w-full">
+    <nav 
+    className="flex justify-between gap-3 overflow-x-auto scroll-hide w-full"
+    style={{msOverflowStyle: "none", scrollbarWidth: "none"} as React.CSSProperties}
+    >
       {tabs.map((tab, index) => (
         <button
           key={index}
-          className={`flex items-center px-4 py-2 rounded-lg ${
+          className={`flex items-center px-2 py-1 rounded-lg ${
             selectedValue === tab.value ? "bg-primary text-secondary" : "bg-gray-100"
           }`}
           onClick={()=>setSelectedValue(tab.value)}

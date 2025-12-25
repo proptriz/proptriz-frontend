@@ -116,7 +116,7 @@ const PropertyDetail = ({
                 alt="Property image"
                 width={1000}
                 height={700}
-                className="w-full h-[400px] object-cover rounded-b-xl"
+                className="w-full h-[400px] object-cover rounded-b-lg"
               /> 
 
               <button
@@ -156,7 +156,6 @@ const PropertyDetail = ({
                 </div>
               </div>
             </div>
-
 
             {/* Title & Price */}
             <div className="p-5">
@@ -226,7 +225,7 @@ const PropertyDetail = ({
             </div>
 
             {/* Reviews */}
-            <Link href={'/property/reviews'}>
+            <Link href={`/property/reviews/${property.id}`}>
               <div className="px-5 mt-10">
                 <h2 className="text-lg font-bold mb-3">Reviews</h2>
                 <div className="bg-primary p-3 rounded-lg flex items-center">

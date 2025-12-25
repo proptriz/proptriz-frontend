@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import dynamic from 'next/dynamic';
-import Link from "next/link";
 import Image from "next/image";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
@@ -34,8 +33,8 @@ export default function ExplorePage() {
   };
 
   useEffect(() => {
-    // sessionStorage.removeItem('prevMapCenter');
-    // sessionStorage.removeItem('prevMapZoom');
+    sessionStorage.removeItem('prevMapCenter');
+    sessionStorage.removeItem('prevMapZoom');
     fetchLocation();
 
   }, [authUser]);
@@ -94,31 +93,28 @@ export default function ExplorePage() {
     <div className="flex flex-col w-full h-screen">
         {/* Header */}
         <Header />
-        <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
-          <SearchBar setQuery={setSearchQuery} onSearch={fetchProperties} />
-          <NavigationTabs setValue={setFilterBy}/>
-        </div>
 
         {/* Map Section */}
         <div className="relative flex-1">
+          <div className="relative top-0 z-10 lg:flex px-6 space-y-4 lg:space-y-0 lg:space-x-3 w-full lg:items-center justify-center pt-4 lg:pt-6 pb-2 bg-transparent">
+            <SearchBar setQuery={setSearchQuery} onSearch={fetchProperties} />
+            <NavigationTabs setValue={setFilterBy}/>
+          </div>
           <Map 
             properties={properties} 
             mapCenter={mapCenter} 
             initialZoom={zoomLevel}
             mapBounds={mapBounds}
             setMapBounds={setMapBounds} 
-          />        
-        </div>
-
-        <div className="absolute bottom-12 z-10 right-0 left-0 m-auto pointer-events-none">
-          <div className="w-[90%] lg:w-full lg:px-6 mx-auto flex items-center justify-between">
+          />  
+          <div className="fixed bottom-12 right-0 left-0 m-auto pointer-events-none">
+          <div className="w-full px-6 mx-auto flex items-center justify-between mb-7">
             {/* Add Agent Button */}
             <div className="">
             </div>
             {/* Location Button */}
-            <div >
               <button
-                className="bg-primary mx-auto"
+                className="bg-primary ms-auto z-10 pointer-events-auto p-2 shadow-lg hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 style={{
                   borderRadius: '50%',
                   width: '55px',
@@ -136,10 +132,12 @@ export default function ExplorePage() {
                   alt="my location"
                 />
               </button>
-            </div>
           </div>
         </div>
+      
+        </div>
 
+        
         {/* Footer Navigation */}
         <Footer />
     </div>

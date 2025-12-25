@@ -26,7 +26,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setQuery, onSearch }) => {
 
   return (
     <>
-      <div className="relative w-full md:max-w-[75%] lg:max-w-[50%] mx-auto lg:ml-0">
+      <div className="w-full md:max-w-[75%] lg:max-w-[50%] mx-auto lg:ml-0 relative">
         <div className="flex mx-auto">
           <div className="flex bg-white rounded-l-full shadow-md p-2 w-full">
             <input

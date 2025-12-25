@@ -51,10 +51,7 @@ export default function EditPropertyPage({
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [showCurrencyPopup, setShowCurrencyPopup] = useState(false);
-  const [showStatusPopup, setShowStatusPopup] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Form Data State
   const [property, setProperty] = useState<PropertyType | null>(null);
@@ -144,13 +141,14 @@ export default function EditPropertyPage({
     try {
       const updatedData: Partial<PropertyType> = {
         ...formData,
-        currency,
         negotiable: negotiable === NegotiableEnum.Negotiable,
         latitude: propCoordinates?.[0],
         longitude: propCoordinates?.[1],
-        features,
         env_facilities: facilities,
-        period: formData.listed_for === ListForEnum.rent ? formData.period : undefined
+        period: formData.listed_for === ListForEnum.rent ? formData.period : undefined,
+        currency,
+        features,
+        user: undefined // prevent updating user field
       };
 
       const updatedProperty = await updateProperty(propertyId, updatedData);
@@ -179,7 +177,8 @@ export default function EditPropertyPage({
     propCoordinates,
     features,
     facilities,
-    propertyId
+    propertyId,
+    currency
   ]);
 
   // Render states
@@ -248,9 +247,11 @@ export default function EditPropertyPage({
                   type="number"
                   name="price"
                   value={formData.price || ""}
-                  onChange={(e) => updateForm("price", Number(e.target.value))}
+                  onChange={(e) => updateForm("price", e.target.value ? Number(e.target.value) : 0)}
                   className="w-full outline-none card-bg"
                   placeholder="Enter price"
+                  min="1"
+                  step="1"
                 />
 
                 <button
@@ -361,9 +362,9 @@ export default function EditPropertyPage({
         <div className="my-3">
           {Object.entries(CurrencyEnum).map(([key, value]) => (
             <button
-              key={value}
+              key={key}
               onClick={() => {
-                updateForm("currency", value);
+                setCurrency(value);
                 setShowCurrencyPopup(false);
               }}
               className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition"

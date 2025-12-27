@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import SearchBar from "@/components/shared/SearchBar";
-import { useRouter } from "next/navigation";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import propertyService from "@/services/propertyApi";
 import { PropertyType } from "@/types";
-import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../../../logger.config.mjs"
 import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";
@@ -62,7 +60,7 @@ export default function PropertyListPage() {
       <Header />
 
       <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
-        <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
+        <SearchBar value={searchQuery} onChange={setSearchQuery} onSearch={fetchProperties} />
         <NavigationTabs setValue={setFilterBy}/>
       </div>
 

@@ -58,65 +58,65 @@ const AllReviewsPage = () => {
       <h2 className="text-lg font-bold mb-3">User Reviews</h2>
                 
       <div className="space-y-6 max-h-[500px] overflow-y-auto">
-      {/* Review Item */}
-      <div className="border border-[#DCDFD9] rounded-2xl">
-        <div className="p-3 rounded-lg flex items-center h-16">
-          <Image 
-            src={'/home/building1.png'}
-            width={50} 
-            height={50} 
-            className="rounded-lg" 
-            alt={'property'}
-          />
-          <div className="ml-2 space-y-1"> 
-            <p className="font-bold">Fairview Apartment</p>                                
-            <div  className="flex items-center">
-              <span className="font-bold mr-2">4.9</span>
-              <HiOutlineLocationMarker />
-              <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
+        {/* Review Item */}
+        <div className="border border-[#DCDFD9] rounded-2xl">
+          <div className="p-3 rounded-lg flex items-center h-16">
+            <Image 
+              src={'/home/building1.png'}
+              width={50} 
+              height={50} 
+              className="rounded-lg" 
+              alt={'property'}
+            />
+            <div className="ml-2 space-y-1"> 
+              <p className="font-bold">Fairview Apartment</p>                                
+              <div  className="flex items-center">
+                <span className="font-bold mr-2">4.9</span>
+                <HiOutlineLocationMarker />
+                <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <ReviewCard
-          id='01' 
-          reviewer="Kurt Mullins" 
-          image="/avatar.png" 
-          ratings={4.0}
-          text="Lorem ipsum dolor sit amet, consectetur 
-          adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-          reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
-        />
-      </div>
-      <div className="border border-[#DCDFD9] rounded-2xl">
-        <div className="p-3 rounded-lg flex items-center h-16">
-          <Image 
-            src={'/home/building1.png'} 
-            width={50} 
-            height={50} 
-            className="rounded-lg" 
-            alt={'property'}
+          <ReviewCard
+            id='01' 
+            reviewer="Kurt Mullins" 
+            image="/avatar.png" 
+            ratings={4.0}
+            text="Lorem ipsum dolor sit amet, consectetur 
+            adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
           />
-          <div className="ml-2 space-y-1"> 
-            <p className="font-bold">Fairview Apartment</p>                                
-            <div  className="flex items-center">
-              <span className="font-bold mr-2">4.9</span>
-              <HiOutlineLocationMarker />
-              <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
+        </div>
+        <div className="border border-[#DCDFD9] rounded-2xl">
+          <div className="p-3 rounded-lg flex items-center h-16">
+            <Image 
+              src={'/home/building1.png'} 
+              width={50} 
+              height={50} 
+              className="rounded-lg" 
+              alt={'property'}
+            />
+            <div className="ml-2 space-y-1"> 
+              <p className="font-bold">Fairview Apartment</p>                                
+              <div  className="flex items-center">
+                <span className="font-bold mr-2">4.9</span>
+                <HiOutlineLocationMarker />
+                <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <ReviewCard 
-          id='02'
-          reviewer="Kurt Mullins" 
-          image="/avatar.png" 
-          ratings={4.0}
-          text="Lorem ipsum dolor sit amet, consectetur 
-          adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-          reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
-        />
-      </div>
+          <ReviewCard 
+            id='02'
+            reviewer="Kurt Mullins" 
+            image="/avatar.png" 
+            ratings={4.0}
+            text="Lorem ipsum dolor sit amet, consectetur 
+            adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
+          />
+        </div>
 
       {/* Add more reviews here */}
       </div>

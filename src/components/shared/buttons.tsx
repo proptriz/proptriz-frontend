@@ -19,7 +19,8 @@ interface SubmitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
   variant?: "primary" | "outline" | "ghost" | "toggle";
   active?: boolean;
   fullWidth?: boolean;
-  isLoading:boolean
+  isLoading: boolean;
+  title?: string;
 }
 export const SubmitButton:React.FC<SubmitButtonProps> = ({
   variant = "primary",
@@ -27,6 +28,7 @@ export const SubmitButton:React.FC<SubmitButtonProps> = ({
   fullWidth = false,
   isLoading=false,
   className,
+  title="Submit",
   ...props
 })=> {
   const router = useRouter();
@@ -35,13 +37,13 @@ export const SubmitButton:React.FC<SubmitButtonProps> = ({
     <button
     type="submit"
     {...props}
-    className="bg-green-600 text-white p-2 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+    className="bg-primary text-white p-2 rounded-md text-lg outline-none hover:outline-secondary focus:outline-none focus:ring-2 focus:outline-secondary"
     >
       {isLoading ? 
       <span className='flex items-center justify-center'>
         <ImSpinner2 className="animate-spin mr-2 ml-1" /> {/* Spinner Icon */}
           Login...
-      </span> : "Login"
+      </span> : title
       }
     </button>
   )

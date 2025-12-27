@@ -196,14 +196,14 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
       const isDev = process.env.NODE_ENV === "development";
 
       // 🚨 Production protection
-      if (!isDev && !inPiBrowser) {
+      if (!isDev && !Pi.isPiBrowser) {
         setLoginStage("try-pi-browser");
         logger.warn("User not in Pi Browser (production)");
         return false;
       }
 
       // 🧪 Development warning (but allow)
-      if (isDev && !inPiBrowser) {
+      if (isDev && !Pi.isPiBrowser) {
         logger.warn("Development mode: not in Pi Browser");
       }
 

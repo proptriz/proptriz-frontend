@@ -14,15 +14,15 @@ import logger from '../../logger.config.mjs';
 import { AuthResult } from '@/config/pi';
 import { onIncompletePaymentFound } from '@/config/payment';
 
-type PiLoginStage =
-  | "idle"
-  | "loading-sdk"
-  | "authenticating"
-  | "waiting-user"
-  | "try-pi-browser"
-  | "verifying-backend"
-  | "success"
-  | "error";
+export type PiLoginStage =
+  | ""
+  | "auto_login"
+  | "pi_sdk_loading"
+  | "pi_authenticating"
+  | "backend_authenticating"
+  | "authenticated"
+  | "timeout"
+  | "failed";
 
 const MAX_LOGIN_RETRIES = 3;
 const BASE_DELAY_MS = 5000; // 5s → 15s → 45s
@@ -94,30 +94,27 @@ const loadPiSdk = (timeoutMs = 1000): Promise<typeof window.Pi> => {
   return piSdkPromise;
 };
 
-const authenticateWithTimeout = <T,>(
+const withTimeout = <T,>(
   promise: Promise<T>,
   timeoutMs: number
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Error("Authentication timeout"));
+      reject(new Error("PI_AUTH_TIMEOUT"));
     }, timeoutMs);
 
     promise
-      .then((res) => {
+      .then(result => {
         clearTimeout(timer);
-        resolve(res);
+        resolve(result);
       })
-      .catch((err) => {
+      .catch(err => {
         clearTimeout(timer);
         reject(err);
       });
   });
 };
 
-const isPiBrowser = (Pi: any): boolean => {
-  return typeof Pi?.isPiBrowser === "function" && Pi.isPiBrowser();
-};
 
 const initialState: IAppContextProps = {
   authUser: null,
@@ -128,7 +125,7 @@ const initialState: IAppContextProps = {
   alertMessage: null,
   showAlert: () => {},
   setReload: () => {},
-  loginStage: "idle",
+  loginStage: "",
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -143,7 +140,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [isSigningInUser, setIsSigningInUser] = useState(false);
   const [reload, setReload] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [loginStage, setLoginStage] = useState<PiLoginStage>("idle");
+  const [loginStage, setLoginStage] = useState<PiLoginStage>("");
 
   const piSdkLoaded = useRef(false);
 
@@ -154,21 +151,29 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
     }, 5000);
   };
 
+  const loadPiSdk = (): Promise<typeof window.Pi> => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://sdk.minepi.com/pi-sdk.js';
+      script.async = true;
+      script.onload = () => resolve(window.Pi);
+      script.onerror = () => reject(new Error('Failed to load Pi SDK'));
+      document.head.appendChild(script);
+    });
+  };
+
   const ensurePiSdkLoaded = async () => {
-    if (piSdkLoaded.current && window.Pi) {
+    if (piSdkLoaded.current) {
       return window.Pi;
     }
-
-    logger.info("Loading Pi SDK...");
+    
     const Pi = await loadPiSdk();
+    piSdkLoaded.current = true;
 
     Pi.init({
-      version: "2.0",
-      sandbox: process.env.NODE_ENV === "development",
+      version: '2.0',
+      sandbox: process.env.NODE_ENV === 'development'
     });
-
-    piSdkLoaded.current = true;
-    logger.info("Pi SDK initialized");
 
     return Pi;
   };
@@ -176,9 +181,12 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   /* Login helper functions */
   const autoLoginProcess = async (): Promise<boolean> => {
     try {
+      setLoginStage("auto_login");
+
       const res = await axiosClient.get("/users/me");
       if (res.status === 200) {
         setAuthUser(res.data.user);
+        setLoginStage("authenticated");
         return true;
       }
       return false;
@@ -187,106 +195,89 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
     }
   };
 
+
+  const PI_AUTH_TIMEOUT_MS = 30_000; // 30 seconds
+
   const piSdkLoginProcess = async (): Promise<boolean> => {
     try {
-      setLoginStage("loading-sdk");
+      setLoginStage("pi_sdk_loading");
       const Pi = await ensurePiSdkLoaded();
 
-      const inPiBrowser = isPiBrowser(Pi);
-      const isDev = process.env.NODE_ENV === "development";
+      setLoginStage("pi_authenticating");
 
-      // 🚨 Production protection
-      if (!isDev && !Pi.isPiBrowser) {
-        setLoginStage("try-pi-browser");
-        logger.warn("User not in Pi Browser (production)");
-        return false;
-      }
-
-      // 🧪 Development warning (but allow)
-      if (isDev && !Pi.isPiBrowser) {
-        logger.warn("Development mode: not in Pi Browser");
-      }
-
-      setLoginStage("authenticating");
-
-      const pioneerAuth: AuthResult = await authenticateWithTimeout(
+      const pioneerAuth: AuthResult = await withTimeout(
         Pi.authenticate(
           ["username", "payments", "wallet_address"],
           onIncompletePaymentFound
         ),
-        10000
+        PI_AUTH_TIMEOUT_MS
       );
 
-      if (!pioneerAuth?.accessToken) {
-        throw new Error("Pi authentication returned no access token");
-      }
-
-      setLoginStage("verifying-backend");
+      setLoginStage("backend_authenticating");
 
       const res = await axiosClient.post(
         "/users/authenticate",
         {},
-        { headers: { Authorization: `Bearer ${pioneerAuth.accessToken}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${pioneerAuth.accessToken}`,
+          },
+        }
       );
 
-      setAuthToken(res.data.token);
+      setAuthToken(res.data?.token);
       setAuthUser(res.data.user);
-      setLoginStage("success");
+      setLoginStage("authenticated");
 
       return true;
-    } catch (error) {
-      logger.error("Pi login failed:", error);
-      setLoginStage("error");
+    } catch (error: any) {
+      if (error?.message === "PI_AUTH_TIMEOUT") {
+        logger.error("Pi authentication timed out.");
+        setLoginStage("timeout");
+        throw error; // ONLY hard throw
+      }
 
-      if (isHardFail(error)) throw error;
+      logger.warn("Soft Pi SDK login failure:", error);
       return false;
     }
   };
-
-
 
   /* Attempt Auto Login (fallback to Pi auth) */
   const authenticateUser = async () => {
     if (isSigningInUser) return;
 
     setIsSigningInUser(true);
+    setLoginStage("");
 
     try {
-      // Process #1 : Attempt Auto-Login
       const autoLoggedIn = await autoLoginProcess();
       if (autoLoggedIn) {
         logger.info("Auto-login successful.");
         return;
       }
 
-      // Process #2 : Fallback to Pi SDK login and registration
       for (let attempt = 0; attempt < MAX_LOGIN_RETRIES; attempt++) {
         try {
-          logger.info(`Pi SDK login attempt ${attempt + 1}...`);
-
           const sdkLoggedIn = await piSdkLoginProcess();
           if (sdkLoggedIn) {
             logger.info("Pi SDK login successful.");
             return;
           }
         } catch (error: any) {
-          if (isHardFail(error)) {
-            logger.warn("401/403 Hard login failure. Stopping retries.");
+          if (error?.message === "PI_AUTH_TIMEOUT") {
+            logger.error("Stopping retries due to Pi timeout.");
             throw error;
           }
-          logger.warn(`Soft failure on attempt ${attempt + 1}:`, error);
+
+          logger.warn(`Soft failure on attempt ${attempt + 1}`, error);
         }
-        
-        // Process #3. Continue retry logic for 'soft failures'
-        // exponential backoff + jitter
+
         const backoff = BASE_DELAY_MS * Math.pow(3, attempt);
         const jitter = Math.random() * 1000;
-        const delay = backoff + jitter;
-        logger.info(`Retrying login in ${Math.round(delay)}ms...`);
-        await sleep(delay);
+        await sleep(backoff + jitter);
       }
-      // if we reach here, all attempts failed
-      logger.error("Max retries reached. Stopping retries.");
+
+      setLoginStage("failed");
       throw new Error("Login retries exhausted");
     } finally {
       setIsSigningInUser(false);

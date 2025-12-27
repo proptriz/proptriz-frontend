@@ -62,7 +62,7 @@ export default function PropertyListPage() {
       <Header />
 
       <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
-        <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
+        <SearchBar value={searchQuery} onChange={setSearchQuery} onSearch={fetchProperties} />
         <NavigationTabs setValue={setFilterBy}/>
       </div>
 

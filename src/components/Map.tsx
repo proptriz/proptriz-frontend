@@ -72,11 +72,11 @@ const MapBoundsUpdater: React.FC<MapBoundsUpdaterProps> = ({ onBoundsChange }) =
 
         const bounds = map.getBounds();
         onBoundsChange(bounds);
-      }, 500),
+      }, 2000),
     [map, onBoundsChange]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     // listen to map events
     map.on("moveend", debouncedUpdateBounds);
     map.on("zoomend", debouncedUpdateBounds);

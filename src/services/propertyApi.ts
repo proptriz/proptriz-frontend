@@ -31,8 +31,8 @@ const propertyService = {
   // },
 
   // Fetch All Properties with Filters
-  getAllProperties: async (filters: any = {}) => {
-    return handleRequest(axiosClient.get(`${API_BASE_URL}/property/all?${filters}`));
+  getAllProperties: async (filters: any = {}, config?: { signal?: AbortSignal }) => {
+    return handleRequest(axiosClient.get(`${API_BASE_URL}/property/all?${filters}`, config));
   },
 
   // Fetch All Properties with Filters

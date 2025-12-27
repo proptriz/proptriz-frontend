@@ -59,7 +59,11 @@ export default function RootPage() {
       {/* Header */}
       <Header />
       <div className="px-6 py-3">
-        <SearchBar setQuery={setSearchQuery} onSearch={fetchProperties} />
+        <SearchBar 
+          value={searchQuery}
+          onChange={setSearchQuery}
+          onSearch={fetchProperties}
+         />
       </div>
       
       {/* Navigation Tabs */}

@@ -4,14 +4,28 @@ import { AppContext } from "@/context/AppContextProvider";
 import { SubmitButton } from "@/components/shared/buttons";
 
 export default function Splash() {
-  const { isSigningInUser} = useContext(AppContext);
+  const { isSigningInUser, authenticateUser, loginStage} = useContext(AppContext);
   return (
-    <div className="flex flex-col items-center justify-start h-screen pt-24 gap-3">
-      <Image src="/splash.png" alt="EscrowPi" width={180} height={180} priority />
-      <SubmitButton 
-      isLoading={isSigningInUser} 
-      onClick={()=>{}}
+    <div className="flex flex-col items-center justify-center h-screen gap-3">
+      <Image 
+        src="/splash.png" 
+        alt="EscrowPi" 
+        width={180} 
+        height={180} 
+        loading="eager" 
+        className={`transition-transform duration-500 ease-in-out ${
+          isSigningInUser 
+            ? "animate-spin scale-110" 
+            : "hover:scale-105"
+        }`}
       />
+      <SubmitButton 
+      title="Signin with Pi"
+      isLoading={isSigningInUser} 
+      disabled={isSigningInUser}
+      onClick={()=>{authenticateUser()}}
+      />
+      <p className="text-primary">{loginStage}</p>
     </div>
   );
 }

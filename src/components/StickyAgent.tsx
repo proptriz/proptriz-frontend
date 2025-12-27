@@ -3,8 +3,8 @@ import { ContactActions } from "./shared/buttons";
 
 const StickyAgentInfo = ({user}: {user: IUser}) => {
   return (
-    <div className="fixed bottom-0 left-0 w-full z-50 border-t shadow-lg ">
-      <div className="mx-auto md:max-w-[650px] w-full px-5 py-3 flex items-center bg-white">
+    <div className="fixed bottom-0 left-0 w-full z-50 border-t shadow-lg">
+      <div className="mx-auto md:max-w-[650px] w-full px-5 py-3 flex items-center  card-bg">
         <img
           src={user.image || "/avatar.png"}
           alt="Agent"

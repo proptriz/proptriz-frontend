@@ -19,6 +19,7 @@ import Popup from "@/components/shared/Popup";
 import { IoMdArrowDropdown } from "react-icons/io";
 import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import { HiOutlineLocationMarker } from "react-icons/hi";
+import Splash from "@/components/shared/Splash";
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
@@ -131,6 +132,10 @@ export default function AddPropertyPage() {
       setIsLoading(false);
     }
   };
+
+  if (!authUser) {
+    return <Splash />;
+  }
 
   return (
     <>

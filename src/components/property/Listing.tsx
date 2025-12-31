@@ -21,7 +21,7 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
   ]
 
   return (
-  <div className="relative mt-14">
+  <div className="relative">
     {/* Explore Nearby Property */}
     <section className="px-4 mb-10">
       <h2 className="text-lg font-semibold">Explore Nearby Property</h2>

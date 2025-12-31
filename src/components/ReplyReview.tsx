@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { ReplyCard, ReviewCard } from "./shared/Cards";
+import { TbSend2 } from "react-icons/tb";
+import { toast } from "react-toastify";
 
 const ReplyReview = ({ id }: { id: string }) => {
   const [replies, setReplies] = useState([]);
@@ -8,9 +10,20 @@ const ReplyReview = ({ id }: { id: string }) => {
     // Fetch review and replies based on the id if needed
   }, [id]);
 
+  const sendReply = async () => {
+    // Logic to send reply
+    toast.success("Reply sent");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      sendReply();
+    }
+  };
+
   return (
-    <div className="relative">
-    {/* Review */}
+    <div className="relative h-full">
+      {/* Review */}
       <ReviewCard
         review={{
           id:'01', 
@@ -24,7 +37,7 @@ const ReplyReview = ({ id }: { id: string }) => {
         }}
       />
       {/* Replies */}
-      <div className="px-4 space-y-4 relative ">
+      <div className="px-4 space-y-4 relative">
         <ReplyCard
           id={"-reply1"}
           reviewer="Owner"
@@ -46,12 +59,26 @@ const ReplyReview = ({ id }: { id: string }) => {
           image={"/avatar.png"}
           reviewDate={new Date().toISOString()}
         />    
-        {/* Reply Input */}
-        <div className="sticky bottom-0 left-0 right-0 border-t bg-white p-2">
-          <p>Reply:</p>
-          <input type="text" className="w-full rounded-md card-bg p-2 " />
-        </div>
+        
       </div>
+      {/* Reply Input */}
+        <div className="sticky bottom-0 left-0 right-0 border-t bg-white p-2 space-y-1 text-primary">
+          <p>Reply:</p>
+          <div className="flex space-x-2 ">
+            <input
+              type="text" 
+              className="w-full rounded-md bg-gray-100 p-2 outline outline-primary" 
+              onKeyDown={handleKeyDown}
+              onClick={sendReply}
+            />
+            <button 
+              className="bg-primary px-2 py-1 rounded-md text-white focus:text-secondary" 
+            >
+              <TbSend2 className="text-2xl" />
+            </button>
+          </div>
+          
+        </div>
     </div>
   )
 };

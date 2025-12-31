@@ -133,7 +133,7 @@ export default function ExplorePage() {
 
 
   return (
-    <div className="flex flex-col w-full h-screen">
+    <div className="flex flex-col w-full h-screen overflow-hidden">
       {/* Header */}
       <Header />
 
@@ -159,7 +159,7 @@ export default function ExplorePage() {
             {/* Add Agent Button */}
             <div className="">
                 <Link href={"/property/add"}
-                  className={`text-secondary text-sm bg-primary z-10 pointer-events-auto p-2 shadow-lg hover:shadow-xl transition-shadow duration-300 outline-none ring-2 ring-offset-2 ring-secondary focus:text-white rounded-md`}
+                  className={`text-white text-sm bg-primary z-10 pointer-events-auto p-2 shadow-lg hover:shadow-xl transition-shadow duration-300 outline-none ring-2 ring-offset-2 ring-secondary focus:text-secondary rounded-md`}
                 >
                   List Property
               </Link>

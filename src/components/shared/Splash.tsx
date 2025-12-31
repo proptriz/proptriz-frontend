@@ -2,10 +2,12 @@ import Image from "next/image";
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContextProvider";
 import { SubmitButton } from "@/components/shared/buttons";
+import Footer from "./Footer";
 
 export default function Splash() {
   const { isSigningInUser, authenticateUser, loginStage} = useContext(AppContext);
   return (
+    <>
     <div className="flex flex-col items-center justify-center h-screen gap-3">
       <Image 
         src="/splash.png" 
@@ -20,12 +22,15 @@ export default function Splash() {
         }`}
       />
       <SubmitButton 
-      title="Signin with Pi"
+      title="Login with Pi browser"
       isLoading={isSigningInUser} 
       disabled={isSigningInUser}
       onClick={()=>{authenticateUser()}}
       />
       <p className="text-primary">{loginStage}</p>
     </div>
+    
+    <Footer />
+    </>
   );
 }

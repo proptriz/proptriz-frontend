@@ -40,14 +40,15 @@ export interface PropertyProps {
   listed_for: string;
 }
 
-export interface ReviewCardProps {
+export type ReviewType = {
   id: string;
   reviewer: string;
   text: string;
   ratings: number;
   image: string;
-  reviewImages?: string[];
-  reviewDate: string; // ISO 8601 date string
+  review_date: string; // ISO 8601 date string
+  review_images?: string[];
+  replies_count?: number;
 }
 
 export interface LocationProps {

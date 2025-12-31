@@ -20,7 +20,7 @@ function Popup({ children, header, toggle, setToggle, useMask, hideReset=false }
     ></div>
     
     <div
-        className={`h-[calc(100vh-150px)] bg-white fixed bottom-0 md:max-w-[650px] mx-auto left-1/2 transform -translate-x-1/2 w-full md:mx-auto rounded-t-3xl px-6 pb-6 ease-linear transition-transform z-50 overflow-y-auto ${
+        className={`h-[calc(100vh-150px)] bg-white fixed bottom-0 md:max-w-[650px] mx-auto left-1/2 transform -translate-x-1/2 w-full md:mx-auto rounded-t-3xl px-6 mb-2 ease-linear transition-transform z-50 overflow-y-auto ${
           toggle ? 'translate-y-0' : 'translate-y-full'
         }`}
     >

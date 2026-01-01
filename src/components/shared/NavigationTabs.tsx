@@ -4,10 +4,10 @@ import { FiHome, FiGrid, FiMap, FiBriefcase, FiMoreHorizontal } from "react-icon
 const tabs = [
   { name: "House", value:'house', icon: <FiHome /> },
   { name: "Land", value:'land', icon: < FiMap/> },
+  { name: "Shortlet", value:'shortlet', icon: <FiHome /> },
   { name: "Office", value:'office', icon: <FiBriefcase /> },
   { name: "Shop", value:'shop', icon: <FiGrid /> },
   { name: "Hotel", value:'hotel', icon: <FiGrid /> },
-  { name: "Shortlet", value:'shortlet', icon: <FiHome /> },
   { name: "Others", value:'others', icon: <FiMoreHorizontal /> },
 ];
 

@@ -15,9 +15,9 @@ import { toast } from "react-toastify";
 import Popup from "@/components/shared/Popup";
 import { getUserSettings } from "@/services/settingsApi";
 import Image from "next/image";
-import { HiOutlineLocationMarker } from "react-icons/hi";
 import { ReviewCard } from "@/components/shared/Cards";
 import Splash from "@/components/shared/Splash";
+import ReplyReview from "@/components/ReplyReview";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
@@ -26,6 +26,8 @@ export default function ProfileTransaction () {
   const [listedProperties, setListedProperties] = useState<PropertyType[]>([]);
   const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
   const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
+  const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
+  const [replyId, setReplyId] = useState<string>('');
 
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
@@ -65,11 +67,11 @@ export default function ProfileTransaction () {
 
     const fetchListedProp = async () => {
       try {
-        const properties = await getUserListedProp();
-        setListedProperties(properties);
-        } catch (error) {
-          logger.error("❌ Error fetching listed properties:", error);
-        }
+      const properties = await getUserListedProp();
+      setListedProperties(properties);
+      } catch (error) {
+        logger.error("❌ Error fetching listed properties:", error);
+      }
     }
     fetchListedProp()
   }, [authUser])
@@ -86,6 +88,11 @@ export default function ProfileTransaction () {
     toast.success("Property deleted successfully");
     return
   };
+
+  const showReply = (id:string)=>{
+    setIsReplyPop(!isReplyPop)
+    setReplyId(id)
+  }
 
   if (!authUser) {
     return <Splash />;
@@ -233,109 +240,60 @@ export default function ProfileTransaction () {
       
       {/* Review List  */}
       {listOrSold==='Reviews' && <section>
-        <div className="flex items-center justify-between m-4">
-          <p className="text-lg mb-4 font-[Raleway]">
-            <span className="font-bold mr-1">
-              {listedProperties.length}
-            </span> 
-            {listOrSold}
-          </p>
-        </div>
-        <div className="space-y-6 max-h-[470px] overflow-y-auto mx-3">
-          {/* Review Item */}
-          <div className="border border-[#DCDFD9] rounded-2xl">
-            <div className="p-3 rounded-lg flex items-center h-16">
-              <Image 
-                src={'/home/building1.png'}
-                width={50} 
-                height={50} 
-                className="rounded-lg" 
-                alt={'property'}
-              />
-              <div className="ml-2 space-y-1"> 
-                <p className="font-bold">Fairview Apartment</p>                                
-                <div  className="flex items-center">
-                  <span className="font-bold mr-2">4.9</span>
-                  <HiOutlineLocationMarker />
-                  <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
-                </div>
-              </div>
-            </div>
-      
-            <ReviewCard
-              id='01' 
-              reviewer="Kurt Mullins" 
-              image="/avatar.png" 
-              ratings={4.0}
-              text="Lorem ipsum dolor sit amet, consectetur 
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
-            />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between m-4">
+            <p className="text-lg mb-4 font-[Raleway]">
+              <span className="font-bold mr-1">
+                {listedProperties.length}
+              </span> 
+              {listOrSold}
+            </p>
           </div>
-          <div className="border border-[#DCDFD9] rounded-2xl">
-            <div className="p-3 rounded-lg flex items-center h-16">
-              <Image 
-                src={'/home/building1.png'}
-                width={50} 
-                height={50} 
-                className="rounded-lg" 
-                alt={'property'}
-              />
-              <div className="ml-2 space-y-1"> 
-                <p className="font-bold">Fairview Apartment</p>                                
-                <div  className="flex items-center">
-                  <span className="font-bold mr-2">4.9</span>
-                  <HiOutlineLocationMarker />
-                  <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
-                </div>
-              </div>
-            </div>
-      
             <ReviewCard
-              id='01' 
-              reviewer="Kurt Mullins" 
-              image="/avatar.png" 
-              ratings={4.0}
-              text="Lorem ipsum dolor sit amet, consectetur 
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
+              review={{
+                id:'01', 
+                reviewer:"Kurt Mullins", 
+                image:"/avatar.png", 
+                ratings:4.0,
+                text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                review_date:"2025-01-01T10:00:00Z", // Example ISO 8601 date string
+                replies_count: 3,
+                review_images: [],
+              }}
+              showReply={showReply}
             />
-          </div>
-          <div className="border border-[#DCDFD9] rounded-2xl">
-            <div className="p-3 rounded-lg flex items-center h-16">
-              <Image 
-                src={'/home/building1.png'} 
-                width={50} 
-                height={50} 
-                className="rounded-lg" 
-                alt={'property'}
-              />
-              <div className="ml-2 space-y-1"> 
-                <p className="font-bold">Fairview Apartment</p>                                
-                <div  className="flex items-center">
-                  <span className="font-bold mr-2">4.9</span>
-                  <HiOutlineLocationMarker />
-                  <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
-                </div>
-              </div>
-            </div>
-
+            {/* <button onClick={() => setShowReply(!showReply)}>reply</button> */}
+            <ReviewCard
+              review={{
+                id:'02', 
+                reviewer:"Kurt Mullins", 
+                image:"/avatar.png", 
+                ratings:4.0,
+                text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                review_date:"2025-01-01T10:00:00Z", // Example ISO 8601 date string
+                replies_count: 3,
+                review_images: [],
+              }}
+              showReply={showReply}
+          />
             <ReviewCard 
-              id='02'
-              reviewer="Kurt Mullins" 
-              image="/avatar.png" 
-              ratings={4.0}
-              text="Lorem ipsum dolor sit amet, consectetur 
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              reviewImages={[
+              review={{
+                id:'02', 
+                reviewer:"Kurt Mullins", 
+                image:"/avatar.png", 
+                ratings:4.0,
+                review_date:"2025-01-01T10:00:00Z",
+                replies_count: 3,
+                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                review_images: [
                   "/apartment.png",
                   "/home/building3.png",
                   "/home/building4.png",
-                  "/home/house-with-pool.png", // This will not be shown because only 3 are displayed
-              ]}
-              reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
+                  "/home/house-with-pool.png"
+                ]
+              }}
+              showReply={showReply}
             />
-          </div>
       
           {/* Add more reviews here */}
         </div>
@@ -352,40 +310,6 @@ export default function ProfileTransaction () {
           </p>
         </div>
         {/* Reviews */}
-        <div className="px-3">                
-          <div className="space-y-6 max-h-[470px] overflow-y-auto pb-14">
-              {/* Review Item */}
-            <ReviewCard 
-              id='01'
-              reviewer="Kurt Mullins" 
-              image="/avatar.png" 
-              ratings={4.0}
-              text="Lorem ipsum dolor sit amet, consectetur 
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              // reviewImages ={[]}
-              reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
-            />
-            <ReviewCard
-              id='02'
-              reviewer="Kurt Mullins"
-              image="/avatar.png"
-              ratings={2.5}
-              text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              reviewDate="2025-01-01T03:04:20Z" // Example ISO 8601 date string
-            />
-            <ReviewCard 
-              id='03'
-              reviewer="Kurt Mullins" 
-              image="/avatar.png" 
-              ratings={5.0}
-              text="Lorem ipsum dolor sit amet, consectetur 
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-              // reviewImages ={[]}
-              reviewDate="2024-01-01T10:04:20Z" // Example ISO 8601 date string
-            />
-            {/* Add more reviews here */}
-          </div>
-        </div>
       </section>}
     </div>
 
@@ -437,6 +361,17 @@ export default function ProfileTransaction () {
         </nav>
       </div>
 
+    </Popup>
+
+    {/* Reply Review Popup */}
+    <Popup
+      header="Reply Review"
+      toggle={isReplyPop}
+      setToggle={setIsReplyPop}
+      useMask={true}
+      hideReset={true}
+    >
+      <ReplyReview id={replyId} />
     </Popup>
   </>
   

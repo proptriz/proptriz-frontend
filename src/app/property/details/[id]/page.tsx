@@ -5,7 +5,7 @@ import { ReviewCard } from "@/components/shared/Cards";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FaStar, FaBed, FaAngleDown, FaRegHeart, FaArrowLeft } from "react-icons/fa";
+import { FaStar, FaBed, FaRegHeart, FaArrowLeft } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { PropertyType } from "@/types";
 import Link from "next/link";
@@ -15,6 +15,8 @@ import Price from "@/components/shared/Price";
 import GalleryModal from "@/components/shared/GalleryModal";
 import { BiShareAlt } from "react-icons/bi";
 import StickyAgentInfo from "@/components/StickyAgent";
+import Popup from "@/components/shared/Popup";
+import ReplyReview from "@/components/ReplyReview";
 
 const PropertyDetail = ({
   params
@@ -26,19 +28,15 @@ const PropertyDetail = ({
   const propertyId = resolvedParams.id;
   logger.info("property id: ", propertyId)
 
-  // console.log("property slug: ", propertySlug)
   const [property, setProperty] = useState<PropertyType | null>(null);
   const [nearestProperty, setNearestProperty] = useState<PropertyType[]>([]);
   const [showGallery, setShowGallery] = useState(false);
   const [togglePopup, setTogglePopup] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState({
-    distance: '2.5 km',
-    address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
-  });
+  const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
+  const [replyId, setReplyId] = useState<string>('');
 
-  // const { data, error, isLoading } = useSWR(`/property/${propertyId}`, fetcher)
   useEffect(() => {
     if (!propertyId || property) return
     setLoading(true);
@@ -57,9 +55,7 @@ const PropertyDetail = ({
 
       } finally {
         setLoading(false);
-      }
-      
-      
+      }      
     };
       
     fetchProperty()
@@ -236,13 +232,16 @@ const PropertyDetail = ({
                 <div className="mt-3 space-y-3">
                   {/* Review Item */}
                   <ReviewCard 
-                  id='01'
-                  reviewer="Kurt Mullins" 
-                  image="/avatar.png" 
-                  ratings={4.0}
-                  text="Lorem ipsum dolor sit amet, consectetur 
-                        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                  reviewDate="2025-01-01T10:00:00Z" // Example ISO 8601 date string
+                    review={{
+                      id:'01', 
+                      reviewer:"Kurt Mullins", 
+                      image:"/avatar.png", 
+                      ratings:4.0,
+                      text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                      review_date:"2025-01-01T10:00:00Z", // Example ISO 8601 date string
+                      replies_count: 3,
+                      review_images: [],
+                    }}
                   />
                   {/* Add more reviews here */}
                 </div>

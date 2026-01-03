@@ -22,7 +22,11 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import Splash from "@/components/shared/Splash";
 import { CgDetailsMore } from "react-icons/cg";
 import Counter from "@/components/Counter";
-import { number } from "zod/v4";
+import dynamic from "next/dynamic";
+import PropertyLocationModal from "@/components/property/PropertyLocationSection";
+import { OutlineButton } from "@/components/shared/buttons";
+
+const LocationPickerMap = dynamic(() => import("@/components/LocationPickerMap"), { ssr: false });
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
@@ -44,6 +48,7 @@ export default function AddPropertyPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [togglePopup, setTogglePopup] = useState(false);
   const [duration, setDuration] = useState<number>(1)
+  const [openLocPicker, setOpenLocPicker] = useState<boolean>(false)
 
   const maxPhotos = 1;
 
@@ -108,6 +113,8 @@ export default function AddPropertyPage() {
     formData.append("address", propertyAddress);
     formData.append("listed_for", listedFor);
     formData.append("category", category);
+    formData.append("description", description);
+    formData.append("duration", duration.toString());
     formData.append("negotiable", negotiable === NegotiableEnum.Negotiable ? "true" : "false");
     formData.append("status", propertyStatus);
     formData.append("latitude", String(propCoordinates?.[0] || userCoordinates[0]));
@@ -138,21 +145,13 @@ export default function AddPropertyPage() {
     }
   };
 
-  const incrementDuration = (index: number): void => {
-    setDuration(duration<=1? 1: (duration+1))
-  };
-
-  const decrementDuration = (index: number): void => {
-    
-  };
-
   if (!authUser) {
     return <Splash />;
   }
 
   return (
     <>
-    <div className="pb-16 mx-auto w-full">
+    <div className="relative pb-16 mx-auto w-full">
       <ScreenName title="Add Property" />
 
       <div className="p-6">
@@ -255,9 +254,16 @@ export default function AddPropertyPage() {
             className="w-full outline-none card-bg"
           />
 
-          <div className="flex gap-4 items-center mt-4">
-            <label htmlFor="duration">Listing Duration (in weeks)</label>
-            <div className="flex card-bg px-3 rounded-lg shadow-md w-full">
+          <div className="gap-4 items-center mt-4">
+            <label htmlFor="duration"  className={styles.H2}>Listing Duration (in weeks)</label>
+            <div 
+              className="flex items-center w-full px-2 rounded-md border-[1px]
+              bg-gray-100 border-primary
+              focus-within:border-secondary
+              focus-within:bg-white
+              transition-colors
+              "
+            >
               <input
                 type="number"
                 name="duration"
@@ -267,7 +273,7 @@ export default function AddPropertyPage() {
                 min={1}
                 max={50}
                 onChange={(e:React.ChangeEvent<HTMLInputElement>) => {setDuration(parseInt(e.target.value) || 1)}}
-                className="flex-1 outline-none card-bg text-sm"
+                className="w-full outline-none p-1"
               />
               <Counter
                 label=""
@@ -290,27 +296,30 @@ export default function AddPropertyPage() {
         </div>
 
         {/* Property Location & Address */}
-        <ToggleCollapse header="Property Location" open={true}>
-          {/* Address */}
-          <div className="mb-4">
-            <TextInput 
-              label="Property Address"
-              icon={<HiOutlineLocationMarker />}
-              name="address"
-              id="address"
-              value={propertyAddress}
-              onChange={(e:React.ChangeEvent<HTMLSelectElement>) => setPropertyAddress(e.target.value)}
-              placeholder="Enter property Address"
-            />
-          </div> 
-
-          {/* Map */}
-          <PropertyLocationSection
-            userCoordinates={userCoordinates}
-            fallbackCoordinates={userCoordinates}
-            onLocationSelect={handleLocationSelect}
+        {/* Address */}
+        <div className="mb-4">
+          <TextInput 
+            label="Property Address"
+            icon={<HiOutlineLocationMarker />}
+            name="address"
+            id="address"
+            value={propertyAddress}
+            onChange={(e:React.ChangeEvent<HTMLSelectElement>) => setPropertyAddress(e.target.value)}
+            placeholder="Enter property Address"
           />
-        </ToggleCollapse>
+        </div>
+
+        <div className="w-full flex justify-end">
+          <OutlineButton 
+            styles={{
+            
+            }}
+            onClick={()=>setOpenLocPicker(true)}
+          >
+            Pick property location
+          </OutlineButton>
+        </div>
+        
       
         {/* Photo Upload */}
         <PhotoUploadSection
@@ -353,7 +362,16 @@ export default function AddPropertyPage() {
           </div>
         </div>
       </div>
+
     </div>
+    <PropertyLocationModal
+      isOpen={openLocPicker}
+      onClose={() => setOpenLocPicker(false)}
+      userCoordinates={userCoordinates}
+      fallbackCoordinates={[9.082, 8.6753]} // Nigeria default
+      onLocationSelect={handleLocationSelect}
+    />
+    
     {/* Currency popup */}
     <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
       <div className="my-3">

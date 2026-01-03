@@ -1,35 +1,63 @@
 "use client";
 
 import React from "react";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import type { LatLngExpression } from "leaflet";
 
-const LocationPickerMap = dynamic(() => import("@/components/LocationPickerMap"), { ssr: false });
+const LocationPickerMap = dynamic(
+  () => import("@/components/LocationPickerMap"),
+  { ssr: false }
+);
 
-interface PropertyLocationSectionProps {
+interface PropertyLocationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   userCoordinates: LatLngExpression | null;
   fallbackCoordinates: [number, number];
   onLocationSelect: (lat: number, lng: number) => void;
 }
 
-const PropertyLocationSection: React.FC<PropertyLocationSectionProps> = ({
+const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
+  isOpen,
+  onClose,
   userCoordinates,
   fallbackCoordinates,
   onLocationSelect,
 }) => {
+  if (!isOpen) return null;
+
   return (
-    <div>      
-      <div className="max-h-[280px] overflow-hidden rounded-lg border border-gray-200 relative map-container-fix">
+    <div className="fixed inset-0 z-50 bg-black/60 flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-b">
+        <h2 className="text-lg font-semibold">Select Property Location</h2>
+        <button
+          onClick={onClose}
+          className="text-sm px-3 py-1 rounded-md border hover:bg-gray-100"
+        >
+          Close
+        </button>
+      </div>
+
+      {/* Map */}
+      <div className="flex-1 relative">
         <LocationPickerMap
           initialCenter={userCoordinates || fallbackCoordinates}
           onLocationSelect={onLocationSelect}
         />
       </div>
-      <button className="w-full py-4 card-bg text-sm rounded-b-lg" disabled>
-        Click to select property Location
-      </button>
+
+      {/* Footer */}
+      <div className="bg-white border-t px-4 py-3">
+        <button
+          className="w-full py-3 rounded-md card-bg text-sm"
+          onClick={onClose}
+        >
+          Confirm Location
+        </button>
+      </div>
     </div>
   );
 };
 
-export default PropertyLocationSection;
+export default PropertyLocationModal;

@@ -1,6 +1,6 @@
 'use client';
 
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Counter from "@/components/Counter";
 import ToggleButtons from "@/components/ToggleButtons";
 import TagSelector from "@/components/TagSelector";
@@ -133,7 +133,7 @@ export default function AddPropertyDetails({
   };
 
   return (
-    <ToggleCollapse header="Other Details" open={false}>
+    <ToggleCollapse header="Other Details" open={true}>
       {/* Negotiable Toggle */}
       <div className="mt-4 mb-7">
         <ToggleButtons

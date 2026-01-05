@@ -4,10 +4,9 @@ import React, { use, useCallback, useContext, useEffect, useState } from "react"
 import { toast } from "react-toastify";
 
 import HorizontalCard from "@/components/shared/HorizontalCard";
-import { SelectButton } from "@/components/shared/Input";
+import { SelectButton, TextareaInput, TextInput } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
-import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import { ScreenName } from "@/components/shared/LabelCards";
 
 import { categories, styles } from "@/constant";
@@ -35,8 +34,12 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import ImageManager from "@/components/ImageManager";
 import Popup from "@/components/shared/Popup";
 import logger from "../../../../../logger.config.mjs";
-import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import { AppContext } from "@/context/AppContextProvider";
+import PropertyLocationModal from "@/components/property/PropertyLocationSection";
+import { HiOutlineLocationMarker } from "react-icons/hi";
+import { OutlineButton } from "@/components/shared/buttons";
+import Counter from "@/components/Counter";
+import { CgDetailsMore } from "react-icons/cg";
 
 export default function EditPropertyPage({
   params
@@ -64,6 +67,8 @@ export default function EditPropertyPage({
   const [facilities, setFacilities] = useState<string[]>([]);
   const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
+  const [duration, setDuration] = useState<number>(1)
+  const [openLocPicker, setOpenLocPicker] = useState<boolean>(false)
 
   // Get user location once
   useEffect(() => {
@@ -147,6 +152,7 @@ export default function EditPropertyPage({
         env_facilities: facilities,
         period: formData.listed_for === ListForEnum.rent ? formData.period : undefined,
         currency,
+        duration: duration.toString() || "1",
         features,
         user: undefined // prevent updating user field
       };
@@ -222,45 +228,45 @@ export default function EditPropertyPage({
 
             {/* Title */}
             <div>
-              <h3 className={styles.H2}>Property Title</h3>
-              <div className="flex card-bg p-3 rounded-full shadow-md">
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title || ""}
-                  onChange={(e) => updateForm("title", e.target.value)}
-                  className="w-full outline-none card-bg"
-                  placeholder="Enter title"
-                />
-                <IoHomeOutline className="text-gray-500 text-lg" />
-              </div>
+              <TextInput
+                label="Property title"
+                icon={<IoHomeOutline />}
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateForm("title", e.target.value)}
+                placeholder="Property title here"
+              />
             </div>
 
             {/* Price */}
             <div>
-              <h3 className={styles.H2}>
+              <label className={styles.H2} htmlFor={"price"}>
                 {formData.listed_for === ListForEnum.rent ? "Rent Price" : "Sell Price"}
-              </h3>
-
-              <div className="flex card-bg p-3 rounded-lg shadow-md">
+              </label>
+              <div 
+              className="flex items-center p-[10px] w-full rounded-md border-[1px]
+                bg-gray-100 border-primary
+                focus-within:border-secondary
+                focus-within:bg-white
+                transition-colors
+                "
+              >
                 <input
-                  type="number"
                   name="price"
-                  value={formData.price || ""}
-                  onChange={(e) => updateForm("price", e.target.value ? Number(e.target.value) : 0)}
-                  className="w-full outline-none card-bg"
-                  placeholder="Enter price"
-                  min="1"
-                  step="1"
+                  id="price"
+                  value={formData.price}
+                  onChange={(e) => updateForm("price", e.target.value)}
+                  type="number"
+                  placeholder="Property price here"
+                  className="w-full outline-none"
                 />
-
-                <button
-                  type="button"
+                <button 
                   className="text-gray-500 text-lg px-3 flex items-center gap-1"
                   onClick={() => setShowCurrencyPopup(true)}
                 >
                   {currency}
-                  <IoMdArrowDropdown />
+                  <IoMdArrowDropdown />          
                 </button>
               </div>
             </div>
@@ -283,6 +289,47 @@ export default function EditPropertyPage({
               />
             )}
 
+            <TextareaInput
+              label="Property Description (optional)"
+              id='description'
+              icon={<CgDetailsMore />}
+              name="description"
+              value={formData.description}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateForm("description", e.target.value)}
+              placeholder="Enter Property details here"
+              className="w-full outline-none card-bg"
+            />
+
+            <div className="gap-4 items-center mt-4">
+              <label htmlFor="duration"  className={styles.H2}>Listing Duration (in weeks)</label>
+              <div 
+                className="flex items-center w-full px-2 rounded-md border-[1px]
+                bg-gray-100 border-primary
+                focus-within:border-secondary
+                focus-within:bg-white
+                transition-colors
+                "
+              >
+                <input
+                  type="number"
+                  name="duration"
+                  id="duration"
+                  placeholder="Enter listing duration (in weeks)"
+                  value={duration}
+                  min={1}
+                  max={50}
+                  onChange={(e:React.ChangeEvent<HTMLInputElement>) => {setDuration(parseInt(e.target.value) || 1)}}
+                  className="w-full outline-none p-1"
+                />
+                <Counter
+                  label=""
+                  value={duration}
+                  onIncrement={() => setDuration(duration < 50 ? duration + 1 : 50)}
+                  onDecrement={() => setDuration(duration > 1 ? duration - 1 : 1)}
+                />
+              </div>
+            </div>
+
             {/* Availability status */}
             <ToggleButtons<PropertyStatusEnum>
               label="Availability status"
@@ -291,30 +338,29 @@ export default function EditPropertyPage({
               onChange={(value) => updateForm("status", value)}
             />
 
-            <ToggleCollapse header="Property Location" open={true}>
-              {/* Address */}
-              <div>
-                <h3 className={styles.H2}>Property Address</h3>
-                <div className="flex card-bg p-3 rounded-full shadow-md">
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address || ""}
-                    onChange={(e) => updateForm("address", e.target.value)}
-                    className="w-full outline-none card-bg"
-                    placeholder="Property address"
-                  />
-                  <IoHomeOutline className="text-gray-500 text-lg" />
-                </div>
-              </div>
-
-              {/* Location */}
-              <PropertyLocationSection
-                userCoordinates={propCoordinates ? propCoordinates : userCoordinates || [0,0]}
-                fallbackCoordinates={userCoordinates || [0,0]}
-                onLocationSelect={handleLocationSelect}
+            {/* Address */}
+            <div className="mb-4">
+              <TextInput 
+                label="Property Address"
+                icon={<HiOutlineLocationMarker />}
+                name="address"
+                id="address"
+                value={formData.address}
+                onChange={(e:React.ChangeEvent<HTMLInputElement>) => updateForm("address", e.target.value)}
+                placeholder="Enter property Address"
               />
-            </ToggleCollapse>
+            </div>
+    
+            <div className="w-full flex justify-end">
+              <OutlineButton 
+                styles={{
+                
+                }}
+                onClick={()=>setOpenLocPicker(true)}
+              >
+                Pick property location
+              </OutlineButton>
+            </div>
 
             {/* Extra Details */}
             <AddPropertyDetails
@@ -351,6 +397,14 @@ export default function EditPropertyPage({
 
         </div>
       </div>
+
+      <PropertyLocationModal
+        isOpen={openLocPicker}
+        onClose={() => setOpenLocPicker(false)}
+        userCoordinates={userCoordinates}
+        fallbackCoordinates={[9.082, 8.6753]} // Nigeria default
+        onLocationSelect={handleLocationSelect}
+      />
 
       {/* Currency Popup */}
       <Popup

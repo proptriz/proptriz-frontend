@@ -4,9 +4,8 @@ import { useState, useContext } from "react";
 import { IoHomeOutline } from "react-icons/io5";
 import { FaArrowLeft } from "react-icons/fa6";
 import { ScreenName } from "@/components/shared/LabelCards";
-import { SelectButton, SelectInput, TextareaInput, TextInput } from "@/components/shared/Input";
+import { SelectButton, TextareaInput, TextInput } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
-import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import { AppContext } from "@/context/AppContextProvider";
@@ -17,7 +16,6 @@ import { toast } from "react-toastify";
 import logger from "../../../../logger.config.mjs"
 import Popup from "@/components/shared/Popup";
 import { IoMdArrowDropdown } from "react-icons/io";
-import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import Splash from "@/components/shared/Splash";
 import { CgDetailsMore } from "react-icons/cg";
@@ -25,8 +23,6 @@ import Counter from "@/components/Counter";
 import dynamic from "next/dynamic";
 import PropertyLocationModal from "@/components/property/PropertyLocationSection";
 import { OutlineButton } from "@/components/shared/buttons";
-
-const LocationPickerMap = dynamic(() => import("@/components/LocationPickerMap"), { ssr: false });
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
@@ -234,22 +230,13 @@ export default function AddPropertyPage() {
             )} 
           </div>
 
-          <div>
-            <SelectInput 
-              label={"Listing Duration (in weeks)"}
-              value={description}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>)=> setDescription(e.target.value)}
-              options={[{name: "1 week", value:"2 weeks"}, {name: "3 weeks", value:"4 weeks"}, {name: "5 weeks", value:"6 weeks"}, {name: "16 weeks", value:"16 weeks"}, {name: "20 weeks", value:"20 weeks"}, {name: "24 weeks", value:"24 weeks"}]} 
-            />
-          </div>
-
           <TextareaInput
             label="Property Description (optional)"
             id='description'
             icon={<CgDetailsMore />}
             name="description"
-            value={propertyTitle}
-            // onChange={(e) => setPropertyTitle(e.target.value)}
+            value={description}
+            onChange={(e:React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
             placeholder="Enter Property details here"
             className="w-full outline-none card-bg"
           />
@@ -304,7 +291,7 @@ export default function AddPropertyPage() {
             name="address"
             id="address"
             value={propertyAddress}
-            onChange={(e:React.ChangeEvent<HTMLSelectElement>) => setPropertyAddress(e.target.value)}
+            onChange={(e:React.ChangeEvent<HTMLInputElement>) => setPropertyAddress(e.target.value)}
             placeholder="Enter property Address"
           />
         </div>

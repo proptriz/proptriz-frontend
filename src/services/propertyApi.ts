@@ -110,6 +110,7 @@ export const getPropertyById = async (propertyId: string): Promise<PropertyType>
       username: property.user.username,
       image: userDetails.image,
       email: userDetails.email,
+      user_type: userDetails.user_type,
       phone: userDetails.phone,
       brand: userDetails.brand,
     },

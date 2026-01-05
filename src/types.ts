@@ -140,9 +140,11 @@ export interface PropertyType {
   category: CategoryEnum; // The class of property (e.g. house, land, shop, office, hotel )
   period?: RenewalEnum; // if is for rent, payment period (e.g monthly, yearly, daily)
   negotiable: boolean; // (true/false)
-  property_terms?: string // agent's term cond
+  description?: string // agent's term cond
+  duration?: string;
+  expired_by?: Date;
   images: string[]; //Other property images for gallery
-  user: IUser; //foreign key representing agent that list the property
+  user: UserSettingsType; //foreign key representing agent that list the property
   latitude: number;
   longitude: number;
   features?: {

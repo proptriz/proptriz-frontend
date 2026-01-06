@@ -20,7 +20,6 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import Splash from "@/components/shared/Splash";
 import { CgDetailsMore } from "react-icons/cg";
 import Counter from "@/components/Counter";
-import dynamic from "next/dynamic";
 import PropertyLocationModal from "@/components/property/PropertyLocationSection";
 import { OutlineButton } from "@/components/shared/buttons";
 
@@ -207,7 +206,7 @@ export default function AddPropertyPage() {
                 onChange={(e) => setPrice(e.target.value)}
                 type="number"
                 placeholder="Property price here"
-                className="w-full outline-none"
+                className="w-full outline-none bg-transparent"
               />
               <button 
                 className="text-gray-500 text-lg px-3 flex items-center gap-1"
@@ -259,8 +258,9 @@ export default function AddPropertyPage() {
                 value={duration}
                 min={1}
                 max={50}
+                readOnly
                 onChange={(e:React.ChangeEvent<HTMLInputElement>) => {setDuration(parseInt(e.target.value) || 1)}}
-                className="w-full outline-none p-1"
+                className="w-full outline-none p-1 bg-transparent"
               />
               <Counter
                 label=""
@@ -284,7 +284,7 @@ export default function AddPropertyPage() {
 
         {/* Property Location & Address */}
         {/* Address */}
-        <div className="mb-4">
+        <div className="mt-4">
           <TextInput 
             label="Property Address"
             icon={<HiOutlineLocationMarker />}
@@ -296,11 +296,8 @@ export default function AddPropertyPage() {
           />
         </div>
 
-        <div className="w-full flex justify-end">
+        <div className="w-full flex justify-end mt-4">
           <OutlineButton 
-            styles={{
-            
-            }}
             onClick={()=>setOpenLocPicker(true)}
           >
             Pick property location

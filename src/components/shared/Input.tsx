@@ -186,8 +186,14 @@ export const TextareaInput = (props:any )=> {
             placeholder={props.placeholder}
             onChange={props.onChange}
             required={props.required ?? true}
-            rows={2}
-            className="flex-1 outline-none bg-transparent"
+            rows={4}
+            className="
+              flex-1
+              outline-none
+              bg-transparent
+              resize-none
+              overflow-y-auto
+            "
           />
 
           {props.icon && (

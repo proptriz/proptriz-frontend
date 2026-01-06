@@ -38,6 +38,7 @@ export interface PropertyProps {
   category: CategoryEnum; // Property type (e.g., "Apartment")
   period: string;
   listed_for: string;
+  expired?: boolean
 }
 
 export type ReviewType = {
@@ -141,7 +142,7 @@ export interface PropertyType {
   period?: RenewalEnum; // if is for rent, payment period (e.g monthly, yearly, daily)
   negotiable: boolean; // (true/false)
   description?: string // agent's term cond
-  duration?: string;
+  duration?: number;
   expired_by?: Date;
   images: string[]; //Other property images for gallery
   user: UserSettingsType; //foreign key representing agent that list the property

@@ -67,7 +67,6 @@ export default function EditPropertyPage({
   const [facilities, setFacilities] = useState<string[]>([]);
   const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
-  const [duration, setDuration] = useState<number>(1)
   const [openLocPicker, setOpenLocPicker] = useState<boolean>(false)
 
   // Get user location once
@@ -129,6 +128,8 @@ export default function EditPropertyPage({
     toast.success(`Location selected: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
   }, []);
 
+  const now = new Date();
+
   // Generic form setter
   const updateForm = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -152,7 +153,6 @@ export default function EditPropertyPage({
         env_facilities: facilities,
         period: formData.listed_for === ListForEnum.rent ? formData.period : undefined,
         currency,
-        duration: duration.toString() || "1",
         features,
         user: undefined // prevent updating user field
       };
@@ -213,6 +213,7 @@ export default function EditPropertyPage({
               period={property.period as RenewalEnum}
               listed_for={property.listed_for as ListForEnum}
               rating={4.5}
+              expired={property.expired_by && new Date(property.expired_by) < new Date()}
             />
           )}
 
@@ -259,7 +260,7 @@ export default function EditPropertyPage({
                   onChange={(e) => updateForm("price", e.target.value)}
                   type="number"
                   placeholder="Property price here"
-                  className="w-full outline-none"
+                  className="w-full outline-none bg-transparent"
                 />
                 <button 
                   className="text-gray-500 text-lg px-3 flex items-center gap-1"
@@ -300,35 +301,53 @@ export default function EditPropertyPage({
               className="w-full outline-none card-bg"
             />
 
-            <div className="gap-4 items-center mt-4">
-              <label htmlFor="duration"  className={styles.H2}>Listing Duration (in weeks)</label>
-              <div 
-                className="flex items-center w-full px-2 rounded-md border-[1px]
-                bg-gray-100 border-primary
-                focus-within:border-secondary
-                focus-within:bg-white
-                transition-colors
-                "
+            {(formData.expired_by && new Date(formData.expired_by) < now) && <div className="gap-4 items-center mt-4">
+              <label htmlFor="duration" className={styles.H2}>
+                Listing Duration (in weeks)
+              </label>
+
+              <div
+                className={`
+                  flex items-center w-full px-2 rounded-md border-[1px]
+                  ${"bg-gray-100 border-gray-300"}
+                  focus-within:border-secondary
+                  transition-colors
+                `}
               >
                 <input
                   type="number"
                   name="duration"
                   id="duration"
                   placeholder="Enter listing duration (in weeks)"
-                  value={duration}
+                  value={formData.duration}
                   min={1}
                   max={50}
-                  onChange={(e:React.ChangeEvent<HTMLInputElement>) => {setDuration(parseInt(e.target.value) || 1)}}
-                  className="w-full outline-none p-1"
+                  onChange={(e) =>
+                    updateForm("duration", Number(e.target.value) || 1)
+                  }
+                  className="w-full outline-none p-1 bg-transparent disabled:cursor-not-allowed"
                 />
+
                 <Counter
                   label=""
-                  value={duration}
-                  onIncrement={() => setDuration(duration < 50 ? duration + 1 : 50)}
-                  onDecrement={() => setDuration(duration > 1 ? duration - 1 : 1)}
+                  value={formData.duration ?? 1}
+                  // disabled={!isExpired}
+                  onIncrement={() =>
+                    updateForm(
+                      "duration",
+                      Math.min((formData.duration ?? 1) + 1, 50)
+                    )
+                  }
+                  onDecrement={() =>
+                    updateForm(
+                      "duration",
+                      Math.max((formData.duration ?? 1) - 1, 1)
+                    )
+                  }
                 />
               </div>
-            </div>
+            </div>}
+
 
             {/* Availability status */}
             <ToggleButtons<PropertyStatusEnum>

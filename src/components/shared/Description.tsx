@@ -9,7 +9,7 @@ interface PropertyDescriptionProps {
 
 export default function PropertyDescription({
   description = "",
-  wordLimit = 5,
+  wordLimit = 30,
 }: PropertyDescriptionProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -31,27 +31,25 @@ export default function PropertyDescription({
 
   return (
     <div className="relative">
-      <textarea
-        disabled
-        rows={expanded ? undefined : 4}
-        value={expanded ? description : previewText}
-        className="
+      <div
+        className={`
           w-full
-          resize-none
           rounded-md
           border
           border-gray-300
           bg-gray-100
           p-3
           pb-10
-          text-sm
+          text-md
           text-gray-500
           whitespace-pre-wrap
           leading-relaxed
-          focus:outline-none
           cursor-text
-        "
-      />
+          ${expanded ? "" : "max-h-40 overflow-hidden"} // 4 lines approx
+        `}
+      >
+        {expanded ? description : previewText}
+      </div>
 
       {hasMore && (
         <button

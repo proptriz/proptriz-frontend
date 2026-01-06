@@ -11,7 +11,8 @@ export const VerticalCard = ({
   currency,
   category,
   period,
-  listed_for
+  listed_for,
+  expired
 }: PropertyProps ) => {
   return (
     <div className="bg-white p-3 rounded-2xl shadow-md" key={id}>
@@ -34,6 +35,7 @@ export const VerticalCard = ({
             {formatPrice(price)}
           </span>
           <span className="text-xs ms-1">{period}</span>
+          {expired && <span className="ms-auto bg-red-800 text-white text-sm p-1 rounded-md">Expired</span>}
         </p>                    
         <p className="text-md font-semibold">{name}</p>
         <div className="flex space-x-2">

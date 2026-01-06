@@ -16,7 +16,7 @@ const StickyAgentInfo = ({user}: {user: UserSettingsType}) => {
             {user.brand || user.username}
           </h2>
           <p className="text-xs text-gray-500">
-            {user.user_type === UserTypeEnum.Individual ? "Individual property owner" : user.user_type === UserTypeEnum.Agent ? "Property agent" : "Real estate company"}
+            {user.user_type === UserTypeEnum.Individual ? "Property owner" : user.user_type === UserTypeEnum.Agent ? "Property agent" : "Real estate company"}
           </p>
         </div>
 

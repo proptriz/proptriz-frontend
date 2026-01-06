@@ -3,7 +3,7 @@ import { FaStar } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import Image from "next/image";
 import formatPrice from "@/utils/formatPrice";
-import { PropertyProps } from "@/types";
+import { CurrencyEnum, PropertyProps } from "@/types";
 
 const HorizontalCard: React.FC<PropertyProps> = ({
   id,
@@ -15,10 +15,11 @@ const HorizontalCard: React.FC<PropertyProps> = ({
   currency,
   category,
   period,
-  listed_for
+  listed_for,
+  expired
 }) => {
   return (
-    <div className="flex items-center card-bg rounded-2xl shadow-md p-2 space-x-4 min-w-[70%] md:min-w-[40%] max-w-lg" key={id}>
+    <div className="flex items-center bg-white p-3 rounded-2xl shadow-md space-x-4 min-w-[70%] md:min-w-[40%] max-w-lg" key={id}>
       {/* Image Section */}
       <div className="relative w-32 h-32 rounded-lg overflow-hidden">
         <img
@@ -47,7 +48,17 @@ const HorizontalCard: React.FC<PropertyProps> = ({
           <HiOutlineLocationMarker />
           <span>{address}</span>
         </div>
-        <div className="text-primary font-bold mt-2">{currency}{formatPrice(price)} {period}</div>
+        <div className="text-primary font-bold mt-2">
+          <p className="flex text-primary items-center text-lg">
+            <span className=""> 
+              {currency===CurrencyEnum.naira ? "₦" : currency===CurrencyEnum.dollars ? "$" : currency===CurrencyEnum.pounds ? "£" : currency===CurrencyEnum.euros ? "€" : ""}
+            </span> <span className="font-semibold"> 
+              {formatPrice(price)}
+            </span>
+            <span className="text-xs ms-1">{period}</span>
+            {expired && <span className="ms-auto bg-red-800 text-white text-sm p-1 rounded-md">Expired</span>}
+          </p>
+        </div>
       </div>
     </div>
   );

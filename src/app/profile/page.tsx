@@ -200,6 +200,7 @@ export default function ProfileTransaction () {
               period={item.period || ""}
               listed_for={item.listed_for || ""}
               rating={20}
+              expired={new Date(item.expired_by) < new Date()}
             />
 
             {/* Overlay */}

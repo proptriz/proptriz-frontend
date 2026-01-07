@@ -1,6 +1,6 @@
 'use client';
 
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Counter from "@/components/Counter";
 import ToggleButtons from "@/components/ToggleButtons";
 import TagSelector from "@/components/TagSelector";
@@ -9,6 +9,7 @@ import { IoClose } from "react-icons/io5";
 import { styles } from "@/constant";
 import ToggleCollapse from "../shared/ToggleCollapse";
 import { CategoryEnum, Feature, NegotiableEnum } from "@/types";
+import { OutlineButton } from "../shared/buttons";
 
 export interface IPropFeatures {
   [key: string]: Feature[];
@@ -133,7 +134,7 @@ export default function AddPropertyDetails({
   };
 
   return (
-    <ToggleCollapse header="Other Details" open={false}>
+    <ToggleCollapse header="Other Details" open={true}>
       {/* Negotiable Toggle */}
       <div className="mt-4 mb-7">
         <ToggleButtons
@@ -189,12 +190,14 @@ export default function AddPropertyDetails({
         </div>
       ))}
 
-      <button
-        onClick={handleAddFeature}
-        className="p-4 rounded-full card-bg shadow-md flex items-center text-xs gap-2 mt-4"
-      >
-        <FaPlus /> Add new
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <OutlineButton
+          style={{ marginTop: '2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+          onClick={handleAddFeature}
+        >
+          <FaPlus /> Add new
+        </OutlineButton>
+      </div>
 
       {/* Facilities */}
       <h2 className={styles.H2}>Environment / Facilities</h2>
@@ -203,13 +206,6 @@ export default function AddPropertyDetails({
         selectedTags={[...existingFacilities, ...selectedFacilities]}
         onToggle={handleToggleFacility}
       />
-
-      <button
-        onClick={handleAddCustomFacility}
-        className="p-4 rounded-full card-bg shadow-md flex items-center gap-2 mt-4 text-xs"
-      >
-        <FaPlus /> Add Custom Facility
-      </button>
 
       {customFacilities.map((facility, index) => (
         <input
@@ -221,6 +217,15 @@ export default function AddPropertyDetails({
           className="w-full border rounded-md p-2 mt-2 text-sm"
         />
       ))}
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <OutlineButton
+          style={{ marginTop: '2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+          onClick={handleAddCustomFacility}
+        >
+          <FaPlus /> Add Custom Facility
+        </OutlineButton>
+      </div>      
     </ToggleCollapse>
   );
 }

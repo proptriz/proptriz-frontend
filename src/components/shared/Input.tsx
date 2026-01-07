@@ -35,45 +35,179 @@ export const PasswordInput = ({password, setPassword, name}:PasswordInputProps )
     </>
   )
 }
-
 export const EmailInput = (props:any )=> {
-
   return (
     <>
-    <div className="mb-4">
-      {props.label && <label htmlFor="email" className="block text-sm text-green font-medium mb-1">{props.label}</label>}
-      <input
-        type="email"
-        id="email"
-        value={props.email}
-        onChange={(e) => props.setEmail(e.target.value)}
-        required
-        className="w-full px-4 py-2 border-b border-gray-700 focus:outline-none focus:border-green-600 bg-transparent"
-      />
-    </div>
+      <div className="w-full">
+        {props.label && (
+          <label className="block text-[17px] mb-1" htmlFor={props.id}>
+            {props.label}
+          </label>
+        )}
+
+        <div
+          className="
+            flex items-center p-[10px] w-full rounded-md border-[1px]
+            bg-gray-100 border-primary
+            focus-within:border-secondary
+            focus-within:bg-white
+            transition-colors
+          "
+        >
+          <input
+            type="email"
+            id={props.id}
+            name={props.name}
+            value={props.value}
+            placeholder={props.placeholder}
+            onChange={props.onChange}
+            required={props.required ?? true}
+            className="flex-1 outline-none bg-transparent"
+          />
+
+          {props.icon && (
+            <span className="text-gray-500 ms-auto">
+              {props.icon}
+            </span>
+          )}
+        </div>
+      </div>
+
     </>
   )
 }
 
 export const TextInput = (props:any )=> {
-
   return (
     <>
-      <div className="mb-4">
-        {props.label && <label htmlFor="text" className="block text-green font-medium mb-1">{props.label}</label>}
-        <input
-          type="text"
-          id={props.id}
-          name={props.name}
-          value={props.value}
-          onChange={(e) => props.setValue(e.target.value)}
-          required
-          className="w-full px-4 py-2 border-b border-gray-700 focus:outline-none focus:border-green-600 bg-transparent"
-        />
+      <div className="w-full">
+        {props.label && (
+          <label className="block text-[17px] mb-1" htmlFor={props.id}>
+            {props.label}
+          </label>
+        )}
+
+        <div
+          className="
+            flex items-center p-[10px] w-full rounded-md border-[1px]
+            bg-gray-100 border-primary
+            focus-within:border-secondary
+            focus-within:bg-white
+            transition-colors
+          "
+        >
+          <input
+            type="text"
+            id={props.id}
+            name={props.name}
+            value={props.value}
+            placeholder={props.placeholder}
+            onChange={props.onChange}
+            required={props.required ?? true}
+            className="flex-1 outline-none bg-transparent"
+          />
+
+          {props.icon && (
+            <span className="text-gray-500 ms-auto">
+              {props.icon}
+            </span>
+          )}
+        </div>
       </div>
+
     </>
   )
 }
+export const PhoneInput = (props:any )=> {
+  return (
+    <>
+      <div className="w-full">
+        {props.label && (
+          <label className="block text-[17px] mb-1" htmlFor={props.id}>
+            {props.label}
+          </label>
+        )}
+
+        <div
+          className="
+            flex items-center p-[10px] w-full rounded-md border-[2px]
+            bg-gray-100 border-primary
+            focus-within:border-secondary
+            focus-within:bg-white
+            transition-colors
+          "
+        >
+          <input
+            type="tel"
+            id={props.id}
+            name={props.name}
+            value={props.value}
+            placeholder={props.placeholder}
+            onChange={props.onChange}
+            required={props.required ?? true}
+            className="flex-1 outline-none bg-transparent"
+          />
+
+          {props.icon && (
+            <span className="text-gray-500 ms-auto">
+              {props.icon}
+            </span>
+          )}
+        </div>
+      </div>
+
+    </>
+  )
+}
+
+export const TextareaInput = (props:any )=> {
+  return (
+    <>
+      <div className="w-full">
+        {props.label && (
+          <label className="block text-[17px] mb-1" htmlFor={props.id}>
+            {props.label}
+          </label>
+        )}
+
+        <div
+          className="
+            flex items-center p-[10px] w-full rounded-md border-[1px]
+            bg-gray-100 border-primary
+            focus-within:border-secondary
+            focus-within:bg-white
+            transition-colors
+          "
+        >
+          <textarea
+            id={props.id}
+            name={props.name}
+            value={props.value}
+            placeholder={props.placeholder}
+            onChange={props.onChange}
+            required={props.required ?? true}
+            rows={4}
+            className="
+              flex-1
+              outline-none
+              bg-transparent
+              resize-none
+              overflow-y-auto
+            "
+          />
+
+          {props.icon && (
+            <span className="text-gray-500 ms-auto">
+              {props.icon}
+            </span>
+          )}
+        </div>
+      </div>
+
+    </>
+  )
+}
+
 interface ListItem {
   title: string;
   value: string;
@@ -97,14 +231,14 @@ export function SelectButton<T extends string>({
 
   return (
     <>
-    {label && <h3 className={styles.H2}>{label}</h3>}
-    <div className="space-x-4 space-y-5 text-sm overflow-x-auto whitespace-nowrap">
+    {label && <label className={styles.H2}>{label}</label>}
+    <div className="space-x-4 text-sm overflow-x-auto whitespace-nowrap">
       {list &&
         list.map((item, index) => (
           <button
             key={index}
             name={name}
-            className={`px-6 py-3 shadow-md rounded-md ${
+            className={`px-4 py-2 shadow-md rounded-md ${
               value === item.value ? "bg-green text-white" : "card-bg"
             }`}
             onClick={() => setValue(item.value as T)}
@@ -189,6 +323,28 @@ export const Slider: React.FC<SliderProps> = ({
         <span>₦{value[0].toLocaleString()}</span>
         <span>₦{value[1].toLocaleString()}</span>
       </div>
+    </div>
+  );
+};
+
+export const SelectInput = (props: any) => {
+  return (
+    <div className="rounded-md">
+      {props.label && (
+        <label className="block text-[17px]">{props.label}</label>
+      )}
+      <select 
+        name={props.name} 
+        value={props.value}
+        onChange={props.onChange} 
+        className="p-[10px] bg-gray-50 block w-full rounded-md border-primary outline-0 bg-transparent border-[1px] focus:border-secondary focus:bg-white"
+      >
+        {props.options.map((option: any) => (
+          <option key={option.value} value={option.value}>
+            {option.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };

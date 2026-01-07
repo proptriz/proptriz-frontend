@@ -20,6 +20,7 @@ const Counter: React.FC<CounterProps> = ({
         <button
           className="bg-gray-200 px-3 py-1 rounded-md"
           onClick={onDecrement}
+          type="button"
         >
           -
         </button>
@@ -27,6 +28,7 @@ const Counter: React.FC<CounterProps> = ({
         <button
           className="bg-gray-200 px-3 py-1 rounded-md"
           onClick={onIncrement}
+          type="button"
         >
           +
         </button>

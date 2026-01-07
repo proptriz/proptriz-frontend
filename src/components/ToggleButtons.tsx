@@ -12,7 +12,7 @@ function ToggleButtons<T extends string>({label, selected, options, onChange }: 
   return (
     <>
     {label && <h3 className={styles.H2}>{label}</h3>}
-    <div className="flex space-x-2 my-4">
+    <div className="flex space-x-2">
       {options.map((option) => (
         <button
           key={option}

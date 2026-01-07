@@ -4,9 +4,8 @@ import { useState, useContext } from "react";
 import { IoHomeOutline } from "react-icons/io5";
 import { FaArrowLeft } from "react-icons/fa6";
 import { ScreenName } from "@/components/shared/LabelCards";
-import { SelectButton } from "@/components/shared/Input";
+import { SelectButton, TextareaInput, TextInput } from "@/components/shared/Input";
 import ToggleButtons from "@/components/ToggleButtons";
-import PropertyLocationSection from "@/components/property/PropertyLocationSection";
 import PhotoUploadSection from "@/components/property/PhotoUploadSection";
 import AddPropertyDetails from "@/components/property/AddDetailsSection";
 import { AppContext } from "@/context/AppContextProvider";
@@ -17,13 +16,17 @@ import { toast } from "react-toastify";
 import logger from "../../../../logger.config.mjs"
 import Popup from "@/components/shared/Popup";
 import { IoMdArrowDropdown } from "react-icons/io";
-import ToggleCollapse from "@/components/shared/ToggleCollapse";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import Splash from "@/components/shared/Splash";
+import { CgDetailsMore } from "react-icons/cg";
+import Counter from "@/components/Counter";
+import PropertyLocationModal from "@/components/property/PropertyLocationSection";
+import { OutlineButton } from "@/components/shared/buttons";
 
 export default function AddPropertyPage() {
   const { authUser } = useContext(AppContext);
   const [propertyTitle, setPropertyTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [propertyAddress, setPropertyAddress] = useState<string>("");
   const [price, setPrice] = useState<string>("0.00");
   const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
@@ -39,6 +42,8 @@ export default function AddPropertyPage() {
   const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [togglePopup, setTogglePopup] = useState(false);
+  const [duration, setDuration] = useState<number>(1)
+  const [openLocPicker, setOpenLocPicker] = useState<boolean>(false)
 
   const maxPhotos = 1;
 
@@ -103,6 +108,8 @@ export default function AddPropertyPage() {
     formData.append("address", propertyAddress);
     formData.append("listed_for", listedFor);
     formData.append("category", category);
+    formData.append("description", description);
+    formData.append("duration", duration.toString());
     formData.append("negotiable", negotiable === NegotiableEnum.Negotiable ? "true" : "false");
     formData.append("status", propertyStatus);
     formData.append("latitude", String(propCoordinates?.[0] || userCoordinates[0]));
@@ -139,7 +146,7 @@ export default function AddPropertyPage() {
 
   return (
     <>
-    <div className="pb-16 mx-auto w-full">
+    <div className="relative pb-16 mx-auto w-full">
       <ScreenName title="Add Property" />
 
       <div className="p-6">
@@ -156,112 +163,148 @@ export default function AddPropertyPage() {
           value={category} 
         />
 
-        {/* Property Title */}
-        <div>
-          <h3 className={styles.H2}>Property title</h3>
-          <div className="flex card-bg p-3 rounded-full shadow-md">
-            <input
-              name="title"
-              value={propertyTitle}
-              onChange={(e) => setPropertyTitle(e.target.value)}
-              type="text"
-              placeholder="Property title here"
-              className="w-full outline-none card-bg"
+        <div className="mt-4 space-y-4">
+          {/* Property Title */}
+          <TextInput
+            label="Property title"
+            icon={<IoHomeOutline />}
+            id="title"
+            name="title"
+            value={propertyTitle}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPropertyTitle(e.target.value)}
+            placeholder="Property title here"
+          />
+
+          {/* Listed For */}
+          <div className="">
+            <SelectButton<ListForEnum> 
+              list={listingTypes} 
+              setValue={setListedFor} 
+              name="listedFor" 
+              value={listedFor} 
+              label="Listed For" 
             />
-            <button className="text-gray-500 text-lg px-3" disabled>
-              <IoHomeOutline className="font-bold" />
-            </button>
+          </div>
+
+          {/* Price */}
+          <div>
+            <label className={styles.H2} htmlFor={"price"}>
+              {listedFor === ListForEnum.rent ? "Rent Price" : "Sell Price"}
+            </label>
+            <div 
+            className="flex items-center p-[10px] w-full rounded-md border-[1px]
+              bg-gray-100 border-primary
+              focus-within:border-secondary
+              focus-within:bg-white
+              transition-colors
+              "
+            >
+              <input
+                name="price"
+                id="price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                type="number"
+                placeholder="Property price here"
+                className="w-full outline-none bg-transparent"
+              />
+              <button 
+                className="text-gray-500 text-lg px-3 flex items-center gap-1"
+                onClick={() => setTogglePopup(!togglePopup)}
+              >
+                {currency}
+                <IoMdArrowDropdown />          
+              </button>
+            </div>
+          </div>
+
+          <div>
+            {listedFor === ListForEnum.rent && (
+              <ToggleButtons<RenewalEnum>
+                label="Tenancy Period"
+                options={Object.values(RenewalEnum)}
+                selected={renewPeriod}
+                onChange={setRenewPeriod}
+              />
+            )} 
+          </div>
+
+          <TextareaInput
+            label="Property Description (optional)"
+            id='description'
+            icon={<CgDetailsMore />}
+            name="description"
+            value={description}
+            onChange={(e:React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+            placeholder="Enter Property details here"
+            className="w-full outline-none card-bg"
+          />
+
+          <div className="gap-4 items-center mt-4">
+            <label htmlFor="duration"  className={styles.H2}>Listing Duration (in weeks)</label>
+            <div 
+              className="flex items-center w-full px-2 rounded-md border-[1px]
+              bg-gray-100 border-primary
+              focus-within:border-secondary
+              focus-within:bg-white
+              transition-colors
+              "
+            >
+              <input
+                type="number"
+                name="duration"
+                id="duration"
+                placeholder="Enter listing duration (in weeks)"
+                value={duration}
+                min={1}
+                max={50}
+                readOnly
+                onChange={(e:React.ChangeEvent<HTMLInputElement>) => {setDuration(parseInt(e.target.value) || 1)}}
+                className="w-full outline-none p-1 bg-transparent"
+              />
+              <Counter
+                label=""
+                value={duration}
+                onIncrement={() => setDuration(duration < 50 ? duration + 1 : 50)}
+                onDecrement={() => setDuration(duration > 1 ? duration - 1 : 1)}
+              />
+            </div>
+          </div>
+
+          {/* Availability status */}
+          <div>
+            <ToggleButtons<PropertyStatusEnum>
+              label="Availability status"
+              options={Object.values(PropertyStatusEnum).filter(status => status !== PropertyStatusEnum.expired)}
+              selected={propertyStatus}
+              onChange={setPropertStatus}
+            />
           </div>
         </div>
 
-        {/* Listed For */}
-        <SelectButton<ListForEnum> 
-          list={listingTypes} 
-          setValue={setListedFor} 
-          name="listedFor" 
-          value={listedFor} 
-          label="Listed For" 
-        />
-
-        {/* Price */}
-        <div>
-          <h3 className={styles.H2}>
-            {listedFor === ListForEnum.rent ? "Rent Price" : "Sell Price"}
-          </h3>
-          <div className="flex card-bg p-3 rounded-lg shadow-md">
-            <input
-              name="price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              type="number"
-              placeholder="Property price here"
-              className="w-full outline-none card-bg"
-            />
-            <button 
-              className="text-gray-500 text-lg px-3 flex items-center gap-1"
-              onClick={() => setTogglePopup(!togglePopup)}
-            >
-              {/* <FaNairaSign className="font-bold" />     */}
-              {currency}
-              <IoMdArrowDropdown />          
-            </button>
-          </div>
-        </div>         
-
-        {listedFor === ListForEnum.rent && (
-          <ToggleButtons<RenewalEnum>
-            label="Tenancy Period"
-            options={Object.values(RenewalEnum)}
-            selected={renewPeriod}
-            onChange={setRenewPeriod}
-          />
-        )}
-
-        {/* Availability status */}
-        <ToggleButtons<PropertyStatusEnum>
-          label="Availability status"
-          options={Object.values(PropertyStatusEnum).filter(status => status !== PropertyStatusEnum.expired)}
-          selected={propertyStatus}
-          onChange={setPropertStatus}
-        />
-
         {/* Property Location & Address */}
-        <ToggleCollapse header="Property Location" open={true}>
-          {/* Address */}
-          <div className="mb-4">
-            <h3 className={styles.H2}>Property Address</h3>
-            <div className="flex card-bg p-3 rounded-full shadow-md">
-              <input
-                name="address"
-                value={propertyAddress}
-                onChange={(e) => setPropertyAddress(e.target.value)}
-                type="text"
-                placeholder="Enter property Address"
-                className="w-full outline-none card-bg"
-              />
-              <button className="text-gray-500 text-lg px-3" disabled>
-                <HiOutlineLocationMarker className="font-bold" />
-              </button>
-            </div>
-          </div> 
-
-          {/* Map */}
-          <PropertyLocationSection
-            userCoordinates={userCoordinates}
-            fallbackCoordinates={userCoordinates}
-            onLocationSelect={handleLocationSelect}
+        {/* Address */}
+        <div className="mt-4">
+          <TextInput 
+            label="Property Address"
+            icon={<HiOutlineLocationMarker />}
+            name="address"
+            id="address"
+            value={propertyAddress}
+            onChange={(e:React.ChangeEvent<HTMLInputElement>) => setPropertyAddress(e.target.value)}
+            placeholder="Enter property Address"
           />
-        </ToggleCollapse>
+        </div>
+
+        <div className="w-full flex justify-end mt-4">
+          <OutlineButton 
+            onClick={()=>setOpenLocPicker(true)}
+          >
+            Pick property location
+          </OutlineButton>
+        </div>
         
-
-        <ToggleCollapse header="Description & Special terms" open={false}>
-          <div className="flex flex-col gap-3">
-            <textarea name="description" id="" placeholder="Enter property description"></textarea>
-            <textarea name="property_terms" id="" placeholder="Enter property Special terms"></textarea>
-          </div>
-          
-        </ToggleCollapse>
-
+      
         {/* Photo Upload */}
         <PhotoUploadSection
           photos={photos}
@@ -303,7 +346,16 @@ export default function AddPropertyPage() {
           </div>
         </div>
       </div>
+
     </div>
+    <PropertyLocationModal
+      isOpen={openLocPicker}
+      onClose={() => setOpenLocPicker(false)}
+      userCoordinates={userCoordinates}
+      fallbackCoordinates={[9.082, 8.6753]} // Nigeria default
+      onLocationSelect={handleLocationSelect}
+    />
+    
     {/* Currency popup */}
     <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
       <div className="my-3">

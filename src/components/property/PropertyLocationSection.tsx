@@ -27,21 +27,60 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const [searchValue, setSearchValue] = useState("");
+  const [submittedQuery, setSubmittedQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+    const triggerSearch = () => {
+      if (searchValue.trim()) {
+        setSubmittedQuery(searchValue.trim());
+      }
+    };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-b">
-        <h2 className="text-lg font-semibold">Select Property Location</h2>
-        <button
-          onClick={onClose}
-          className="text-sm px-3 py-1 rounded-md border hover:bg-gray-100"
-        >
-          Close
-        </button>
-      </div>
+      
 
       {/* Map */}
       <div className="flex-1 relative">
+        {/* Header */}
+        <div className="relative flex items-center justify-between px-4 py-2 bg-white border-b z-10 mb-3">
+          <h2 className="text-lg font-semibold">Select Property Location</h2>
+          <button
+            onClick={onClose}
+            className="text-sm px-3 py-1 rounded-md hover:bg-red-500 bg-red-700 text-white"
+          >
+            Close
+          </button>
+        </div>
+        {/* Search Bar */}
+        <div className="relative w-full md:max-w-[75%] lg:max-w-[50%] mx-auto z-10">
+          <div className="flex">
+            <div className="flex bg-white rounded-l-full shadow-md p-2 w-full">
+              <input
+                type="text"
+                placeholder="Search location (Nigeria only)..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && triggerSearch()}
+                className="w-full outline-none text-gray-600"
+              />
+            </div>
+  
+            <button
+              type="button"
+              onClick={triggerSearch}
+              disabled={loading}
+              className="ml-1 bg-primary px-6 rounded-r-full text-white flex items-center justify-center"
+            >
+              {loading ? (
+                <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+              ) : (
+                <FiSearch className="text-xl" />
+              )}
+            </button>
+          </div>
+        </div>
         <LocationPickerMap
           initialCenter={userCoordinates || fallbackCoordinates}
           onLocationSelect={onLocationSelect}
@@ -59,16 +98,6 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
           </button>
         </div>
         
-      </div>
-
-      {/* Footer */}
-      <div className="bg-white border-t px-4 py-3">
-        <button
-          className="w-full py-3 rounded-md card-bg text-sm"
-          onClick={onClose}
-        >
-          Confirm Location
-        </button>
       </div>
     </div>
   );

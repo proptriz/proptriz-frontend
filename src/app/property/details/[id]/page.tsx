@@ -15,8 +15,7 @@ import Price from "@/components/shared/Price";
 import GalleryModal from "@/components/shared/GalleryModal";
 import { BiShareAlt } from "react-icons/bi";
 import StickyAgentInfo from "@/components/StickyAgent";
-import Popup from "@/components/shared/Popup";
-import ReplyReview from "@/components/ReplyReview";
+import PropertyDescription from "@/components/shared/Description";
 
 const PropertyDetail = ({
   params
@@ -34,8 +33,6 @@ const PropertyDetail = ({
   const [togglePopup, setTogglePopup] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
-  const [replyId, setReplyId] = useState<string>('');
 
   useEffect(() => {
     if (!propertyId || property) return
@@ -157,9 +154,8 @@ const PropertyDetail = ({
             <div className="p-5">
               <div className="flex items-center justify-between">
                 <p>
-                  Listed on: {property.updatedAt && new Date(property.updatedAt).toLocaleString(undefined, {
+                  Updated on: {property.updatedAt && new Date(property.updatedAt).toLocaleString(undefined, {
                     dateStyle: "medium",
-                    timeStyle: "short",
                   })}
                 </p>
                 <p className="bg-primary text-secondary px-3 py-1 rounded-sm text-sm">
@@ -168,7 +164,7 @@ const PropertyDetail = ({
               </div>
               <div className="flex items-center justify-between mt-3">
                 <div>
-                  <h1 className="text-2xl font-bold">{ property.title }</h1>
+                  <h1 className="text-lg font-bold">{ property.title }</h1>
                   <div  className="flex">
                     <HiOutlineLocationMarker />
                     <p className="text-gray-500 text-sm"> { property.address }</p>
@@ -179,7 +175,7 @@ const PropertyDetail = ({
               </div>
             </div>
 
-            {/* Property Details */}
+            {/* Property Features */}
             <div className="px-5 mb-7 flex overflow-x-auto space-x-6">
               {property.features?.map((item, key)=>(
                 <div className="card-bg flex p-3 rounded-lg text-sm text-primary items-center" key={key}>
@@ -189,10 +185,10 @@ const PropertyDetail = ({
               ))}               
             </div>
 
-            <button className="text-xl font-semibold card-bg p-4 rounded-full">
-              {/* {<TbView360Number />} */}
-              {property.status}
-            </button>
+            {/* Property Description */}
+            <div className="px-5">
+              <PropertyDescription description={property.description} />
+            </div>
 
             {/* Map Section */}
             <div className="px-5 mt-5">

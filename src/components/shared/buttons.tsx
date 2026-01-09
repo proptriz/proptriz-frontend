@@ -152,7 +152,7 @@ export const OutlineButton = (props:any) => {
   return (
     <button
       {...props}
-      className={`text-primary text-sm focus:bg-primary z-10 pointer-events-auto p-2 shadow-lg hover:shadow-xl transition-shadow duration-300 outline-none ring-4 ring-offset-2 ring-secondary focus:text-secondary rounded-md`}
+      className={`text-primary text-sm focus:bg-primary z-10 pointer-events-auto p-2 shadow-lg hover:shadow-xl transition-shadow duration-300 outline-none ring-2 ring-offset-2 ring-secondary focus:text-secondary rounded-md`}
     >
       {props.children}
     </button>

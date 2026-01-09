@@ -7,19 +7,19 @@ import { FaUser, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { FaPencil } from 'react-icons/fa6';
 import { toast } from 'react-toastify';
 import logger from '../../../../logger.config.mjs';
-import { styles } from '@/constant';
 import { BsWhatsapp } from 'react-icons/bs';
-import { UserSettingsType } from '@/types';
+import { UserSettingsType, UserTypeEnum } from '@/types';
 import ToggleCollapse from '@/components/shared/ToggleCollapse';
 import { addOrUpdateUserSettings, getUserSettings } from '@/services/settingsApi';
 import Image from 'next/image';
+import { EmailInput, PhoneInput, SelectInput, TextInput } from '@/components/shared/Input';
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
   const [photo, setPhoto] = useState<File>();
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string>("/logo.png");
-  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<Partial<UserSettingsType>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     // Fetch existing user settings if needed
@@ -81,7 +81,7 @@ const EditProfile = () => {
 
   const handleSubmit = async () => {
     try {
-      setSubmitLoading(true);
+      setIsLoading(true);
       const updatedSettings = addOrUpdateUserSettings(formData, photo);
       if (updatedSettings) {
         logger.info('User profile updated', updatedSettings);
@@ -90,16 +90,16 @@ const EditProfile = () => {
       logger.error('Error updating profile', err);
       toast.error('Failed to update profile.');
     } finally {
-      setSubmitLoading(false);
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className="p-6">
+    <div className="px-6 pb-7">
       <ScreenName title="Update Profile" />
 
       <div className="flex flex-col items-center mb-8">
-        <div className="relative bg-white w-32 h-32 rounded-full p-1 mt-4 overflow-hidden shadow-lg">
+        <div className="relative bg-white w-32 h-32 rounded-full p-1 overflow-hidden shadow-lg">
           <input
             type="file"
             name="image"
@@ -107,7 +107,7 @@ const EditProfile = () => {
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             onChange={handleUpload} 
           />
-
+          
           <Image 
             src={photo ? URL.createObjectURL(photo) : existingPhotoUrl}
             height={32}
@@ -115,6 +115,7 @@ const EditProfile = () => {
             alt="profile"
             className="rounded-full w-full h-full object-cover"
           />
+
           <div className="absolute bottom-2 right-1 bg-white p-2 rounded-full shadow-md">
             <FaPencil className="text-green text-sm" />
           </div>
@@ -123,82 +124,74 @@ const EditProfile = () => {
 
       {/* Form Fields */}
       <div className="space-y-6">
-        <div> 
-          <h3 className={styles.H2}>Full name or Brand:</h3>
-          <div className="flex items-center card-bg rounded-xl p-3">                
-            <input
-              name='brand'
-              type="text"
-              value={formData.brand || ""}
-              onChange={onChange}
-              placeholder='Enter your full name or brand'
-              className="w-full bg-transparent outline-none"
-            />
-              <FaUser className="text-gray-500 ms-auto" />
-          </div>
-        </div>
+        <TextInput
+          label="Full name or Brand:" 
+          icon={<FaUser />} 
+          name='brand'
+          id={'brand'}
+          value={formData.brand || ""}  
+          onChange={onChange} 
+          placeholder='Enter your full name or brand' 
+        />
+
+        <SelectInput 
+          label={"Register as:"}
+          value={formData.user_type || UserTypeEnum.Individual}
+          onChange={onChange}
+          options={Object.values(UserTypeEnum).map((type) => ({ name: type.charAt(0).toUpperCase() + type.slice(1), value: type }))}
+          name="user_type"
+        />
         
         <ToggleCollapse header="Contact Details" open={true} >
-          <div> 
-            <h3 className={styles.H2}>Email (optional):</h3> 
-            <div className="flex items-center card-bg rounded-xl p-3">           
-              <input
-                name='email'
-                type="email"
-                value={formData.email || ""}
-                onChange={onChange}
-                placeholder='Enter your email'
-                className="w-full bg-transparent outline-none"
-              />
-                <FaEnvelope className="text-gray-500 ms-auto" />
-            </div>
-          </div>
-          <div>
-            <h3 className={styles.H2}>Phone number (optional):</h3> 
-            <div className="flex items-center card-bg rounded-xl p-3">             
-              <input
-                type="tel"
-                name='phone'
-                value={formData.phone || ""}
-                onChange={onChange}
-                placeholder='Enter your phone number (+234 080-3288-9111)'
-                className="w-full bg-transparent outline-none"
-              />
-              <FaPhone className="text-gray-500 ms-auto" />
-            </div>
-          </div>
-          <div>
-            <h3 className={styles.H2}>Whatsapp number (optional):</h3>          
-            <div className="flex items-center card-bg rounded-xl p-3">
-              <input
-                type="tel"
-                name='whatsapp'
-                value={formData.whatsapp || ""}
-                onChange={onChange}
-                placeholder='Enter your Whatsapp number (+234 080-3288-9111)'
-                className="w-full bg-transparent outline-none"
-              />
-              <BsWhatsapp className="text-gray-500 ms-auto" />
-            </div>
+          <div className='space-y-4'>
+            <EmailInput
+              label="Email (optional):" 
+              icon={<FaEnvelope />} 
+              name='email'
+              id={'email'}
+              value={formData.email || ""}  
+              onChange={onChange} 
+              placeholder='Enter your email'
+            />
+
+            <PhoneInput
+              label="Phone number (optional):" 
+              icon={<FaPhone />} 
+              name='phone'
+              id={'phone'}
+              value={formData.phone || ""}  
+              onChange={onChange} 
+              placeholder='Enter your phone number (+234 080-3288-9111)'
+            />
+
+            <PhoneInput
+              label="Whatsapp number (optional):" 
+              icon={<BsWhatsapp />} 
+              name='whatsapp'
+              id={'whatsapp'}
+              value={formData.phone || ""}  
+              onChange={onChange} 
+              placeholder='Enter your Whatsapp number (234 080-3288-9111)'
+            />
           </div>
         </ToggleCollapse>
         
       </div>
 
       {/* Submit Button */}
-      <div className="mt-16 bottom-3">
+      <div className="mt-16 mb-7">
         {authUser? <button
-            disabled={submitLoading}
+            disabled={isLoading}
             onClick={handleSubmit}
-            className={`px-4 py-2 rounded-md w-full text-white ${
-              submitLoading ? "bg-gray-400" : "bg-green"
+            className={`px-4 py-2 rounded-md w-full text-white focus:border-secondary ${
+              isLoading ? "bg-gray-400 text-primary" : "bg-primary text-white"
             }`}
           >
-            {submitLoading ? "Updating..." : "Update Profile"}
+            {isLoading ? "Updating..." : "Update Profile"}
           </button> :
           <button
             disabled
-            className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 
+            className="px-4 py-2 rounded-md w-full text-white bg-tertiary" 
           >
             Update (Login on Pi Browser)
           </button>

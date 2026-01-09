@@ -110,21 +110,33 @@ const Map: React.FC<MapProps> = ({
   setMapBounds  = () => {},
 }) => {
 
+  const africaBounds: L.LatLngBoundsExpression = [
+    [-35, -20], // South-West (latitude, longitude)
+    [38, 55],   // North-East
+  ];
+
   return (
     <div className="absolute h-full w-full z-0" style={{ minHeight: 400, height: '100%', overflow: 'hidden' }}>
       
       {/* Map Container */}
       <MapContainer
+        center={mapCenter ?? [9.082, 8.6753]} 
         zoomControl={false}
+        maxBounds={africaBounds}
+        maxBoundsViscosity={1.0}
         className="w-full flex-1 fixed bottom-0 h-full left-0 right-0"
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; OpenStreetMap contributors'
         />
-        {/* Update map view to user location */}
-        {mapCenter && <MapUpdater center={mapCenter as LatLngExpression} zoom={initialZoom} />}
 
+        {mapCenter && (
+          <MapUpdater
+            center={mapCenter as LatLngExpression}
+            zoom={initialZoom}
+          />
+        )}
         {/* Capture bounds */}
         {mapCenter && <MapBoundsUpdater onBoundsChange={setMapBounds} />}
 

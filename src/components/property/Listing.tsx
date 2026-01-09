@@ -1,11 +1,10 @@
 'use client';
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 import HorizontalCard from "../shared/HorizontalCard";
 import Link from "next/link";
 import { PropertyType } from "@/types";
-import formatPrice from "@/utils/formatPrice";
 import { VerticalCard } from "../shared/VerticalCard";
 
 interface PropertyListingProps {

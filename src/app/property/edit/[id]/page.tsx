@@ -420,8 +420,8 @@ export default function EditPropertyPage({
       <PropertyLocationModal
         isOpen={openLocPicker}
         onClose={() => setOpenLocPicker(false)}
-        userCoordinates={userCoordinates}
-        fallbackCoordinates={[9.082, 8.6753]} // Nigeria default
+        userCoordinates={propCoordinates}
+        fallbackCoordinates={userCoordinates || [9.082, 8.6753]} // Nigeria default
         onLocationSelect={handleLocationSelect}
       />
 

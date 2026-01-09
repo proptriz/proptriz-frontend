@@ -2,7 +2,6 @@
 "use client";
 import React, { useState } from 'react';
 import { AppButton as Button } from "@/components/shared/buttons";
-import { Select } from "@/components/shared/Input";
 import { Slider } from "@/components/shared/Input";
 import { TiFilter } from "react-icons/ti";
 import { FiSearch } from "react-icons/fi";

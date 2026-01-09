@@ -9,7 +9,6 @@ import { getPropertyById } from "@/services/propertyApi";
 import { PropertyType } from "@/types";
 import logger from "logger.config.mjs";
 import Image from "next/image";
-import getUserPosition from "@/utils/getUserPosition";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -23,15 +22,15 @@ export default function PropertyMap({
   const propertyId = resolvedParams.id;
 
   const [property, setProperty] = useState<PropertyType | null>(null);
-  const [propLoc, setPropLoc] = useState<[number, number]>([0.0, 0.0]);
-  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
-  const [zoomLevel, setZoomLevel] = useState<number>(13);
-
+  const [propLoc, setPropLoc] = useState<[number, number]>([9.082, 8.6753]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!propertyId || property) return;
     const fetchProperty = async () => {
       try {
+        setLoading(true)
         const property = await getPropertyById(propertyId);
         if (property.id) {
           setProperty(property);
@@ -42,17 +41,28 @@ export default function PropertyMap({
         }
       } catch (error: any) {
         logger.info("error fetching all property ");
+        setError("error lodaing property location")
+      } finally {
+        setLoading(false)
       }
       
     };
         
     fetchProperty()
   }, [propertyId]);
+
+  if (loading) return (
+    <div>Map Location is loading</div>
+  )
+
+  if (error) return (
+    <div className="text-red">Error Property Location</div>
+  )
     
   return (
     <div className="flex flex-col">
       {/* Map Section */}
-      <div className="">
+      {property && <div className="">
         {/* Top Buttons */}
         <div className="absolute z-10 pt-2">
           <div className="flex overflow-x-auto space-x-4 px-5 relative">
@@ -118,11 +128,11 @@ export default function PropertyMap({
         {property && <div className="relative flex-1">
           <Map 
             properties={[property]} 
-            mapCenter={propLoc || mapCenter}
-            initialZoom={zoomLevel}
+            mapCenter={propLoc }
+            initialZoom={10}
           />
         </div>}
-      </div>
+      </div>}
     </div>
   );
 }

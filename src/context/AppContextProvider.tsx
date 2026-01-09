@@ -5,7 +5,6 @@ import {
   useState,
   SetStateAction,
   ReactNode,
-  useEffect,
   useRef
 } from 'react';
 import axiosClient, {setAuthToken} from '@/config/client';

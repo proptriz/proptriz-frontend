@@ -13,7 +13,6 @@ import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../logger.config.mjs"
 import Header from "@/components/shared/Header";
 import Link from "next/link";
-import { OutlineButton } from "@/components/shared/buttons";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 

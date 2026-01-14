@@ -12,12 +12,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Proptriz Hub',
     description: 'Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.',
-    metadataBase: new URL('https://proptriz.com'),
-    alternates: { canonical: 'https://proptriz.com'},
+    metadataBase: new URL('https://proptriz4623.pinet.com'),
+    alternates: { canonical: 'https://proptriz4623.pinet.com'},
     openGraph: {
       title: 'Proptriz Hub',
       description: 'Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.',
-      url: 'https://proptriz.com',
+      url: 'https://proptriz4623.pinet.com',
       siteName: 'Proptriz Hub',
       type: 'website',
       locale: 'en_US',
@@ -52,7 +52,7 @@ export default function RootLayout({
           content="Proptriz Hub, Connecting you with trusted properties"
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://proptriz.com" />
+        <meta property="og:url" content="https://proptriz4623.pinet.com" />
         <meta
           name="description"
           content="Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities."

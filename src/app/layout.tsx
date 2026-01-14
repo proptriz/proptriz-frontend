@@ -12,12 +12,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Proptriz Hub',
     description: 'Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.',
-    metadataBase: new URL('https://proptriz.netlify.app'),
-    alternates: { canonical: 'https://proptriz-test.netlify.app'},
+    metadataBase: new URL('https://proptriz.com'),
+    alternates: { canonical: 'https://proptriz.com'},
     openGraph: {
       title: 'Proptriz Hub',
       description: 'Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities.',
-      url: 'https://proptriz.netlify.app',
+      url: 'https://proptriz.com',
       siteName: 'Proptriz Hub',
       type: 'website',
       locale: 'en_US',
@@ -52,17 +52,18 @@ export default function RootLayout({
           content="Proptriz Hub, Connecting you with trusted properties"
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://proptriz.netlify.app" />
+        <meta property="og:url" content="https://proptriz.com" />
         <meta
           name="description"
           content="Proptriz, A Web3 integrated platform that helps you discover trusted properties within your locality for rent, sale and investment opportunities."
          />
-        <meta name="keywords" content="property, properties, rent, sale, pi, land, apartment, real estate" />
-        <meta name="author" content="Proptriz Team" />
+        <meta name="keywords" content="proptriz, hub, app, property, properties, rent, sale, pi, land, apartment, real estate, nigeria, africa" />
+        <meta name="author" content="Proptriz Hub Team" />
         <meta
           httpEquiv="Content-Security-Policy"
           content="font-src 'self' https://cdnjs.cloudflare.com/ajax/libs/font-awesome/https://fonts.gstatic.com/;"
         />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         {/* Google tag (gtag.js) using Next.js Script */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-0T7BSEVRN9"

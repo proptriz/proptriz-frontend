@@ -109,12 +109,6 @@ const ACTIONS = ({ phone, email }:{ phone: string; email: string }) => [
     label: "Call",
   },
   {
-    key: "sms",
-    href: `sms:${phone}`,
-    Icon: Text3DIcon,
-    label: "Text",
-  },
-  {
     key: "email",
     href: `mailto:${email}`,
     Icon: GmailMinimalIcon,

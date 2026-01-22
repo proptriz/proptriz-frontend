@@ -113,6 +113,7 @@ export const getPropertyById = async (propertyId: string): Promise<PropertyType>
       user_type: userDetails.user_type,
       phone: userDetails.phone,
       brand: userDetails.brand,
+      whatsapp: userDetails.whatsapp,
     },
     longitude: property.map_location?.coordinates[0] || 0.0,
     latitude: property.map_location?.coordinates[1] || 0.0,

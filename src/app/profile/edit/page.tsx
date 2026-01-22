@@ -169,7 +169,7 @@ const EditProfile = () => {
               icon={<BsWhatsapp />} 
               name='whatsapp'
               id={'whatsapp'}
-              value={formData.phone || ""}  
+              value={formData.whatsapp || ""}  
               onChange={onChange} 
               placeholder='Enter your Whatsapp number (234 080-3288-9111)'
             />

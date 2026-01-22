@@ -25,7 +25,7 @@ const PropertyDetail = ({
   const router = useRouter();
   const resolvedParams = use(params);
   const propertyId = resolvedParams.id;
-  logger.info("property id: ", propertyId)
+  logger.info("property id: ", propertyId);
 
   const [property, setProperty] = useState<PropertyType | null>(null);
   const [nearestProperty, setNearestProperty] = useState<PropertyType[]>([]);
@@ -33,6 +33,7 @@ const PropertyDetail = ({
   const [togglePopup, setTogglePopup] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [baseURL, setBaseURL] = useState('');
 
   useEffect(() => {
     if (!propertyId || property) return
@@ -60,22 +61,35 @@ const PropertyDetail = ({
 
   useEffect(() => {
     if (!propertyId || nearestProperty.length>0) return
+    
     const fetchProperty = async () => {
       try {
         const properties = await getNearestProperties(propertyId);
+        
         if (properties && properties.length>0) {
           setNearestProperty(properties);
           logger.info("fetched properties: ", properties);
+
         } else {
           logger.info("unable to fetch nearest properties ");
         }
+
       } catch (error:any){
         logger.info("error fetching nearest properties ");
       }
     };
-      
+
     fetchProperty()
   }, [propertyId,]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // window.location.origin returns the protocol, hostname, and port (e.g., http://localhost:3000)
+      setBaseURL(window.location.href); 
+    }
+  }, []);
+
+  logger.info("Base URL: ", baseURL);
 
   if (loading){
     return (
@@ -123,6 +137,7 @@ const PropertyDetail = ({
                 <button className="p-2 hover:bg-gray-100 rounded-full shadow-md">
                   <BiShareAlt />
                 </button>
+                
                 <button className="p-2 hover:bg-gray-100 hover:text-red-800 rounded-full shadow-md">
                   <FaRegHeart />
                 </button>
@@ -144,6 +159,7 @@ const PropertyDetail = ({
                   alt="View more images"
                   className="w-16 h-16 object-cover rounded-lg border-2 border-white shadow-lg hover:opacity-90 transition"
                 />
+                
                 <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded-lg text-white text-sm font-medium">
                   +{property?.images?.length || 0}
                 </div>
@@ -158,10 +174,12 @@ const PropertyDetail = ({
                     dateStyle: "medium",
                   })}
                 </p>
+
                 <p className="bg-primary text-secondary px-3 py-1 rounded-sm text-sm">
                   For {property.listed_for.charAt(0).toUpperCase() + property.listed_for.slice(1)}
                 </p>
               </div>
+
               <div className="flex items-center justify-between mt-3">
                 <div>
                   <h1 className="text-lg font-bold">{ property.title }</h1>
@@ -220,11 +238,13 @@ const PropertyDetail = ({
             <Link href={`/property/reviews/${property.id}`}>
               <div className="px-5 mt-10">
                 <h2 className="text-lg font-bold mb-3">Reviews</h2>
+                
                 <div className="bg-primary p-3 rounded-lg flex items-center">
                   <FaStar className="text-secondary" />
                   <span className="ml-2 text-lg text-gray-200 font-bold">5.0</span>
                   <span className="ml-2 text-gray-400">(6 reviews)</span>
                 </div>
+                
                 <div className="mt-3 space-y-3">
                   {/* Review Item */}
                   <ReviewCard 
@@ -241,9 +261,11 @@ const PropertyDetail = ({
                   />
                   {/* Add more reviews here */}
                 </div>
+
                 <button className="mt-3 text-green" onClick={()=>router.push('/property/reviews')}>
                   View all reviews
                 </button>
+
               </div>
             </Link>
 
@@ -275,8 +297,9 @@ const PropertyDetail = ({
             </div>
           </div>}
         </div>
+
         {/* Sticky bottom agent bar */}
-        <StickyAgentInfo user={property.user} />
+        <StickyAgentInfo user={property.user} property={property} baseUrl={baseURL} />
         </>
       )} 
       

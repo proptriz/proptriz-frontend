@@ -4,7 +4,7 @@ import { AppContext } from "@/context/AppContextProvider";
 import { SubmitButton } from "@/components/shared/buttons";
 import Footer from "./Footer";
 
-export default function Splash() {
+export default function Splash({showFooter=false}: {showFooter?: boolean}) {
   const { isSigningInUser, authenticateUser, loginStage} = useContext(AppContext);
   return (
     <>
@@ -29,8 +29,8 @@ export default function Splash() {
       />
       <p className="text-primary">{loginStage}</p>
     </div>
-    
-    <Footer />
+
+    {showFooter && <Footer />}
     </>
   );
 }

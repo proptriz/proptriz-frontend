@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaStar, FaBed, FaRegHeart, FaArrowLeft } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { PropertyType } from "@/types";
+import { PropertyType, RatingScaleEnum } from "@/types";
 import Link from "next/link";
 import { getNearestProperties, getPropertyById } from "@/services/propertyApi";
 import logger from '../../../../../logger.config.mjs';
@@ -16,6 +16,9 @@ import GalleryModal from "@/components/shared/GalleryModal";
 import { BiShareAlt } from "react-icons/bi";
 import StickyAgentInfo from "@/components/StickyAgent";
 import PropertyDescription from "@/components/shared/Description";
+import { OutlineButton } from "@/components/shared/buttons";
+import Popup from "@/components/shared/Popup";
+import { AddReview } from "@/components/AddReview";
 
 const PropertyDetail = ({
   params
@@ -25,7 +28,9 @@ const PropertyDetail = ({
   const router = useRouter();
   const resolvedParams = use(params);
   const propertyId = resolvedParams.id;
-  logger.info("property id: ", propertyId)
+  // logger.info("property id: ", propertyId)
+
+  const maxPhotos = 1;
 
   const [property, setProperty] = useState<PropertyType | null>(null);
   const [nearestProperty, setNearestProperty] = useState<PropertyType[]>([]);
@@ -217,15 +222,31 @@ const PropertyDetail = ({
             </div>
 
             {/* Reviews */}
-            <Link href={`/property/reviews/${property.id}`}>
-              <div className="px-5 mt-10">
-                <h2 className="text-lg font-bold mb-3">Reviews</h2>
-                <div className="bg-primary p-3 rounded-lg flex items-center">
-                  <FaStar className="text-secondary" />
-                  <span className="ml-2 text-lg text-gray-200 font-bold">5.0</span>
-                  <span className="ml-2 text-gray-400">(6 reviews)</span>
-                </div>
+            
+            <div className="px-5 mt-10">
+
+              <h2 className="text-lg font-bold mb-3">Reviews</h2>
+
+              <div className="bg-primary p-3 rounded-lg flex items-center">
+                <FaStar className="text-secondary" />
+                <span className="ml-2 text-lg text-gray-200 font-bold">5.0</span>
+                <span className="ml-2 text-gray-400">(6 reviews)</span>
+
+                <OutlineButton 
+                  style={{
+                    color:"white",
+                    marginLeft: "auto"
+                  }} 
+                  onClick={()=>setTogglePopup(true)}
+                > 
+                  Add review
+                </OutlineButton>
+
+              </div>
+
+              <Link href={`/property/reviews/${property.id}`}>
                 <div className="mt-3 space-y-3">
+
                   {/* Review Item */}
                   <ReviewCard 
                     review={{
@@ -238,15 +259,17 @@ const PropertyDetail = ({
                       replies_count: 3,
                       review_images: [],
                     }}
+
                   />
                   {/* Add more reviews here */}
                 </div>
                 <button className="mt-3 text-green" onClick={()=>router.push('/property/reviews')}>
                   View all reviews
                 </button>
-              </div>
-            </Link>
+              </Link>
 
+            </div>
+            
           {/* Nearby Properties */}
           {nearestProperty && nearestProperty.length>0 && <div className="px-5 mt-10">
             <h2 className="text-lg font-bold mb-3">Properties from same location (Nearby)</h2>
@@ -289,6 +312,12 @@ const PropertyDetail = ({
           onClose={() => setShowGallery(false)}
         />
       )}
+
+        
+      <Popup header="Add review to property" toggle={togglePopup} setToggle={setTogglePopup} useMask={true} hideReset >
+        <AddReview propertyId={propertyId} />
+      </Popup>
+      
     </div>
   );
 };

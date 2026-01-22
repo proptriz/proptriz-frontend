@@ -52,6 +52,14 @@ export type ReviewType = {
   replies_count?: number;
 }
 
+export enum RatingScaleEnum {
+  DESPAIR = 0,
+  SAD = 2,
+  OKAY = 3,
+  HAPPY = 4,
+  DELIGHT = 5
+}
+
 export interface LocationProps {
   id: string;
   distance: number;

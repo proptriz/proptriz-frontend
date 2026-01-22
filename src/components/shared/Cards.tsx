@@ -13,9 +13,11 @@ dayjs.extend(relativeTime);
 export const ReviewCard: React.FC<{
   review: ReviewType;
   showReply?: (id:string) => void;
+  showPropDetails?: boolean
 }> = ({ 
   review, 
   showReply, 
+  showPropDetails = false
 }) => {
   const [relativeTimeString, setRelativeTimeString] = useState("");
 
@@ -31,7 +33,7 @@ export const ReviewCard: React.FC<{
 
   return (
     <div className="border border-[#DCDFD9] rounded-2xl">
-      <div className="p-3 rounded-lg flex items-center h-16">
+      {showPropDetails && <div className="p-3 rounded-lg flex items-center h-16">
         <Image 
           src={'/home/building1.png'}
           width={50} 
@@ -47,7 +49,7 @@ export const ReviewCard: React.FC<{
             <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
           </div>
         </div>
-      </div>
+      </div>}
       <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-5" key={review.id}>
         <div className="flex items-start space-x-3">
           <img

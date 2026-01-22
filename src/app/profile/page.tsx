@@ -95,7 +95,7 @@ export default function ProfileTransaction () {
   }
 
   if (!authUser) {
-    return <Splash />;
+    return <Splash showFooter={true} />;
   }
 
   return (
@@ -262,6 +262,7 @@ export default function ProfileTransaction () {
                 review_images: [],
               }}
               showReply={showReply}
+              showPropDetails={true}
             />
             {/* <button onClick={() => setShowReply(!showReply)}>reply</button> */}
             <ReviewCard
@@ -276,6 +277,7 @@ export default function ProfileTransaction () {
                 review_images: [],
               }}
               showReply={showReply}
+              showPropDetails={true}
           />
             <ReviewCard 
               review={{
@@ -294,6 +296,7 @@ export default function ProfileTransaction () {
                 ]
               }}
               showReply={showReply}
+              showPropDetails={true}
             />
       
           {/* Add more reviews here */}

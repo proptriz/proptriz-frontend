@@ -2,7 +2,15 @@ import { PropertyType, UserSettingsType, UserTypeEnum } from "@/types";
 import { generateWhatsAppLink } from "@/utils/generateWhatsappLink";
 import { Call3DIcon, GmailMinimalIcon, WhatsAppMinimalIcon } from "./Icons";
 
-const StickyAgentInfo = ({user, property, baseUrl}: {user: UserSettingsType, property: PropertyType, baseUrl: string}) => {
+const StickyAgentInfo = ({user, property}: {user: UserSettingsType, property: PropertyType}) => {
+  
+  const link = generateWhatsAppLink({
+    phoneNumber: user.whatsapp || user.phone || "",
+    messageTop: `Hello, I'm interested in this property: ${property.title}`,
+    pageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/property/details/${property.id}`,
+    bustCache: true,
+  });
+
   return (
     <div className="fixed bottom-0 left-0 w-full z-50 border-t shadow-lg">
       <div className="mx-auto md:max-w-[650px] w-full px-5 py-3 flex items-center bg-white">
@@ -49,7 +57,7 @@ const StickyAgentInfo = ({user, property, baseUrl}: {user: UserSettingsType, pro
             {user.whatsapp &&
               <a
                 key={"whatsapp"}
-                href={generateWhatsAppLink(property.title, property.slug, baseUrl, user.whatsapp)}
+                href={link}
                 aria-label={"WhatsApp"}
                 target="_blank"
                 rel="noopener noreferrer"

@@ -100,9 +100,11 @@ export const updateProperty = async (id: string, data: Partial<PropertyType>): P
 
 export const getPropertyById = async (propertyId: string): Promise<PropertyType> => {
   const response = await axiosClient.get(`/property/${propertyId}`);
-  logger.info(response.data);
+  // logger.info(response.data);
+  
   const property = response.data.property;
   const userDetails = response.data.userDetails;
+  
   return {
     ...property,
     id: property._id,

@@ -18,7 +18,7 @@ export async function generateMetadata(
 
   const property = await getPropertyCached(id);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3400";
 
   // fallback OG image (put this image in /public/og-default.jpg)
   const fallbackOgImage = `${siteUrl}/logo.png`;

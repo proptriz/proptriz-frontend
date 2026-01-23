@@ -14,17 +14,17 @@ export default function PropertyDescription({
   const [expanded, setExpanded] = useState(false);
 
   const { previewText, hasMore } = useMemo(() => {
-    const words = description.trim().split(/\s+/);
+    const clean = description.trim();
+    if (!clean) return { previewText: "", hasMore: false };
+
+    const words = clean.split(/\s+/);
 
     if (words.length <= wordLimit) {
-      return {
-        previewText: description,
-        hasMore: false,
-      };
+      return { previewText: clean, hasMore: false };
     }
 
     return {
-      previewText: words.slice(0, wordLimit).join(" "),
+      previewText: words.slice(0, wordLimit).join(" ") + "...",
       hasMore: true,
     };
   }, [description, wordLimit]);
@@ -32,7 +32,7 @@ export default function PropertyDescription({
   return (
     <div className="relative">
       <div
-        className={`
+        className="
           w-full
           rounded-md
           border
@@ -45,8 +45,7 @@ export default function PropertyDescription({
           whitespace-pre-wrap
           leading-relaxed
           cursor-text
-          ${expanded ? "" : "max-h-40 overflow-hidden"} // 4 lines approx
-        `}
+        "
       >
         {expanded ? description : previewText}
       </div>

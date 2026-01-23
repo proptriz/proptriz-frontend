@@ -16,6 +16,7 @@ import GalleryModal from "@/components/shared/GalleryModal";
 import { BiShareAlt } from "react-icons/bi";
 import StickyAgentInfo from "@/components/StickyAgent";
 import PropertyDescription from "@/components/shared/Description";
+import ShareButton from "./ShareButton";
 
 const PropertyDetailsClient = ({
   property
@@ -31,7 +32,6 @@ const PropertyDetailsClient = ({
   const [togglePopup, setTogglePopup] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [pageURL, setPageURL] = useState('');
 
   useEffect(() => {
     if (!propertyId || nearestProperty.length>0) return
@@ -56,14 +56,6 @@ const PropertyDetailsClient = ({
     fetchProperty()
   }, [propertyId,]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // window.location.origin returns the protocol, hostname, and port (e.g., http://localhost:3000)
-      setPageURL(window.location.href); 
-    }
-  }, []);
-
-  // logger.info("Base URL: ", pageURL);
   if (loading){
     return (
       <div>Loading property details</div>
@@ -100,18 +92,16 @@ const PropertyDetailsClient = ({
               /> 
 
               <button
-                className="absolute top-5 left-3 p-2 text-xl hover:bg-gray-100 rounded-full shadow-md"
+                className="absolute top-5 left-3 p-2 text-xl hover:bg-gray-100 rounded-full shadow-md bg-white"
                 onClick={() => router.back()}
               >
                 <FaArrowLeft className="text-xl" />
               </button>           
                     
               <div className="absolute top-5 right-5 flex space-x-3">                
-                <button className="p-2 hover:bg-gray-100 rounded-full shadow-md">
-                  <BiShareAlt />
-                </button>
+                <ShareButton title={property.title} relativeURL={`/property/details/${property.id}`} />
                 
-                <button className="p-2 hover:bg-gray-100 hover:text-red-800 rounded-full shadow-md">
+                <button className="p-2 hover:bg-gray-100 hover:text-red-800 rounded-full shadow-md bg-white">
                   <FaRegHeart />
                 </button>
               </div>

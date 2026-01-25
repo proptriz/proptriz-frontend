@@ -18,6 +18,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "leaflet": "^1.9.4",
+    "leaflet-routing-machine": "^3.2.12",
     "lodash.debounce": "^4.0.8",
     "loglevel": "^1.9.1",
     "next": "15.1.9",

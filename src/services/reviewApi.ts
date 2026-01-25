@@ -26,8 +26,7 @@ export const addReviewApi = async (
     });
 
     if (res.status===200){
-      toast.success(res.data.message || "Review added successfully");
-      logger.info("Review added:", res.data);
+      // logger.info("Review added:", res.data);
       return res.data;
     }
 
@@ -36,5 +35,26 @@ export const addReviewApi = async (
   } catch (error) {
     handleApiError(error, "Failed to update settings");
     return null;
+  }
+}
+
+export const getPropertyReviewsApi = async (propertyId: string, cursor?: string) => {
+  try {
+    const query = {
+      property_id: propertyId,
+      cursor: cursor || ""
+    }
+    const res = await axiosClient.get(`/property-review/property?${query}`);
+
+    if (res.status !== 200) {
+      return [];
+    }
+
+    logger.info("property reviews: ", res.data);
+    return res.data;
+
+  } catch (error){
+    handleApiError(error, "Failed to get property reviews")
+    return null
   }
 }

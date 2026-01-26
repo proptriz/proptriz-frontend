@@ -110,9 +110,14 @@ const Map: React.FC<MapProps> = ({
   setMapBounds  = () => {},
 }) => {
 
-  const africaBounds: L.LatLngBoundsExpression = [
-    [-35, -20], // South-West (latitude, longitude)
-    [38, 55],   // North-East
+  // const africaBounds: L.LatLngBoundsExpression = [
+  //   [-35, -20], // South-West (latitude, longitude)
+  //   [38, 55],   // North-East
+  // ];
+  
+  const NIGERIA_BOUNDS: L.LatLngBoundsExpression = [
+    [4.24, 6.99], // South-West (latitude, longitude)
+    [13.89, 14.65],   // North-East
   ];
 
   return (
@@ -122,8 +127,7 @@ const Map: React.FC<MapProps> = ({
       <MapContainer
         center={mapCenter ?? [9.082, 8.6753]} 
         zoomControl={false}
-        maxBounds={africaBounds}
-        maxBoundsViscosity={1.0}
+        maxBounds={NIGERIA_BOUNDS}
         className="w-full flex-1 fixed bottom-0 h-full left-0 right-0"
       >
         <TileLayer

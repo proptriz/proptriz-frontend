@@ -42,13 +42,12 @@ export interface PropertyProps {
 }
 
 export type ReviewType = {
-  id: string;
-  reviewer: string;
-  text: string;
-  ratings: number;
-  image: string;
-  review_date: string; // ISO 8601 date string
-  review_images?: string[];
+  _id: string;
+  sender: {username: string; image: string};
+  comment: string;
+  rating: number;
+  createdAt?: Date;
+  image?: string;
   replies_count?: number;
 }
 
@@ -161,7 +160,8 @@ export interface PropertyType {
     quantity: number;
   }[];
   env_facilities?: string[];
-  rating?: number;
+  average_rating?: number;
+  review_count?: number;
   status: PropertyStatusEnum; // (available, sold, unavailable, rented)
   createdAt?: Date;
   updatedAt?: Date;

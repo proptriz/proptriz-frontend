@@ -12,7 +12,13 @@ import { toast } from "react-toastify";
 import logger from "../../logger.config.mjs"
 import Image from "next/image";
 
-export function AddReview({propertyId}: {propertyId: string}) {
+export function AddReview({
+  propertyId, 
+  setRefreshReviews
+} : {
+  propertyId: string, 
+  setRefreshReviews: React.Dispatch<React.SetStateAction<boolean>>
+}) {
   const { authUser } = useContext(AppContext);
 
   const [rating, setRating] = useState<RatingScaleEnum>(RatingScaleEnum.HAPPY);
@@ -70,6 +76,7 @@ export function AddReview({propertyId}: {propertyId: string}) {
     toast.success("Review submitted successfully!");
     resetForm();
     setIsSubmitting(false);
+    setRefreshReviews(true);
   }
 
   if (!authUser) {

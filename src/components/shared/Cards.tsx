@@ -24,12 +24,12 @@ export const ReviewCard: React.FC<{
   useEffect(() => {
     // Update the relative time string every minute
     const updateRelativeTime = () => {
-      setRelativeTimeString(dayjs(review.review_date).fromNow());
+      setRelativeTimeString(dayjs(review.createdAt).fromNow());
     };  
     updateRelativeTime();
     const interval = setInterval(updateRelativeTime, 60000);
     return () => clearInterval(interval); 
-  }, [review.review_date]);
+  }, [review.createdAt]);
 
   return (
     <div className="border border-[#DCDFD9] rounded-2xl">
@@ -50,19 +50,20 @@ export const ReviewCard: React.FC<{
           </div>
         </div>
       </div>}
-      <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-5" key={review.id}>
+      <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-5" key={review._id}>
         <div className="flex items-start space-x-3">
           <img
-            src={review.image}
+            src={review.sender?.image || '/avatar.png'}
             alt="Reviewer"
             className="w-10 h-10 rounded-full"
           />
           <div className="flex-1 relative">
             <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold">{review.reviewer}</h3>
+              <h3 className="text-sm font-bold">{review.sender?.username}</h3>
+              
               <div className="flex text-yellow-500">
                 {Array.from({ length: 5 }).map((_, index) =>
-                  index < Math.floor(review.ratings) ? (
+                  index < Math.floor(review.rating) ? (
                   <FaStar key={index} />
                   ) : (
                   <FaRegStar key={index} />
@@ -70,25 +71,30 @@ export const ReviewCard: React.FC<{
                 )}
               </div>
             </div>
-              <p className="text-sm text-gray-700">{review.text}</p>
-              {/* Review Images */}
-              {review.review_images && review.review_images.length > 0 && (
-                <div className="flex space-x-3 mt-2">
-                  {review.review_images.slice(0, 3).map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt={`Review Image ${idx + 1}`}
-                      className="w-16 h-16 rounded-lg object-cover"
-                    />
-                  ))}
-                </div>
-              )}
-              {/* Date-Time */}
-              <div className="text-xs text-gray-400 my-4 flex relative">
-                <span>Reviewed {relativeTimeString}</span>
-                <button className="ms-auto text-primary" onClick={() => showReply && showReply(review.id)}>reply ({review.replies_count})</button>
+            <p className="text-sm text-gray-700">{review.comment}</p>
+
+            {/* Review Images */}
+            {review.image && (
+              <div className="flex space-x-3 mt-2">
+                <img
+                  src={review.image}
+                  alt="Review Image"
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
               </div>
+            )}
+
+            {/* Date-Time */}
+            <div className="text-xs text-gray-400 my-4 flex relative">
+              <span>Reviewed {relativeTimeString}</span>
+
+              <button 
+                className="ms-auto text-primary" 
+                onClick={() => showReply && showReply(review._id)}
+              >
+                Reply ({review.replies_count || 0})
+              </button>
+            </div>
           </div>
         </div>
       </div>

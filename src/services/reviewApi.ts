@@ -40,11 +40,12 @@ export const addReviewApi = async (
 
 export const getPropertyReviewsApi = async (propertyId: string, cursor?: string) => {
   try {
-    const query = {
+    const query = new URLSearchParams({
       property_id: propertyId,
       cursor: cursor || ""
-    }
-    const res = await axiosClient.get(`/property-review/property?${query}`);
+    });
+    
+    const res = await axiosClient.get(`/property-review/property?${query.toString()}`);
 
     if (res.status !== 200) {
       return [];

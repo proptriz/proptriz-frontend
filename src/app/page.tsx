@@ -24,28 +24,26 @@ export default function ExplorePage() {
   const [filterBy, setFilterBy] = useState<string>('house');
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
-  const [zoomLevel, setZoomLevel] = useState<number>(13);
+  const [zoomLevel, setZoomLevel] = useState<number>(7);
 
   const renderedMarkerIds = useRef<Set<string>>(new Set());
 
   // Get user location
   const fetchLocation = async () => {    
     const [lat, lng] = await getUserPosition();
-    // logger.debug("User location:", lat, lng);
     setMapCenter([lat, lng]);
-    setZoomLevel(13);
   };
 
   useEffect(() => {
     fetchLocation();
-
+    setZoomLevel(7);
   }, [authUser]);
 
   const onLocateMe = async () => {    
-    // logger.debug("User location:", lat, lng);
     sessionStorage.removeItem('prevMapCenter');
     sessionStorage.removeItem('prevMapZoom');
     await fetchLocation();
+    setZoomLevel(10);
   };
 
   const fetchProperties = useCallback(
@@ -132,13 +130,13 @@ export default function ExplorePage() {
 
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden">
+    <div className="flex-1 flex-col w-full h-screen overflow-hidden">
       {/* Header */}
       <Header />
 
       {/* Map Section */}
       <div className="relative flex-1">
-        <div className="relative top-0 z-10 lg:flex px-6 space-y-4 lg:space-y-0 lg:space-x-3 w-full lg:items-center justify-center pt-4 lg:pt-6 pb-2 bg-transparent">
+        <div className="relative top-0 z-50 lg:flex px-6 space-y-4 lg:space-y-0 lg:space-x-3 w-full lg:items-center justify-center pt-4 lg:pt-6 pb-2 bg-transparent">
           <SearchBar
             value={searchInput}
             onChange={setSearchInput}
@@ -181,6 +179,8 @@ export default function ExplorePage() {
                   width={40}
                   height={40}
                   alt="my location"
+                  priority
+                  fetchPriority="high"
                 />
               </button>
           </div>

@@ -24,28 +24,26 @@ export default function ExplorePage() {
   const [filterBy, setFilterBy] = useState<string>('house');
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
-  const [zoomLevel, setZoomLevel] = useState<number>(13);
+  const [zoomLevel, setZoomLevel] = useState<number>(7);
 
   const renderedMarkerIds = useRef<Set<string>>(new Set());
 
   // Get user location
   const fetchLocation = async () => {    
     const [lat, lng] = await getUserPosition();
-    // logger.debug("User location:", lat, lng);
     setMapCenter([lat, lng]);
-    setZoomLevel(13);
   };
 
   useEffect(() => {
     fetchLocation();
-
+    setZoomLevel(7);
   }, [authUser]);
 
   const onLocateMe = async () => {    
-    // logger.debug("User location:", lat, lng);
     sessionStorage.removeItem('prevMapCenter');
     sessionStorage.removeItem('prevMapZoom');
     await fetchLocation();
+    setZoomLevel(10);
   };
 
   const fetchProperties = useCallback(

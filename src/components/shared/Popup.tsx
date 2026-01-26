@@ -1,40 +1,64 @@
-import React, { SetStateAction } from 'react';
+import { useEffect } from "react";
 
-interface PopupProps {
-  children: React.ReactNode;
-  header: string;
-  toggle: boolean; 
-  setToggle: React.Dispatch<SetStateAction<boolean>>
-  useMask?: boolean;
-  hideReset?: boolean
-}
+export default function Popup({
+  header,
+  toggle,
+  setToggle,
+  useMask = true,
+  hideReset = false,
+  children,
+}: any) {
+  // Prevent background scrolling when popup is open
+  useEffect(() => {
+    if (toggle) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
 
-function Popup({ children, header, toggle, setToggle, useMask, hideReset=false }: PopupProps) {
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [toggle]);
 
   return (
     <>
-    <div className={`absolute top-0 left-0 w-full h-full z-50 bg-gray-200 opacity-75 ${
-        toggle ? '' : 'hidden'
+      {/* Mask / Overlay */}
+      <div
+        className={`fixed inset-0 w-full h-full bg-black/40 z-[9998] transition-opacity ${
+          toggle ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
-        onClick={()=>{useMask && setToggle(false)}}
-    ></div>
-    
-    <div
-        className={`h-[calc(100vh-150px)] bg-white fixed bottom-0 md:max-w-[650px] mx-auto left-1/2 transform -translate-x-1/2 w-full md:mx-auto rounded-t-3xl px-6 mb-2 ease-linear transition-transform z-50 overflow-y-auto ${
-          toggle ? 'translate-y-0' : 'translate-y-full'
-        }`}
-    >
-        <div className="sticky top-0 bg-white pt-6">
+        onClick={() => {
+          if (useMask) setToggle(false);
+        }}
+      />
+
+      {/* Bottom Sheet */}
+      <div
+        className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full md:max-w-[650px] bg-white rounded-t-3xl px-6 pb-6 z-[9999]
+        h-[calc(100vh-150px)] overflow-y-auto transition-transform duration-200 ease-linear
+        ${toggle ? "translate-y-0" : "translate-y-full"}`}
+        onClick={(e) => e.stopPropagation()} // prevent clicks closing when interacting inside
+      >
+        <div className="sticky top-0 bg-white pt-6 z-10">
           <div className="h-px w-16 mx-auto bg-black mb-4"></div>
+
           <div className="flex items-center justify-between">
             <p className="font-[Raleway] font-bold">{header}</p>
-            { !hideReset && <button className="px-4 py-2 rounded-full bg-[#234F68] text-white text-sm">reset</button>}
+
+            {!hideReset && (
+              <button className="px-4 py-2 rounded-full bg-[#234F68] text-white text-sm">
+                reset
+              </button>
+            )}
           </div>
         </div>
-      {children}
-    </div>
+
+        {children}
+      </div>
     </>
   );
 }
-
-export default Popup;

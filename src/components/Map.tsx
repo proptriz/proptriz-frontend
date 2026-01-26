@@ -106,7 +106,7 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ 
   properties, 
   mapCenter,
-  initialZoom = 13,
+  initialZoom = 7,
   setMapBounds  = () => {},
 }) => {
 

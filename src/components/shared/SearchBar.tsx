@@ -49,7 +49,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
             <button
               type="button"
-              className="text-gray-500 text-lg p-1 rounded bg-gray-100"
+              className="text-primary text-lg p-1 rounded card-bg"
               onClick={() => setTogglePopup(prev => !prev)}
             >
               <AiOutlineMenuUnfold />

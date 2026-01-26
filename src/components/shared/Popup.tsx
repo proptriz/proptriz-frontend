@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Popup({
   header,
@@ -8,6 +8,15 @@ export default function Popup({
   hideReset = false,
   children,
 }: any) {
+  // Swipe refs
+  const startY = useRef<number | null>(null);
+  const endY = useRef<number | null>(null);
+  const startX = useRef<number | null>(null);
+  const endX = useRef<number | null>(null);
+
+  const SWIPE_CLOSE_THRESHOLD = 90; // px
+  const SWIPE_HORIZONTAL_TOLERANCE = 60; // px (avoid closing on sideways swipe)
+
   // Prevent background scrolling when popup is open
   useEffect(() => {
     if (toggle) {
@@ -23,6 +32,36 @@ export default function Popup({
       document.body.style.touchAction = "";
     };
   }, [toggle]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!toggle) return;
+    startY.current = e.touches[0].clientY;
+    startX.current = e.touches[0].clientX;
+    endY.current = null;
+    endX.current = null;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!toggle) return;
+    endY.current = e.touches[0].clientY;
+    endX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!toggle) return;
+    if (startY.current === null || endY.current === null) return;
+
+    const deltaY = endY.current - startY.current; // positive = down
+    const deltaX =
+      startX.current !== null && endX.current !== null
+        ? Math.abs(endX.current - startX.current)
+        : 0;
+
+    // Swipe down to close (only if mostly vertical)
+    if (deltaY > SWIPE_CLOSE_THRESHOLD && deltaX < SWIPE_HORIZONTAL_TOLERANCE) {
+      setToggle(false);
+    }
+  };
 
   return (
     <>
@@ -41,7 +80,10 @@ export default function Popup({
         className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full md:max-w-[650px] bg-white rounded-t-3xl px-6 pb-6 z-[9999]
         h-[calc(100vh-150px)] overflow-y-auto transition-transform duration-200 ease-linear
         ${toggle ? "translate-y-0" : "translate-y-full"}`}
-        onClick={(e) => e.stopPropagation()} // prevent clicks closing when interacting inside
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="sticky top-0 bg-white pt-6 z-10">
           <div className="h-px w-16 mx-auto bg-black mb-4"></div>

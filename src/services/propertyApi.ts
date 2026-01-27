@@ -98,28 +98,33 @@ export const updateProperty = async (id: string, data: Partial<PropertyType>): P
 //   return response.data;
 // };
 
-export const getPropertyById = async (propertyId: string): Promise<PropertyType> => {
-  const response = await axiosClient.get(`/property/${propertyId}`);
-  // logger.info(response.data);
-  
-  const property = response.data.property;
-  const userDetails = response.data.userDetails;
-  
-  return {
-    ...property,
-    id: property._id,
-    user: {
-      username: property.user.username,
-      image: userDetails.image,
-      email: userDetails.email,
-      user_type: userDetails.user_type,
-      phone: userDetails.phone,
-      brand: userDetails.brand,
-      whatsapp: userDetails.whatsapp,
-    },
-    longitude: property.map_location?.coordinates[0] || 0.0,
-    latitude: property.map_location?.coordinates[1] || 0.0,
-  };
+export const getPropertyById = async (propertyId: string): Promise<PropertyType | null> => {
+  try {
+    const response = await axiosClient.get(`/property/${propertyId}`);
+    // logger.info(response.data);
+    
+    const property = response.data.property;
+    const userDetails = response.data.userDetails;
+    
+    return {
+      ...property,
+      id: property._id,
+      user: {
+        username: property.user.username,
+        image: userDetails.image,
+        email: userDetails.email,
+        user_type: userDetails.user_type,
+        phone: userDetails.phone,
+        brand: userDetails.brand,
+        whatsapp: userDetails.whatsapp,
+      },
+      longitude: property.map_location?.coordinates[0] || 0.0,
+      latitude: property.map_location?.coordinates[1] || 0.0,
+    };
+  } catch (error:any) {
+    logger.error("error fetching property")
+    return null
+  }
 };
 
 export const getNearestProperties = async (propertyId: string): Promise<PropertyType[]> => {

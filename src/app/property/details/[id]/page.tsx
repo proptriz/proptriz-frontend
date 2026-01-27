@@ -11,66 +11,121 @@ type PageProps = {
   params: Promise<{ id: string }>;
 };
 
+function buildPropertyDescription(property: any) {
+  if (!property) {
+    return "Find verified properties on Proptriz Hub.";
+  }
+
+  const parts: string[] = [];
+
+  if (property.category && property.listed_for) {
+    parts.push(
+      `${property.category} for ${property.listed_for}`
+    );
+  }
+
+  if (property.address) {
+    parts.push(`Located at ${property.address}`);
+  }
+
+  let summary = parts.join(". ");
+
+  if (property.description) {
+    const trimmed =
+      property.description.length > 140
+        ? property.description.slice(0, 140) + "…"
+        : property.description;
+
+    summary = summary
+      ? `${summary}. ${trimmed}`
+      : trimmed;
+  }
+
+  return summary || "Find verified properties on Proptriz Hub.";
+}
+
 export async function generateMetadata(
   { params }: PageProps
 ): Promise<Metadata> {
   const { id } = await params;
 
-  const property = await getPropertyCached(id);
+  const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3400";
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3400";
 
-  // fallback OG image (put this image in /public/og-default.jpg)
-  const fallbackOgImage = `${siteUrl}/logo.png`;
+  try {
+    const property = await getPropertyCached(id);
 
-  const ogImage =
-    property?.banner ||
-    property?.images?.[0] ||
-    fallbackOgImage;
+    const fallbackOgImage = `${siteUrl}/logo.png`;
 
-  return {
-    metadataBase: new URL(siteUrl),
-    title: property?.title || "Property Details",
-    description:
-      property?.description ||
-      "Find verified properties on Proptriz Hub.",
+    const ogImage =
+      property?.banner
+        ? property.banner.startsWith("http")
+          ? property.banner
+          : `${siteUrl}${property.banner}`
+        : property?.images?.[0]
+          ? property.images[0]
+          : fallbackOgImage;
 
-    openGraph: {
-      title: property?.title || "Property Details",
+    const description = buildPropertyDescription(property);
 
-      description:
-        property?.description ||
-        "Find verified properties on Proptriz Hub.",
+    return {
+      metadataBase: new URL(siteUrl),
 
-      url: `/property/details/${id}`,
+      title: property?.title
+        ? `${property.title} | Proptriz Hub`
+        : "Property Details | Proptriz Hub",
 
-      images: [
-        {
-          url: ogImage, // always available now
-          width: 1200,
-          height: 630,
-          alt: property?.title || "Proptriz Hub Property",
-        },
-      ],
-      
-      type: "website",
-    },
+      description,
 
-    twitter: {
-      card: "summary_large_image",
-      title: property?.title || "Property Details",
-      description:
-        property?.description ||
-        "Find verified properties on Proptriz Hub.",
-      images: [ogImage],
-    },
-  };
+      alternates: {
+        canonical: `/property/details/${id}`,
+      },
+
+      openGraph: {
+        title: property?.title || "Property Details",
+        description,
+        url: `/property/details/${id}`,
+        siteName: "Proptriz Hub",
+        type: "website",
+        images: [
+          {
+            url: ogImage,
+            width: 1200,
+            height: 630,
+            alt: property?.title || "Proptriz Property",
+          },
+        ],
+      },
+
+      twitter: {
+        card: "summary_large_image",
+        title: property?.title || "Property Details",
+        description,
+        images: [ogImage],
+      },
+    } 
+  } catch (error) {
+    // ✅ NEVER fail page due to metadata
+    return {
+      title: "Property Details | Proptriz Hub",
+      description: "View verified property listings on Proptriz Hub.",
+      openGraph: {
+        title: "Property Details",
+        description: "View verified property listings on Proptriz Hub.",
+        images: [`${siteUrl}/logo.png`],
+      }
+    };
+  }
 }
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
-
   const property = await getPropertyCached(id);
 
-  return <PropertyDetailsClient property={property} />;
+  return property? 
+    <PropertyDetailsClient property={property} /> :
+    <div>
+      No property Found
+    </div>;
 }

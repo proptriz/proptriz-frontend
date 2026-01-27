@@ -19,7 +19,7 @@ const menus = [
 const Footer: React.FC = () => {
   const pathname = usePathname();
   return (
-    <footer className="fixed bottom-0 left-0 w-full bg-gray-200 flex justify-around shadow-md z-50">
+    <footer className="fixed bottom-0 left-0 w-full bg-gray-200 flex justify-around shadow-md z-20">
       {menus.map((menu, index) => (
         <Link 
         href={menu.link} 

@@ -12,7 +12,8 @@ import { UserSettingsType, UserTypeEnum } from '@/types';
 import ToggleCollapse from '@/components/shared/ToggleCollapse';
 import { addOrUpdateUserSettings, getUserSettings } from '@/services/settingsApi';
 import Image from 'next/image';
-import { EmailInput, PhoneInput, SelectInput, TextInput } from '@/components/shared/Input';
+import { EmailInput, SelectInput, TextInput } from '@/components/shared/Input';
+import { PhoneInput } from '@/components/shared/PhoneInput';
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);

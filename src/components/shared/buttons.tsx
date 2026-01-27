@@ -16,7 +16,7 @@ export const BackButton = ({ fallback = "/" }: { fallback?: string }) => {
 
     // If referrer is empty or from outside your app → go home inside the app
     if (!referrer || !referrer.startsWith(currentOrigin)) {
-      router.replace(fallback);
+      router.push("/");
       return;
     }
 

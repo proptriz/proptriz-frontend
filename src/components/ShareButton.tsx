@@ -12,7 +12,7 @@ type Props = {
 export default function ShareButton({ title, relativeURL }: Props) {
   const [open, setOpen] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3400";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://proptriz.com";
   const siteUrl = `${baseUrl}${relativeURL}`;
 
   const handleShare = async () => {

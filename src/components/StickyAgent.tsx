@@ -1,6 +1,7 @@
 import { PropertyType, UserSettingsType, UserTypeEnum } from "@/types";
 import { generateWhatsAppLink } from "@/utils/generateWhatsappLink";
 import { Call3DIcon, GmailMinimalIcon, WhatsAppMinimalIcon } from "./Icons";
+import { normalizePhone } from "@/utils/normalizePhone";
 
 const StickyAgentInfo = ({user, property}: {user: UserSettingsType, property: PropertyType}) => {
   
@@ -8,7 +9,7 @@ const StickyAgentInfo = ({user, property}: {user: UserSettingsType, property: Pr
     phoneNumber: user.whatsapp || user.phone || "",
     messageTop: `Hello, I'm interested in this property: ${property.title}`,
     pageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/property/details/${property.id}`,
-    bustCache: true,
+    bustCache: false,
   });
 
   return (
@@ -35,7 +36,7 @@ const StickyAgentInfo = ({user, property}: {user: UserSettingsType, property: Pr
             {user.phone &&
               <a
                 key={"call"}
-                href={`tel:${user.phone}`}
+                href={`tel:${normalizePhone(user.phone)}`}
                 aria-label={"Call"}
                 className="p-2 rounded-lg hover:bg-gray-200 transition caese-in-out card-bg"
               >

@@ -131,7 +131,7 @@ const PropertyDetailsClient = ({
               </button>           
                     
               <div className="absolute top-5 right-5 flex space-x-3">                
-                <ShareButton title={property.title} relativeURL={`/property/details/${property.id}`} />
+                <ShareButton title={`${property.title} for ${property.listed_for}, located at ${property.address}.`} relativeURL={`/property/details/${property.id}`} />
                 
                 <button className="p-2 hover:bg-gray-100 hover:text-red-800 rounded-full shadow-md bg-white">
                   <FaRegHeart />

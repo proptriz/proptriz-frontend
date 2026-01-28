@@ -43,9 +43,10 @@ export interface PropertyProps {
 
 export type ReviewType = {
   _id: string;
-  sender: {username: string; image: string};
+  sender: Pick<UserSettingsType, 'username' | 'image'>;
   comment: string;
   rating: number;
+  property: Pick<PropertyType, 'title' | 'banner' | 'address' | 'average_rating'>;
   createdAt?: Date;
   image?: string;
   replies_count?: number;

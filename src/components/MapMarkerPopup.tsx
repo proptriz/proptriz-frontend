@@ -28,7 +28,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
         {/* Property Type */}
         <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded-lg">
           <span className="text-yellow-500">★</span>
-          {property.rating} | {property.category}
+          {property.average_rating} | {property.category}
         </div>
       </div>
 

@@ -51,11 +51,80 @@ export const getPropertyReviewsApi = async (propertyId: string, cursor?: string)
       return [];
     }
 
-    logger.info("property reviews: ", res.data);
+    // logger.info("property reviews: ", res.data);
     return res.data;
 
   } catch (error){
     handleApiError(error, "Failed to get property reviews")
+    return null
+  }
+}
+
+export const addReplyReviewApi = async (
+  review_id:string, 
+  comment: string, 
+) => {
+  logger.info("Adding reply to review:", review_id, comment);
+  const formData = new FormData();
+
+  formData.append("review_id", review_id);
+  formData.append("comment", comment);
+
+  try {
+    const res = await axiosClient.post(`/property-review/reply/add`, {review_id, comment});
+
+    if (res.status===200){
+      logger.info("Reply added:", res.data);
+      return res.data;
+    }
+
+    return null;
+
+  } catch (error) {
+    handleApiError(error, "Failed to update settings");
+    return null;
+  }
+}
+
+export const getPropertyReviewReplyApi = async (reviewId: string, cursor?: string) => {
+  try {
+    const query = new URLSearchParams({
+      review_id: reviewId,
+      cursor: cursor || ""
+    });
+
+    const res = await axiosClient.get(`/property-review/reply?${query.toString()}`);
+
+    if (res.status !== 200) {
+      return [];
+    }
+
+    logger.info("property review replies: ", res.data);
+
+    return res.data;
+  } catch (error){
+    handleApiError(error, "Failed to get property review replies")
+    return null
+  }
+}
+
+export const getPropertyUserReviewApi = async (cursor?: string) => {
+  try {
+    const query = new URLSearchParams({
+      cursor: cursor || ""
+    });
+
+    const res = await axiosClient.get(`/property-review/user/review?${query.toString()}`);
+
+    if (res.status !== 200) {
+      return [];
+    }
+
+    logger.info("property review replies: ", res.data);
+
+    return res.data;
+  } catch (error){
+    handleApiError(error, "Failed to get property review replies")
     return null
   }
 }

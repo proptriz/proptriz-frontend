@@ -3,7 +3,6 @@
 import React, { useContext, useState } from "react";
 import { RatingScaleEnum } from "@/types";
 import { TextareaInput } from "./shared/Input";
-import PhotoUploadSection from "./property/PhotoUploadSection";
 import { StarRatingSelector } from "./StarRatingSelector";
 import { addReviewApi } from "@/services/reviewApi";
 import { AppContext } from "@/context/AppContextProvider";

@@ -26,11 +26,11 @@ const PropertyReviews = ({
   const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
   const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
   const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
-  const [replyId, setReplyId] = useState<string>('');
+  const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
 
-  const showReply = (id:string)=>{
+  const showReply = (review: ReviewType)=>{
     setIsReplyPop(!isReplyPop)
-    setReplyId(id)
+    setReplyReview(review)
   }
 
   useEffect(() => {
@@ -109,7 +109,7 @@ const PropertyReviews = ({
       <div className="flex-1 overflow-hidden px-5 py-4">
         <h2 className="text-lg font-bold mb-3">Property Reviews</h2>
 
-        <div className="h-full overflow-y-auto space-y-3 pb-24">
+        <div className="h-full overflow-y-auto space-y-7 pb-24">
           {reviews && reviews.length > 0 ? (
             reviews.map((review) => (
               <div key={review._id}>
@@ -124,15 +124,15 @@ const PropertyReviews = ({
     </div>
 
     {/* Reply Review Popup */}
-    <Popup
+    {replyReview && <Popup
       header="Reply Review"
       toggle={isReplyPop}
       setToggle={setIsReplyPop}
       useMask={true}
       hideReset={true}
     >
-      <ReplyReview id={replyId} />
-    </Popup>
+      <ReplyReview review={replyReview} />
+    </Popup>}
   </>
 
   );

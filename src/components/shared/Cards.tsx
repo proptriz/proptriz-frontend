@@ -12,7 +12,7 @@ dayjs.extend(relativeTime);
 
 export const ReviewCard: React.FC<{
   review: ReviewType;
-  showReply?: (id:string) => void;
+  showReply?: (review:ReviewType) => void;
   showPropDetails?: boolean
 }> = ({ 
   review, 
@@ -26,37 +26,47 @@ export const ReviewCard: React.FC<{
     const updateRelativeTime = () => {
       setRelativeTimeString(dayjs(review.createdAt).fromNow());
     };  
+
     updateRelativeTime();
     const interval = setInterval(updateRelativeTime, 60000);
+    
     return () => clearInterval(interval); 
-  }, [review.createdAt]);
+  }, [review]);
+
+  if (!review) {
+    return <div> Missing Review </div>
+  }
 
   return (
     <div className="border border-[#DCDFD9] rounded-2xl">
-      {showPropDetails && <div className="p-3 rounded-lg flex items-center h-16">
+      {showPropDetails && <div className="p-3 rounded-lg flex items-center h-16 bg-white">
         <Image 
-          src={'/home/building1.png'}
+          src={review.property.banner || '/logo.png'}
           width={50} 
           height={50} 
           className="rounded-lg" 
           alt={'property'}
         />
+
         <div className="ml-2 space-y-1"> 
-          <p className="font-bold">Fairview Apartment</p>                                
+          <p className="font-bold">{review.property.title}</p>                                
+          
           <div  className="flex items-center">
-            <span className="font-bold mr-2">4.9</span>
+            <span className="font-bold mr-2">{review.property.average_rating}</span>
             <HiOutlineLocationMarker />
-            <p className="text-gray-500 text-sm"> Jakarta, Indonesia</p>
+            <p className="text-gray-500 text-sm"> {review.property.address}</p>
           </div>
         </div>
       </div>}
-      <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-5" key={review._id}>
+      
+      <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-3" key={review._id} >
         <div className="flex items-start space-x-3">
           <img
             src={review.sender?.image || '/avatar.png'}
             alt="Reviewer"
             className="w-10 h-10 rounded-full"
           />
+          
           <div className="flex-1 relative">
             <div className="flex justify-between items-center">
               <h3 className="text-sm font-bold">{review.sender?.username}</h3>
@@ -90,7 +100,7 @@ export const ReviewCard: React.FC<{
 
               <button 
                 className="ms-auto text-primary" 
-                onClick={() => showReply && showReply(review._id)}
+                onClick={() => showReply && showReply(review)}
               >
                 Reply ({review.replies_count || 0})
               </button>
@@ -105,17 +115,17 @@ export const ReviewCard: React.FC<{
 
 interface ReplyCardProps {
   id: string;
-  reviewer: string;
-  text: string;
-  image: string;
+  sender: string;
+  comment: string;
+  senderAvatar: string;
   reviewDate: string; // ISO 8601 date string
 }
 export const ReplyCard: React.FC<ReplyCardProps> = ({
   id,
-  reviewer,
-  text,
-  image,
-  reviewDate,
+  sender,
+  comment,
+  senderAvatar,
+  reviewDate
 }) => {
   const [relativeTimeString, setRelativeTimeString] = useState("");
 
@@ -124,8 +134,10 @@ export const ReplyCard: React.FC<ReplyCardProps> = ({
     const updateRelativeTime = () => {
         setRelativeTimeString(dayjs(reviewDate).fromNow());
     };  
+
     updateRelativeTime();
     const interval = setInterval(updateRelativeTime, 60000);
+    
     return () => clearInterval(interval); 
   }, [reviewDate]);
 
@@ -133,19 +145,22 @@ export const ReplyCard: React.FC<ReplyCardProps> = ({
     <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-5" key={id}>
       <div className="flex items-start space-x-3">
         <img
-          src={image}
+          src={senderAvatar || '/avatar.png'}
           alt="Reviewer"
           className="w-7 h-7 rounded-full"
         />
+        
         <div className="flex-1 relative">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold">{reviewer}</h3>
+            <h3 className="text-sm font-bold">{sender}</h3>
           </div>
-            <p className="text-sm text-gray-700">{text}</p>
-            {/* Date-Time */}
-            <div className="text-xs text-gray-500 my-4 flex relative">
-              <span>Reviewed {relativeTimeString}</span>
-            </div>
+          
+          <p className="text-sm text-gray-700">{comment}</p>
+          
+          {/* Date-Time */}
+          <div className="text-xs text-gray-500 my-4 flex relative">
+            <span>Reviewed {relativeTimeString}</span>
+          </div>
         </div>
       </div>
             

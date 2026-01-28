@@ -102,7 +102,7 @@ export const ReviewCard: React.FC<{
                 className="ms-auto text-primary" 
                 onClick={() => showReply && showReply(review)}
               >
-                Reply ({review.replies_count || 0})
+                Reply ({review.reply_count || 0})
               </button>
             </div>
           </div>

@@ -49,7 +49,7 @@ export type ReviewType = {
   property: Pick<PropertyType, 'title' | 'banner' | 'address' | 'average_rating'>;
   createdAt?: Date;
   image?: string;
-  replies_count?: number;
+  reply_count?: number;
 }
 
 export enum RatingScaleEnum {

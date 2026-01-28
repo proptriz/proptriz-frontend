@@ -54,15 +54,15 @@ export interface AgentType {
   featured?: boolean;
 }
 
-export interface ReviewType {
-  id: string;
-  userId: string;
-  userName: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  userAvatar?: string;
-}
+// export interface ReviewType {
+//   id: string;
+//   userId: string;
+//   userName: string;
+//   rating: number;
+//   comment: string;
+//   createdAt: string;
+//   userAvatar?: string;
+// }
 
 export interface Profile {
   id: string;

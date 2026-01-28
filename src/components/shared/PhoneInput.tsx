@@ -1,68 +1,88 @@
-import { useState } from "react";
-import { normalizePhone } from "@/utils/normalizePhone";
+import { useCallback, useRef, useState } from "react";
+import { normalizePhone, formatPhone } from "@/utils/normalizePhone";
 
-export const PhoneInput = (props: any) => {
+type PhoneInputProps = {
+  id?: string;
+  name?: string;
+  label?: string;
+  value: string;
+  placeholder?: string;
+  required?: boolean;
+  onChange: (value: string) => void;
+  onNormalize?: (normalized: string | null) => void;
+};
+
+export const PhoneInput = ({
+  id,
+  name,
+  label,
+  value,
+  placeholder = "+234 801 234 5678",
+  required,
+  onChange,
+  onNormalize,
+}: PhoneInputProps) => {
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const normalized = normalizePhone(value);
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target;
+      const cursor = input.selectionStart ?? input.value.length;
 
-    if (!normalized) {
-      setError("Enter a valid phone number");
-    } else {
-      setError(null);
-    }
+      const formatted = formatPhone(input.value);
+      const normalized = normalizePhone(formatted);
 
-    // Pass raw value upward (or normalized if you prefer)
-    props.onChange?.({
-      ...e,
-      target: {
-        ...e.target,
-        value,
-        normalizedPhone: normalized,
-      },
-    });
-  };
+      setError(normalized ? null : "Enter a valid phone number");
+
+      onChange(formatted);
+      onNormalize?.(normalized);
+
+      // Restore cursor position after formatting
+      requestAnimationFrame(() => {
+        inputRef.current?.setSelectionRange(cursor, cursor);
+      });
+    },
+    [onChange, onNormalize]
+  );
 
   return (
     <div className="w-full">
-      {props.label && (
-        <label className="block text-[17px] mb-1" htmlFor={props.id}>
-          {props.label}
+      {label && (
+        <label htmlFor={id} className="block text-[17px] mb-1">
+          {label}
         </label>
       )}
 
       <div
         className={`
           flex items-center p-[10px] w-full rounded-md border-[2px]
-          bg-gray-100
-          transition-colors
+          bg-gray-100 transition-colors
           ${
             error
-              ? "border-red-500 focus-within:border-red-500"
+              ? "border-red-500"
               : "border-primary focus-within:border-secondary focus-within:bg-white"
           }
         `}
       >
         <input
+          ref={inputRef}
           type="tel"
-          id={props.id}
-          name={props.name}
-          value={props.value}
-          placeholder={props.placeholder ?? "+2348012345678"}
+          id={id}
+          name={name}
+          value={value}
+          placeholder={placeholder}
+          required={required}
           onChange={handleChange}
-          required={props.required ?? true}
-          className="flex-1 outline-none bg-transparent"
+          className="flex-1 bg-transparent outline-none"
+          aria-invalid={!!error}
         />
-
-        {props.icon && (
-          <span className="text-gray-500 ms-auto">{props.icon}</span>
-        )}
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 mt-1">{error}</p>
+        <p className="mt-1 text-sm text-red-500" role="alert">
+          {error}
+        </p>
       )}
     </div>
   );

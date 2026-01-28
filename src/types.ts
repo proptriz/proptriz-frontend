@@ -42,14 +42,22 @@ export interface PropertyProps {
 }
 
 export type ReviewType = {
-  id: string;
-  reviewer: string;
-  text: string;
-  ratings: number;
-  image: string;
-  review_date: string; // ISO 8601 date string
-  review_images?: string[];
+  _id: string;
+  sender: Pick<UserSettingsType, 'username' | 'image'>;
+  comment: string;
+  rating: number;
+  property: Pick<PropertyType, 'title' | 'banner' | 'address' | 'average_rating'>;
+  createdAt?: Date;
+  image?: string;
   replies_count?: number;
+}
+
+export enum RatingScaleEnum {
+  DESPAIR = 0,
+  SAD = 2,
+  OKAY = 3,
+  HAPPY = 4,
+  DELIGHT = 5
 }
 
 export interface LocationProps {
@@ -153,7 +161,8 @@ export interface PropertyType {
     quantity: number;
   }[];
   env_facilities?: string[];
-  rating?: number;
+  average_rating?: number;
+  review_count?: number;
   status: PropertyStatusEnum; // (available, sold, unavailable, rented)
   createdAt?: Date;
   updatedAt?: Date;

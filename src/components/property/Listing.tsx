@@ -26,19 +26,19 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
       <h2 className="text-lg font-semibold">Explore Nearby Property</h2>
       <div className="grid grid-cols-2 gap-4 mt-4">
                 
-        {properties.map(((info, key)=>(
-          <Link href={`/property/details/${info.id}?slug=${info.slug}`} key={key}>
+        {properties.map(((property, key)=>(
+          <Link href={`/property/details/${property.id}?slug=${property.slug}`} key={key}>
             <VerticalCard
-              id={info.id}
-              name={info.title} 
-              price={info.price}
-              currency={info.currency}
-              category={info.category}
-              address={info.address}
-              image={info.banner}
-              period={info.period ?? ''}
-              listed_for={info.listed_for ?? ''}
-              rating={info.rating ?? 5.0}
+              id={property.id}
+              name={property.title} 
+              price={property.price}
+              currency={property.currency}
+              category={property.category}
+              address={property.address}
+              image={property.banner}
+              period={property.period ?? ''}
+              listed_for={property.listed_for ?? ''}
+              rating={property.average_rating ?? 5.0}
             />
           </Link>
         )))}
@@ -55,18 +55,18 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
       <div className="flex space-x-4 mt-4 overflow-x-auto">
 
         {/* Card */}
-        {properties.slice(0,3).map(((info, key) => (
+        {properties.slice(0,3).map(((property, key) => (
           <HorizontalCard 
-            id={''}
-            name={info.title} 
+            id={property.id}
+            name={property.title} 
             price={30} 
-            currency={info.currency}
-            category={info.category} 
-            listed_for={info.listed_for}
-            address={info.address} 
-            image={info.banner} 
-            period={info.period ?? ''} 
-            rating={info.rating ?? 5.0}
+            currency={property.currency}
+            category={property.category} 
+            listed_for={property.listed_for}
+            address={property.address} 
+            image={property.banner} 
+            period={property.period ?? ''} 
+            rating={property.average_rating ?? 5.0}
             key={key}
           />
         )))}

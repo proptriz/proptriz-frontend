@@ -3,11 +3,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
-import { agent } from "@/constant";
+import { agent, Reviews } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../context/AppContextProvider";
-import { PropertyType, UserSettingsType } from "@/types";
+import { PropertyType, ReviewType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
@@ -18,6 +18,7 @@ import Image from "next/image";
 import { ReviewCard } from "@/components/shared/Cards";
 import Splash from "@/components/shared/Splash";
 import ReplyReview from "@/components/ReplyReview";
+import { getPropertyUserReviewApi } from "@/services/reviewApi";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
@@ -27,7 +28,10 @@ export default function ProfileTransaction () {
   const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
   const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
   const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
-  const [replyId, setReplyId] = useState<string>('');
+  const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
+  const [reviews, setReviews] = useState<ReviewType[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
 
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
@@ -76,6 +80,31 @@ export default function ProfileTransaction () {
     fetchListedProp()
   }, [authUser])
 
+  // Fetch user reviews
+  useEffect(() => {
+    if (!authUser) return
+    setRefreshReviews(false);
+    
+    const fetchReview = async () => {
+      try {
+        const data = await getPropertyUserReviewApi(nextCursor);
+        
+        if (data && data.reviews && data.reviews.length>0) {
+          setReviews(data.reviews);
+          setNextCursor(data.nextCursor);
+          logger.info("fetched reviews: ", data.reviews);
+        } else {
+          logger.info("unable to fetch property reviews ");
+        }
+
+      } catch (error:any){
+        logger.info("error fetching property reviews ");
+      }
+    };
+
+    fetchReview()
+  }, [authUser, refreshReviews]);
+
   const handleDelete = async (id: string) => {
     const res = await deleteUserProperty(id);
     if (!res.success) {
@@ -89,13 +118,13 @@ export default function ProfileTransaction () {
     return
   };
 
-  const showReply = (id:string)=>{
+  const showReply = (review: ReviewType)=>{
     setIsReplyPop(!isReplyPop)
-    setReplyId(id)
+    setReplyReview(review)
   }
 
   if (!authUser) {
-    return <Splash />;
+    return <Splash showFooter={true} />;
   }
 
   return (
@@ -239,78 +268,60 @@ export default function ProfileTransaction () {
           </div>
       </section>}
       
-      {/* Review List  */}
+      {/* User properties Reviews */}
       {listOrSold==='Reviews' && <section>
         <div className="space-y-4">
           <div className="flex items-center justify-between m-4">
             <p className="text-lg mb-4 font-[Raleway]">
               <span className="font-bold mr-1">
-                {listedProperties.length}
+                {reviews.length}
               </span> 
-              {listOrSold}
+              Reviews
             </p>
           </div>
-            <ReviewCard
-              review={{
-                id:'01', 
-                reviewer:"Kurt Mullins", 
-                image:"/avatar.png", 
-                ratings:4.0,
-                text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                review_date:"2025-01-01T10:00:00Z", // Example ISO 8601 date string
-                replies_count: 3,
-                review_images: [],
-              }}
-              showReply={showReply}
-            />
-            {/* <button onClick={() => setShowReply(!showReply)}>reply</button> */}
-            <ReviewCard
-              review={{
-                id:'02', 
-                reviewer:"Kurt Mullins", 
-                image:"/avatar.png", 
-                ratings:4.0,
-                text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                review_date:"2025-01-01T10:00:00Z", // Example ISO 8601 date string
-                replies_count: 3,
-                review_images: [],
-              }}
-              showReply={showReply}
-          />
-            <ReviewCard 
-              review={{
-                id:'02', 
-                reviewer:"Kurt Mullins", 
-                image:"/avatar.png", 
-                ratings:4.0,
-                review_date:"2025-01-01T10:00:00Z",
-                replies_count: 3,
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                review_images: [
-                  "/apartment.png",
-                  "/home/building3.png",
-                  "/home/building4.png",
-                  "/home/house-with-pool.png"
-                ]
-              }}
-              showReply={showReply}
-            />
-      
-          {/* Add more reviews here */}
+
+          {reviews.length===0 && (
+            <p className="text-gray-500 m-4">No reviews yet.</p>
+          )}
+          
+          <div className="space-y-6 px-4">
+            {reviews.map((review: any) => (
+              <ReviewCard
+                key={review.id}
+                review={review}
+                showReply={review}
+                showPropDetails={true}
+              />
+            ))}
+          </div>
         </div>
       </section>}
       
-      {/* Inbox List  */}
+      {/* User sent reviews  */}
       {listOrSold==='Inbox' && <section>
         <div className="flex items-center justify-between m-4">
           <p className="text-lg mb-4 font-[Raleway]">
             <span className="font-bold mr-1">
-              {listedProperties.length}
+              {reviews.length}
             </span> 
-            {listOrSold}
+            Reviews
           </p>
         </div>
-        {/* Reviews */}
+
+        {reviews.length===0 && (
+          <p className="text-gray-500 m-4">No reviews yet.</p>
+        )}
+
+        <div className="space-y-6 px-4">
+          {reviews.map((review: any) => (
+            <ReviewCard
+              key={review.id}
+              review={review}
+              showReply={review}
+              showPropDetails={true}
+            />
+          ))}
+        </div>
       </section>}
     </div>
 
@@ -365,15 +376,15 @@ export default function ProfileTransaction () {
     </Popup>
 
     {/* Reply Review Popup */}
-    <Popup
+    {replyReview && <Popup
       header="Reply Review"
       toggle={isReplyPop}
       setToggle={setIsReplyPop}
       useMask={true}
       hideReset={true}
     >
-      <ReplyReview id={replyId} />
-    </Popup>
+      <ReplyReview review={replyReview} />
+    </Popup>}
   </>
   
 );

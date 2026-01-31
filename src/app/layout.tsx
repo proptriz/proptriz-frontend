@@ -109,6 +109,11 @@ export default function RootLayout({
           `}
         </Script>
 
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
+
         <div className="w-full min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300">
           <AppContextProvider>
             {children}

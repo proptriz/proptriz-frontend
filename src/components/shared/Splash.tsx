@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { AppContext } from "@/context/AppContextProvider";
 import { SubmitButton } from "@/components/shared/buttons";
 import Footer from "./Footer";
+import GoogleLoginButton from "../GoogleLoginButton";
 
 export default function Splash() {
   const { isSigningInUser, authenticateUser, loginStage} = useContext(AppContext);
@@ -28,6 +29,8 @@ export default function Splash() {
       onClick={()=>{authenticateUser()}}
       />
       <p className="text-primary">{loginStage}</p>
+
+      <GoogleLoginButton />
     </div>
     
     <Footer />

@@ -1,222 +1,252 @@
-
 "use client";
-import React, { useState } from 'react';
+
+import React, { useEffect, useRef, useState } from "react";
 import { AppButton as Button } from "@/components/shared/buttons";
 import { Slider } from "@/components/shared/Input";
+import { FiSearch, FiMapPin } from "react-icons/fi";
 import { TiFilter } from "react-icons/ti";
-import { FiSearch } from "react-icons/fi";
 
-interface FilterProps {
-  onFilter: (filters: any) => void;
+export interface PropertyFilterPayload {
+  location?: {
+    query: string;
+    lat: number;
+    lng: number;
+    name: string;
+    lga?: string;
+    state?: string;
+  };
+  propertyType: string;
+  priceType: "all" | "sale" | "rent";
+  priceMin: number | null;
+  priceMax: number | null;
+  description?: string;
 }
 
-const PropertyFilter = ({ onFilter }: FilterProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+
+interface FilterProps {
+  onFilter: (filters: PropertyFilterPayload) => void;
+}
+
+const PRICE_MAX = 100_000_000;
+
+const propertyTypes = [
+  { value: "all", label: "All Types" },
+  { value: "house", label: "House" },
+  { value: "apartment", label: "Apartment" },
+  { value: "land", label: "Land" },
+  { value: "office", label: "Office" },
+  { value: "shop", label: "Shop" },
+];
+
+const PropertyFilter: React.FC<FilterProps> = ({ onFilter }) => {
+  const abortRef = useRef<AbortController | null>(null);
+
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locationResult, setLocationResult] = useState<any>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
   const [filters, setFilters] = useState({
-    location: '',
-    type: '',
-    priceType: 'all',
-    priceRange: [0, 10000000],
-    bedrooms: '',
-    bathrooms: ''
+    propertyType: "all",
+    priceType: "all" as "all" | "sale" | "rent",
+    price: [0, PRICE_MAX],
+    description: "",
   });
 
-  const handleFilterChange = (name: string, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  /* ---------------- Location Search (Forward + Reverse) ---------------- */
+
+  useEffect(() => {
+    if (!locationQuery || locationQuery.length < 3) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const fetchLocation = async () => {
+      try {
+        setLoadingLocation(true);
+
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?` +
+            new URLSearchParams({
+              q: locationQuery,
+              format: "json",
+              addressdetails: "1",
+              countrycodes: "ng",
+              limit: "1",
+            }),
+          {
+            signal: controller.signal,
+            headers: { "Accept-Language": "en" },
+          }
+        );
+
+        const data = await res.json();
+        if (!data?.length) return;
+
+        const item = data[0];
+
+        setLocationResult({
+          query: locationQuery,
+          lat: Number(item.lat),
+          lng: Number(item.lon),
+          name: item.display_name.split(",")[0],
+          lga: item.address?.county || item.address?.city_district,
+          state: item.address?.state,
+        });
+      } catch (err) {
+        if ((err as any).name !== "AbortError") {
+          console.error("Geocoding failed", err);
+        }
+      } finally {
+        setLoadingLocation(false);
+      }
+    };
+
+    const debounce = setTimeout(fetchLocation, 500);
+    return () => {
+      clearTimeout(debounce);
+      controller.abort();
+    };
+  }, [locationQuery]);
+
+  /* ---------------- Submit ---------------- */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onFilter(filters);
+
+    onFilter({
+      location: locationResult || undefined,
+      propertyType: filters.propertyType,
+      priceType: filters.priceType,
+      priceMin: filters.price[0],
+      priceMax: filters.price[1],
+      description: filters.description || undefined,
+    });
   };
 
-  const locationOptions = [
-    { value: "lagos", label: "Lagos" },
-    { value: "abuja", label: "Abuja" },
-    { value: "portharcourt", label: "Port Harcourt" },
-    { value: "ibadan", label: "Ibadan" },
-    { value: "kano", label: "Kano" }
-  ];
-
-  const propertyTypes = [
-    { value: "all", label: "All Types" },
-    { value: "house", label: "House" },
-    { value: "hotel", label: "Hotel" },
-    { value: "apartment", label: "Apartment" },
-    { value: "land", label: "Land" },
-    { value: "office", label: "Office" },
-    { value: "shop", label: "Shop" }
-  ];
-
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-6">
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-wrap -mx-2 space-y-4 md:space-y-0">
-          {/* Basic Filters - Always Visible */}
-          <div className="flex items-center space-x-2 w-full px-2 md:w-1/3">
-            <span className="text-sm text-gray-600">Sort by:</span>
-            <select className="p-2 border border-gray-200 rounded-md focus:ring-estate-primary focus:border-estate-primary">
-              <option>Most Recent</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
-              <option>Most Popular</option>
-            </select>
-          </div>
-          <div className="w-full px-2 md:w-1/3 mb-4 md:mb-0">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <select 
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-              value={filters.location}
-              onChange={(e) => handleFilterChange('location', e.target.value)}
-            >
-              <option value="">All Locations</option>
-              {locationOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="w-full px-2 md:w-1/3 mb-4 md:mb-0">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
-            <select 
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-              value={filters.type}
-              onChange={(e) => handleFilterChange('type', e.target.value)}
-            >
-              {propertyTypes.map(type => (
-                <option key={type.value} value={type.value}>{type.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="w-full px-2 md:w-1/3 mb-4 md:mb-0">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sale/Rent</label>
-            <div className="flex space-x-2">
-              <button
-                type="button"
-                className={`flex-1 p-2 rounded-md border ${
-                  filters.priceType === 'all' ? 'bg-estate-primary text-white border-estate-primary' : 'bg-white text-gray-700 border-gray-300'
-                }`}
-                onClick={() => handleFilterChange('priceType', 'all')}
-              >
-                All
-              </button>
-              <button
-                type="button"
-                className={`flex-1 p-2 rounded-md border ${
-                  filters.priceType === 'sale' ? 'bg-estate-primary text-white border-estate-primary' : 'bg-white text-gray-700 border-gray-300'
-                }`}
-                onClick={() => handleFilterChange('priceType', 'sale')}
-              >
-                Buy
-              </button>
-              <button
-                type="button"
-                className={`flex-1 p-2 rounded-md border ${
-                  filters.priceType === 'rent' ? 'bg-estate-primary text-white border-estate-primary' : 'bg-white text-gray-700 border-gray-300'
-                }`}
-                onClick={() => handleFilterChange('priceType', 'rent')}
-              >
-                Rent
-              </button>
-            </div>
-          </div>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-xl shadow-lg p-4 space-y-4"
+    >
+      {/* ---------------- Location ---------------- */}
+      <div>
+        <label className="text-sm font-medium text-gray-700 mb-1 block">
+          Location
+        </label>
+        <div className="relative">
+          <FiMapPin className="absolute left-3 top-3 text-gray-400" />
+          <input
+            value={locationQuery}
+            onChange={(e) => setLocationQuery(e.target.value)}
+            placeholder="Search city, area or landmark"
+            className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-estate-primary"
+          />
         </div>
 
-        {/* Advanced Filters - Toggleable */}
-        {isExpanded && (
-          <div className="mt-4 border-t pt-4">
-            <div className="flex flex-wrap -mx-2">
-              <div className="w-full px-2 md:w-1/3 mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
-                <div className="px-2">
-                  <Slider
-                    defaultValue={[0, 100]}
-                    max={100}
-                    step={1}
-                    className="mt-1"
-                  />
-                  <div className="flex justify-between mt-2 text-sm">
-                    <span>₦0</span>
-                    <span>₦10,000,000+</span>
-                  </div>
-                </div>
-              </div>
+        {loadingLocation && (
+          <p className="text-xs text-gray-500 mt-1">Searching location…</p>
+        )}
 
-              <div className="w-full px-2 md:w-1/3 mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
-                <select 
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-                  value={filters.bedrooms}
-                  onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
-                >
-                  <option value="">Any</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
-                  <option value="5">5+</option>
-                </select>
-              </div>
-
-              <div className="w-full px-2 md:w-1/3 mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
-                <select 
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-                  value={filters.bathrooms}
-                  onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
-                >
-                  <option value="">Any</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
-                </select>
-              </div>
+        {locationResult && (
+          <div className="mt-2 p-3 rounded-md bg-gray-50 border text-sm">
+            <div className="font-medium">{locationResult.name}</div>
+            <div className="text-gray-600">
+              {locationResult.lga && `${locationResult.lga}, `}
+              {locationResult.state}
             </div>
           </div>
         )}
+      </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between">
-          <Button 
-            type="button" 
-            className="flex items-center text-gray-700 mb-2"
-            onClick={() => setIsExpanded(!isExpanded)}
+      {/* ---------------- Property Type ---------------- */}
+      <div>
+        <label className="text-sm font-medium text-gray-700 mb-1 block">
+          Property Type
+        </label>
+        <select
+          className="w-full p-2 border rounded-md"
+          value={filters.propertyType}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, propertyType: e.target.value }))
+          }
+        >
+          {propertyTypes.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* ---------------- Sale / Rent ---------------- */}
+      <div className="flex gap-2">
+        {(["all", "sale", "rent"] as const).map((type) => (
+          <button
+            key={type}
+            type="button"
+            onClick={() =>
+              setFilters((f) => ({ ...f, priceType: type }))
+            }
+            className={`flex-1 py-2 rounded-md border ${
+              filters.priceType === type
+                ? "bg-estate-primary text-white"
+                : "bg-white"
+            }`}
           >
-            <TiFilter className="h-4 w-4 mr-2" />
-            {isExpanded ? 'Less Filters' : 'More Filters'}
-          </Button>
-          
-          <div className="flex space-x-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="border-estate-secondary text-estate-primary"
-              onClick={() => setFilters({
-                location: '',
-                type: '',
-                priceType: 'all',
-                priceRange: [0, 10000000],
-                bedrooms: '',
-                bathrooms: ''
-              })}
-            >
-              Reset
-            </Button>
-            <Button 
-              type="submit" 
-              className="bg-estate-primary text-white hover:bg-estate-primary/90"
-            >
-              <FiSearch className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-          </div>
+            {type === "all" ? "All" : type === "sale" ? "Buy" : "Rent"}
+          </button>
+        ))}
+      </div>
+
+      {/* ---------------- Price (Modern UX) ---------------- */}
+      <div>
+        <label className="text-sm font-medium text-gray-700 mb-1 block">
+          Price Range (₦)
+        </label>
+
+        <Slider
+          // value={filters.price}
+          min={0}
+          max={PRICE_MAX}
+          step={100_000}
+          onValueChange={(v) =>
+            setFilters((f) => ({ ...f, price: v }))
+          }
+          defaultValue={[0, 10_000_000]}
+
+        />
+
+
+        <div className="flex justify-between text-xs text-gray-600 mt-1">
+          <span>₦{filters.price[0].toLocaleString()}</span>
+          <span>₦{filters.price[1].toLocaleString()}</span>
         </div>
-      </form>
-    </div>
+      </div>
+
+      {/* ---------------- Description Query ---------------- */}
+      <div>
+        <label className="text-sm font-medium text-gray-700 mb-1 block">
+          Description contains
+        </label>
+        <input
+          value={filters.description}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, description: e.target.value }))
+          }
+          placeholder="e.g. furnished, sea view, serviced"
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
+
+      {/* ---------------- Actions ---------------- */}
+      <div className="flex justify-end gap-2 pt-2">
+        <Button type="submit" className="bg-estate-primary text-white">
+          <FiSearch className="mr-2" />
+          Apply Filters
+        </Button>
+      </div>
+    </form>
   );
 };
 

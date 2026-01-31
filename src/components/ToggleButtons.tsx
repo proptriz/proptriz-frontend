@@ -16,6 +16,7 @@ function ToggleButtons<T extends string>({label, selected, options, onChange }: 
       {options.map((option) => (
         <button
           key={option}
+          type="button"
           className={`px-4 py-2 rounded-md text-sm ${
             selected === option ? "bg-green text-white" : "card-bg"
           }`}

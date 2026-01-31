@@ -49,7 +49,7 @@ export type ReviewType = {
   property: Pick<PropertyType, 'title' | 'banner' | 'address' | 'average_rating'>;
   createdAt?: Date;
   image?: string;
-  replies_count?: number;
+  reply_count?: number;
 }
 
 export enum RatingScaleEnum {
@@ -135,6 +135,22 @@ export enum PropertyStatusEnum {
   rented = "rented",
   unavailable = "unavailable",
   expired = "expired",
+}
+
+export interface PropertyFilterPayload {
+  location?: {
+    query: string;
+    lat: number;
+    lng: number;
+    name: string;
+    lga?: string;
+    state?: string;
+  };
+  propertyType: CategoryEnum;
+  listedFor: "all" | "sale" | "rent";
+  priceMin: number | null;
+  priceMax: number | null;
+  description?: string;
 }
 
 export interface PropertyType {

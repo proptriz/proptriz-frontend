@@ -137,6 +137,22 @@ export enum PropertyStatusEnum {
   expired = "expired",
 }
 
+export interface PropertyFilterPayload {
+  location?: {
+    query: string;
+    lat: number;
+    lng: number;
+    name: string;
+    lga?: string;
+    state?: string;
+  };
+  propertyType: CategoryEnum;
+  listedFor: "all" | "sale" | "rent";
+  priceMin: number | null;
+  priceMax: number | null;
+  description?: string;
+}
+
 export interface PropertyType {
   id: string;
   banner: string; // URL of the property image or image with index = 0

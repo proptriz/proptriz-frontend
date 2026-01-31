@@ -28,7 +28,7 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
       try {
         const data = await getPropertyReviewReplyApi(review._id, nextCursor);
 
-        if (data && data.replies && data.replies.length>0) {
+        if (data && data.replies) {
           setReplies(data.replies);
           setNextCursor(data.nextCursor);
           logger.info("fetched replies: ", data.replies.length);

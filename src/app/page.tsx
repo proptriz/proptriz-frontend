@@ -7,7 +7,7 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import propertyService from "@/services/propertyApi";
-import { PropertyType } from "@/types";
+import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../logger.config.mjs"
@@ -21,11 +21,13 @@ export default function ExplorePage() {
   const [properties, setProperties] = useState<PropertyType[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
-  const [filterBy, setFilterBy] = useState<string>('house');
+  const [category, setCategory] = useState<string>('house');
+  const [listedFor, setListedFor] = useState<string>('all');
+  const [minPriceBudget, setMinPriceBudget] = useState<number>(0); 
+  const [maxPriceBudget, setMaxPriceBudget] = useState<number>(100000000); 
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(7);
-
   const renderedMarkerIds = useRef<Set<string>>(new Set());
 
   // Get user location
@@ -56,8 +58,10 @@ export default function ExplorePage() {
           query: appliedSearchQuery ?? "",
           page: "1",
           limit: "50",
-          category: filterBy ?? "",
-          listed_for: "",
+          category: category ?? "",
+          listed_for: listedFor == "all" ? "" : listedFor,
+          min_price: minPriceBudget.toString(),
+          max_price: maxPriceBudget.toString(),
           ne_lat: ne.lat.toString(),
           ne_lng: ne.lng.toString(),
           sw_lat: sw.lat.toString(),
@@ -94,7 +98,7 @@ export default function ExplorePage() {
         }
       }
     },
-    [mapBounds, appliedSearchQuery, filterBy]
+    [mapBounds, appliedSearchQuery, category, listedFor, minPriceBudget, maxPriceBudget]
   );
 
   const onSearchClick = useCallback(() => {
@@ -102,6 +106,25 @@ export default function ExplorePage() {
     setProperties([]);
     setAppliedSearchQuery(searchInput);
   }, [searchInput]);
+
+  const onFilter = useCallback((filters: PropertyFilterPayload) => {
+    renderedMarkerIds.current.clear();
+    setProperties([]);  
+      
+    if (filters.location) {
+      sessionStorage.removeItem('prevMapCenter');
+      sessionStorage.removeItem('prevMapZoom');
+      setZoomLevel(10);
+    }
+
+    setMapCenter(filters.location ? [filters.location.lat, filters.location.lng] : mapCenter);
+    setListedFor(filters.listedFor);
+    setMinPriceBudget(filters.priceMin || 0);
+    setMaxPriceBudget(filters.priceMax || 100000000);
+    setCategory(filters.propertyType);
+    setSearchInput(filters.description || "");
+    setAppliedSearchQuery(filters.description || appliedSearchQuery);
+  }, [mapCenter, appliedSearchQuery]);
 
   useEffect(() => {
     if (!mapBounds) return;
@@ -118,7 +141,7 @@ export default function ExplorePage() {
     renderedMarkerIds.current.clear();
     setProperties([]);
     setAppliedSearchQuery(searchInput);
-  }, [filterBy, appliedSearchQuery]);
+  }, [category, appliedSearchQuery]);
 
   useEffect(() => {
     if (searchInput === "" && appliedSearchQuery) {
@@ -141,8 +164,9 @@ export default function ExplorePage() {
             value={searchInput}
             onChange={setSearchInput}
             onSearch={onSearchClick}
+            onFilter={onFilter}
           />
-          <NavigationTabs setValue={setFilterBy}/>
+          <NavigationTabs onChange={setCategory} value={category} />
         </div>
         <Map 
           properties={properties} 

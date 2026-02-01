@@ -218,7 +218,7 @@ const PropertyFilter: React.FC<FilterProps> = ({ onFilter, setTogglePopup }) => 
         )}
 
         {locationResult && (
-          <div className="mt-2 p-3 rounded-md bg-blue-100 border text-sm">
+          <div className="mt-2 p-3 rounded-md card-bg border text-sm">
             <div className="flex items-center w-full">
               <img
                 src={`https://static-maps.yandex.ru/1.x/?lang=en_US&ll=${locationResult.lng},${locationResult.lat}&z=12&size=200,100&l=map&pt=${locationResult.lng},${locationResult.lat},pm2rdm`}

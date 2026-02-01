@@ -13,10 +13,12 @@ import Image from "next/image";
 
 export function AddReview({
   propertyId, 
-  setRefreshReviews
+  setRefreshReviews,
+  propOwner
 } : {
   propertyId: string, 
-  setRefreshReviews: React.Dispatch<React.SetStateAction<boolean>>
+  setRefreshReviews: React.Dispatch<React.SetStateAction<boolean>>,
+  propOwner: string  
 }) {
   const { authUser } = useContext(AppContext);
 
@@ -63,6 +65,16 @@ export function AddReview({
 
   const handleSubmit = async () => {
     // Handle review submission logic here
+    if (!authUser) {
+      toast.error("You must be logged in to submit a review.");
+      return;
+    }
+
+    if (authUser.username === propOwner) {
+      toast.warn("You cannot rate your own property.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const newReview = await addReviewApi(propertyId, rating, comment, photo);

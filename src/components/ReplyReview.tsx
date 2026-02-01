@@ -131,8 +131,9 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
             />
 
             <button 
-              className="bg-primary px-2 py-1 rounded-md text-white focus:text-secondary" 
+              className={`bg-primary px-2 py-1 rounded-md text-white focus:text-secondary ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`} 
               onClick={sendReply}
+              disabled={isSubmitting}
             >
               <TbSend2 className="text-2xl" />
             </button>

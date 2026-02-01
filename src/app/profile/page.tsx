@@ -81,29 +81,29 @@ export default function ProfileTransaction () {
   }, [authUser])
 
   // Fetch user reviews
-  useEffect(() => {
-    if (!authUser) return
-    setRefreshReviews(false);
+  // useEffect(() => {
+  //   if (!authUser) return
+  //   setRefreshReviews(false);
     
-    const fetchReview = async () => {
-      try {
-        const data = await getPropertyUserReviewApi(nextCursor);
+  //   const fetchReview = async () => {
+  //     try {
+  //       const data = await getPropertyUserReviewApi(nextCursor);
         
-        if (data && data.reviews && data.reviews.length>0) {
-          setReviews(data.reviews);
-          setNextCursor(data.nextCursor);
-          logger.info("fetched reviews: ", data.reviews);
-        } else {
-          logger.info("unable to fetch property reviews ");
-        }
+  //       if (data && data.reviews && data.reviews.length>0) {
+  //         setReviews(data.reviews);
+  //         setNextCursor(data.nextCursor);
+  //         logger.info("fetched reviews: ", data.reviews);
+  //       } else {
+  //         logger.info("unable to fetch property reviews ");
+  //       }
 
-      } catch (error:any){
-        logger.info("error fetching property reviews ");
-      }
-    };
+  //     } catch (error:any){
+  //       logger.info("error fetching property reviews ");
+  //     }
+  //   };
 
-    fetchReview()
-  }, [authUser, refreshReviews]);
+  //   fetchReview()
+  // }, [authUser, refreshReviews]);
 
   const handleDelete = async (id: string) => {
     const res = await deleteUserProperty(id);
@@ -163,18 +163,16 @@ export default function ProfileTransaction () {
         {/* Count Status */}
         <div className="grid grid-cols-3 space-x-6 text-center mb-2">
           <div className={statusCountStyle}>
-              <p className="font-bold">{agent.rating}</p>
-              <p className="text-gray-500 ">Rating</p>
+              <p className="font-bold">{22}</p>
+              <p className="text-gray-500 ">Properties</p>
           </div>
-          <Link href={'/profile/reviews'} >
             <div className={statusCountStyle}>
-              <p className="font-bold">{agent.reviews}</p>
-              <p className="text-gray-500">Reviews</p>
+              <p className="font-bold">{4.5}</p>
+              <p className="text-gray-500">Ratings</p>
             </div>
-          </Link>
           <div className={statusCountStyle}>
-            <p className="font-bold">{agent.sold}</p>
-            <p className="text-gray-500">Sold</p>
+            <p className="font-bold">{25}</p>
+            <p className="text-gray-500">Reviews</p>
           </div>
         </div>
       </div>

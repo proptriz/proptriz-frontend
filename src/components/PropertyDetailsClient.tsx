@@ -236,8 +236,13 @@ const PropertyDetailsClient = ({
                 
                 <div className="bg-primary p-3 rounded-lg flex items-center">
                   <FaStar className="text-secondary" />
-                  <span className="ml-2 text-lg text-gray-200 font-bold">{property.average_rating}</span>
-                  <span className="ml-2 text-gray-400">({reviews.length} reviews)</span>
+                  
+                  <Link 
+                    href={`/property/reviews/${property.id}`}
+                  >  
+                    <span className="ml-2 text-lg text-gray-200 font-bold">{property.average_rating}</span>
+                    <span className="ml-2 text-gray-400">({reviews.length} reviews)</span>
+                  </Link>
                 
                   <OutlineButton 
                     style={{
@@ -252,20 +257,26 @@ const PropertyDetailsClient = ({
                 
                 <div className="mt-3 flex overflow-x-auto space-x-4 pb-2">
                   {/* Review Item */}
-                  {reviews && reviews.length>0 && reviews.slice(0,10).map((review)=> <div 
+                  {reviews && reviews.length>0 && reviews.slice(0,6).map((review)=> <div 
                     key={review._id} 
                     className="flex-shrink-0 w-80"
                     >
-                      <ReviewCard 
-                        review={review}
-                      />
+                      <Link 
+                        href={`/property/reviews/${property.id}`}
+                      >
+                        <ReviewCard 
+                          review={review}
+                        />
+                      </Link>
+                      
                     </div>
                   )}
                 </div>
-                {reviews && reviews.length>0 && <Link href={`/property/reviews/${property.id}`}>
-                  <button className="mt-3 text-green" onClick={()=>router.push('/property/reviews')}>
-                    View all reviews
-                  </button>
+                {reviews && reviews.length>0 && <Link 
+                  href={`/property/reviews/${property.id}`}
+                  className="ms-auto text-primary font-medium text-right mt-2 block"
+                >
+                  View all reviews
                 </Link>}
 
             </div>
@@ -289,7 +300,7 @@ const PropertyDetailsClient = ({
                       address={item.address} 
                       image={item.banner} 
                       period={item.period? item.period : ""} 
-                      rating={20}                      
+                      rating={item.average_rating? item.average_rating : 4.5}                      
                     />
                   </Link>
                 )))}
@@ -316,7 +327,7 @@ const PropertyDetailsClient = ({
       )}
 
       <Popup header="Add review to property" toggle={togglePopup} setToggle={setTogglePopup} useMask={true} hideReset >
-        <AddReview propertyId={propertyId} setRefreshReviews={setRefreshReviews} />
+        <AddReview propertyId={propertyId} setRefreshReviews={setRefreshReviews} propOwner={property?.user.username} />
       </Popup>
     </div>
   );

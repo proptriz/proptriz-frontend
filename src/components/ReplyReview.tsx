@@ -1,64 +1,120 @@
-import { useEffect, useState } from "react";
+'use client';
+
+import { useContext, useEffect, useState } from "react";
 import { ReplyCard, ReviewCard } from "./shared/Cards";
 import { TbSend2 } from "react-icons/tb";
 import { toast } from "react-toastify";
+import { ReviewType } from "@/types";
+import logger from "../../logger.config.mjs"
+import { addReplyReviewApi, getPropertyReviewReplyApi } from "@/services/reviewApi";
+import Splash from "./shared/Splash";
+import { AppContext } from "@/context/AppContextProvider";
 
-const ReplyReview = ({ id }: { id: string }) => {
+const ReplyReview = ({ review }: { review: ReviewType }) => {
+  const { authUser } = useContext(AppContext);
+  
   const [replies, setReplies] = useState([]);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [refreshReplies, setRefreshReplies] = useState<boolean>(false);
+  const [comment, setComment] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  // Fetch review replies
   useEffect(() => {
-    // Fetch review and replies based on the id if needed
-  }, [id]);
+    if (!review._id) return
+    setRefreshReplies(false);
+    
+    const fetchReview = async () => {
+      try {
+        const data = await getPropertyReviewReplyApi(review._id, nextCursor);
+
+        if (data && data.replies) {
+          setReplies(data.replies);
+          setNextCursor(data.nextCursor);
+          logger.info("fetched replies: ", data.replies.length);
+        } else {
+          logger.info("unable to fetch property reviews ");
+        }
+
+      } catch (error:any){
+        logger.info("error fetching property reviews ");
+      }
+    };
+
+    fetchReview()
+  }, [review, refreshReplies]);
 
   const sendReply = async () => {
-    // Logic to send reply
-    toast.success("Reply sent");
-  };
+    // Handle review submission logic here
+    setIsSubmitting(true);
+    
+    try {
+      if (comment.trim() === "") {
+        toast.error("Reply comment cannot be empty.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const newReply = await addReplyReviewApi(review._id, comment);
+      // logger.info("Submitted reply:", newReply);
+
+      if (!newReply) {
+        toast.error("Failed to submit reply. Please try again.");
+        setIsSubmitting(false);
+
+      } else {
+        toast.success("Reply submitted successfully!");
+        setComment("");
+        setIsSubmitting(false);
+        setRefreshReplies(true);
+      }
+
+    } catch (error) {
+      logger.error("Error submitting reply:", error);
+      // toast.error("An error occurred while submitting your reply.");
+      setIsSubmitting(false);
+    }
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       sendReply();
     }
   };
+  
+  if (!authUser) {
+    return <Splash />;
+  }
 
   return (
     <div className="relative h-full">
       {/* Review */}
-      <ReviewCard
-        review={{
-          id:'01', 
-          reviewer:"Kurt Mullins", 
-          image:"/avatar.png", 
-          ratings:4.0,
-          text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          review_date:"2025-01-01T10:00:00Z", // Example ISO 8601 date string
-          replies_count: 3,
-          review_images: [],
-        }}
-      />
+      <div>
+        <h2 className="text-xl font-semibold px-4 pt-4 pb-2">Review Details</h2>
+        
+        <ReviewCard
+          review={review}
+        />
+      </div>
+      
       {/* Replies */}
       <div className="px-4 space-y-4 relative">
-        <ReplyCard
-          id={"-reply1"}
-          reviewer="Owner"
-          text="Thank you for your feedback! We're glad you had a great experience."
-          image="/avatar.png"
-          reviewDate={new Date().toISOString()}
-        />
-        <ReplyCard
-          id={"-reply2"}
-          reviewer="Owner"
-          text="Thank you for your feedback! We're glad you had a great experience."
-          image={"/logo.png"}
-          reviewDate={new Date().toISOString()}
-        />
-        <ReplyCard 
-          id={"-reply3"}
-          reviewer="Owner"
-          text="Thank you for your feedback! We're glad you had a great experience."
-          image={"/avatar.png"}
-          reviewDate={new Date().toISOString()}
-        />    
+        <h2 className="text-lg font-semibold pt-4 pb-2">Replies</h2>
+
+        {replies.length === 0 && (
+          <p className="text-gray-500">No replies yet.</p>
+        )}
+
+        {replies.map((reply: any) => (
+          <ReplyCard
+            key={reply._id}
+            id={reply._id}
+            sender={reply.sender?.username || "Owner"}
+            comment={reply.comment}
+            senderAvatar={reply.sender?.image || '/avatar.png'}
+            reviewDate={reply.createdAt}
+          />
+        ))}
         
       </div>
       {/* Reply Input */}
@@ -69,10 +125,14 @@ const ReplyReview = ({ id }: { id: string }) => {
               type="text" 
               className="w-full rounded-md bg-gray-100 p-2 outline outline-primary" 
               onKeyDown={handleKeyDown}
-              onClick={sendReply}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Write your reply here..."
             />
+
             <button 
               className="bg-primary px-2 py-1 rounded-md text-white focus:text-secondary" 
+              onClick={sendReply}
             >
               <TbSend2 className="text-2xl" />
             </button>

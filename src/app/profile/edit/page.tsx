@@ -12,13 +12,18 @@ import { UserSettingsType, UserTypeEnum } from '@/types';
 import ToggleCollapse from '@/components/shared/ToggleCollapse';
 import { addOrUpdateUserSettings, getUserSettings } from '@/services/settingsApi';
 import Image from 'next/image';
-import { EmailInput, PhoneInput, SelectInput, TextInput } from '@/components/shared/Input';
+import { EmailInput, SelectInput, TextInput } from '@/components/shared/Input';
+import { PhoneInput } from '@/components/shared/PhoneInput';
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
   const [photo, setPhoto] = useState<File>();
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string>("/logo.png");
   const [formData, setFormData] = useState<Partial<UserSettingsType>>({});
+  const [phone, setPhone] = useState("");
+  const [normalizedPhone, setNormalizedPhone] = useState<string | null>(null);
+  const [whatsapp, setWhatsapp] = useState("");
+  const [normalizedWhatsapp, setNormalizedWhatsapp] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
@@ -34,6 +39,10 @@ const EditProfile = () => {
 
         setFormData(settings);
         setExistingPhotoUrl(settings.image || '');
+        setPhone(settings.phone || '');
+        setNormalizedPhone(settings.phone || null);
+        setWhatsapp(settings.whatsapp || '')
+        setNormalizedWhatsapp(settings.whatsapp || null)
         
 
       } catch (err) {
@@ -82,6 +91,9 @@ const EditProfile = () => {
   const handleSubmit = async () => {
     try {
       setIsLoading(true);
+      formData.phone = normalizedPhone || "";
+      formData.whatsapp= normalizedWhatsapp || "";
+
       const updatedSettings = addOrUpdateUserSettings(formData, photo);
       if (updatedSettings) {
         logger.info('User profile updated', updatedSettings);
@@ -155,27 +167,23 @@ const EditProfile = () => {
             />
 
             <PhoneInput
-              label="Phone number (optional):" 
-              icon={<FaPhone />} 
-              name='phone'
-              id={'phone'}
-              value={formData.phone || ""}  
-              onChange={onChange} 
-              placeholder='Enter your phone number (+234 080-3288-9111)'
+              label="Phone number"
+              value={phone}
+              onChange={setPhone}
+              onNormalize={setNormalizedPhone}
             />
 
             <PhoneInput
               label="Whatsapp number (optional):" 
-              icon={<BsWhatsapp />} 
               name='whatsapp'
               id={'whatsapp'}
-              value={formData.whatsapp || ""}  
-              onChange={onChange} 
+              value={whatsapp}  
+              onChange={setWhatsapp} 
+              onNormalize={setNormalizedWhatsapp}
               placeholder='Enter your Whatsapp number (234 080-3288-9111)'
             />
           </div>
-        </ToggleCollapse>
-        
+        </ToggleCollapse>        
       </div>
 
       {/* Submit Button */}

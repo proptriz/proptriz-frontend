@@ -72,7 +72,7 @@ const MapBoundsUpdater: React.FC<MapBoundsUpdaterProps> = ({ onBoundsChange }) =
 
         const bounds = map.getBounds();
         onBoundsChange(bounds);
-      }, 2000),
+      }, 500),
     [map, onBoundsChange]
   );
 

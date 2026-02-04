@@ -108,10 +108,11 @@ export const getPropertyReviewReplyApi = async (reviewId: string, cursor?: strin
   }
 }
 
-export const getPropertyUserReviewApi = async (cursor?: string) => {
+export const getPropertyUserReviewApi = async (sentCursor?: string, receivedCursor?: string) => {
   try {
     const query = new URLSearchParams({
-      cursor: cursor || ""
+      sent_cursor: sentCursor || "",
+      received_cursor: receivedCursor || ""
     });
 
     const res = await axiosClient.get(`/property-review/user/review?${query.toString()}`);
@@ -120,7 +121,7 @@ export const getPropertyUserReviewApi = async (cursor?: string) => {
       return [];
     }
 
-    logger.info("property review replies: ", res.data);
+    logger.info("user reviews data: ", res.data);
 
     return res.data;
   } catch (error){

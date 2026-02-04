@@ -92,9 +92,12 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
       <div>
         <h2 className="text-xl font-semibold px-4 pt-4 pb-2">Review Details</h2>
         
-        <ReviewCard
-          review={review}
-        />
+        <div className="shadow-lg rounded-md">
+          <ReviewCard
+            review={review}
+          />
+        </div>
+        
       </div>
       
       {/* Replies */}
@@ -109,9 +112,9 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
           <ReplyCard
             key={reply._id}
             id={reply._id}
-            sender={reply.sender?.username || "Owner"}
+            sender={reply.reply_from?.username || "Owner"}
             comment={reply.comment}
-            senderAvatar={reply.sender?.image || '/avatar.png'}
+            senderAvatar={reply.reply_from?.image || '/avatar.png'}
             reviewDate={reply.createdAt}
           />
         ))}

@@ -1,222 +1,374 @@
-
-"use client";
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import { AppButton as Button } from "@/components/shared/buttons";
-import { Slider } from "@/components/shared/Input";
-import { TiFilter } from "react-icons/ti";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiMapPin } from "react-icons/fi";
+import ToggleButtons from "../ToggleButtons";
+import { CategoryEnum, PropertyFilterPayload } from "@/types";
+import { styles } from "@/constant";
+
+const PRICE_LIMITS = {
+  rent: 10_000_000,
+  sale: 5_000_000_000,
+};
+
+const getPriceMax = (listedFor: string) =>
+  listedFor === "rent"
+    ? PRICE_LIMITS.rent
+    : PRICE_LIMITS.sale;
+
+const getBudgetPresets = (listedFor: string, PRICE_MAX: number) => {
+  if (listedFor === "rent") {
+    return [
+      { label: "Any", min: 0, max: PRICE_MAX },
+      { label: "Under ₦500k", min: 0, max: 500_000 },
+      { label: "₦500k – ₦2M", min: 500_000, max: 2_000_000 },
+      { label: "₦2M – ₦5M", min: 2_000_000, max: 5_000_000 },
+      { label: "₦5M+", min: 5_000_000, max: PRICE_MAX },
+    ];
+  }
+
+  // sale
+  return [
+    { label: "Any", min: 0, max: PRICE_MAX },
+    { label: "Under ₦5M", min: 0, max: 5_000_000 },
+    { label: "₦5M – ₦20M", min: 5_000_000, max: 20_000_000 },
+    { label: "₦20M – ₦100M", min: 20_000_000, max: 100_000_000 },
+    { label: "₦100M+", min: 100_000_000, max: PRICE_MAX },
+  ];
+};
 
 interface FilterProps {
-  onFilter: (filters: any) => void;
+  onFilter: (filters: PropertyFilterPayload) => void;
+  setTogglePopup?: (value: boolean) => void;
 }
 
-const PropertyFilter = ({ onFilter }: FilterProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const PropertyFilter: React.FC<FilterProps> = ({ onFilter, setTogglePopup }) => {
+  const abortRef = useRef<AbortController | null>(null);
+
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locationResult, setLocationResult] = useState<any>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
   const [filters, setFilters] = useState({
-    location: '',
-    type: '',
-    priceType: 'all',
-    priceRange: [0, 10000000],
-    bedrooms: '',
-    bathrooms: ''
+    propertyType: CategoryEnum.house,
+    listedFor: "all" as "all" | "sale" | "rent",
+    price: [0, 10_000_000] as [number, number],
+    description: "",
   });
 
-  const handleFilterChange = (name: string, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
+  /* ---------------- Location Search (Forward + Reverse) ---------------- */
+
+  useEffect(() => {
+    if (!locationQuery || locationQuery.length < 3) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const fetchLocation = async () => {
+      try {
+        setLoadingLocation(true);
+
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?` +
+            new URLSearchParams({
+              q: locationQuery,
+              format: "json",
+              addressdetails: "1",
+              countrycodes: "ng",
+              limit: "1",
+            }),
+          {
+            signal: controller.signal,
+            headers: { "Accept-Language": "en" },
+          }
+        );
+
+        const data = await res.json();
+        if (!data?.length) return;
+
+        const item = data[0];
+
+        setLocationResult({
+          query: locationQuery,
+          lat: Number(item.lat),
+          lng: Number(item.lon),
+          name: item.display_name.split(",")[0],
+          lga: item.address?.county || item.address?.city_district,
+          state: item.address?.state,
+        });
+      } catch (err) {
+        if ((err as any).name !== "AbortError") {
+          // console.error("Geocoding failed", err);
+        }
+      } finally {
+        setLoadingLocation(false);
+      }
+    };
+
+    const debounce = setTimeout(fetchLocation, 500);
+    return () => {
+      clearTimeout(debounce);
+      controller.abort();
+    };
+  }, [locationQuery]);
+
+  /* ---------------- Price Handlers ---------------- */
+  
+  const PRICE_MAX = getPriceMax(filters.listedFor);
+  const BUDGET_PRESETS = getBudgetPresets(filters.listedFor, PRICE_MAX);
+
+  useEffect(() => {
+    setFilters((f) => ({
+      ...f,
+      price: [
+        Math.min(f.price[0], PRICE_MAX),
+        Math.min(f.price[1], PRICE_MAX),
+      ],
+    }));
+  }, [filters.listedFor]);
+
+  const formatMoneyInput = (v: string) =>
+    v.replace(/[^\d]/g, "");
+
+  const handleMinChange = (raw: string) => {
+    const n = Number(formatMoneyInput(raw) || 0);
+    setFilters((f) => ({
+      ...f,
+      price: [Math.min(n, f.price[1]), f.price[1]],
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onFilter(filters);
+  const handleMaxChange = (raw: string) => {
+    const n = Number(formatMoneyInput(raw) || PRICE_MAX);
+    setFilters((f) => ({
+      ...f,
+      price: [f.price[0], Math.min(Math.max(n, f.price[0]), PRICE_MAX)],
+    }));
   };
 
-  const locationOptions = [
-    { value: "lagos", label: "Lagos" },
-    { value: "abuja", label: "Abuja" },
-    { value: "portharcourt", label: "Port Harcourt" },
-    { value: "ibadan", label: "Ibadan" },
-    { value: "kano", label: "Kano" }
-  ];
+  /* ---------------- Submit ---------------- */
 
-  const propertyTypes = [
-    { value: "all", label: "All Types" },
-    { value: "house", label: "House" },
-    { value: "hotel", label: "Hotel" },
-    { value: "apartment", label: "Apartment" },
-    { value: "land", label: "Land" },
-    { value: "office", label: "Office" },
-    { value: "shop", label: "Shop" }
-  ];
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    onFilter({
+      location: locationResult || undefined,
+      propertyType: filters.propertyType,
+      listedFor: filters.listedFor,
+      priceMin: filters.price[0],
+      priceMax: filters.price[1],
+      description: filters.description || undefined,
+    });
+
+    setTogglePopup?.(false);
+  };
+
+  const handleResetFilter = () => {
+    // clear location
+    setLocationQuery("");
+    setLocationResult(null);
+
+    // reset filters
+    setFilters({
+      propertyType: CategoryEnum.house,
+      listedFor: "all" as "all" | "sale" | "rent",
+      price: [0, 10_000_000] as [number, number],
+      description: ""
+    });
+
+    // optional: immediately trigger refresh with cleared filters
+    onFilter({
+      location: undefined,
+      propertyType: CategoryEnum.house,
+      listedFor: "all",
+      priceMin: null,
+      priceMax: null,
+      description: undefined,
+    });
+
+    // optional — only if you WANT popup closed on reset
+    // setTogglePopup?.(false);
+  };
+
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-6">
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-wrap -mx-2 space-y-4 md:space-y-0">
-          {/* Basic Filters - Always Visible */}
-          <div className="flex items-center space-x-2 w-full px-2 md:w-1/3">
-            <span className="text-sm text-gray-600">Sort by:</span>
-            <select className="p-2 border border-gray-200 rounded-md focus:ring-estate-primary focus:border-estate-primary">
-              <option>Most Recent</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
-              <option>Most Popular</option>
-            </select>
-          </div>
-          <div className="w-full px-2 md:w-1/3 mb-4 md:mb-0">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <select 
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-              value={filters.location}
-              onChange={(e) => handleFilterChange('location', e.target.value)}
-            >
-              <option value="">All Locations</option>
-              {locationOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="w-full px-2 md:w-1/3 mb-4 md:mb-0">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
-            <select 
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-              value={filters.type}
-              onChange={(e) => handleFilterChange('type', e.target.value)}
-            >
-              {propertyTypes.map(type => (
-                <option key={type.value} value={type.value}>{type.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="w-full px-2 md:w-1/3 mb-4 md:mb-0">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sale/Rent</label>
-            <div className="flex space-x-2">
-              <button
-                type="button"
-                className={`flex-1 p-2 rounded-md border ${
-                  filters.priceType === 'all' ? 'bg-estate-primary text-white border-estate-primary' : 'bg-white text-gray-700 border-gray-300'
-                }`}
-                onClick={() => handleFilterChange('priceType', 'all')}
-              >
-                All
-              </button>
-              <button
-                type="button"
-                className={`flex-1 p-2 rounded-md border ${
-                  filters.priceType === 'sale' ? 'bg-estate-primary text-white border-estate-primary' : 'bg-white text-gray-700 border-gray-300'
-                }`}
-                onClick={() => handleFilterChange('priceType', 'sale')}
-              >
-                Buy
-              </button>
-              <button
-                type="button"
-                className={`flex-1 p-2 rounded-md border ${
-                  filters.priceType === 'rent' ? 'bg-estate-primary text-white border-estate-primary' : 'bg-white text-gray-700 border-gray-300'
-                }`}
-                onClick={() => handleFilterChange('priceType', 'rent')}
-              >
-                Rent
-              </button>
-            </div>
-          </div>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-xl shadow-lg p-4 space-y-6"
+    >
+      {/* ---------------- Location ---------------- */}
+      <div>
+        <label className={styles.H2}>
+          Location Search
+        </label>
+        
+        <div className="relative">
+          <FiMapPin className="absolute left-3 top-3 text-gray-400" />
+          
+          <input
+            value={locationQuery}
+            onChange={(e) => setLocationQuery(e.target.value)}
+            placeholder="Search city, area or landmark"
+            className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-estate-primary"
+          />
         </div>
 
-        {/* Advanced Filters - Toggleable */}
-        {isExpanded && (
-          <div className="mt-4 border-t pt-4">
-            <div className="flex flex-wrap -mx-2">
-              <div className="w-full px-2 md:w-1/3 mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
-                <div className="px-2">
-                  <Slider
-                    defaultValue={[0, 100]}
-                    max={100}
-                    step={1}
-                    className="mt-1"
-                  />
-                  <div className="flex justify-between mt-2 text-sm">
-                    <span>₦0</span>
-                    <span>₦10,000,000+</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full px-2 md:w-1/3 mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
-                <select 
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-                  value={filters.bedrooms}
-                  onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
-                >
-                  <option value="">Any</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
-                  <option value="5">5+</option>
-                </select>
-              </div>
-
-              <div className="w-full px-2 md:w-1/3 mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
-                <select 
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-estate-primary focus:border-estate-primary"
-                  value={filters.bathrooms}
-                  onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
-                >
-                  <option value="">Any</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
-                </select>
-              </div>
-            </div>
-          </div>
+        {loadingLocation && (
+          <p className="text-xs text-gray-500 mt-1">Searching location…</p>
         )}
 
-        <div className="mt-4 flex flex-wrap items-center justify-between">
-          <Button 
-            type="button" 
-            className="flex items-center text-gray-700 mb-2"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <TiFilter className="h-4 w-4 mr-2" />
-            {isExpanded ? 'Less Filters' : 'More Filters'}
-          </Button>
-          
-          <div className="flex space-x-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="border-estate-secondary text-estate-primary"
-              onClick={() => setFilters({
-                location: '',
-                type: '',
-                priceType: 'all',
-                priceRange: [0, 10000000],
-                bedrooms: '',
-                bathrooms: ''
-              })}
-            >
-              Reset
-            </Button>
-            <Button 
-              type="submit" 
-              className="bg-estate-primary text-white hover:bg-estate-primary/90"
-            >
-              <FiSearch className="h-4 w-4 mr-2" />
-              Search
-            </Button>
+        {locationResult && (
+          <div className="mt-2 p-3 rounded-md card-bg border text-sm">
+            <div className="flex items-center w-full">
+              <img
+                src={`https://static-maps.yandex.ru/1.x/?lang=en_US&ll=${locationResult.lng},${locationResult.lat}&z=12&size=200,100&l=map&pt=${locationResult.lng},${locationResult.lat},pm2rdm`}
+                alt="Location Map"
+                className="w-24 h-12 rounded-md mr-3 border"
+              />
+              
+              <div className="w-full">
+                {/* <div className="text-xs font-small text-blue-700">Location identified</div> */}
+                <div className="text-md font-medium">{locationResult.name}</div>
+                
+                <div className="text-gray-700">
+                  {locationResult.lga && `${locationResult.lga}, `}
+                  {locationResult.state}
+                </div>
+
+                <div className="text-right text-xs text-gray-500">
+                  {Math.abs(locationResult.lat).toFixed(4)}° {locationResult.lat >= 0 ? 'N' : 'S'}, {Math.abs(locationResult.lng).toFixed(4)}° {locationResult.lng >= 0 ? 'E' : 'W'}
+                </div>
+              </div>              
+            </div>            
           </div>
+        )}
+      </div>
+
+      {/* ---------------- Property Type ---------------- */}
+      <div>        
+        <div className="overflow-x-auto">
+          <ToggleButtons<CategoryEnum>
+            label={"Property Type"}
+            options={Object.values(CategoryEnum)}
+            selected={filters.propertyType as CategoryEnum}
+            onChange={(value) =>
+              setFilters((f) => ({ ...f, propertyType: value as CategoryEnum }))
+            }
+          />
         </div>
-      </form>
-    </div>
+      </div>
+
+      {/* ---------------- Sale / Rent ---------------- */}
+      <div className="">
+        {/* <label htmlFor="listedFor">Listed For</label> */}
+        <ToggleButtons
+          label="Listed For"
+          options={["all", "sale", "rent"]}
+          selected={filters.listedFor}
+          onChange={(value) =>
+            setFilters((f) => ({ ...f, listedFor: value as "all" | "sale" | "rent" }))
+          }
+        />
+      </div>
+
+      {/* ---------------- Price (Modern UX) ---------------- */}
+      <div>
+        <label className={styles.H2}>
+          Price Budget (₦ / {filters.listedFor === "rent" ? "year" : "total"})
+        </label>
+
+        {/* Presets */}
+        <div className="flex flex-wrap gap-2 mb-3 mt-2">
+          {BUDGET_PRESETS.map((p) => {
+            const active =
+              filters.price[0] === p.min &&
+              filters.price[1] === p.max;
+
+            return (
+              <button
+                key={p.label}
+                type="button"
+                onClick={() =>
+                  setFilters((f) => ({ ...f, price: [p.min, p.max] }))
+                }
+                className={`px-3 py-1.5 rounded-full text-xs border transition
+                ${
+                  active
+                    ? "bg-primary text-white border-primary"
+                    : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                }`}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Inputs */}
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            inputMode="numeric"
+            value={filters.price[0] || ""}
+            onChange={(e) => handleMinChange(e.target.value)}
+            className="w-full p-2 border rounded-md"
+            placeholder="Min"
+          />
+
+          <input
+            inputMode="numeric"
+            value={
+              filters.price[1] >= PRICE_MAX
+                ? ""
+                : filters.price[1]
+            }
+            onChange={(e) => handleMaxChange(e.target.value)}
+            className="w-full p-2 border rounded-md"
+            placeholder="No limit"
+          />
+        </div>
+
+        <div className="text-xs text-gray-600 mt-2">
+          Selected: ₦{filters.price[0].toLocaleString()} —{" "}
+          {filters.price[1] >= PRICE_MAX
+            ? "No limit"
+            : `₦${filters.price[1].toLocaleString()}`}
+        </div>
+      </div>
+
+      {/* ---------------- Description Query ---------------- */}
+      <div>
+        <label className={styles.H2}>
+          Describe what you need
+        </label>
+        <input
+          value={filters.description}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, description: e.target.value }))
+          }
+          placeholder="e.g. furnished, fenced, parking lot"
+          className="w-full p-2 border rounded-md mt-2"
+        />
+      </div>
+
+      {/* ---------------- Actions ---------------- */}
+      <div className="flex justify-between gap-2 pt-2">
+        <Button type="button" 
+          className={`px-3 py-1.5 rounded-lg border transition bg-gray-50 text-gray-700 border-gray-400 hover:bg-gray-100`}
+          onClick={handleResetFilter}
+        >
+          Reset
+        </Button>
+
+        <Button 
+        type="submit" 
+        className="bg-primary text-white"
+        onClick={handleSubmit}
+        >
+          <FiSearch className="mr-2" />
+          Apply Filters
+        </Button>
+      </div>
+    </form>
   );
 };
 

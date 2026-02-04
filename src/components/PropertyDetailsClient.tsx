@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaStar, FaBed, FaRegHeart, FaArrowLeft } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { PropertyType } from "@/types";
+import { PropertyType, ReviewType } from "@/types";
 import Link from "next/link";
 import { getNearestProperties, getPropertyById } from "@/services/propertyApi";
 import logger from '../../logger.config.mjs';
@@ -17,6 +17,10 @@ import { BiShareAlt } from "react-icons/bi";
 import StickyAgentInfo from "@/components/StickyAgent";
 import PropertyDescription from "@/components/shared/Description";
 import ShareButton from "./ShareButton";
+import { getPropertyReviewsApi } from "@/services/reviewApi";
+import Popup from "./shared/Popup";
+import { AddReview } from "./AddReview";
+import { OutlineButton } from "./shared/buttons";
 
 const PropertyDetailsClient = ({
   property
@@ -30,6 +34,9 @@ const PropertyDetailsClient = ({
   const [nearestProperty, setNearestProperty] = useState<PropertyType[]>([]);
   const [showGallery, setShowGallery] = useState(false);
   const [togglePopup, setTogglePopup] = useState(false);
+  const [reviews, setReviews] = useState<ReviewType[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,6 +62,31 @@ const PropertyDetailsClient = ({
 
     fetchProperty()
   }, [propertyId,]);
+
+  // Fetch property reviews
+  useEffect(() => {
+    if (!propertyId) return
+    setRefreshReviews(false);
+    
+    const fetchReview = async () => {
+      try {
+        const data = await getPropertyReviewsApi(propertyId, nextCursor);
+        
+        if (data && data.reviews && data.reviews.length>0) {
+          setReviews(data.reviews);
+          setNextCursor(data.nextCursor);
+          logger.info("fetched reviews: ", data.reviews);
+        } else {
+          logger.info("unable to fetch property reviews ");
+        }
+
+      } catch (error:any){
+        logger.info("error fetching property reviews ");
+      }
+    };
+
+    fetchReview()
+  }, [propertyId, refreshReviews]);
 
   if (loading){
     return (
@@ -109,7 +141,7 @@ const PropertyDetailsClient = ({
               {/* Bottom-left rating and category */}
               <div className="absolute bottom-5 left-5 bg-black bg-opacity-50 text-white px-4 py-1 rounded-full">
                 <span className="text-yellow-500">★</span>
-                <span>5.0</span> | <span>{property?.category}</span>
+                <span>{property?.average_rating}</span> | <span>{property?.category}</span>
               </div>
 
               {/* Thumbnail link (replaces bottom-right overlay) */}
@@ -198,39 +230,57 @@ const PropertyDetailsClient = ({
             </div>
 
             {/* Reviews */}
-            <Link href={`/property/reviews/${property.id}`}>
-              <div className="px-5 mt-10">
+            
+            <div className="px-5 mt-10">
                 <h2 className="text-lg font-bold mb-3">Reviews</h2>
                 
                 <div className="bg-primary p-3 rounded-lg flex items-center">
                   <FaStar className="text-secondary" />
-                  <span className="ml-2 text-lg text-gray-200 font-bold">5.0</span>
-                  <span className="ml-2 text-gray-400">(6 reviews)</span>
+                  
+                  <Link 
+                    href={`/property/reviews/${property.id}`}
+                  >  
+                    <span className="ml-2 text-lg text-gray-200 font-bold">{property.average_rating}</span>
+                    <span className="ml-2 text-gray-400">({reviews.length} reviews)</span>
+                  </Link>
+                
+                  <OutlineButton 
+                    style={{
+                      color:"white",
+                      marginLeft: "auto"
+                    }} 
+                    onClick={()=>setTogglePopup(true)}
+                  > 
+                    Add review
+                  </OutlineButton>
                 </div>
                 
-                <div className="mt-3 space-y-3">
+                <div className="mt-3 flex overflow-x-auto space-x-4 pb-2">
                   {/* Review Item */}
-                  <ReviewCard 
-                    review={{
-                      id:'01', 
-                      reviewer:"Kurt Mullins", 
-                      image:"/avatar.png", 
-                      ratings:4.0,
-                      text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                      review_date:"2025-01-01T10:00:00Z", // Example ISO 8601 date string
-                      replies_count: 3,
-                      review_images: [],
-                    }}
-                  />
-                  {/* Add more reviews here */}
+                  {reviews && reviews.length>0 && reviews.slice(0,6).map((review)=> <div 
+                    key={review._id} 
+                    className="flex-shrink-0 w-80"
+                    >
+                      <Link 
+                        href={`/property/reviews/${property.id}`}
+                      >
+                        <ReviewCard 
+                          review={review}
+                        />
+                      </Link>
+                      
+                    </div>
+                  )}
                 </div>
-
-                <button className="mt-3 text-green" onClick={()=>router.push('/property/reviews')}>
+                {reviews && reviews.length>0 && <Link 
+                  href={`/property/reviews/${property.id}`}
+                  className="ms-auto text-primary font-medium text-right mt-2 block"
+                >
                   View all reviews
-                </button>
+                </Link>}
 
-              </div>
-            </Link>
+            </div>
+            
 
           {/* Nearby Properties */}
           {nearestProperty && nearestProperty.length>0 && <div className="px-5 mt-10">
@@ -250,7 +300,7 @@ const PropertyDetailsClient = ({
                       address={item.address} 
                       image={item.banner} 
                       period={item.period? item.period : ""} 
-                      rating={20}                      
+                      rating={item.average_rating? item.average_rating : 4.5}                      
                     />
                   </Link>
                 )))}
@@ -275,6 +325,10 @@ const PropertyDetailsClient = ({
           onClose={() => setShowGallery(false)}
         />
       )}
+
+      <Popup header="Add review to property" toggle={togglePopup} setToggle={setTogglePopup} useMask={true} hideReset >
+        <AddReview propertyId={propertyId} setRefreshReviews={setRefreshReviews} propOwner={property?.user.username} />
+      </Popup>
     </div>
   );
 };

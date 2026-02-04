@@ -6,19 +6,22 @@ import { AiOutlineMenuUnfold } from "react-icons/ai";
 import RecentSearchCard from "../search/RecentSearchCard";
 import Popup from "./Popup";
 import PropertyFilter from "../property/PropertyFilter";
+import { PropertyFilterPayload } from "@/types";
 
 type SearchBarProps = {
   value: string;
   onChange: (value: string) => void;
   onSearch: () => void;
+  onFilter: (filters: PropertyFilterPayload) => void;
 };
 
 const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChange,
   onSearch,
+  onFilter
 }) => {
-  const [showRecentSearch, setShowRecentSearch] = useState(false);
+  // const [showRecentSearch, setShowRecentSearch] = useState(false);
   const [togglePopup, setTogglePopup] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -42,8 +45,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
               value={value}
               onChange={(e) => onChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              onFocus={() => setShowRecentSearch(true)}
-              onBlur={() => setShowRecentSearch(false)}
+              // onFocus={() => setShowRecentSearch(true)}
+              // onBlur={() => setShowRecentSearch(false)}
               className="w-full outline-none text-gray-500"
             />
 
@@ -65,20 +68,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </button>
         </div>
 
-        {showRecentSearch && (
+        {/* {showRecentSearch && (
           <div className="absolute z-10">
             <RecentSearchCard />
           </div>
-        )}
+        )} */}
       </div>
 
       <Popup
-        header="Filter"
+        header="Filter Properties"
         toggle={togglePopup}
         setToggle={setTogglePopup}
         useMask
+        hideReset={true}
       >
-        <PropertyFilter onFilter={handleFilter} />
+        <PropertyFilter onFilter={onFilter} setTogglePopup={setTogglePopup} />
       </Popup>
     </>
   );

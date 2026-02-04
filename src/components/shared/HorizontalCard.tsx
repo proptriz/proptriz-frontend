@@ -28,7 +28,7 @@ const HorizontalCard: React.FC<PropertyProps> = ({
           className="w-full h-full object-cover"
         />
         {/* Listed For */}
-        <div className="absolute top-2 left-2 font-bold text-primary text-sm px-2 py-1 rounded-lg">
+        <div className="absolute top-2 left-2 font-bold text-primary text-sm px-2 py-1 rounded-lg bg-white">
           For {listed_for}
         </div>
         {/* Property Type */}

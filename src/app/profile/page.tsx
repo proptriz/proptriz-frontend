@@ -29,8 +29,10 @@ export default function ProfileTransaction () {
   const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
   const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
   const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
-  const [reviews, setReviews] = useState<ReviewType[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [sentReviews, setSentReviews] = useState<ReviewType[]>([]);
+  const [receivedReviews, setReceivedReviews] = useState<ReviewType[]>([]);
+  const [sentNextCursor, setSentNextCursor] = useState<string | undefined>(undefined);
+  const [receivedNextCursor, setReceivedNextCursor] = useState<string | undefined>(undefined);
   const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
 
   const menuItems = [
@@ -81,29 +83,31 @@ export default function ProfileTransaction () {
   }, [authUser])
 
   // Fetch user reviews
-  // useEffect(() => {
-  //   if (!authUser) return
-  //   setRefreshReviews(false);
+  useEffect(() => {
+    if (!authUser) return
+    setRefreshReviews(false);
     
-  //   const fetchReview = async () => {
-  //     try {
-  //       const data = await getPropertyUserReviewApi(nextCursor);
+    const fetchReview = async () => {
+      try {
+        const data = await getPropertyUserReviewApi(sentNextCursor, receivedNextCursor);
         
-  //       if (data && data.reviews && data.reviews.length>0) {
-  //         setReviews(data.reviews);
-  //         setNextCursor(data.nextCursor);
-  //         logger.info("fetched reviews: ", data.reviews);
-  //       } else {
-  //         logger.info("unable to fetch property reviews ");
-  //       }
+        if (data) {
+          setSentReviews(data.sent.reviews);
+          setReceivedReviews(data.received.reviews);
+          setSentNextCursor(data.sent.nextCursor);
+          setReceivedNextCursor(data.received.nextCursor);
+          logger.info("fetched reviews: ", data.sent.reviews);
+        } else {
+          logger.info("unable to fetch property reviews ");
+        }
 
-  //     } catch (error:any){
-  //       logger.info("error fetching property reviews ");
-  //     }
-  //   };
+      } catch (error:any){
+        logger.info("error fetching property reviews ");
+      }
+    };
 
-  //   fetchReview()
-  // }, [authUser, refreshReviews]);
+    fetchReview()
+  }, [authUser, refreshReviews]);
 
   const handleDelete = async (id: string) => {
     const res = await deleteUserProperty(id);
@@ -187,12 +191,12 @@ export default function ProfileTransaction () {
         <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Reviews'? 'bg-white text-[#61AF74]' : '' }`}
           onClick={()=>setListOrSold('Reviews')}
         >
-          Reviews
+          received
         </button>                
         <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Inbox'? 'bg-white text-[#61AF74]' : '' }`}
           onClick={()=>setListOrSold('Inbox')}
         >
-          Inbox
+          Sent
         </button>                
       </div>
 
@@ -272,22 +276,21 @@ export default function ProfileTransaction () {
           <div className="flex items-center justify-between m-4">
             <p className="text-lg mb-4 font-[Raleway]">
               <span className="font-bold mr-1">
-                {reviews.length}
+                {receivedReviews.length}
               </span> 
               Reviews
             </p>
           </div>
 
-          {reviews.length===0 && (
+          {receivedReviews.length===0 && (
             <p className="text-gray-500 m-4">No reviews yet.</p>
           )}
           
           <div className="space-y-6 px-4">
-            {reviews.map((review: any) => (
+            {receivedReviews.map((review: any) => (
               <ReviewCard
-                key={review.id}
                 review={review}
-                showReply={review}
+                showReply={showReply}
                 showPropDetails={true}
               />
             ))}
@@ -300,22 +303,21 @@ export default function ProfileTransaction () {
         <div className="flex items-center justify-between m-4">
           <p className="text-lg mb-4 font-[Raleway]">
             <span className="font-bold mr-1">
-              {reviews.length}
+              {sentReviews.length}
             </span> 
             Reviews
           </p>
         </div>
 
-        {reviews.length===0 && (
+        {sentReviews.length===0 && (
           <p className="text-gray-500 m-4">No reviews yet.</p>
         )}
 
         <div className="space-y-6 px-4">
-          {reviews.map((review: any) => (
+          {sentReviews.map((review: any) => (
             <ReviewCard
-              key={review.id}
               review={review}
-              showReply={review}
+              showReply={showReply}
               showPropDetails={true}
             />
           ))}

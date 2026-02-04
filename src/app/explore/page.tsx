@@ -95,7 +95,7 @@ export default function RootPage() {
 
       {/* Map Section */}
       <div className="relative flex-1">
-        <PropertyListing properties={properties.slice(0,6) || []}/>
+        <PropertyListing properties={properties.slice(0,10) || []}/>
       </div>
 
       {/* Footer Navigation */}

@@ -21,10 +21,10 @@ export default function ExplorePage() {
   const [properties, setProperties] = useState<PropertyType[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
-  const [category, setCategory] = useState<string>('house');
+  const [category, setCategory] = useState<string>(CategoryEnum.house);
   const [listedFor, setListedFor] = useState<string>('all');
   const [minPriceBudget, setMinPriceBudget] = useState<number>(0); 
-  const [maxPriceBudget, setMaxPriceBudget] = useState<number>(100000000); 
+  const [maxPriceBudget, setMaxPriceBudget] = useState<number>(900000000000); 
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(7);

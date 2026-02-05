@@ -6,8 +6,8 @@ import { CategoryEnum, PropertyFilterPayload } from "@/types";
 import { styles } from "@/constant";
 
 const PRICE_LIMITS = {
-  rent: 10_000_000,
-  sale: 5_000_000_000,
+  rent: 1_000_000_000,
+  sale: 900_000_000_000,
 };
 
 const getPriceMax = (listedFor: string) =>
@@ -19,7 +19,8 @@ const getBudgetPresets = (listedFor: string, PRICE_MAX: number) => {
   if (listedFor === "rent") {
     return [
       { label: "Any", min: 0, max: PRICE_MAX },
-      { label: "Under ₦500k", min: 0, max: 500_000 },
+      { label: "Under ₦100k", min: 0, max: 100_000 },
+      { label: "Under ₦500k", min: 100_000, max: 500_000 },
       { label: "₦500k – ₦2M", min: 500_000, max: 2_000_000 },
       { label: "₦2M – ₦5M", min: 2_000_000, max: 5_000_000 },
       { label: "₦5M+", min: 5_000_000, max: PRICE_MAX },
@@ -51,7 +52,7 @@ const PropertyFilter: React.FC<FilterProps> = ({ onFilter, setTogglePopup }) => 
   const [filters, setFilters] = useState({
     propertyType: CategoryEnum.house,
     listedFor: "all" as "all" | "sale" | "rent",
-    price: [0, 10_000_000] as [number, number],
+    price: [0, PRICE_LIMITS.sale] as [number, number],
     description: "",
   });
 
@@ -172,7 +173,7 @@ const PropertyFilter: React.FC<FilterProps> = ({ onFilter, setTogglePopup }) => 
     setFilters({
       propertyType: CategoryEnum.house,
       listedFor: "all" as "all" | "sale" | "rent",
-      price: [0, 10_000_000] as [number, number],
+      price: [0, PRICE_LIMITS.sale] as [number, number],
       description: ""
     });
 

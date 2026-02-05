@@ -8,6 +8,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/a
 const handleRequest = async (request: Promise<any>) => {
   try {
     const response = await request;
+    logger.info("returned properties", response.data.properties)
     return { success: true, data: response.data.properties };
   } catch (error: any) {
     logger.error("API Error:", error.response?.data || error.message);

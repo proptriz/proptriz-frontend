@@ -17,7 +17,7 @@ export default function PropertyListPage() {
     const [category, setCategory] = useState<string>('house');
     const [listedFor, setListedFor] = useState<string>('all');
     const [minPriceBudget, setMinPriceBudget] = useState<number>(0); 
-    const [maxPriceBudget, setMaxPriceBudget] = useState<number>(100000000);
+    const [maxPriceBudget, setMaxPriceBudget] = useState<number>(900000000000);
     const [ searchQuery, setSearchQuery ] = useState<string>('');
     const [centerLat, setCenterLat] = useState<number| null>(null)
     const [centerLng, setCenterLng] = useState<number| null>(null)
@@ -35,8 +35,6 @@ export default function PropertyListPage() {
         listed_for: listedFor == "all" ? "" : listedFor,
         min_price: minPriceBudget.toString(),
         max_price: maxPriceBudget.toString(),
-        center_lat:  centerLat?.toString() || "",
-        center_lng: centerLng?.toString() || ""
         // Add other filters as needed
       }).toString();
 

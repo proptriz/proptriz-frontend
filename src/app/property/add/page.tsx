@@ -143,7 +143,7 @@ export default function AddPropertyPage() {
   };
 
   if (!authUser) {
-    return <Splash />;
+    return <Splash showFooter/>;
   }
 
   return (

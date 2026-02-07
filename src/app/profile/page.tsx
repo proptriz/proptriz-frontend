@@ -3,11 +3,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
-import { agent, Reviews } from "@/constant";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../context/AppContextProvider";
-import { PropertyType, ReviewType, UserSettingsType } from "@/types";
+import { CursorResponse, PropertyReviewType, PropertyType, ReviewType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
@@ -19,20 +18,22 @@ import { ReviewCard } from "@/components/shared/Cards";
 import Splash from "@/components/shared/Splash";
 import ReplyReview from "@/components/ReplyReview";
 import { getPropertyUserReviewApi } from "@/services/reviewApi";
+import { useInfiniteCursorScroll } from "@/components/shared/useInfiniteCursorScroll";
+import { ReviewCardSkeleton } from "@/components/skeletons/ReviewCardSkeleton";
+import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
   const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
-  const [listOrSold, setListOrSold] = useState<string>('Listings');
+  const [receivedOrSent, setReceivedOrSent] = useState<string>('Listings');
   const [listedProperties, setListedProperties] = useState<PropertyType[]>([]);
+  const [loadingProperties, setLoadingProperties] = useState<boolean>(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
   const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
   const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
+  const [isConfirmPop, setIsConfirmPop] = useState<boolean>(false);
   const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
-  const [sentReviews, setSentReviews] = useState<ReviewType[]>([]);
-  const [receivedReviews, setReceivedReviews] = useState<ReviewType[]>([]);
-  const [sentNextCursor, setSentNextCursor] = useState<string | undefined>(undefined);
-  const [receivedNextCursor, setReceivedNextCursor] = useState<string | undefined>(undefined);
+  // const [sentReviews, setSentReviews] = useState<ReviewType[]>([]);
   const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
 
   const menuItems = [
@@ -43,6 +44,7 @@ export default function ProfileTransaction () {
     {title: 'FAQ', link: '/profile/faq'},
   ];
   
+  // Load user Settings
   useEffect(() => {
     if (!authUser) return;
     
@@ -68,46 +70,27 @@ export default function ProfileTransaction () {
     }
   }, [authUser]);
 
+  // Load properties
   useEffect(() => {
-    if (!authUser) return;
+    if (!authUser || loadingProperties) return;
 
-    const fetchListedProp = async () => {
+    setLoadingProperties(true);
+
+    const fetchListedProp = async () => {      
       try {
       const properties = await getUserListedProp();
+
       setListedProperties(properties);
       } catch (error) {
         logger.error("❌ Error fetching listed properties:", error);
+      } finally {
+        setLoadingProperties(false)
       }
     }
+
     fetchListedProp()
   }, [authUser])
 
-  // Fetch user reviews
-  useEffect(() => {
-    if (!authUser) return
-    setRefreshReviews(false);
-    
-    const fetchReview = async () => {
-      try {
-        const data = await getPropertyUserReviewApi(sentNextCursor, receivedNextCursor);
-        
-        if (data) {
-          setSentReviews(data.sent.reviews);
-          setReceivedReviews(data.received.reviews);
-          setSentNextCursor(data.sent.nextCursor);
-          setReceivedNextCursor(data.received.nextCursor);
-          logger.info("fetched reviews: ", data.sent.reviews);
-        } else {
-          logger.info("unable to fetch property reviews ");
-        }
-
-      } catch (error:any){
-        logger.info("error fetching property reviews ");
-      }
-    };
-
-    fetchReview()
-  }, [authUser, refreshReviews]);
 
   const handleDelete = async (id: string) => {
     const res = await deleteUserProperty(id);
@@ -126,6 +109,66 @@ export default function ProfileTransaction () {
     setIsReplyPop(!isReplyPop)
     setReplyReview(review)
   }
+
+  // Sent Reviews lazy loading
+  const {
+    items: sentReviews,
+    loading: loadingsSent,
+    hasMore: hasMoreSent,
+    setObserverTarget
+  } = useInfiniteCursorScroll({
+    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyReviewType>> => {
+      const res = await getPropertyUserReviewApi(
+        { sentCursor: cursor },
+        { signal }
+      );
+
+      if (!res) {
+        return {
+          items: [],
+          nextCursor: null
+        };
+      }
+
+      return {
+        items: res.sent.reviews,
+        nextCursor: res.sent.nextCursor
+      };
+    },
+    
+    enabled: true,
+    isAuthRequired: true
+  });
+
+  //Received Reviews lazy loading
+  const {
+    items: receivedReviews,
+    loading: loadingReceived,
+    hasMore: hasMoreReceived,
+    setObserverTarget: setReceivedObserverTarget
+  } = useInfiniteCursorScroll({
+    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyReviewType>> => {
+      const res = await getPropertyUserReviewApi(
+        { receivedCursor: cursor },
+        { signal }
+      );
+
+      if (!res) {
+        return {
+          items: [],
+          nextCursor: null
+        };
+      }
+
+      return {
+        items: res.received.reviews,
+        nextCursor: res.received.nextCursor
+      };
+    },
+    enabled: true,
+    isAuthRequired: true
+
+  });
 
   if (!authUser) {
     return <Splash showFooter={true} />;
@@ -183,40 +226,40 @@ export default function ProfileTransaction () {
 
       {/* List or Sold Toggle button */}
       <div className="flex bg-gray-200 rounded-full shadow-lg text-white mb-2 p-4 space-x-4">
-        <button className={`w-full py-1 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Listings'? 'bg-white text-[#61AF74]' : '' }`}
-          onClick={()=>setListOrSold('Listings')}
+        <button className={`w-full py-1 rounded-full text-gray-600 text-center text-sm ${receivedOrSent==='Listings'? 'bg-white text-[#61AF74]' : '' }`}
+          onClick={()=>setReceivedOrSent('Listings')}
         >
           Listings
         </button>
-        <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Reviews'? 'bg-white text-[#61AF74]' : '' }`}
-          onClick={()=>setListOrSold('Reviews')}
+        <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${receivedOrSent==='receivedReviews'? 'bg-white text-[#61AF74]' : '' }`}
+          onClick={()=>setReceivedOrSent('receivedReviews')}
         >
-          received
+          Received
         </button>                
-        <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Inbox'? 'bg-white text-[#61AF74]' : '' }`}
-          onClick={()=>setListOrSold('Inbox')}
+        <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${receivedOrSent==='sentReviews'? 'bg-white text-[#61AF74]' : '' }`}
+          onClick={()=>setReceivedOrSent('sentReviews')}
         >
           Sent
         </button>                
       </div>
 
       {/* Listed Property  */}
-      {listOrSold==='Listings' &&  <section>
+      {receivedOrSent==='Listings' &&  <section>
         <div className="flex items-center justify-between m-4">
           <p className="text-lg mb-4 font-[Raleway]">
             <span className="font-bold mr-1">
               {listedProperties.length}
             </span> 
-            {listOrSold}
+            {receivedOrSent}
           </p>
-          {listOrSold==='Listings' && (<Link href="/property/add">
+          {receivedOrSent==='Listings' && (<Link href="/property/add">
             <button className="w-10 h-10 rounded-full bg-primary text-white text-2xl">+</button>
           </Link>)}
         </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {listedProperties.map((item: any) => (
+        {listedProperties.map((item: any, index) => (
           <div
-            key={item.id}
+            key={index}
             className="relative group rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
           >
             {/* Property Card */}
@@ -230,7 +273,7 @@ export default function ProfileTransaction () {
               image={item.banner}
               period={item.period || ""}
               listed_for={item.listed_for || ""}
-              rating={20}
+              rating={item.average_rating}
               expired={new Date(item.expired_by) < new Date()}
             />
 
@@ -267,11 +310,17 @@ export default function ProfileTransaction () {
             </div>
           </div>
           ))}
-          </div>
+
+          {loadingProperties &&
+            Array.from({ length: 6 }).map((_, i) => (
+              <VerticalPropertyCardSkeleton key={i} />
+            ))
+          }
+        </div>
       </section>}
       
       {/* User properties Reviews */}
-      {listOrSold==='Reviews' && <section>
+      {receivedOrSent==='receivedReviews' && <section>
         <div className="space-y-4">
           <div className="flex items-center justify-between m-4">
             <p className="text-lg mb-4 font-[Raleway]">
@@ -287,19 +336,36 @@ export default function ProfileTransaction () {
           )}
           
           <div className="space-y-6 px-4">
-            {receivedReviews.map((review: any) => (
-              <ReviewCard
-                review={review}
-                showReply={showReply}
-                showPropDetails={true}
-              />
-            ))}
+            {receivedReviews.map((review: any, index: number) => {
+              const isLast = index === receivedReviews.length - 1;
+
+              return (
+                <div
+                  key={review._id}
+                  ref={isLast ? setReceivedObserverTarget : undefined}
+                >
+                  <ReviewCard
+                    review={review}
+                    showReply={showReply}
+                    showPropDetails={true}
+                  />
+                </div> 
+              )             
+            })}
           </div>
+          
+          {loadingReceived &&
+            Array.from({ length: 2 }).map((_, i) => (
+              <ReviewCardSkeleton key={i} showPropDetails />
+            ))
+          }
+
+          {!hasMoreReceived && <p>No more reviews</p>}
         </div>
       </section>}
       
       {/* User sent reviews  */}
-      {listOrSold==='Inbox' && <section>
+      {receivedOrSent==='sentReviews' && <section>
         <div className="flex items-center justify-between m-4">
           <p className="text-lg mb-4 font-[Raleway]">
             <span className="font-bold mr-1">
@@ -314,13 +380,30 @@ export default function ProfileTransaction () {
         )}
 
         <div className="space-y-6 px-4">
-          {sentReviews.map((review: any) => (
-            <ReviewCard
-              review={review}
-              showReply={showReply}
-              showPropDetails={true}
-            />
-          ))}
+          {sentReviews.map((review: any, index: number) => {
+              const isLast = index === sentReviews.length - 1;
+
+            return (
+              <div
+                key={review._id}
+                ref={isLast ? setObserverTarget : undefined}
+              >
+                <ReviewCard
+                  review={review}
+                  showReply={showReply}
+                  showPropDetails={true}
+                />                
+              </div> 
+            )             
+          })}
+
+          {loadingsSent &&
+            Array.from({ length: 2 }).map((_, i) => (
+              <ReviewCardSkeleton key={i} showPropDetails />
+            ))
+          }
+          
+          {!hasMoreSent && <p>No more reviews</p>}
         </div>
       </section>}
     </div>
@@ -385,6 +468,19 @@ export default function ProfileTransaction () {
     >
       <ReplyReview review={replyReview} />
     </Popup>}
+
+    <Popup
+      header="Confirm Delete"
+      toggle={isConfirmPop}
+      setToggle={setIsConfirmPop}
+      useMask={true}
+      hideReset={true}
+    >
+      <div>
+        <button>Close</button>
+        <button className="bg-red">Confirm</button>
+      </div>
+    </Popup>
   </>
   
 );

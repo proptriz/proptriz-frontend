@@ -52,6 +52,12 @@ export type ReviewType = {
   reply_count?: number;
 }
 
+export type CursorResponse<T> = {
+  items: T[];
+  nextCursor: string | null;
+};
+
+
 export enum RatingScaleEnum {
   DESPAIR = 0,
   SAD = 2,

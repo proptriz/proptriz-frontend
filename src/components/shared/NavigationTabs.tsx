@@ -27,7 +27,7 @@ const NavigationTabs: React.FC<NavigationTabsProps> = ({ value, onChange }) => {
         <button
           key={index}
           className={`flex items-center px-2 py-1 rounded-lg ${
-            value === tab.value ? "bg-primary text-secondary" : "bg-gray-100"
+            value === tab.value ? "bg-primary text-secondary" : "card-bg"
           }`}
           onClick={()=>onChange(tab.value)}
         >

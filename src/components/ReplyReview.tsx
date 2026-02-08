@@ -1,48 +1,23 @@
 'use client';
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ReplyCard, ReviewCard } from "./shared/Cards";
 import { TbSend2 } from "react-icons/tb";
 import { toast } from "react-toastify";
-import { ReviewType } from "@/types";
+import { CursorResponse, ReviewType } from "@/types";
 import logger from "../../logger.config.mjs"
 import { addReplyReviewApi, getPropertyReviewReplyApi } from "@/services/reviewApi";
 import Splash from "./shared/Splash";
 import { AppContext } from "@/context/AppContextProvider";
+import { useInfiniteCursorScroll } from "./shared/useInfiniteCursorScroll";
+import { ReplyCardSkeleton } from "./skeletons/ReplyCardSkeleton";
 
 const ReplyReview = ({ review }: { review: ReviewType }) => {
   const { authUser } = useContext(AppContext);
-  
-  const [replies, setReplies] = useState([]);
-  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+
   const [refreshReplies, setRefreshReplies] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  // Fetch review replies
-  useEffect(() => {
-    if (!review._id) return
-    setRefreshReplies(false);
-    
-    const fetchReview = async () => {
-      try {
-        const data = await getPropertyReviewReplyApi(review._id, nextCursor);
-
-        if (data && data.replies) {
-          setReplies(data.replies);
-          setNextCursor(data.nextCursor);
-          logger.info("fetched replies: ", data.replies.length);
-        } else {
-          logger.info("unable to fetch property reviews ");
-        }
-
-      } catch (error:any){
-        logger.info("error fetching property reviews ");
-      }
-    };
-
-    fetchReview()
-  }, [review, refreshReplies]);
 
   const sendReply = async () => {
     // Handle review submission logic here
@@ -81,6 +56,37 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
       sendReply();
     }
   };
+
+  // Sent Reviews lazy loading
+    const {
+      items: replies,
+      loading: loadingReplies,
+      hasMore: hasMoreReplies,
+      setObserverTarget
+    } = useInfiniteCursorScroll({
+      fetcher: async (cursor, signal): Promise<CursorResponse<{replies:string[], cursor: string | null}>> => {
+        const res = await getPropertyReviewReplyApi(
+          { reviewId: review._id, nextCursor: cursor },
+          { signal }
+        );
+  
+        if (!res) {
+          return {
+            items: [],
+            nextCursor: null
+          };
+        }
+  
+        return {
+          items: res.replies,
+          nextCursor: res.cursor
+        };
+      },
+      
+      enabled: true,
+      isMissingRequired: review === null || undefined,
+      deps: [review, refreshReplies]
+    });
   
   if (!authUser) {
     return <Splash />;
@@ -100,24 +106,41 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
         
       </div>
       
-      {/* Replies */}
-      <div className="px-4 space-y-4 relative">
+      {/* Replies */}        
+      <div className="space-y-6 px-4">
         <h2 className="text-lg font-semibold pt-4 pb-2">Replies</h2>
 
-        {replies.length === 0 && (
+        {!loadingReplies && replies.length === 0 && (
           <p className="text-gray-500">No replies yet.</p>
         )}
+        
+        {replies.map((reply: any, index: number) => {
+            const isLast = index === replies.length - 1;
 
-        {replies.map((reply: any) => (
-          <ReplyCard
-            key={reply._id}
-            id={reply._id}
-            sender={reply.reply_from?.username || "Owner"}
-            comment={reply.comment}
-            senderAvatar={reply.reply_from?.image || '/avatar.png'}
-            reviewDate={reply.createdAt}
-          />
-        ))}
+          return (
+            <div
+              key={reply._id}
+              ref={isLast ? setObserverTarget : undefined}
+            >
+              <ReplyCard
+                key={reply._id}
+                id={reply._id}
+                sender={reply.reply_from?.username || "Owner"}
+                comment={reply.comment}
+                senderAvatar={reply.reply_from?.image || '/logo.png'}
+                reviewDate={reply.createdAt}
+              />             
+            </div> 
+          )             
+        })}
+
+        {loadingReplies &&
+          Array.from({ length: 2 }).map((_, i) => (
+            <ReplyCardSkeleton key={i}  />
+          ))
+        }
+        
+        {!hasMoreReplies && <p>No more reviews</p>}
         
       </div>
       {/* Reply Input */}

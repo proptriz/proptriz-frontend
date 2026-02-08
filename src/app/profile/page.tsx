@@ -454,6 +454,27 @@ export default function ProfileTransaction () {
     >
       <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md">
         {/* Menu */}
+        <div>
+          <div className="flex flex-col items-center mb-2">
+            <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
+              <Image
+                src={userSettings?.image || "/logo.png"}
+                height={32}
+                width={32}
+                alt="profile"
+                className="rounded-full w-full h-full object-cover"
+              />                    
+            </div>                    
+            <div className="-mt-4 ml-12">
+              <span className="bg-green text-white text-xs px-2 py-1 rounded-full">
+                #1
+              </span>
+            </div>
+          </div>
+          <h2 className="font-bold text-2xl text-center">{userSettings?.brand || authUser?.username}</h2>
+          <p className="text-gray-500 mb-3 text-center">{userSettings?.email}</p>
+        </div>
+
         <nav role="menu" aria-label="User settings" className="divide-y">
           <ul className="px-2 py-2 space-y-1">
             {menuItems.map((item, index) => (
@@ -463,7 +484,7 @@ export default function ProfileTransaction () {
                   role="menuitem"
                   tabIndex={0}
                   onClick={() => setShowSettingsMenu(false)}
-                  className="block w-full text-left px-3 py-2 rounded-md text-primary hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
+                  className="block w-full text-left px-3 py-2 rounded-md text-primary shadow-sm hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
                 >
                   {item.title}
                 </Link>

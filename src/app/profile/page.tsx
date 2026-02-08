@@ -35,7 +35,6 @@ export default function ProfileTransaction () {
   const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
   const [isConfirmPop, setIsConfirmPop] = useState<boolean>(false);
   const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
-  // const [sentReviews, setSentReviews] = useState<ReviewType[]>([]);
   const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
 
   const menuItems = [
@@ -149,7 +148,7 @@ export default function ProfileTransaction () {
     },
     
     enabled: true,
-    isAuthRequired: true
+    isMissingRequired: authUser === null
   });
 
   //Received Reviews lazy loading
@@ -178,7 +177,7 @@ export default function ProfileTransaction () {
       };
     },
     enabled: true,
-    isAuthRequired: true
+    isMissingRequired: authUser === null
 
   });
 

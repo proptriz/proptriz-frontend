@@ -1,6 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import logger from "../../../logger.config.mjs"
-import { AppContext } from "@/context/AppContextProvider";
 
 interface CursorResponse<T> {
   items: T[];
@@ -11,15 +10,16 @@ interface CursorResponse<T> {
 interface UseInfiniteScrollOptions<T> {
   fetcher: (cursor?: string, signal?: AbortSignal) => Promise<CursorResponse<T>>;
   enabled?: boolean;
-  isAuthRequired?: boolean;
+  isMissingRequired?: boolean;
+  deps?: any[];
 }
 
 export function useInfiniteCursorScroll<T>({
   fetcher,
   enabled = true,
-  isAuthRequired=false
+  isMissingRequired=false,
+  deps = []
 }: UseInfiniteScrollOptions<T>) {
-  const { authUser } = useContext(AppContext);
   const [items, setItems] = useState<T[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ export function useInfiniteCursorScroll<T>({
   const lastItemRef = useRef<HTMLDivElement | null>(null);
 
   const loadMore = useCallback(async () => {
-    if ((isAuthRequired && !authUser) || !enabled || loading || !hasMore) return;
+    if (isMissingRequired || !enabled || loading || !hasMore) return;
 
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -51,7 +51,7 @@ export function useInfiniteCursorScroll<T>({
     } finally {
       setLoading(false);
     }
-  }, [cursor, fetcher, hasMore, loading, enabled]);
+  }, [cursor, fetcher, hasMore, loading, enabled, isMissingRequired]);
 
   /** Observe last item */
   const setObserverTarget = useCallback((node: HTMLDivElement | null) => {
@@ -69,11 +69,22 @@ export function useInfiniteCursorScroll<T>({
     lastItemRef.current = node;
   }, [loadMore, enabled]);
 
+  /** Auto reset when filters/search/sort change */
+  useEffect(() => {
+    abortRef.current?.abort();
+
+    setItems([]);
+    setCursor(null);
+    setHasMore(true);
+
+    loadMore();
+  }, deps);
+
   /** Initial load */
   useEffect(() => {
     loadMore();
     return () => abortRef.current?.abort();
-  }, [authUser]);
+  }, [isMissingRequired]);
 
   return {
     items,

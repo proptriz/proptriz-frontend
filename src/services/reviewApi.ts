@@ -86,14 +86,27 @@ export const addReplyReviewApi = async (
   }
 }
 
-export const getPropertyReviewReplyApi = async (reviewId: string, cursor?: string) => {
+export const getPropertyReviewReplyApi = async (
+  params: {
+    reviewId: string;
+    nextCursor?: string | null;
+  },
+  config?: { signal?: AbortSignal }
+) => {
   try {
-    const query = new URLSearchParams({
-      review_id: reviewId,
-      cursor: cursor || ""
-    });
+    if (!params.reviewId) return;
 
-    const res = await axiosClient.get(`/property-review/reply?${query.toString()}`);
+    const query = new URLSearchParams();
+    
+    query.set("review_id", params.reviewId);
+
+    if (params.nextCursor)
+      query.set("cursor", params.nextCursor);
+
+    const res = await axiosClient.get(
+      `/property-review/reply?${query.toString()}`, 
+      { signal: config?.signal }
+    );
 
     if (res.status !== 200) {
       return [];
@@ -108,24 +121,34 @@ export const getPropertyReviewReplyApi = async (reviewId: string, cursor?: strin
   }
 }
 
-export const getPropertyUserReviewApi = async (sentCursor?: string, receivedCursor?: string) => {
+export const getPropertyUserReviewApi = async (
+  params: {
+    sentCursor?: string | null;
+    receivedCursor?: string | null;
+  },
+  config?: { signal?: AbortSignal }
+) => {
   try {
-    const query = new URLSearchParams({
-      sent_cursor: sentCursor || "",
-      received_cursor: receivedCursor || ""
-    });
+    const query = new URLSearchParams();
 
-    const res = await axiosClient.get(`/property-review/user/review?${query.toString()}`);
+    if (params.sentCursor)
+      query.set("sent_cursor", params.sentCursor);
 
-    if (res.status !== 200) {
-      return [];
-    }
+    if (params.receivedCursor)
+      query.set("received_cursor", params.receivedCursor);
 
-    logger.info("user reviews data: ", res.data);
+    const res = await axiosClient.get(
+      `/property-review/user/review?${query.toString()}`,
+      { signal: config?.signal }
+    );
+
+    if (res.status !== 200) return null;
 
     return res.data;
-  } catch (error){
-    handleApiError(error, "Failed to get property review replies")
-    return null
+  } catch (error) {
+    if ((error as any).name !== "CanceledError") {
+      handleApiError(error, "Failed to get property review replies");
+    }
+    return null;
   }
-}
+};

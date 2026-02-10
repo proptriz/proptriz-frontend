@@ -72,6 +72,7 @@ export function useInfiniteCursorScroll<T>({
   /** Auto reset when filters/search/sort change */
   useEffect(() => {
     abortRef.current?.abort();
+    // observerRef.current?.disconnect(); // ✅ ADD THIS
 
     setItems([]);
     setCursor(null);

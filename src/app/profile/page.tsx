@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import Link from "next/link";
-import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../context/AppContextProvider";
 import { CursorResponse, PropertyReviewType, PropertyType, ReviewType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
@@ -28,8 +27,7 @@ export default function ProfileTransaction () {
   const statusCountStyle = 'border-2 border-white py-2 rounded-xl font-[Montserrat]';
   const [showStats, setShowStats] = useState(true);
   const [receivedOrSent, setReceivedOrSent] = useState<string>('Listings');
-  const [listedProperties, setListedProperties] = useState<PropertyType[]>([]);
-  const [loadingProperties, setLoadingProperties] = useState<boolean>(false);
+  const [refreshListedProp, setRefreshListedProp] = useState<boolean>(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
   const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
   const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
@@ -82,25 +80,25 @@ export default function ProfileTransaction () {
   }, [authUser]);
 
   // Load properties
-  useEffect(() => {
-    if (!authUser || loadingProperties) return;
+  // useEffect(() => {
+  //   if (!authUser || loadingProperties) return;
 
-    setLoadingProperties(true);
+  //   setLoadingProperties(true);
 
-    const fetchListedProp = async () => {      
-      try {
-      const properties = await getUserListedProp();
+  //   const fetchListedProp = async () => {      
+  //     try {
+  //     const properties = await getUserListedProp();
 
-      setListedProperties(properties);
-      } catch (error) {
-        logger.error("❌ Error fetching listed properties:", error);
-      } finally {
-        setLoadingProperties(false)
-      }
-    }
+  //     setListedProperties(properties);
+  //     } catch (error) {
+  //       logger.error("❌ Error fetching listed properties:", error);
+  //     } finally {
+  //       setLoadingProperties(false)
+  //     }
+  //   }
 
-    fetchListedProp()
-  }, [authUser])
+  //   fetchListedProp()
+  // }, [authUser])
 
 
   const handleDelete = async (id: string) => {
@@ -110,8 +108,8 @@ export default function ProfileTransaction () {
       toast.error("Failed to delete property");
       return;
     }
-    const updatedProperties = listedProperties.filter(prop => prop.id !== id);
-    setListedProperties(updatedProperties);
+    const updatedProperties = listedProperties.filter((prop:any) => prop._id !== id);
+    // setListedProperties(updatedProperties);
     toast.success("Property deleted successfully");
     return
   };
@@ -120,6 +118,37 @@ export default function ProfileTransaction () {
     setIsReplyPop(!isReplyPop)
     setReplyReview(review)
   }
+
+  // Listed properties lazy loading
+  const {
+    items: listedProperties,
+    loading: loadingProp,
+    hasMore: hasMoreProp,
+    setObserverTarget: setPropObserverTarget
+  } = useInfiniteCursorScroll({
+    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyType[]>> => {
+      const res = await getUserListedProp(
+        { cursor },
+        { signal }
+      );
+
+      if (!res) {
+        return {
+          items: [],
+          nextCursor: null
+        };
+      }
+
+      return {
+        items: res.properties,
+        nextCursor: res.nextCursor
+      };
+    },
+    
+    enabled: true,
+    isMissingRequired: authUser === null,
+    deps: [authUser]
+  });
 
   // Sent Reviews lazy loading
   const {
@@ -151,7 +180,7 @@ export default function ProfileTransaction () {
     isMissingRequired: authUser === null
   });
 
-  //Received Reviews lazy loading
+  // Received Reviews lazy loading
   const {
     items: receivedReviews,
     loading: loadingReceived,
@@ -291,15 +320,24 @@ export default function ProfileTransaction () {
       <div className="h-[300px]" />
       {/* Listed Property  */}
       {receivedOrSent==='Listings' &&  <section>
+        {!loadingProp && listedProperties.length === 0 && (
+          <p className="text-gray-500">No listed propery yet.</p>
+        )}
+
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {listedProperties.map((item: any, index) => (
-            <div
-              key={index}
-              className="relative group rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
-            >
+          {listedProperties.map((item: any, index: number) => {
+            const isLast = index === listedProperties.length - 1;
+      
+            return (
+              <div
+                key={item._id}
+                ref={isLast ? setPropObserverTarget : undefined}
+                className="relative group rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+
               {/* Property Card */}
               <VerticalCard
-                id={item.id}
+                id={item._id}
                 name={item.title}
                 price={item.price}
                 currency={item.currency}
@@ -311,13 +349,13 @@ export default function ProfileTransaction () {
                 rating={item.average_rating}
                 expired={new Date(item.expired_by) < new Date()}
               />
-
+              
               {/* Overlay */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <div className="flex items-center gap-4 bg-white/90 rounded-full px-5 py-3 shadow-lg backdrop-blur-md">
                   {/* Preview */}
                   <Link
-                    href={`/property/details/${item.id}`}
+                    href={`/property/details/${item._id}`}
                     aria-label="Preview Property"
                     className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition-all duration-200"
                   >
@@ -326,7 +364,7 @@ export default function ProfileTransaction () {
 
                   {/* Edit */}
                   <Link
-                  href={`/property/edit/${item.id}`}
+                  href={`/property/edit/${item._id}`}
                   aria-label="Edit Property"
                   className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-green-600 transition-all duration-200"
                   >
@@ -336,21 +374,22 @@ export default function ProfileTransaction () {
                   {/* Delete */}
                   <button
                     aria-label="Delete Property"
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDelete(item._id)}
                     className="p-3 rounded-full text-red-600 hover:bg-gray-100 hover:text-red-700 transition-all duration-200"
                   >
                     <FaTrash size={18} />
                   </button>
                 </div>
-              </div>
-            </div>
-          ))}
+              </div>            
+            </div>)             
+          })}
 
-          {loadingProperties &&
-            Array.from({ length: 6 }).map((_, i) => (
+          {loadingProp &&
+            Array.from({ length: 4 }).map((_, i) => (
               <VerticalPropertyCardSkeleton key={i} />
             ))
           }
+          {!hasMoreProp && <p>No more listed properties</p>}
         </div>
       </section>}
       
@@ -451,7 +490,7 @@ export default function ProfileTransaction () {
       useMask={true}
       hideReset={true}
     >
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md">
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md mx-auto">
         {/* Menu */}
         <div>
           <div className="flex flex-col items-center mb-2">

@@ -1,115 +1,132 @@
 'use client';
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import SearchBar from "@/components/shared/SearchBar";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import propertyService from "@/services/propertyApi";
-import { PropertyFilterPayload, PropertyType } from "@/types";
+import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
 import logger from "../../../../logger.config.mjs"
 import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";
+import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
+import { VerticalCard } from "@/components/shared/VerticalCard";
 
 export default function PropertyListPage() {
     const [properties, setProperties] = useState<PropertyType[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loadingProp, setLoadingProp] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [category, setCategory] = useState<string>('house');
+    const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
     const [listedFor, setListedFor] = useState<string>('all');
     const [minPriceBudget, setMinPriceBudget] = useState<number>(0); 
     const [maxPriceBudget, setMaxPriceBudget] = useState<number>(900000000000);
-    const [ searchQuery, setSearchQuery ] = useState<string>('');
+    const [searchQuery, setSearchQuery ] = useState<string>('');
+    const [nextCursor, setNextCursor] = useState<string | undefined>(undefined)
     const [centerLat, setCenterLat] = useState<number| null>(null)
     const [centerLng, setCenterLng] = useState<number| null>(null)
 
   const fetchProperties = async () => {
-    setLoading(true);
-    setProperties([]);
+    if (loadingProp) return
+
+    setLoadingProp(true);
 
     try {
       const query = new URLSearchParams({
         query: searchQuery,
-        page: "1",
-        limit: "50",
         category: category ?? "",
         listed_for: listedFor == "all" ? "" : listedFor,
         min_price: minPriceBudget.toString(),
         max_price: maxPriceBudget.toString(),
+        cursor: nextCursor ?? ""
         // Add other filters as needed
       }).toString();
 
-      const response = await propertyService.getAllProperties(query);
+      const result = await propertyService.getAllProperties(query);
 
-      if (response.success) {
-        setProperties(response.data);
-        logger.info("Listed properties: ", response.data);
+      if (result.success) {
+        setProperties(result.properties);
+        logger.info("Listed properties: ", result.properties);
+        setNextCursor(result.nextCursor)
 
       } else {
-        setError(response.message);
-        logger.error("error fetching all properties: ", response.message);
+        setError(result.message);
+        logger.error("error fetching all properties: ", result.message);
 
       }
-      setLoading(false);
+      setLoadingProp(false);
     } catch (error:any) {
       setError(error.message);
       logger.error("error fetching all properties: ", error.message)
 
     } finally {
-      setLoading(false);
+      setLoadingProp(false);
     }
 
     
   };
 
+  useEffect(() => {
+    fetchProperties();
+  
+  }, [category, listedFor, minPriceBudget, maxPriceBudget]);
+  
+  useEffect(() => {
+    if (searchQuery.trim() !== '') return;
+    fetchProperties();
+  }, [searchQuery]);
+
   const onFilter = useCallback((filters: PropertyFilterPayload) => {
-      setProperties([]);  
-      setListedFor(filters.listedFor);
-      setMinPriceBudget(filters.priceMin || 0);
-      setMaxPriceBudget(filters.priceMax || 100000000);
-      setCategory(filters.propertyType);
-      setSearchQuery(filters.description || searchQuery);
-      setCenterLat(filters.location ? filters.location.lat : null);
-      setCenterLng(filters.location ? filters.location.lng : null); 
-    }, [searchQuery, listedFor, category, minPriceBudget, maxPriceBudget]);
+    setProperties([]);  
+    setListedFor(filters.listedFor);
+    setMinPriceBudget(filters.priceMin || 0);
+    setMaxPriceBudget(filters.priceMax || 100000000);
+    setCategory(filters.propertyType);
+    setSearchQuery(filters.description || searchQuery);
+    setCenterLat(filters.location ? filters.location.lat : null);
+    setCenterLng(filters.location ? filters.location.lng : null); 
+  }, [searchQuery, listedFor, category, minPriceBudget, maxPriceBudget]);
 
   return (
     <div className="flex flex-col pt-5 pb-16">
       {/* Header */}
       <Header />
 
-      <div className="z-10 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
+      <div className="relative z-50 lg:flex px-6 py-6 space-y-4 lg:space-y-0  w-full">
         <SearchBar value={searchQuery} onChange={setSearchQuery} onSearch={fetchProperties} onFilter={onFilter} />
-        <NavigationTabs onChange={setSearchQuery} value={searchQuery}/>
+        <NavigationTabs onChange={setCategory} value={category}/>
       </div>
 
       {/* Explore Nearby Property List */}
       <section className="px-4 my-6">
         <h2 className="text-lg font-semibold">Properties</h2>
+
         <div className="grid grid-cols-2 gap-4 mt-4">
           {properties.map((item, key) => (
-            <Link href={"/property/details"} key={key}>
-              <div className="bg-white p-3 rounded-2xl shadow-md">
-                <div
-                  className="w-full bg-cover bg-center h-48 rounded-xl relative"
-                  style={{ backgroundImage: `url(${item.banner})` }}
-                >
-                  <div className="absolute bottom-2 right-2 bg-gray-700 text-white font-bold p-1 rounded-xl">
-                    N{item.price}
-                    <span className="text-xs">{item.period}</span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-md font-semibold my-2">{item.title}</p>
-                  <div className="flex space-x-2">
-                    <span className="text-yellow-500">★</span>
-                    <span className="text-gray-500 text-sm">{0}</span>
-                    <p className="text-gray-500 text-sm">{item.address}</p>
-                  </div>
-                </div>
-              </div>
+            <Link href={`/property/details/${item._id}`} key={key}>
+              {/* Property Card */}
+              <VerticalCard
+                id={item._id}
+                name={item.title}
+                price={item.price}
+                currency={item.currency}
+                category={item.category || ""}
+                address={item.address}
+                image={item.banner}
+                period={item.period || ""}
+                listed_for={item.listed_for || ""}
+                rating={item.average_rating || 4.9}
+              />
             </Link>
           ))}
+
+          {loadingProp &&
+            Array.from({ length: 6 }).map((_, i) => (
+              <VerticalPropertyCardSkeleton key={i} />
+            ))
+          }
         </div>
+        
+        {/* {!hasMoreProp && <p>No more listed properties</p>} */}
       </section>
       <Footer />
     </div>

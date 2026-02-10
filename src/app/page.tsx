@@ -21,7 +21,7 @@ export default function ExplorePage() {
   const [properties, setProperties] = useState<PropertyType[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
-  const [category, setCategory] = useState<string>(CategoryEnum.house);
+  const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
   const [listedFor, setListedFor] = useState<string>('all');
   const [minPriceBudget, setMinPriceBudget] = useState<number>(0); 
   const [maxPriceBudget, setMaxPriceBudget] = useState<number>(900000000000); 
@@ -29,6 +29,7 @@ export default function ExplorePage() {
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(7);
   const renderedMarkerIds = useRef<Set<string>>(new Set());
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined)
 
   // Get user location
   const fetchLocation = async () => {    
@@ -56,8 +57,6 @@ export default function ExplorePage() {
 
         const params = new URLSearchParams({
           query: appliedSearchQuery ?? "",
-          page: "1",
-          limit: "50",
           category: category ?? "",
           listed_for: listedFor == "all" ? "" : listedFor,
           min_price: minPriceBudget.toString(),
@@ -66,29 +65,31 @@ export default function ExplorePage() {
           ne_lng: ne.lng.toString(),
           sw_lat: sw.lat.toString(),
           sw_lng: sw.lng.toString(),
+          cursor: nextCursor ?? ""
         });
 
-        const response = await propertyService.getAllProperties(
+        const result = await propertyService.getAllProperties(
           params.toString(),
           { signal }
         );
 
-        if (!response.success) {
-          logger.error("Error fetching properties:", response.message);
+        if (!result.success) {
+          logger.error("Error fetching properties:", result.message);
           return;
         }
 
         const newMarkers: PropertyType[] = [];
 
-        for (const property of response.data) {
-          if (!renderedMarkerIds.current.has(property.id)) {
-            renderedMarkerIds.current.add(property.id);
+        for (const property of result.properties) {
+          if (!renderedMarkerIds.current.has(property._id)) {
+            renderedMarkerIds.current.add(property._id);
             newMarkers.push(property);
           }
         }
 
         if (newMarkers.length) {
           setProperties(prev => [...prev, ...newMarkers]);
+          setNextCursor(result.nextCursor)
         }
 
         logger.info("New properties added:", newMarkers.length);

@@ -97,7 +97,7 @@ const PropertyReviews = ({
         <div className="flex justify-center px-4 mb-2 border-b">
           {property && (
             <HorizontalCard
-              id={property.id}
+              id={property._id}
               name={property.title}
               price={property.price}
               currency={property.currency}

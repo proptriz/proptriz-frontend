@@ -32,7 +32,7 @@ export default function PropertyMap({
       try {
         setLoading(true)
         const property = await getPropertyById(propertyId);
-        if (property && property.id) {
+        if (property && property._id) {
           setProperty(property);
           setPropLoc([property.latitude, property.longitude])
           logger.info("fetched property: ", property);

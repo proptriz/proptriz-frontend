@@ -1,6 +1,23 @@
 import { CurrencyEnum, PropertyProps } from "@/types";
 import formatPrice from "@/utils/formatPrice";
 
+const formatDistance = (distance?: string | number) => {
+  if (!distance) return null;
+
+  const meters = typeof distance === "string"
+    ? Number(distance)
+    : distance;
+
+  if (Number.isNaN(meters)) return null;
+
+  if (meters < 1000) {
+    return `${Math.round(meters)} m`;
+  }
+
+  return `${(meters / 1000).toFixed(1)} km`;
+};
+
+
 export const VerticalCard = ({
   id,
   image,
@@ -12,6 +29,7 @@ export const VerticalCard = ({
   category,
   period,
   listed_for,
+  distance,
   expired
 }: PropertyProps ) => {
   return (
@@ -57,6 +75,12 @@ export const VerticalCard = ({
             {address}
           </p>
         </div>
+
+        {distance && (
+          <div className="inline-flex items-center card-bg rounded-md text-xs px-2 py-1 mt-2 w-fit">
+            {formatDistance(distance)}
+          </div>
+        )}
       </div>
     </div>
   )

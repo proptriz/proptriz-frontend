@@ -9,9 +9,10 @@ import { VerticalCard } from "../shared/VerticalCard";
 
 interface PropertyListingProps {
   properties: PropertyType[];
+  setPropObserverTarget: any
 }
   
-const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
+const PropertyListing: React.FC<PropertyListingProps> = ({ properties, setPropObserverTarget }) => {
   const topLocation = [
     { image: '/avatar.png', name: 'Idumata Lagos' },
     { image: '/avatar.png', name: 'Tanke Ilorin' },
@@ -25,23 +26,31 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
     <section className="px-4 mb-10">
       <h2 className="text-lg font-semibold">Explore Nearby Property</h2>
       <div className="grid grid-cols-2 gap-4 mt-4">
-                
-        {properties.map(((property, key)=>(
-          <Link href={`/property/details/${property.id}?slug=${property.slug}`} key={key}>
-            <VerticalCard
-              id={property.id}
-              name={property.title} 
-              price={property.price}
-              currency={property.currency}
-              category={property.category}
-              address={property.address}
-              image={property.banner}
-              period={property.period ?? ''}
-              listed_for={property.listed_for ?? ''}
-              rating={property.average_rating ?? 5.0}
-            />
-          </Link>
-        )))}
+        
+        {properties.map((property, index)=> {
+          const isLast = index === properties.length - 1;
+          
+          return (
+            <div
+              key={property._id}
+              ref={isLast ? setPropObserverTarget : undefined}
+            >
+              <Link href={`/property/details/${property._id}?slug=${property.slug}`}>
+                <VerticalCard
+                  id={property._id}
+                  name={property.title} 
+                  price={property.price}
+                  currency={property.currency}
+                  category={property.category}
+                  address={property.address}
+                  image={property.banner}
+                  period={property.period ?? ''}
+                  listed_for={property.listed_for ?? ''}
+                  rating={property.average_rating ?? 5.0}
+                />
+              </Link>
+            </div>
+          )})}
       </div>
       <Link href={'/property/list'}>
         <button className="mt-4 text-green">View all properties</button>
@@ -57,7 +66,7 @@ const PropertyListing: React.FC<PropertyListingProps> = ({ properties }) => {
         {/* Card */}
         {properties.slice(0,3).map(((property, key) => (
           <HorizontalCard 
-            id={property.id}
+            id={property._id}
             name={property.title} 
             price={30} 
             currency={property.currency}

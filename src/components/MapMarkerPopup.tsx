@@ -59,7 +59,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
         </div>
 
         {/* CTA */}
-        <Link href={`/property/details/${property.id}`}>
+        <Link href={`/property/details/${property._id}`}>
           <button className="w-full mt-3 rounded-lg bg-primary text-white py-1.5 text-sm font-medium hover:bg-secondary hover:text-primary transition">
             View Details
           </button>

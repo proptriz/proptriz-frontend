@@ -147,7 +147,7 @@ const Map: React.FC<MapProps> = ({
 
         {properties.map(property => (
           <Marker
-            key={property.id}
+            key={property._id}
             position={[property.latitude, property.longitude]  as LatLngExpression}
             icon={propertyIcon as any}
           >

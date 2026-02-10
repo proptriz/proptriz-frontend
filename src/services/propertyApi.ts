@@ -9,7 +9,7 @@ const handleRequest = async (request: Promise<any>) => {
   try {
     const response = await request;
     logger.info("returned properties", response.data.properties)
-    return { success: true, data: response.data.properties };
+    return response.data;
   } catch (error: any) {
     logger.error("API Error:", error.response?.data || error.message);
     return {
@@ -128,16 +128,80 @@ export const getPropertyById = async (propertyId: string): Promise<PropertyType 
   }
 };
 
-export const getNearestProperties = async (propertyId: string): Promise<PropertyType[]> => {
-  const response = await axiosClient.get(`/property/nearest-prop/${propertyId}`);
+export const getCollocatedProperties = async (propertyId: string): Promise<PropertyType[]> => {
+  const response = await axiosClient.get(`/property/collocated-prop/${propertyId}`);
   logger.info(response.data);
   return response.data.properties;
 };
 
-export const getUserListedProp = async (): Promise<PropertyType[]> => {
-  const response = await axiosClient.get(`/property/user/listed`);
-  logger.info(response.data);
-  return response.data.properties;
+export const getAllProperties = async (
+  query: string,
+  config?: { signal?: AbortSignal }
+) => {
+  try {
+    if (!query) return;
+
+    const response = await axiosClient.get(
+      `/property/all?${query}`,
+      { signal: config?.signal }
+    );
+
+    logger.info(response.data);
+
+    return response.data;
+  } catch (error: any) {
+    logger.error("error loading available properties")
+    return null
+  }
+  
+};
+
+export const getNearestProperties = async (
+  query: string,
+  config?: { signal?: AbortSignal }
+) => {
+  try {
+    if (!query) return;
+
+    const response = await axiosClient.get(
+      `/property/user/nearest-prop?${query}`,
+      { signal: config?.signal }
+    );
+
+    logger.info(response.data);
+    return response.data;
+  } catch (error: any) {
+    logger.error("Error loading nearest properties");
+    return null;
+  }
+};
+
+
+export const getUserListedProp = async (
+  params: {
+    cursor?: string | null;
+  },
+  config?: { signal?: AbortSignal }
+) => {
+  try {
+    const query = new URLSearchParams();
+
+    if (params.cursor)
+      query.set("cursor", params.cursor);
+
+    const response = await axiosClient.get(
+      `/property/user/listed?${query}`,
+      { signal: config?.signal }
+    );
+
+    logger.info(response.data);
+
+    return response.data.properties;
+  } catch (error: any) {
+    logger.error("error loading user properties")
+    return null
+  }
+  
 };
 
 export const deleteUserProperty = async (propertyId: string) => {

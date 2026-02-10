@@ -3,11 +3,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BackButton } from "@/components/shared/buttons";
 import { VerticalCard } from "@/components/shared/VerticalCard";
-import { agent, Reviews } from "@/constant";
 import Link from "next/link";
-import { IoSettingsOutline } from "react-icons/io5";
 import { AppContext } from "../../context/AppContextProvider";
-import { PropertyType, ReviewType, UserSettingsType } from "@/types";
+import { CursorResponse, PropertyReviewType, PropertyType, ReviewType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
@@ -19,21 +17,24 @@ import { ReviewCard } from "@/components/shared/Cards";
 import Splash from "@/components/shared/Splash";
 import ReplyReview from "@/components/ReplyReview";
 import { getPropertyUserReviewApi } from "@/services/reviewApi";
+import { useInfiniteCursorScroll } from "@/components/shared/useInfiniteCursorScroll";
+import { ReviewCardSkeleton } from "@/components/skeletons/ReviewCardSkeleton";
+import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
+import { MdMenu } from "react-icons/md";
 
 export default function ProfileTransaction () {
   const { authUser } = useContext(AppContext);
-  const statusCountStyle = 'border-2 border-white py-4 rounded-xl font-[Montserrat]'
-  const [listOrSold, setListOrSold] = useState<string>('Listings');
-  const [listedProperties, setListedProperties] = useState<PropertyType[]>([]);
+  const statusCountStyle = 'border-2 border-white py-2 rounded-xl font-[Montserrat]';
+  const [showStats, setShowStats] = useState(true);
+  const [receivedOrSent, setReceivedOrSent] = useState<string>('Listings');
+  const [refreshListedProp, setRefreshListedProp] = useState<boolean>(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
   const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
   const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
+  const [isConfirmPop, setIsConfirmPop] = useState<boolean>(false);
   const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
-  const [sentReviews, setSentReviews] = useState<ReviewType[]>([]);
-  const [receivedReviews, setReceivedReviews] = useState<ReviewType[]>([]);
-  const [sentNextCursor, setSentNextCursor] = useState<string | undefined>(undefined);
-  const [receivedNextCursor, setReceivedNextCursor] = useState<string | undefined>(undefined);
   const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
+  const [totalProperties, setTotalProperties] = useState<number>(0);
 
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
@@ -42,7 +43,18 @@ export default function ProfileTransaction () {
     {title: 'Become an Agent', link: '/profile/become-agent'},
     {title: 'FAQ', link: '/profile/faq'},
   ];
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowStats(window.scrollY <= 20); // only show near top
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   
+  // Load user Settings
   useEffect(() => {
     if (!authUser) return;
     
@@ -68,46 +80,27 @@ export default function ProfileTransaction () {
     }
   }, [authUser]);
 
-  useEffect(() => {
-    if (!authUser) return;
+  // Load properties
+  // useEffect(() => {
+  //   if (!authUser || loadingProperties) return;
 
-    const fetchListedProp = async () => {
-      try {
-      const properties = await getUserListedProp();
-      setListedProperties(properties);
-      } catch (error) {
-        logger.error("❌ Error fetching listed properties:", error);
-      }
-    }
-    fetchListedProp()
-  }, [authUser])
+  //   setLoadingProperties(true);
 
-  // Fetch user reviews
-  useEffect(() => {
-    if (!authUser) return
-    setRefreshReviews(false);
-    
-    const fetchReview = async () => {
-      try {
-        const data = await getPropertyUserReviewApi(sentNextCursor, receivedNextCursor);
-        
-        if (data) {
-          setSentReviews(data.sent.reviews);
-          setReceivedReviews(data.received.reviews);
-          setSentNextCursor(data.sent.nextCursor);
-          setReceivedNextCursor(data.received.nextCursor);
-          logger.info("fetched reviews: ", data.sent.reviews);
-        } else {
-          logger.info("unable to fetch property reviews ");
-        }
+  //   const fetchListedProp = async () => {      
+  //     try {
+  //     const properties = await getUserListedProp();
 
-      } catch (error:any){
-        logger.info("error fetching property reviews ");
-      }
-    };
+  //     setListedProperties(properties);
+  //     } catch (error) {
+  //       logger.error("❌ Error fetching listed properties:", error);
+  //     } finally {
+  //       setLoadingProperties(false)
+  //     }
+  //   }
 
-    fetchReview()
-  }, [authUser, refreshReviews]);
+  //   fetchListedProp()
+  // }, [authUser])
+
 
   const handleDelete = async (id: string) => {
     const res = await deleteUserProperty(id);
@@ -116,8 +109,8 @@ export default function ProfileTransaction () {
       toast.error("Failed to delete property");
       return;
     }
-    const updatedProperties = listedProperties.filter(prop => prop.id !== id);
-    setListedProperties(updatedProperties);
+    const updatedProperties = listedProperties.filter((prop:any) => prop._id !== id);
+    // setListedProperties(updatedProperties);
     toast.success("Property deleted successfully");
     return
   };
@@ -127,151 +120,284 @@ export default function ProfileTransaction () {
     setReplyReview(review)
   }
 
+  // Listed properties lazy loading
+  const {
+    items: listedProperties,
+    loading: loadingProp,
+    hasMore: hasMoreProp,
+    setObserverTarget: setPropObserverTarget
+  } = useInfiniteCursorScroll({
+    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyType[]>> => {
+      const res = await getUserListedProp(
+        { cursor },
+        { signal }
+      );
+
+      if (!res) {
+        return {
+          items: [],
+          nextCursor: null
+        };
+      }
+
+      setTotalProperties(res.totalProperties)
+
+      return {
+        items: res.properties,
+        nextCursor: res.nextCursor
+      };
+    },
+    
+    enabled: true,
+    isMissingRequired: authUser === null,
+    deps: [authUser]
+  });
+
+  // Sent Reviews lazy loading
+  const {
+    items: sentReviews,
+    loading: loadingsSent,
+    hasMore: hasMoreSent,
+    setObserverTarget
+  } = useInfiniteCursorScroll({
+    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyReviewType>> => {
+      const res = await getPropertyUserReviewApi(
+        { sentCursor: cursor },
+        { signal }
+      );
+
+      if (!res) {
+        return {
+          items: [],
+          nextCursor: null
+        };
+      }
+
+      return {
+        items: res.sent.reviews,
+        nextCursor: res.sent.nextCursor
+      };
+    },
+    
+    enabled: true,
+    isMissingRequired: authUser === null
+  });
+
+  // Received Reviews lazy loading
+  const {
+    items: receivedReviews,
+    loading: loadingReceived,
+    hasMore: hasMoreReceived,
+    setObserverTarget: setReceivedObserverTarget
+  } = useInfiniteCursorScroll({
+    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyReviewType>> => {
+      const res = await getPropertyUserReviewApi(
+        { receivedCursor: cursor },
+        { signal }
+      );
+
+      if (!res) {
+        return {
+          items: [],
+          nextCursor: null
+        };
+      }
+
+      return {
+        items: res.received.reviews,
+        nextCursor: res.received.nextCursor
+      };
+    },
+    enabled: true,
+    isMissingRequired: authUser === null
+
+  });
+
   if (!authUser) {
     return <Splash showFooter={true} />;
   }
 
   return (
   <>
-    <div className="p-6 pb-24 relative">
-      <div className="flex items-center justify-between">
-        <BackButton />            
-        <h1 className="text-2xl font-bold 2xl">Profile</h1>
-        <button className="top-5 left-5 px-4 py-4 text-xl rounded-full" 
-        onClick={()=>setShowSettingsMenu(!showSettingsMenu)}>
-          <IoSettingsOutline />
-        </button> 
-                  
-      </div>
-              
-      <div className="mb-4 text-center">
-        <div className="flex flex-col items-center mb-2">
-          <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
-            <Image
-              src={userSettings?.image || "/logo.png"}
-              height={32}
-              width={32}
-              alt="profile"
-              className="rounded-full w-full h-full object-cover"
-            />                    
-          </div>                    
-          <div className="-mt-4 ml-12">
-            <span className="bg-green text-white text-xs px-2 py-1 rounded-full">
-              #1
-            </span>
-          </div>
-        </div>
-        <h2 className="font-bold text-2xl">{userSettings?.brand || authUser?.username}</h2>
-        <p className="text-gray-500 mb-3">{userSettings?.email}</p>
+    <div className="px-6 pb-24">
+      <header
+        className="fixed top-0 left-0 right-0 z-50 md:max-w-[650px] mx-auto bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300"
+      >
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-6 py-4">
+          <BackButton />
 
-        {/* Count Status */}
-        <div className="grid grid-cols-3 space-x-6 text-center mb-2">
-          <div className={statusCountStyle}>
-              <p className="font-bold">{22}</p>
-              <p className="text-gray-500 ">Properties</p>
-          </div>
-            <div className={statusCountStyle}>
-              <p className="font-bold">{4.5}</p>
-              <p className="text-gray-500">Ratings</p>
-            </div>
-          <div className={statusCountStyle}>
-            <p className="font-bold">{25}</p>
-            <p className="text-gray-500">Reviews</p>
-          </div>
-        </div>
-      </div>
+          <h1 className="text-xl font-bold truncate">
+            {userSettings?.brand || authUser?.username || "Profile"}
+          </h1>
 
-      {/* List or Sold Toggle button */}
-      <div className="flex bg-gray-200 rounded-full shadow-lg text-white mb-2 p-4 space-x-4">
-        <button className={`w-full py-1 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Listings'? 'bg-white text-[#61AF74]' : '' }`}
-          onClick={()=>setListOrSold('Listings')}
-        >
-          Listings
-        </button>
-        <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Reviews'? 'bg-white text-[#61AF74]' : '' }`}
-          onClick={()=>setListOrSold('Reviews')}
-        >
-          received
-        </button>                
-        <button className={`w-full py-2 rounded-full text-gray-600 text-center text-sm ${listOrSold==='Inbox'? 'bg-white text-[#61AF74]' : '' }`}
-          onClick={()=>setListOrSold('Inbox')}
-        >
-          Sent
-        </button>                
-      </div>
-
-      {/* Listed Property  */}
-      {listOrSold==='Listings' &&  <section>
-        <div className="flex items-center justify-between m-4">
-          <p className="text-lg mb-4 font-[Raleway]">
-            <span className="font-bold mr-1">
-              {listedProperties.length}
-            </span> 
-            {listOrSold}
-          </p>
-          {listOrSold==='Listings' && (<Link href="/property/add">
-            <button className="w-10 h-10 rounded-full bg-primary text-white text-2xl">+</button>
-          </Link>)}
-        </div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {listedProperties.map((item: any) => (
-          <div
-            key={item.id}
-            className="relative group rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+          <button
+            className="flex items-center gap-2 p-2 rounded-full"
+            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
           >
-            {/* Property Card */}
-            <VerticalCard
-              id={item.id}
-              name={item.title}
-              price={item.price}
-              currency={item.currency}
-              category={item.category || ""}
-              address={item.address}
-              image={item.banner}
-              period={item.period || ""}
-              listed_for={item.listed_for || ""}
-              rating={20}
-              expired={new Date(item.expired_by) < new Date()}
-            />
+            <div className="bg-white w-10 h-10 rounded-full p-0.5">
+              <Image
+                src={userSettings?.image || "/logo.png"}
+                height={40}
+                width={40}
+                alt="profile"
+                className="rounded-full w-full h-full object-cover"
+              />
+            </div>
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <div className="flex items-center gap-4 bg-white/90 rounded-full px-5 py-3 shadow-lg backdrop-blur-md">
-                {/* Preview */}
-                <Link
-                  href={`/property/details/${item.id}`}
-                  aria-label="Preview Property"
-                  className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition-all duration-200"
-                >
-                  <FaEye size={18} />
-                </Link>
+            <MdMenu size={22} />
+          </button>
+        </div>
 
-                {/* Edit */}
-                <Link
-                href={`/property/edit/${item.id}`}
-                aria-label="Edit Property"
-                className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-green-600 transition-all duration-200"
-                >
-                  <FaEdit size={18} />
-                </Link>
+        {/* Status count — COLLAPSING */}
+        <div
+          className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
+            showStats ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="px-6 pb-3 shadow-md">
+            <div className="grid grid-cols-3 gap-6 text-center shadow-sm rounded-lg p-3">
+              <div className={statusCountStyle}>
+                <p className="font-bold">{totalProperties}</p>
+                <p className="text-gray-500 text-sm">Properties</p>
+              </div>
 
-                {/* Delete */}
-                <button
-                  aria-label="Delete Property"
-                  onClick={() => handleDelete(item.id)}
-                  className="p-3 rounded-full text-red-600 hover:bg-gray-100 hover:text-red-700 transition-all duration-200"
-                >
-                  <FaTrash size={18} />
-                </button>
+              <div className={statusCountStyle}>
+                <p className="font-bold">{4.5}</p>
+                <p className="text-gray-500 text-sm">Ratings</p>
+              </div>
+
+              <div className={statusCountStyle}>
+                <p className="font-bold">{25}</p>
+                <p className="text-gray-500 text-sm">Reviews</p>
               </div>
             </div>
           </div>
-          ))}
+        </div>
+
+        {/* Tabs & action */}
+        <div className="px-6 pb-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-medium">
+              <span className="font-bold mr-1">
+                {receivedOrSent === "Listings"
+                  ? listedProperties.length
+                  : receivedOrSent === "receivedReviews"
+                  ? receivedReviews.length
+                  : sentReviews.length}
+              </span>
+              {receivedOrSent}
+            </p>
+
+            <Link
+              href="/property/add"
+              className="text-sm bg-primary text-white px-3 py-2 rounded-md shadow"
+            >
+              Add Property
+            </Link>
           </div>
+
+          {/* Toggle */}
+          <div className="flex bg-gray-200 rounded-full p-1">
+            {["Listings", "receivedReviews", "sentReviews"].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setReceivedOrSent(tab as any)}
+                className={`flex-1 py-2 rounded-full text-sm transition ${
+                  receivedOrSent === tab
+                    ? "bg-white text-primary font-medium"
+                    : "text-gray-600"
+                }`}
+              >
+                {tab === "Listings"
+                  ? "Listings"
+                  : tab === "receivedReviews"
+                  ? "Received"
+                  : "Sent"}
+              </button>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <div className="h-[300px]" />
+      {/* Listed Property  */}
+      {receivedOrSent==='Listings' &&  <section>
+        {!loadingProp && listedProperties.length === 0 && (
+          <p className="text-gray-500">No listed propery yet.</p>
+        )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {listedProperties.map((item: any, index: number) => {
+            const isLast = index === listedProperties.length - 1;
+      
+            return (
+              <div
+                key={item._id}
+                ref={isLast ? setPropObserverTarget : undefined}
+                className="relative group rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+
+              {/* Property Card */}
+              <VerticalCard
+                id={item._id}
+                name={item.title}
+                price={item.price}
+                currency={item.currency}
+                category={item.category || ""}
+                address={item.address}
+                image={item.banner}
+                period={item.period || ""}
+                listed_for={item.listed_for || ""}
+                rating={item.average_rating}
+                expired={new Date(item.expired_by) < new Date()}
+              />
+              
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div className="flex items-center gap-4 bg-white/90 rounded-full px-5 py-3 shadow-lg backdrop-blur-md">
+                  {/* Preview */}
+                  <Link
+                    href={`/property/details/${item._id}`}
+                    aria-label="Preview Property"
+                    className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition-all duration-200"
+                  >
+                    <FaEye size={18} />
+                  </Link>
+
+                  {/* Edit */}
+                  <Link
+                  href={`/property/edit/${item._id}`}
+                  aria-label="Edit Property"
+                  className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-green-600 transition-all duration-200"
+                  >
+                    <FaEdit size={18} />
+                  </Link>
+
+                  {/* Delete */}
+                  <button
+                    aria-label="Delete Property"
+                    onClick={() => handleDelete(item._id)}
+                    className="p-3 rounded-full text-red-600 hover:bg-gray-100 hover:text-red-700 transition-all duration-200"
+                  >
+                    <FaTrash size={18} />
+                  </button>
+                </div>
+              </div>            
+            </div>)             
+          })}
+
+          {loadingProp &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <VerticalPropertyCardSkeleton key={i} />
+            ))
+          }
+          {!hasMoreProp && <p>No more listed properties</p>}
+        </div>
       </section>}
       
       {/* User properties Reviews */}
-      {listOrSold==='Reviews' && <section>
+      {receivedOrSent==='receivedReviews' && <section>
         <div className="space-y-4">
           <div className="flex items-center justify-between m-4">
             <p className="text-lg mb-4 font-[Raleway]">
@@ -287,19 +413,36 @@ export default function ProfileTransaction () {
           )}
           
           <div className="space-y-6 px-4">
-            {receivedReviews.map((review: any) => (
-              <ReviewCard
-                review={review}
-                showReply={showReply}
-                showPropDetails={true}
-              />
-            ))}
+            {receivedReviews.map((review: any, index: number) => {
+              const isLast = index === receivedReviews.length - 1;
+
+              return (
+                <div
+                  key={review._id}
+                  ref={isLast ? setReceivedObserverTarget : undefined}
+                >
+                  <ReviewCard
+                    review={review}
+                    showReply={showReply}
+                    showPropDetails={true}
+                  />
+                </div> 
+              )             
+            })}
           </div>
+          
+          {loadingReceived &&
+            Array.from({ length: 2 }).map((_, i) => (
+              <ReviewCardSkeleton key={i} showPropDetails />
+            ))
+          }
+
+          {!hasMoreReceived && <p>No more reviews</p>}
         </div>
       </section>}
       
       {/* User sent reviews  */}
-      {listOrSold==='Inbox' && <section>
+      {receivedOrSent==='sentReviews' && <section>
         <div className="flex items-center justify-between m-4">
           <p className="text-lg mb-4 font-[Raleway]">
             <span className="font-bold mr-1">
@@ -314,13 +457,30 @@ export default function ProfileTransaction () {
         )}
 
         <div className="space-y-6 px-4">
-          {sentReviews.map((review: any) => (
-            <ReviewCard
-              review={review}
-              showReply={showReply}
-              showPropDetails={true}
-            />
-          ))}
+          {sentReviews.map((review: any, index: number) => {
+              const isLast = index === sentReviews.length - 1;
+
+            return (
+              <div
+                key={review._id}
+                ref={isLast ? setObserverTarget : undefined}
+              >
+                <ReviewCard
+                  review={review}
+                  showReply={showReply}
+                  showPropDetails={true}
+                />                
+              </div> 
+            )             
+          })}
+
+          {loadingsSent &&
+            Array.from({ length: 2 }).map((_, i) => (
+              <ReviewCardSkeleton key={i} showPropDetails />
+            ))
+          }
+          
+          {!hasMoreSent && <p>No more reviews</p>}
         </div>
       </section>}
     </div>
@@ -333,8 +493,29 @@ export default function ProfileTransaction () {
       useMask={true}
       hideReset={true}
     >
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md">
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md mx-auto">
         {/* Menu */}
+        <div>
+          <div className="flex flex-col items-center mb-2">
+            <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
+              <Image
+                src={userSettings?.image || "/logo.png"}
+                height={32}
+                width={32}
+                alt="profile"
+                className="rounded-full w-full h-full object-cover"
+              />                    
+            </div>                    
+            <div className="-mt-4 ml-12">
+              <span className="bg-green text-white text-xs px-2 py-1 rounded-full">
+                #1
+              </span>
+            </div>
+          </div>
+          <h2 className="font-bold text-2xl text-center">{userSettings?.brand || authUser?.username}</h2>
+          <p className="text-gray-500 mb-3 text-center">{userSettings?.email}</p>
+        </div>
+
         <nav role="menu" aria-label="User settings" className="divide-y">
           <ul className="px-2 py-2 space-y-1">
             {menuItems.map((item, index) => (
@@ -344,7 +525,7 @@ export default function ProfileTransaction () {
                   role="menuitem"
                   tabIndex={0}
                   onClick={() => setShowSettingsMenu(false)}
-                  className="block w-full text-left px-3 py-2 rounded-md text-primary hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
+                  className="block w-full text-left px-3 py-2 rounded-md text-primary shadow-sm hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
                 >
                   {item.title}
                 </Link>
@@ -385,6 +566,19 @@ export default function ProfileTransaction () {
     >
       <ReplyReview review={replyReview} />
     </Popup>}
+
+    <Popup
+      header="Confirm Delete"
+      toggle={isConfirmPop}
+      setToggle={setIsConfirmPop}
+      useMask={true}
+      hideReset={true}
+    >
+      <div>
+        <button>Close</button>
+        <button className="bg-red">Confirm</button>
+      </div>
+    </Popup>
   </>
   
 );

@@ -38,6 +38,7 @@ export interface PropertyProps {
   category: CategoryEnum; // Property type (e.g., "Apartment")
   period: string;
   listed_for: string;
+  distance?: string;
   expired?: boolean
 }
 
@@ -51,6 +52,12 @@ export type ReviewType = {
   image?: string;
   reply_count?: number;
 }
+
+export type CursorResponse<T> = {
+  items: T[];
+  nextCursor: string | null;
+};
+
 
 export enum RatingScaleEnum {
   DESPAIR = 0,
@@ -154,7 +161,7 @@ export interface PropertyFilterPayload {
 }
 
 export interface PropertyType {
-  id: string;
+  _id: string;
   banner: string; // URL of the property image or image with index = 0
   title: string; // Title of the property (e.g. 3 bedroom flat, self contain, )
   slug: string;
@@ -177,6 +184,7 @@ export interface PropertyType {
     quantity: number;
   }[];
   env_facilities?: string[];
+  distance?: string;
   average_rating?: number;
   review_count?: number;
   status: PropertyStatusEnum; // (available, sold, unavailable, rented)

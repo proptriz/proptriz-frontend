@@ -1,150 +1,198 @@
 'use client';
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ReplyCard, ReviewCard } from "./shared/Cards";
 import { TbSend2 } from "react-icons/tb";
 import { toast } from "react-toastify";
 import { ReviewType } from "@/types";
-import logger from "../../logger.config.mjs"
-import { addReplyReviewApi, getPropertyReviewReplyApi } from "@/services/reviewApi";
+import logger from "../../logger.config.mjs";
+import {
+  addReplyReviewApi,
+  getPropertyReviewReplyApi
+} from "@/services/reviewApi";
 import Splash from "./shared/Splash";
 import { AppContext } from "@/context/AppContextProvider";
+import { ReplyCardSkeleton } from "./skeletons/ReplyCardSkeleton";
+
+const PAGE_LIMIT = 10;
 
 const ReplyReview = ({ review }: { review: ReviewType }) => {
   const { authUser } = useContext(AppContext);
-  
-  const [replies, setReplies] = useState([]);
-  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
-  const [refreshReplies, setRefreshReplies] = useState<boolean>(false);
-  const [comment, setComment] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Fetch review replies
+  const [replies, setReplies] = useState<any[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const observerRef = useRef<HTMLDivElement | null>(null);
+  const observerInstance = useRef<IntersectionObserver | null>(null);
+
+  /* ---------------- FETCH REPLIES ---------------- */
+
+  const fetchReplies = async (reset = false) => {
+    if (loading || (!hasMore && !reset)) return;
+
+    setLoading(true);
+
+    try {
+      const res = await getPropertyReviewReplyApi({
+        reviewId: review._id,
+        nextCursor: reset ? null : cursor,
+      });
+
+      if (!res) return;
+
+      setReplies(prev =>
+        reset ? res.replies : [...prev, ...res.replies]
+      );
+      setCursor(res.cursor);
+      setHasMore(Boolean(res.cursor));
+    } catch (err) {
+      logger.error("Failed to fetch replies:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ---------------- OBSERVER ---------------- */
+
   useEffect(() => {
-    if (!review._id) return
-    setRefreshReplies(false);
-    
-    const fetchReview = async () => {
-      try {
-        const data = await getPropertyReviewReplyApi(review._id, nextCursor);
+    if (!observerRef.current) return;
 
-        if (data && data.replies) {
-          setReplies(data.replies);
-          setNextCursor(data.nextCursor);
-          logger.info("fetched replies: ", data.replies.length);
-        } else {
-          logger.info("unable to fetch property reviews ");
-        }
+    observerInstance.current?.disconnect();
 
-      } catch (error:any){
-        logger.info("error fetching property reviews ");
+    observerInstance.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore && !loading) {
+        fetchReplies();
       }
-    };
+    });
 
-    fetchReview()
-  }, [review, refreshReplies]);
+    observerInstance.current.observe(observerRef.current);
+
+    return () => observerInstance.current?.disconnect();
+  }, [hasMore, loading]);
+
+  /* ---------------- INITIAL LOAD ---------------- */
+
+  useEffect(() => {
+    if (review?._id) {
+      setReplies([]);
+      setCursor(null);
+      setHasMore(true);
+      fetchReplies(true);
+    }
+  }, [review?._id]);
+
+  /* ---------------- SEND REPLY ---------------- */
 
   const sendReply = async () => {
-    // Handle review submission logic here
+    if (!comment.trim() || isSubmitting) return;
+
     setIsSubmitting(true);
-    
+
     try {
-      if (comment.trim() === "") {
-        toast.error("Reply comment cannot be empty.");
-        setIsSubmitting(false);
+      const newReply = await addReplyReviewApi(review._id, comment.trim());
+
+      if (!newReply) {
+        toast.error("Failed to submit reply.");
         return;
       }
 
-      const newReply = await addReplyReviewApi(review._id, comment);
-      // logger.info("Submitted reply:", newReply);
+      toast.success("Reply sent");
 
-      if (!newReply) {
-        toast.error("Failed to submit reply. Please try again.");
-        setIsSubmitting(false);
+      // 🔥 Optimistic prepend with animation
+      setReplies(prev => [
+        { ...newReply, __optimistic: true },
+        ...prev
+      ]);
 
-      } else {
-        toast.success("Reply submitted successfully!");
-        setComment("");
-        setIsSubmitting(false);
-        setRefreshReplies(true);
-      }
-
-    } catch (error) {
-      logger.error("Error submitting reply:", error);
-      // toast.error("An error occurred while submitting your reply.");
+      setComment("");
+    } catch (err) {
+      logger.error("Reply error:", err);
+      toast.error("Something went wrong.");
+    } finally {
       setIsSubmitting(false);
     }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      sendReply();
-    }
   };
-  
-  if (!authUser) {
-    return <Splash />;
-  }
+
+  if (!authUser) return <Splash />;
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full flex flex-col">
       {/* Review */}
-      <div>
-        <h2 className="text-xl font-semibold px-4 pt-4 pb-2">Review Details</h2>
-        
-        <div className="shadow-lg rounded-md">
-          <ReviewCard
-            review={review}
-          />
-        </div>
-        
+      <div className="px-4 pt-4">
+        <h2 className="text-xl font-semibold pb-2">Review Details</h2>
+        <ReviewCard review={review} />
       </div>
-      
-      {/* Replies */}
-      <div className="px-4 space-y-4 relative">
-        <h2 className="text-lg font-semibold pt-4 pb-2">Replies</h2>
 
-        {replies.length === 0 && (
+      {/* Replies */}
+      <div className="flex-1 overflow-y-auto px-4 space-y-4 pt-6">
+        <h2 className="text-lg font-semibold">Replies</h2>
+
+        {!loading && replies.length === 0 && (
           <p className="text-gray-500">No replies yet.</p>
         )}
 
-        {replies.map((reply: any) => (
-          <ReplyCard
+        {replies.map(reply => (
+          <div
             key={reply._id}
-            id={reply._id}
-            sender={reply.reply_from?.username || "Owner"}
-            comment={reply.comment}
-            senderAvatar={reply.reply_from?.image || '/avatar.png'}
-            reviewDate={reply.createdAt}
-          />
-        ))}
-        
-      </div>
-      {/* Reply Input */}
-        <div className="sticky bottom-0 left-0 right-0 border-t bg-white p-2 space-y-1 text-primary">
-          <p>Reply:</p>
-          <div className="flex space-x-2 ">
-            <input
-              type="text" 
-              className="w-full rounded-md bg-gray-100 p-2 outline outline-primary" 
-              onKeyDown={handleKeyDown}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Write your reply here..."
+            className={`transition-all duration-300 ${
+              reply.__optimistic ? "animate-slide-in" : ""
+            }`}
+          >
+            <ReplyCard
+              id={reply._id}
+              sender={reply.reply_from?.username || "Owner"}
+              comment={reply.comment}
+              senderAvatar={reply.reply_from?.image || "/logo.png"}
+              reviewDate={reply.createdAt}
             />
-
-            <button 
-              className={`bg-primary px-2 py-1 rounded-md text-white focus:text-secondary ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`} 
-              onClick={sendReply}
-              disabled={isSubmitting}
-            >
-              <TbSend2 className="text-2xl" />
-            </button>
           </div>
-          
+        ))}
+
+        {loading &&
+          Array.from({ length: 2 }).map((_, i) => (
+            <ReplyCardSkeleton key={i} />
+          ))}
+
+        {hasMore && <div ref={observerRef} />}
+
+        {!hasMore && replies.length > 0 && (
+          <p className="text-center text-gray-400 py-4">
+            No more replies
+          </p>
+        )}
+      </div>
+
+      {/* Reply Input */}
+      <div className="sticky bottom-0 bg-white border-t p-3 space-y-1">
+        <p className="font-medium">Reply</p>
+
+        <div className="flex gap-2">
+          <input
+            type="text"
+            disabled={isSubmitting}
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && sendReply()}
+            placeholder="Write your reply..."
+            className="flex-1 rounded-md bg-gray-100 p-2 outline-primary disabled:opacity-50"
+          />
+
+          <button
+            disabled={isSubmitting}
+            onClick={sendReply}
+            className="bg-primary px-3 rounded-md text-white disabled:opacity-50"
+          >
+            <TbSend2 className="text-xl" />
+          </button>
         </div>
+      </div>
     </div>
-  )
+  );
 };
 
 export default ReplyReview;

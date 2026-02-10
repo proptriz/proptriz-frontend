@@ -9,7 +9,7 @@ import { FaStar, FaBed, FaRegHeart, FaArrowLeft } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { PropertyType, ReviewType } from "@/types";
 import Link from "next/link";
-import { getNearestProperties, getPropertyById } from "@/services/propertyApi";
+import { getCollocatedProperties } from "@/services/propertyApi";
 import logger from '../../logger.config.mjs';
 import Price from "@/components/shared/Price";
 import GalleryModal from "@/components/shared/GalleryModal";
@@ -28,7 +28,7 @@ const PropertyDetailsClient = ({
   property: PropertyType
 }) => {
   const router = useRouter();
-  const propertyId = property.id;
+  const propertyId = property._id;
 //   logger.info("property id: ", propertyId);
 
   const [nearestProperty, setNearestProperty] = useState<PropertyType[]>([]);
@@ -45,7 +45,7 @@ const PropertyDetailsClient = ({
     
     const fetchProperty = async () => {
       try {
-        const properties = await getNearestProperties(propertyId);
+        const properties = await getCollocatedProperties(propertyId);
         
         if (properties && properties.length>0) {
           setNearestProperty(properties);
@@ -131,7 +131,7 @@ const PropertyDetailsClient = ({
               </button>           
                     
               <div className="absolute top-5 right-5 flex space-x-3">                
-                <ShareButton title={`${property.title} for ${property.listed_for}, located at ${property.address}.`} relativeURL={`/property/details/${property.id}`} />
+                <ShareButton title={`${property.title} for ${property.listed_for}, located at ${property.address}.`} relativeURL={`/property/details/${property._id}`} />
                 
                 <button className="p-2 hover:bg-gray-100 hover:text-red-800 rounded-full shadow-md bg-white">
                   <FaRegHeart />
@@ -238,7 +238,7 @@ const PropertyDetailsClient = ({
                   <FaStar className="text-secondary" />
                   
                   <Link 
-                    href={`/property/reviews/${property.id}`}
+                    href={`/property/reviews/${property._id}`}
                   >  
                     <span className="ml-2 text-lg text-gray-200 font-bold">{property.average_rating}</span>
                     <span className="ml-2 text-gray-400">({reviews.length} reviews)</span>
@@ -262,7 +262,7 @@ const PropertyDetailsClient = ({
                     className="flex-shrink-0 w-80"
                     >
                       <Link 
-                        href={`/property/reviews/${property.id}`}
+                        href={`/property/reviews/${property._id}`}
                       >
                         <ReviewCard 
                           review={review}
@@ -273,7 +273,7 @@ const PropertyDetailsClient = ({
                   )}
                 </div>
                 {reviews && reviews.length>0 && <Link 
-                  href={`/property/reviews/${property.id}`}
+                  href={`/property/reviews/${property._id}`}
                   className="ms-auto text-primary font-medium text-right mt-2 block"
                 >
                   View all reviews
@@ -289,9 +289,9 @@ const PropertyDetailsClient = ({
               {/* Property Card */}
               <div className="grid grid-cols-2 w-full gap-3 ">
                 {nearestProperty.slice(0,4).map(((item, key)=>(
-                  <Link href={`/property/details/${item.id}`} key={key}>
+                  <Link href={`/property/details/${item._id}`} key={key}>
                     <VerticalCard
-                      id={item.id}
+                      id={item._id}
                       name={item.title} 
                       currency={item.currency}
                       price={item.price} 
@@ -300,7 +300,8 @@ const PropertyDetailsClient = ({
                       address={item.address} 
                       image={item.banner} 
                       period={item.period? item.period : ""} 
-                      rating={item.average_rating? item.average_rating : 4.5}                      
+                      distance={item.distance || undefined}
+                      rating={item.average_rating? item.average_rating : 4.9}                      
                     />
                   </Link>
                 )))}

@@ -34,6 +34,7 @@ export default function ProfileTransaction () {
   const [isConfirmPop, setIsConfirmPop] = useState<boolean>(false);
   const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
   const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
+  const [totalProperties, setTotalProperties] = useState<number>(0);
 
   const menuItems = [
     {title: 'Edit profile', link: '/profile/edit'},
@@ -138,6 +139,8 @@ export default function ProfileTransaction () {
           nextCursor: null
         };
       }
+
+      setTotalProperties(res.totalProperties)
 
       return {
         items: res.properties,
@@ -255,7 +258,7 @@ export default function ProfileTransaction () {
           <div className="px-6 pb-3 shadow-md">
             <div className="grid grid-cols-3 gap-6 text-center shadow-sm rounded-lg p-3">
               <div className={statusCountStyle}>
-                <p className="font-bold">{22}</p>
+                <p className="font-bold">{totalProperties}</p>
                 <p className="text-gray-500 text-sm">Properties</p>
               </div>
 

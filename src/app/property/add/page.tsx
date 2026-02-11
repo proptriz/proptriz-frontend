@@ -66,6 +66,8 @@ export default function AddPropertyPage() {
     setFeatures([]);
     setFacilities([]);
     setPropCoordinates(userCoordinates);
+    setDescription("")
+    setDuration(1)
   }
   const handleLocationSelect = (lat: number, lng: number,) => {
     // Save to form state, API, etc.
@@ -141,7 +143,7 @@ export default function AddPropertyPage() {
   };
 
   if (!authUser) {
-    return <Splash />;
+    return <Splash showFooter/>;
   }
 
   return (

@@ -5,36 +5,15 @@ import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
 import { ImSpinner2 } from "react-icons/im";
 
-export const BackButton = ({ fallback = "/" }: { fallback?: string }) => {
+export const BackButton = ()=> {
   const router = useRouter();
 
-  const handleBack = () => {
-    if (typeof window === "undefined") return;
-
-    const referrer = document.referrer; // previous page url (if any)
-    const currentOrigin = window.location.origin;
-
-    // If referrer is empty or from outside your app → go home inside the app
-    if (!referrer || !referrer.startsWith(currentOrigin)) {
-      router.push("/");
-      return;
-    }
-
-    // Otherwise go back normally
-    router.back();
-  };
-
   return (
-    <button
-      type="button"
-      className="top-5 left-0 text-xl"
-      onClick={handleBack}
-      aria-label="Go back"
-    >
+    <button className="top-5 left-0 text-xl" onClick={()=>router.back()}>
       <FaArrowLeft className="text-xl" />
     </button>
-  );
-};
+  )
+}
 
 interface SubmitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "outline" | "ghost" | "toggle";
@@ -128,6 +107,12 @@ const ACTIONS = ({ phone, email }:{ phone: string; email: string }) => [
     href: `tel:${phone}`,
     Icon: Call3DIcon,
     label: "Call",
+  },
+  {
+    key: "sms",
+    href: `sms:${phone}`,
+    Icon: Text3DIcon,
+    label: "Text",
   },
   {
     key: "email",

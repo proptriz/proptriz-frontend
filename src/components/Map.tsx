@@ -72,7 +72,7 @@ const MapBoundsUpdater: React.FC<MapBoundsUpdaterProps> = ({ onBoundsChange }) =
 
         const bounds = map.getBounds();
         onBoundsChange(bounds);
-      }, 2000),
+      }, 500),
     [map, onBoundsChange]
   );
 
@@ -147,7 +147,7 @@ const Map: React.FC<MapProps> = ({
 
         {properties.map(property => (
           <Marker
-            key={property.id}
+            key={property._id}
             position={[property.latitude, property.longitude]  as LatLngExpression}
             icon={propertyIcon as any}
           >

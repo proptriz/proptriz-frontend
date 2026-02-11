@@ -95,7 +95,7 @@ export default function EditPropertyPage({
         const res = await getPropertyById(propertyId);
         if (!mounted) return;
 
-        if (!res?.id) {
+        if (!res?._id) {
           setError("Property not found");
           return;
         }
@@ -201,9 +201,9 @@ export default function EditPropertyPage({
         <div className="p-6 max-w-4xl mx-auto">
 
           {/* Preview Card */}
-          {formData.id && (
+          {formData._id && (
             <HorizontalCard
-              id={property.id}
+              id={property._id}
               name={property.title || "Property"}
               price={property.price || 0.00}
               currency={property.currency}
@@ -409,8 +409,8 @@ export default function EditPropertyPage({
             }
 
             {/* Image Manager */}
-            {formData.id && (
-              <ImageManager propertyId={formData.id} images={formData.images || []} />
+            {formData._id && (
+              <ImageManager propertyId={formData._id} images={formData.images || []} />
             )}
           </div>
 

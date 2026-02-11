@@ -38,18 +38,33 @@ export interface PropertyProps {
   category: CategoryEnum; // Property type (e.g., "Apartment")
   period: string;
   listed_for: string;
+  distance?: string;
   expired?: boolean
 }
 
 export type ReviewType = {
-  id: string;
-  reviewer: string;
-  text: string;
-  ratings: number;
-  image: string;
-  review_date: string; // ISO 8601 date string
-  review_images?: string[];
-  replies_count?: number;
+  _id: string;
+  sender: Pick<UserSettingsType, 'username' | 'image'>;
+  comment: string;
+  rating: number;
+  property: Pick<PropertyType, 'title' | 'banner' | 'address' | 'average_rating'>;
+  createdAt?: Date;
+  image?: string;
+  reply_count?: number;
+}
+
+export type CursorResponse<T> = {
+  items: T[];
+  nextCursor: string | null;
+};
+
+
+export enum RatingScaleEnum {
+  DESPAIR = 0,
+  SAD = 2,
+  OKAY = 3,
+  HAPPY = 4,
+  DELIGHT = 5
 }
 
 export interface LocationProps {
@@ -129,8 +144,24 @@ export enum PropertyStatusEnum {
   expired = "expired",
 }
 
+export interface PropertyFilterPayload {
+  location?: {
+    query: string;
+    lat: number;
+    lng: number;
+    name: string;
+    lga?: string;
+    state?: string;
+  };
+  propertyType: CategoryEnum;
+  listedFor: "all" | "sale" | "rent";
+  priceMin: number | null;
+  priceMax: number | null;
+  description?: string;
+}
+
 export interface PropertyType {
-  id: string;
+  _id: string;
   banner: string; // URL of the property image or image with index = 0
   title: string; // Title of the property (e.g. 3 bedroom flat, self contain, )
   slug: string;
@@ -153,7 +184,9 @@ export interface PropertyType {
     quantity: number;
   }[];
   env_facilities?: string[];
-  rating?: number;
+  distance?: string;
+  average_rating?: number;
+  review_count?: number;
   status: PropertyStatusEnum; // (available, sold, unavailable, rented)
   createdAt?: Date;
   updatedAt?: Date;

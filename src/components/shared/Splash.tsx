@@ -5,7 +5,7 @@ import { SubmitButton } from "@/components/shared/buttons";
 import Footer from "./Footer";
 import GoogleLoginButton from "../GoogleLoginButton";
 
-export default function Splash() {
+export default function Splash({showFooter=false}: {showFooter?: boolean}) {
   const { isSigningInUser, authenticateUser, loginStage} = useContext(AppContext);
   return (
     <>
@@ -32,8 +32,8 @@ export default function Splash() {
 
       <GoogleLoginButton />
     </div>
-    
-    <Footer />
+
+    {showFooter && <Footer />}
     </>
   );
 }

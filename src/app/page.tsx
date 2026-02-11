@@ -7,7 +7,7 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import propertyService from "@/services/propertyApi";
-import { PropertyType } from "@/types";
+import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
 import logger from "../../logger.config.mjs"
@@ -21,12 +21,15 @@ export default function ExplorePage() {
   const [properties, setProperties] = useState<PropertyType[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
-  const [filterBy, setFilterBy] = useState<string>('house');
+  const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
+  const [listedFor, setListedFor] = useState<string>('all');
+  const [minPriceBudget, setMinPriceBudget] = useState<number>(0); 
+  const [maxPriceBudget, setMaxPriceBudget] = useState<number>(900000000000); 
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(7);
-
   const renderedMarkerIds = useRef<Set<string>>(new Set());
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined)
 
   // Get user location
   const fetchLocation = async () => {    
@@ -54,37 +57,39 @@ export default function ExplorePage() {
 
         const params = new URLSearchParams({
           query: appliedSearchQuery ?? "",
-          page: "1",
-          limit: "50",
-          category: filterBy ?? "",
-          listed_for: "",
+          category: category ?? "",
+          listed_for: listedFor == "all" ? "" : listedFor,
+          min_price: minPriceBudget.toString(),
+          max_price: maxPriceBudget.toString(),
           ne_lat: ne.lat.toString(),
           ne_lng: ne.lng.toString(),
           sw_lat: sw.lat.toString(),
           sw_lng: sw.lng.toString(),
+          cursor: nextCursor ?? ""
         });
 
-        const response = await propertyService.getAllProperties(
+        const result = await propertyService.getAllProperties(
           params.toString(),
           { signal }
         );
 
-        if (!response.success) {
-          logger.error("Error fetching properties:", response.message);
+        if (!result.success) {
+          logger.error("Error fetching properties:", result.message);
           return;
         }
 
         const newMarkers: PropertyType[] = [];
 
-        for (const property of response.data) {
-          if (!renderedMarkerIds.current.has(property.id)) {
-            renderedMarkerIds.current.add(property.id);
+        for (const property of result.properties) {
+          if (!renderedMarkerIds.current.has(property._id)) {
+            renderedMarkerIds.current.add(property._id);
             newMarkers.push(property);
           }
         }
 
         if (newMarkers.length) {
           setProperties(prev => [...prev, ...newMarkers]);
+          setNextCursor(result.nextCursor)
         }
 
         logger.info("New properties added:", newMarkers.length);
@@ -94,7 +99,7 @@ export default function ExplorePage() {
         }
       }
     },
-    [mapBounds, appliedSearchQuery, filterBy]
+    [mapBounds, appliedSearchQuery, category, listedFor, minPriceBudget, maxPriceBudget]
   );
 
   const onSearchClick = useCallback(() => {
@@ -102,6 +107,25 @@ export default function ExplorePage() {
     setProperties([]);
     setAppliedSearchQuery(searchInput);
   }, [searchInput]);
+
+  const onFilter = useCallback((filters: PropertyFilterPayload) => {
+    renderedMarkerIds.current.clear();
+    setProperties([]);  
+      
+    if (filters.location) {
+      sessionStorage.removeItem('prevMapCenter');
+      sessionStorage.removeItem('prevMapZoom');
+      setZoomLevel(10);
+    }
+
+    setMapCenter(filters.location ? [filters.location.lat, filters.location.lng] : mapCenter);
+    setListedFor(filters.listedFor);
+    setMinPriceBudget(filters.priceMin || 0);
+    setMaxPriceBudget(filters.priceMax || 100000000);
+    setCategory(filters.propertyType);
+    setSearchInput(filters.description || "");
+    setAppliedSearchQuery(filters.description || appliedSearchQuery);
+  }, [mapCenter, appliedSearchQuery]);
 
   useEffect(() => {
     if (!mapBounds) return;
@@ -118,7 +142,7 @@ export default function ExplorePage() {
     renderedMarkerIds.current.clear();
     setProperties([]);
     setAppliedSearchQuery(searchInput);
-  }, [filterBy, appliedSearchQuery]);
+  }, [category, appliedSearchQuery]);
 
   useEffect(() => {
     if (searchInput === "" && appliedSearchQuery) {
@@ -141,8 +165,9 @@ export default function ExplorePage() {
             value={searchInput}
             onChange={setSearchInput}
             onSearch={onSearchClick}
+            onFilter={onFilter}
           />
-          <NavigationTabs setValue={setFilterBy}/>
+          <NavigationTabs onChange={setCategory} value={category} />
         </div>
         <Map 
           properties={properties} 

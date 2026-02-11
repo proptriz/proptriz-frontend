@@ -8,7 +8,7 @@ const StickyAgentInfo = ({user, property}: {user: UserSettingsType, property: Pr
   const link = generateWhatsAppLink({
     phoneNumber: user.whatsapp || user.phone || "",
     messageTop: `Hello, I'm interested in this property: ${property.title}`,
-    pageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/property/details/${property.id}`,
+    pageUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/property/details/${property._id}`,
     bustCache: false,
   });
 

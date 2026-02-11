@@ -1,23 +1,23 @@
-import React, { useEffect, useState }  from "react";
+import { CategoryEnum } from "@/types";
+import React, { SetStateAction }  from "react";
 import { FiHome, FiGrid, FiMap, FiBriefcase, FiMoreHorizontal } from "react-icons/fi";
 
 const tabs = [
-  { name: "House", value:'house', icon: <FiHome /> },
-  { name: "Land", value:'land', icon: < FiMap/> },
-  { name: "Shortlet", value:'shortlet', icon: <FiHome /> },
-  { name: "Office", value:'office', icon: <FiBriefcase /> },
-  { name: "Shop", value:'shop', icon: <FiGrid /> },
-  { name: "Hotel", value:'hotel', icon: <FiGrid /> },
-  { name: "Others", value:'others', icon: <FiMoreHorizontal /> },
+  { name: "House", value:CategoryEnum.house, icon: <FiHome /> },
+  { name: "Land", value:CategoryEnum.land, icon: < FiMap/> },
+  { name: "Shortlet", value:CategoryEnum.shortlet, icon: <FiHome /> },
+  { name: "Hotel", value:CategoryEnum.hotel, icon: <FiGrid /> },
+  { name: "Shop", value:CategoryEnum.shop, icon: <FiGrid /> },
+  { name: "Office", value:CategoryEnum.office, icon: <FiBriefcase /> },
+  { name: "Others", value:CategoryEnum.others, icon: <FiMoreHorizontal /> },
 ];
 
-const NavigationTabs: React.FC<{setValue: (value: string) => void}> = ({ setValue }) => {
-  const [selectedValue, setSelectedValue] = useState<string>(tabs[0]?.value || "");
-  
-    useEffect(() => {
-      // Set the default value as the first item's value
-      setValue(selectedValue);
-    }, [selectedValue, setValue]);
+interface NavigationTabsProps {
+  value: string;
+  onChange: React.Dispatch<SetStateAction<CategoryEnum>>;
+}
+
+const NavigationTabs: React.FC<NavigationTabsProps> = ({ value, onChange }) => {
   
   return (
     <nav 
@@ -28,9 +28,9 @@ const NavigationTabs: React.FC<{setValue: (value: string) => void}> = ({ setValu
         <button
           key={index}
           className={`flex items-center px-2 py-1 rounded-lg ${
-            selectedValue === tab.value ? "bg-primary text-secondary" : "bg-gray-100"
+            value === tab.value ? "bg-primary text-secondary" : "card-bg"
           }`}
-          onClick={()=>setSelectedValue(tab.value)}
+          onClick={()=>onChange(tab.value)}
         >
           {/* <span>{tab.icon}</span> */}
           <span>{tab.name}</span>

@@ -4,9 +4,9 @@ import React, { useState, useCallback, useRef, useMemo, useEffect } from "react"
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
-import { getAllProperties, getNearestProperties } from "@/services/propertyApi";
-import { CategoryEnum, CursorResponse, PropertyFilterPayload, PropertyType } from "@/types";
-import logger from "../../../logger.config.mjs"
+import { getNearestProperties } from "@/services/propertyApi";
+import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
+// import logger from "../../../logger.config.mjs"
 import Header from "@/components/shared/Header";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import Link from "next/link";
@@ -30,6 +30,8 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [showAllProperties, setShowAllProperties] = useState(false);
+  const [isLocationReady, setIsLocationReady] = useState(false);
+
 
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -44,11 +46,13 @@ export default function Page() {
     : listedProperties.slice(0, previewCount);
 
   // Get user location
-  const fetchLocation = async () => {    
+  const fetchLocation = async () => {
     const [lat, lng] = await getUserPosition();
-    setCenterLat(lat)
-    setCenterLng(lng)
+    setCenterLat(lat);
+    setCenterLng(lng);
+    setIsLocationReady(true);
   };
+
 
   useEffect(() => {
     fetchLocation();
@@ -71,8 +75,10 @@ export default function Page() {
       listed_for: listedFor === "all" ? "" : listedFor,
       min_price: minPriceBudget.toString(),
       max_price: maxPriceBudget.toString(),
-      lat: centerLat?.toString() || "",
-      lng: centerLng?.toString() || "",
+      ...(centerLat != null && centerLng != null && {
+        lat: centerLat.toString(),
+        lng: centerLng.toString(),
+      }),
     }).toString();
   }, [
     searchQuery,
@@ -118,11 +124,14 @@ export default function Page() {
 
   // Listed properties lazy loading
   useEffect(() => {
+    if (!isLocationReady) return;
+
     setListedProperties([]);
     setCursor(null);
     setHasMore(true);
     fetchProperties(true);
   }, [
+    isLocationReady,
     searchQuery,
     category,
     listedFor,

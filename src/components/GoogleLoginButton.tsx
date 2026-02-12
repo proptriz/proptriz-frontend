@@ -4,6 +4,7 @@ import axiosClient, { setAuthToken } from "@/config/client";
 import { useEffect, useContext } from "react";
 import logger from "../../logger.config.mjs";
 import {AppContext} from "@/context/AppContextProvider";
+import { useRouter } from "next/navigation";
 
 declare global {
   interface Window {
@@ -12,7 +13,8 @@ declare global {
 }
 
 export default function GoogleLoginButton() {
-    const { authenticateUser, setAuthUser,  } = useContext(AppContext);
+  const { setAuthUser } = useContext(AppContext);
+  const router = useRouter()
 
   useEffect(() => {
     if (!window.google) return;
@@ -20,44 +22,44 @@ export default function GoogleLoginButton() {
     window.google.accounts.id.initialize({
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       callback: async (response: any) => {
-        // This is the Google ID token (JWT)
         const idToken = response.credential;
-        // logger.info("Google ID Token:", idToken);
+        try {
+          const res = await axiosClient.post(`/users/authenticate/google`, {
+            idToken: idToken,
+          });
+          const data = res.data;
 
-        // Send token to your backend
-        const res = await axiosClient.post(`/users/authenticate/google`, {
-          idToken: idToken,
-        });
-
-        const data = await res.data;
-
-        if (res.status !== 200) {
-          logger.error("Login failed:", data);
-          return;
+          if (res.status === 200) {
+            logger.info("Login success:", data);
+            setAuthUser(data.user);
+            setAuthToken(data.token);
+            if (res.data.requiresOnboarding) {
+              router.push("/profile/edit");
+            } 
+          }
+        } catch (error) {
+          logger.error("Login failed:", error);
         }
-
-        logger.info("Login success:", data);
-        setAuthUser(data.user);
-        setAuthToken(data.token);
-
-        // You can redirect after success
-        // window.location.href = "/dashboard";
       },
     });
 
-    // Render the Google button into a div
     window.google.accounts.id.renderButton(
       document.getElementById("googleSignInDiv"),
       {
-        theme: "outline",
+        theme: "outline", // 'outline' looks more modern and premium
         size: "large",
-        width: 200,
+        width: "320", // Matches mobile-first widths
+        shape: "rectangular",
+        text: "continue_with",
+        logo_alignment: "center",
       }
     );
-
-    // Optional: enable One Tap
-    // window.google.accounts.id.prompt();
   }, []);
 
-  return <div id="googleSignInDiv" />;
+  return (
+    <div className="flex flex-col items-center w-full">
+      {/* Container with a subtle shadow to make it pop */}
+      <div id="googleSignInDiv" className="shadow-sm rounded-lg overflow-hidden transition-transform active:scale-95" />
+    </div>
+  );
 }

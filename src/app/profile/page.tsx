@@ -228,7 +228,7 @@ export default function ProfileTransaction () {
           <BackButton />
 
           <h1 className="text-xl font-bold truncate">
-            {userSettings?.brand || authUser?.username || "Profile"}
+            {userSettings?.brand || authUser?.display_name || "Profile"}
           </h1>
 
           <button
@@ -512,7 +512,7 @@ export default function ProfileTransaction () {
               </span>
             </div>
           </div>
-          <h2 className="font-bold text-2xl text-center">{userSettings?.brand || authUser?.username}</h2>
+          <h2 className="font-bold text-2xl text-center">{userSettings?.brand || authUser?.display_name}</h2>
           <p className="text-gray-500 mb-3 text-center">{userSettings?.email}</p>
         </div>
 

@@ -41,7 +41,7 @@ export function AddReview({
         return;
       }
   
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 2 * 1024 * 1024; // 2MB
       if (file.size > maxSize) {
         toast.error('File is too large. Maximum size is 5 MB.');
         logger.error('File too large', { size: file.size });
@@ -70,7 +70,7 @@ export function AddReview({
       return;
     }
 
-    if (authUser.username === propOwner) {
+    if (propOwner === authUser._id) {
       toast.warn("You cannot rate your own property.");
       return;
     }
@@ -82,6 +82,8 @@ export function AddReview({
     
     if (!newReview) {
       toast.error("Failed to submit review. Please try again.");
+      setIsSubmitting(false);
+      return
     }
 
     toast.success("Review submitted successfully!");
@@ -153,7 +155,8 @@ export function AddReview({
       <button
         disabled={isSubmitting}
         onClick={handleSubmit}
-        className="px-4 py-2 rounded-md w-full text-white bg-primary" 
+        className={`px-4 py-2 rounded-md w-full text-white 
+          ${isSubmitting ? "bg-gray-400" : "bg-green"}`} 
       >
         Submit Review
       </button>

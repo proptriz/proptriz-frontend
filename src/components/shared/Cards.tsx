@@ -62,14 +62,14 @@ export const ReviewCard: React.FC<{
       <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-3" key={review._id} >
         <div className="flex items-start space-x-3">
           <img
-            src={review.sender?.image || '/avatar.png'}
+            src={review.sender?.avatar || '/avatar.png'}
             alt="Reviewer"
             className="w-10 h-10 rounded-full"
           />
           
           <div className="flex-1 relative">
             <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold">{review.sender?.username}</h3>
+              <h3 className="text-sm font-bold">{review.sender?.display_name}</h3>
               
               <div className="flex text-yellow-500">
                 {Array.from({ length: 5 }).map((_, index) =>

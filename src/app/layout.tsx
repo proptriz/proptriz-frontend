@@ -97,9 +97,15 @@ export default function RootLayout({
       <body className={`bg-background text-black ${lato.className} antialiased`}>
         {/* Google Analytics */}
         <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
+
+        <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-0T7BSEVRN9"
           strategy="afterInteractive"
         />
+        
         <Script id="gtag-init" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];

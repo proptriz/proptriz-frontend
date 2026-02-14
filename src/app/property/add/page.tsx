@@ -153,7 +153,7 @@ export default function AddPropertyPage() {
 
       <div className="p-6">
         <h2 className="text-xl mb-7">
-          Hi {authUser?.username || "User"}, Fill Details of your <span className="font-semibold">property</span>
+          Hi {authUser?.display_name || "User"}, Fill Details of your <span className="font-semibold">property</span>
         </h2>
 
         {/* Property Category */}

@@ -1,18 +1,12 @@
 export interface AuthUserType {
-  pi_uid: string;
-  username: string;
-  membership: {class:string, balance:number};
-};
-
-export interface IUser {
   _id: string;
-  username: string; // unique identifyer
-  pi_uid: string; // hashed user password
-  brand?: string; // User Legal Name (e.g. Tony Adeola Ezenwa) (optional)
-  image?: string; // URL to user profile pics (optional)
-  email?: string; // for notification
-  phone?: string; // user phone number (optional)
-  provider?: string; // URLs of reviewer upload (optional)
+  display_name: string;
+  avatar?: string;
+  primary_email?: string;
+  role: "user" | "admin";
+  last_login_at?: Date
+  createdAt?: Date;
+  updatedAt?: Date
 };
 
 export interface AgentProps { 
@@ -44,7 +38,7 @@ export interface PropertyProps {
 
 export type ReviewType = {
   _id: string;
-  sender: Pick<UserSettingsType, 'username' | 'image'>;
+  sender: Pick<AuthUserType, '_id' | 'display_name' | 'avatar'>;
   comment: string;
   rating: number;
   property: Pick<PropertyType, 'title' | 'banner' | 'address' | 'average_rating'>;
@@ -92,6 +86,7 @@ export enum UserTypeEnum {
 
 export interface UserSettingsType {
   _id?: string;
+  user_id: string;
   username: string; // 
   user_type: UserTypeEnum;
   brand?: string; // User Legal Name (e.g. Tony Adeola Ezenwa)
@@ -176,7 +171,7 @@ export interface PropertyType {
   duration?: number;
   expired_by?: Date;
   images: string[]; //Other property images for gallery
-  user: UserSettingsType; //foreign key representing agent that list the property
+  user: UserSettingsType;
   latitude: number;
   longitude: number;
   features?: {

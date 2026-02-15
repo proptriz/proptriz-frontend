@@ -14,6 +14,7 @@ import { addOrUpdateUserSettings, getUserSettings } from '@/services/settingsApi
 import Image from 'next/image';
 import { EmailInput, SelectInput, TextInput } from '@/components/shared/Input';
 import { PhoneInput } from '@/components/shared/PhoneInput';
+import Splash from '@/components/shared/Splash';
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
@@ -72,7 +73,7 @@ const EditProfile = () => {
         return;
       }
 
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 2 * 1024 * 1024; // 2MB
       if (file.size > maxSize) {
         toast.error('File is too large. Maximum size is 5 MB.');
         logger.error('File too large', { size: file.size });
@@ -104,6 +105,10 @@ const EditProfile = () => {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  if (!authUser) {
+    return <Splash showFooter/>;
   }
 
   return (

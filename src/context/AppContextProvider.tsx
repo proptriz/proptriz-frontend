@@ -12,6 +12,7 @@ import { AuthUserType,  } from '../types';
 import logger from '../../logger.config.mjs';
 import { AuthResult } from '@/config/pi';
 import { onIncompletePaymentFound } from '@/config/payment';
+import { useRouter } from 'next/navigation';
 
 export type PiLoginStage =
   | ""
@@ -36,6 +37,8 @@ interface IAppContextProps {
   showAlert: (message: string) => void;
   setReload: React.Dispatch<SetStateAction<boolean>>;
   loginStage: PiLoginStage;
+  googleReady: boolean;
+  setGoogleReady: (value: boolean) => void;
 }
 
 const sleep = (ms: number) =>
@@ -43,55 +46,6 @@ const sleep = (ms: number) =>
 
 // both HTTP 401 Unauthorized and HTTP 403 Forbidden errors are considered "hard fails" 
 // in the sense that the server is actively denying access
-const isHardFail = (err: any) => {
-  const code = err?.response?.status || err?.status;
-  return code === 401 || code === 403;
-};
-
-let piSdkPromise: Promise<typeof window.Pi> | null = null;
-
-const loadPiSdk = (timeoutMs = 1000): Promise<typeof window.Pi> => {
-  if (typeof window === "undefined") {
-    return Promise.reject(new Error("Pi SDK cannot load on server"));
-  }
-
-  if (window.Pi) {
-    return Promise.resolve(window.Pi);
-  }
-
-  if (piSdkPromise) return piSdkPromise;
-
-  piSdkPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://sdk.minepi.com/pi-sdk.js";
-    script.async = true;
-
-    const timeout = setTimeout(() => {
-      piSdkPromise = null; // allow retry
-      reject(new Error("Pi SDK load timeout"));
-    }, timeoutMs);
-
-    script.onload = () => {
-      clearTimeout(timeout);
-      if (window.Pi) {
-        resolve(window.Pi);
-      } else {
-        piSdkPromise = null;
-        reject(new Error("Pi SDK loaded but Pi object missing"));
-      }
-    };
-
-    script.onerror = () => {
-      clearTimeout(timeout);
-      piSdkPromise = null;
-      reject(new Error("Failed to load Pi SDK"));
-    };
-
-    document.head.appendChild(script);
-  });
-
-  return piSdkPromise;
-};
 
 const withTimeout = <T,>(
   promise: Promise<T>,
@@ -125,6 +79,8 @@ const initialState: IAppContextProps = {
   showAlert: () => {},
   setReload: () => {},
   loginStage: "",
+  googleReady: false,
+  setGoogleReady: () => {}
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -140,8 +96,10 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [reload, setReload] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [loginStage, setLoginStage] = useState<PiLoginStage>("");
+  const [googleReady, setGoogleReady] = useState(false);
 
   const piSdkLoaded = useRef(false);
+  const router = useRouter()
 
   const showAlert = (message: string) => {
     setAlertMessage(message);
@@ -215,7 +173,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
       setLoginStage("backend_authenticating");
 
       const res = await axiosClient.post(
-        "/users/authenticate",
+        "/users/authenticate/pi",
         {},
         {
           headers: {
@@ -227,6 +185,10 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
       setAuthToken(res.data?.token);
       setAuthUser(res.data.user);
       setLoginStage("authenticated");
+
+      if (res.data.requiresOnboarding) {
+        router.push("/profile/edit");
+      } 
 
       return true;
     } catch (error: any) {
@@ -284,7 +246,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   };
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady }}>
       {children}
     </AppContext.Provider>
   );

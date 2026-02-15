@@ -328,7 +328,7 @@ const PropertyDetailsClient = ({
       )}
 
       <Popup header="Add review to property" toggle={togglePopup} setToggle={setTogglePopup} useMask={true} hideReset >
-        <AddReview propertyId={propertyId} setRefreshReviews={setRefreshReviews} propOwner={property?.user.username} />
+        <AddReview propertyId={propertyId} setRefreshReviews={setRefreshReviews} propOwner={property?.user.user_id} />
       </Popup>
     </div>
   );

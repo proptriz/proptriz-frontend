@@ -16,7 +16,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
   const imageUrl =
     property.banner && property.banner.trim() !== ''
       ? property.banner
-      : '/PropTriz.svg';
+      : '/logo.png';
 
   const truncateChars = (text: string, maxChars: number): string => {
     return text.length > maxChars ? text.slice(0, maxChars) + '...' : text;

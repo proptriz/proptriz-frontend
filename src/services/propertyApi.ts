@@ -111,6 +111,7 @@ export const getPropertyById = async (propertyId: string): Promise<PropertyType 
       ...property,
       id: property._id,
       user: {
+        user_id: userDetails.user,
         username: property.user.username,
         image: userDetails.image,
         email: userDetails.email,

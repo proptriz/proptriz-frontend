@@ -1,5 +1,6 @@
 declare interface Window {
   Pi: any;
+  google?: any;
 }
 
 // Declaration for leaflet-control-geocoder

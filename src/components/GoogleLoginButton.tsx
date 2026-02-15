@@ -6,19 +6,13 @@ import logger from "../../logger.config.mjs";
 import { AppContext } from "@/context/AppContextProvider";
 import { useRouter } from "next/navigation";
 
-declare global {
-  interface Window {
-    google?: any;
-  }
-}
-
 export default function GoogleLoginButton() {
-  const { setAuthUser } = useContext(AppContext);
+  const { setAuthUser, googleReady  } = useContext(AppContext);
   const router = useRouter();
   const buttonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!window.google || !buttonRef.current) return;
+    if (!googleReady || !buttonRef.current) return;
 
     // Prevent duplicate initialization
     window.google.accounts.id.initialize({
@@ -58,7 +52,7 @@ export default function GoogleLoginButton() {
       logo_alignment: "center",
     });
 
-  }, []);
+  }, [googleReady]);
 
   return (
     <div className="flex flex-col items-center w-full">

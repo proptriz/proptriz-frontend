@@ -2,10 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { Lato } from "next/font/google";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
-
+import Script from "next/script";
 import AppContextProvider from "../context/AppContextProvider";
 import { ToastContainer } from "react-toastify";
-import Script from "next/script";
+import GoogleScriptLoader from "@/components/GoogleScriptLoader";
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -33,12 +33,24 @@ export const metadata: Metadata = {
   keywords: [
     "property",
     "properties",
-    "rent",
-    "sale",
-    "pi",
     "land",
     "apartment",
-    "real estate",
+    "hotel",
+    "hotel in",
+    "shortlet",
+    "office",
+    "shop",
+    "properties in nigeria",
+    "apartments for rent",
+    "apartments for sale",
+    "for sale",
+    "for rent",
+    "farming land",
+    "pi property",
+    "nigeria real estate",
+    "real estate in nigeria",
+    "apartment in lagos",
+    "apartments in abuja",
     "Nigeria",
   ],
 
@@ -95,12 +107,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`bg-background text-black ${lato.className} antialiased`}>
-        {/* Google Analytics */}
-        <Script
-          src="https://accounts.google.com/gsi/client"
-          strategy="afterInteractive"
-        />
-
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-0T7BSEVRN9"
           strategy="afterInteractive"
@@ -117,6 +123,7 @@ export default function RootLayout({
 
         <div className="w-full min-h-screen bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300">
           <AppContextProvider>
+            <GoogleScriptLoader />
             {children}
             <ToastContainer />
           </AppContextProvider>

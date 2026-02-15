@@ -12,7 +12,6 @@ import { AuthUserType,  } from '../types';
 import logger from '../../logger.config.mjs';
 import { AuthResult } from '@/config/pi';
 import { onIncompletePaymentFound } from '@/config/payment';
-import Router from 'next/router';
 import { useRouter } from 'next/navigation';
 
 export type PiLoginStage =
@@ -38,6 +37,8 @@ interface IAppContextProps {
   showAlert: (message: string) => void;
   setReload: React.Dispatch<SetStateAction<boolean>>;
   loginStage: PiLoginStage;
+  googleReady: boolean;
+  setGoogleReady: (value: boolean) => void;
 }
 
 const sleep = (ms: number) =>
@@ -78,6 +79,8 @@ const initialState: IAppContextProps = {
   showAlert: () => {},
   setReload: () => {},
   loginStage: "",
+  googleReady: false,
+  setGoogleReady: () => {}
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -93,6 +96,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [reload, setReload] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [loginStage, setLoginStage] = useState<PiLoginStage>("");
+  const [googleReady, setGoogleReady] = useState(false);
 
   const piSdkLoaded = useRef(false);
   const router = useRouter()
@@ -242,7 +246,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   };
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady }}>
       {children}
     </AppContext.Provider>
   );

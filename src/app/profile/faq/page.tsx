@@ -32,8 +32,9 @@ export default function FAQSupport() {
         <div className="space-y-4 mb-4">
           {[
             { text: "Visit our website", icon: "🌐", link: "#" },
-            { text: "Email us", icon: "✉️", link: "#" },
-            { text: "Terms of service", icon: "📄", link: "#" },
+            { text: "Email us", icon: "✉️", link: "info@proptriz.com" },
+            { text: "Privacy policy", icon: "📄", link: "/privacy-policy" },
+            { text: "Terms of service", icon: "📄", link: "/terms-of-service" },
           ].map((item, idx) => (
             <div
               key={idx}
@@ -51,11 +52,6 @@ export default function FAQSupport() {
       
         
         <div className="md:mx-16">
-          {/* Search Input */}
-          {/* <div className="mb-4 mx-auto w-full">
-            <SearchBar setQuery={setSearchQuery} onSearch={()=>{}} />
-          </div>  */}
-
           {/* Tab Navigation */}
           <div className="flex justify-around items-center bg-gray-300 rounded-full mb-6">
             {["Buyer", "Estate Agent"].map((tab) => (
@@ -76,7 +72,7 @@ export default function FAQSupport() {
           <div className="space-y-4">
             {/* FAQ Items */}
             {[
-              { question: "What is ERH?", content: "Lorem ipsum dolor sit amet..." },
+              { question: "What is PH?", content: "Lorem ipsum dolor sit amet..." },
               {
                 question: "Why choose buy in Rise?",
                 content:

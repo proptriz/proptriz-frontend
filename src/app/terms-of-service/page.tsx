@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ScreenName } from "@/components/shared/LabelCards";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Proptriz",

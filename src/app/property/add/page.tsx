@@ -156,6 +156,14 @@ export default function AddPropertyPage() {
           Hi {authUser?.display_name || "User"}, Fill Details of your <span className="font-semibold">property</span>
         </h2>
 
+        {/* Photo Upload */}
+        <PhotoUploadSection
+          photos={photos}
+          maxPhotos={maxPhotos}
+          handlePhotoUpload={handlePhotoUpload}
+          removePhoto={removePhoto}
+        />
+
         {/* Property Category */}
         <h3 className={styles.H2}>Property Category</h3>
         <SelectButton<CategoryEnum> 
@@ -305,15 +313,6 @@ export default function AddPropertyPage() {
             Pick property location
           </OutlineButton>
         </div>
-        
-      
-        {/* Photo Upload */}
-        <PhotoUploadSection
-          photos={photos}
-          maxPhotos={maxPhotos}
-          handlePhotoUpload={handlePhotoUpload}
-          removePhoto={removePhoto}
-        />
 
         {/* Property Details */}
         <AddPropertyDetails 

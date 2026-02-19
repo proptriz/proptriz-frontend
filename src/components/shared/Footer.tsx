@@ -11,7 +11,7 @@ import { LuMapPin } from "react-icons/lu";
 
 const menus = [
   { name: "Map", icon: <LuMapPin />, activeIcon:<FaMapMarkerAlt />, link: '/' },
-  { name: "Pomotion", icon: <FiHome />, activeIcon:<PiHouseFill />, link: '/explore' },
+  { name: "Promotion", icon: <FiHome />, activeIcon:<PiHouseFill />, link: '/explore' },
   { name: "Favorite", icon: <FiHeart />,  activeIcon:<FaHeart />, link: '/property/list' },
   { name: "Profile", icon: <FaRegUser />, activeIcon:<FaUser />, link: '/profile' },
 ];

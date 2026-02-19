@@ -150,12 +150,8 @@ const PropertyReviews = ({
       <ReplyReview review={replyReview} />
     </Popup>}
 
-    {reviewPopup && <Popup header="Add review to property" toggle={reviewPopup} setToggle={setReviewPopup} useMask={true} hideReset >
-      {property?.user.username && <AddReview 
-        propertyId={propertyId} 
-        setRefreshReviews={setRefreshReviews} 
-        propOwner={property?.user.username} 
-      /> }
+    {property && <Popup header="Add review to property" toggle={reviewPopup} setToggle={setReviewPopup} useMask={true} hideReset >
+      <AddReview propertyId={propertyId} setRefreshReviews={setRefreshReviews} propOwner={property?.user.user_id} />
     </Popup>}
   </>
 

@@ -1,122 +1,161 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import React, { useContext, useState } from "react";
+import { IoClose } from "react-icons/io5";
 import { SlMenu } from "react-icons/sl";
 import Popup from "./Popup";
 import { AppContext } from "@/context/AppContextProvider";
+import Image from "next/image";
 
-const menuItems = [
-    {title: 'Edit profile', link: '/profile/edit'},
-    {title: 'Become an agent', link: '/profile/become-agent'},
-    {title: 'List new property', link: '/property/add'},
-    {title: ' Privacy policy ', link: '/privacy-policy'},
-    {title: 'Terms of service', link: '/terms-of-service'},
-    {title: 'FAQ', link: '/profile/faq'},
-  ];
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const MENU_ITEMS = [
+  { icon: "✏️", title: "Edit Profile",       link: "/profile/edit"         },
+  { icon: "🏠", title: "List New Property",  link: "/property/add"         },
+  { icon: "🤝", title: "Become an Agent",    link: "/profile/become-agent" },
+  { icon: "🔒", title: "Privacy Policy",     link: "/privacy-policy"       },
+  { icon: "📋", title: "Terms of Service",   link: "/terms-of-service"     },
+  { icon: "❓", title: "FAQ",                link: "/profile/faq"          },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const Header: React.FC = () => {
-  const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
-  const {authUser} = useContext(AppContext);
-
+  const [showMenu, setShowMenu] = useState(false);
+  const { authUser }            = useContext(AppContext);
 
   return (
     <>
-    <header className="sticky top-0 z-20 w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300 border-b border-black/5">
-      <div className="h-14 px-4 flex items-center justify-between">
-        {/* Logo + Brand */}
-        <Link href="/" aria-label="Home" className="flex items-center">
-          <Image
-            src="/logo.png"
-            alt="Proptriz"
-            width={104}
-            height={64}
-            priority
-            fetchPriority="high"
-            className="h-9 w-auto object-contain"
-          />
+      {/* ── Sticky header bar ─────────────────────────────────────────── */}
+      <header
+        className="sticky top-0 z-20 w-full border-b border-black/10"
+        style={{ background: "linear-gradient(135deg,#143d4d 0%,#1e5f74 100%)" }}
+      >
+        <div className="h-14 px-4 flex items-center justify-between md:max-w-[650px] mx-auto">
 
-          <div className="text-base text-2xl font-bold tracking-wide text-gray-900">
-            ropTriz
-          </div>
-        </Link>
-
-        {/* Menu */}
-        <button
-          type="button"
-          onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-          className="text-gray-600 text-xl p-2 rounded-full hover:bg-black/5 active:scale-95 transition"
-          aria-label="Open menu"
-        >
-          <SlMenu />
-        </button>
-      </div>
-    </header>
-
-    {/* User Admin Popup */}
-        <Popup
-          header=""
-          toggle={showSettingsMenu}
-          setToggle={setShowSettingsMenu}
-          useMask={true}
-          hideReset={true}
-        >
-          <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md mx-auto">
-            {/* Menu */}
-            <div>
-              <div className="flex flex-col items-center mb-2">
-                <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
-                  <Image
-                    src={authUser?.avatar || "/logo.png"}
-                    height={32}
-                    width={32}
-                    alt="profile"
-                    className="rounded-full w-full h-full object-cover"
-                  />                    
-                </div>                    
-                <div className="-mt-4 ml-12">
-                  <span className="bg-green text-white text-xs px-2 py-1 rounded-full">
-                    #1
-                  </span>
-                </div>
-              </div>
-              <h2 className="font-bold text-2xl text-center">{authUser?.display_name || ""}</h2>
-              <p className="text-gray-500 mb-3 text-center">{authUser?.primary_email || ""}</p>
+          {/* Logo: gold circle + wordmark */}
+          <Link href="/" aria-label="PropTriz Home" className="flex items-center gap-2">
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center
+                         text-[#143d4d] font-black text-lg flex-shrink-0"
+              style={{
+                fontFamily: "'Raleway', sans-serif",
+                boxShadow: "0 2px 8px rgba(240,165,0,0.4)",
+              }}
+            >
+              <Image src={"/logo.png"} height={32} width={32} alt="logo" />
             </div>
-    
-            <nav role="menu" aria-label="User settings" className="divide-y">
-              <ul className="px-2 py-2 space-y-1">
-                {menuItems.map((item, index) => (
-                  <li key={index}>
-                    <Link
-                      href={item.link}
-                      role="menuitem"
-                      tabIndex={0}
-                      onClick={() => setShowSettingsMenu(false)}
-                      className="block w-full text-left px-3 py-2 rounded-md text-primary shadow-sm hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
-                    >
-                      {item.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-    
-              {/* Actions */}
-              <div className="px-3 py-3 bg-gray-50 flex items-center gap-3 justify-end">   
-                <button
-                  type="button"
-                  onClick={() => setShowSettingsMenu(false)}
-                  className="px-3 py-2 rounded-md bg-red-600 text-sm text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  Close
-                </button>
-              </div>
-            </nav>
+            <span
+              className="text-white font-black text-[18px] tracking-tight"
+              style={{ fontFamily: "'Raleway', sans-serif" }}
+            >
+              <span style={{ color: "#f0a500" }}>Prop</span>Triz
+            </span>
+          </Link>
+
+          {/* Menu button */}
+          <button
+            type="button"
+            onClick={() => setShowMenu(true)}
+            className="w-9 h-9 rounded-full flex items-center justify-center
+                       text-white text-lg transition-colors
+                       bg-white/15 border border-white/25
+                       hover:bg-white/25 active:scale-95"
+            aria-label="Open menu"
+          >
+            <SlMenu size={16} />
+          </button>
+        </div>
+      </header>
+
+      {/* ── Navigation popup ──────────────────────────────────────────── */}
+      <Popup
+        header=""
+        toggle={showMenu}
+        setToggle={setShowMenu}
+        useMask
+        hideReset
+      >
+        {/* User section */}
+        <div className="flex items-center gap-4 px-1 pb-4 mb-1 border-b border-[#e5e7eb]">
+          <div
+            className="w-14 h-14 rounded-full flex-shrink-0 overflow-hidden
+                       border-[3px] border-[#f0a500]
+                       shadow-[0_2px_12px_rgba(240,165,0,0.3)]"
+          >
+            <Image
+              src={authUser?.avatar || "/logo.png"}
+              width={56}
+              height={56}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
           </div>
-    
-        </Popup>
-        </>
+          <div className="min-w-0">
+            <p
+              className="font-extrabold text-[16px] text-[#111827] truncate"
+              style={{ fontFamily: "'Raleway', sans-serif" }}
+            >
+              {authUser?.display_name || "Guest"}
+            </p>
+            <p className="text-[12px] text-[#9ca3af] truncate mt-0.5">
+              {authUser?.primary_email || ""}
+            </p>
+            <span
+              className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold
+                         bg-[#fef3cd] text-[#c88400] px-2 py-0.5 rounded-full
+                         border border-[rgba(240,165,0,0.3)]"
+            >
+              🏆 Top Agent #1
+            </span>
+          </div>
+        </div>
+
+        {/* Menu items */}
+        <nav className="flex flex-col gap-0.5 my-2">
+          {MENU_ITEMS.map((item) => (
+            <Link
+              key={item.link}
+              href={item.link}
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl
+                         hover:bg-[#e0f0f5] transition-colors"
+            >
+              <div
+                className="w-8 h-8 rounded-[10px] flex items-center justify-center
+                           text-[15px] flex-shrink-0 bg-[#e0f0f5] text-[#1e5f74]"
+              >
+                {item.icon}
+              </div>
+              <span className="text-[13px] font-semibold text-[#111827]">
+                {item.title}
+              </span>
+            </Link>
+          ))}
+        </nav>
+
+        {/* Footer actions */}
+        <div className="flex gap-2 pt-3 border-t border-[#e5e7eb] mt-1">
+          <Link
+            href="/profile/edit"
+            onClick={() => setShowMenu(false)}
+            className="flex-1 py-2.5 rounded-xl text-center text-[13px] font-bold
+                       bg-[#e0f0f5] text-[#1e5f74]"
+          >
+            ⚙️ Manage Account
+          </Link>
+          <button
+            type="button"
+            onClick={() => setShowMenu(false)}
+            className="flex-1 py-2.5 rounded-xl text-[13px] font-bold
+                       bg-[#fee2e2] text-[#ef4444]"
+          >
+            ✕ Close
+          </button>
+        </div>
+      </Popup>
+    </>
   );
 };
 

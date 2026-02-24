@@ -48,7 +48,7 @@ export type ReviewType = {
 }
 
 export type CursorResponse<T> = {
-  items: T[];
+  items: T;
   nextCursor: string | null;
 };
 

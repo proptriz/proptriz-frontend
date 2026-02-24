@@ -18,12 +18,8 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
       ? property.banner
       : '/logo.png';
 
-  const truncateChars = (text: string, maxChars: number): string => {
-    return text.length > maxChars ? text.slice(0, maxChars) + '...' : text;
-  };
-
   return (
-    <div style={{ position: 'relative', zIndex: 20 }} className='p-1'>
+    <div style={{ position: 'relative', zIndex: 20 }} className='p-1 bg-wite'>
       {/* property image - Close to property category */}
       <div className="w-full bg-cover bg-center h-40 relative" style={{ backgroundImage: `url(${ imageUrl })`}}>
         {/* Listed For */}
@@ -31,32 +27,43 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
           For {property.listed_for}
         </div>
         {/* Property Type */}
-        <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded-lg">
-          <span className="text-yellow-500">★</span>
-          {property.average_rating || 5.0} | {property.category}
+        <div className="absolute bottom-2 left-2 flex items-center gap-1
+                        bg-black/55 backdrop-blur-[2px] text-white
+                        text-[10px] font-medium px-2 py-1 rounded-md leading-none">
+          <span className="text-[#f5a623]">★</span>
+          {property.average_rating || 5.0} · {property.category}
         </div>
       </div>
 
       {/* property title - Close with a small gap */}
       <div className="p-3 space-y-1.5">
-        {/* Title */}
-        <h3 className="font-semibold text-gray-900 truncate leading-tight">
-          {truncateChars(property.title, 20)}
-        </h3>
-
-        {/* Price */}
-        <div className="flex items-center gap-1 leading-none">
-          <span className="text-base text-xl font-bold text-primary">
-            {currencySymbol[property.currency]}
-            {formatPrice(property.price)}
+        {/* Price row */}
+        <div className="flex items-baseline gap-1">
+          <span
+            className={`text-[18px] font-extrabold ${
+              "text-primary"
+            }`}
+          >
+            {currencySymbol[property.currency]}{formatPrice(property.price)}
           </span>
-
           {property.period && (
-            <span className="text-sm text-gray-700">
+            <span className="text-[10px] text-[#9ca3af] font-normal">
               /{property.period}
             </span>
           )}
         </div>
+
+        {/* Name */}
+        <p className="text-[12px] font-semibold text-[#111827]
+                      truncate leading-snug">
+          {property.title}
+        </p>
+
+        {/* Address */}
+        <p className="text-[10px] text-[#9ca3af] truncate flex items-center gap-1">
+          <span>📍</span>
+          {property.address}
+        </p>
 
         {/* CTA */}
         <Link href={`/property/details/${property._id}`}>

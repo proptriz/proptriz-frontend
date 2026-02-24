@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import dynamic from 'next/dynamic';
-import Image from "next/image";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
@@ -10,76 +9,76 @@ import propertyService from "@/services/propertyApi";
 import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
-import logger from "../../logger.config.mjs"
 import Header from "@/components/shared/Header";
 import Link from "next/link";
+import { FiNavigation } from "react-icons/fi";
+import type L from "leaflet";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
+// ─── Page ────────────────────────────────────────────────────────────────────
+
 export default function ExplorePage() {
   const { authUser, isSigningInUser } = useContext(AppContext);
-  const [properties, setProperties] = useState<PropertyType[]>([]);
-  const [searchInput, setSearchInput] = useState("");
-  const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
-  const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
-  const [listedFor, setListedFor] = useState<string>('all');
-  const [minPriceBudget, setMinPriceBudget] = useState<number>(0); 
-  const [maxPriceBudget, setMaxPriceBudget] = useState<number>(900000000000); 
-  const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
-  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
-  const [zoomLevel, setZoomLevel] = useState<number>(7);
-  const renderedMarkerIds = useRef<Set<string>>(new Set());
-  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined)
 
-  // Get user location
-  const fetchLocation = async () => {    
+  const [properties, setProperties]             = useState<PropertyType[]>([]);
+  const [searchInput, setSearchInput]           = useState("");
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
+  const [category, setCategory]                 = useState<CategoryEnum>(CategoryEnum.house);
+  const [listedFor, setListedFor]               = useState<string>("all");
+  const [minPriceBudget, setMinPriceBudget]     = useState<number>(0);
+  const [maxPriceBudget, setMaxPriceBudget]     = useState<number>(900_000_000_000);
+  const [mapBounds, setMapBounds]               = useState<L.LatLngBounds | null>(null);
+  const [mapCenter, setMapCenter]               = useState<[number, number] | null>(null);
+  const [zoomLevel, setZoomLevel]               = useState<number>(7);
+  const [selectedProperty, setSelectedProperty] = useState<PropertyType | null>(null);
+
+  const renderedMarkerIds = useRef<Set<string>>(new Set());
+  const [nextCursor, setNextCursor]             = useState<string | undefined>(undefined);
+
+  // ── Location ───────────────────────────────────────────────────────────
+  const fetchLocation = useCallback(async () => {
     const [lat, lng] = await getUserPosition();
     setMapCenter([lat, lng]);
-  };
+  }, []);
 
   useEffect(() => {
     fetchLocation();
     setZoomLevel(7);
-  }, [authUser]);
+  }, [authUser, fetchLocation]);
 
-  const onLocateMe = async () => {    
-    sessionStorage.removeItem('prevMapCenter');
-    sessionStorage.removeItem('prevMapZoom');
+  const onLocateMe = async () => {
+    sessionStorage.removeItem("prevMapCenter");
+    sessionStorage.removeItem("prevMapZoom");
     await fetchLocation();
     setZoomLevel(10);
   };
 
+  // ── Fetch properties ──────────────────────────────────────────────────
   const fetchProperties = useCallback(
     async (signal: AbortSignal) => {
+      if (!mapBounds) return;
       try {
-        const ne = mapBounds!.getNorthEast();
-        const sw = mapBounds!.getSouthWest();
+        const ne = mapBounds.getNorthEast();
+        const sw = mapBounds.getSouthWest();
 
         const params = new URLSearchParams({
-          query: appliedSearchQuery ?? "",
-          category: category ?? "",
-          listed_for: listedFor == "all" ? "" : listedFor,
-          min_price: minPriceBudget.toString(),
-          max_price: maxPriceBudget.toString(),
-          ne_lat: ne.lat.toString(),
-          ne_lng: ne.lng.toString(),
-          sw_lat: sw.lat.toString(),
-          sw_lng: sw.lng.toString(),
-          cursor: nextCursor ?? ""
+          query:      appliedSearchQuery ?? "",
+          category:   category ?? "",
+          listed_for: listedFor === "all" ? "" : listedFor,
+          min_price:  minPriceBudget.toString(),
+          max_price:  maxPriceBudget.toString(),
+          ne_lat:     ne.lat.toString(),
+          ne_lng:     ne.lng.toString(),
+          sw_lat:     sw.lat.toString(),
+          sw_lng:     sw.lng.toString(),
+          cursor:     nextCursor ?? "",
         });
 
-        const result = await propertyService.getAllProperties(
-          params.toString(),
-          { signal }
-        );
-
-        if (!result.success) {
-          logger.error("Error fetching properties:", result.message);
-          return;
-        }
+        const result = await propertyService.getAllProperties(params.toString(), { signal });
+        if (!result.success) return;
 
         const newMarkers: PropertyType[] = [];
-
         for (const property of result.properties) {
           if (!renderedMarkerIds.current.has(property._id)) {
             renderedMarkerIds.current.add(property._id);
@@ -88,54 +87,54 @@ export default function ExplorePage() {
         }
 
         if (newMarkers.length) {
-          setProperties(prev => [...prev, ...newMarkers]);
-          setNextCursor(result.nextCursor)
+          setProperties((prev) => [...prev, ...newMarkers]);
+          setNextCursor(result.nextCursor);
         }
-
-        logger.info("New properties added:", newMarkers.length);
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          logger.error("Fetch properties failed:", error.message);
+      } catch (error: unknown) {
+        if ((error as Error).name !== "AbortError") {
+          console.error("Fetch properties failed:", (error as Error).message);
         }
       }
     },
     [mapBounds, appliedSearchQuery, category, listedFor, minPriceBudget, maxPriceBudget]
   );
 
+  // ── Search / filter handlers ──────────────────────────────────────────
   const onSearchClick = useCallback(() => {
     renderedMarkerIds.current.clear();
     setProperties([]);
     setAppliedSearchQuery(searchInput);
   }, [searchInput]);
 
-  const onFilter = useCallback((filters: PropertyFilterPayload) => {
-    renderedMarkerIds.current.clear();
-    setProperties([]);  
-      
-    if (filters.location) {
-      sessionStorage.removeItem('prevMapCenter');
-      sessionStorage.removeItem('prevMapZoom');
-      setZoomLevel(10);
-    }
+  const onFilter = useCallback(
+    (filters: PropertyFilterPayload) => {
+      renderedMarkerIds.current.clear();
+      setProperties([]);
+      setSelectedProperty(null);
 
-    setMapCenter(filters.location ? [filters.location.lat, filters.location.lng] : mapCenter);
-    setListedFor(filters.listedFor);
-    setMinPriceBudget(filters.priceMin || 0);
-    setMaxPriceBudget(filters.priceMax || 100000000);
-    setCategory(filters.propertyType);
-    setSearchInput(filters.description || "");
-    setAppliedSearchQuery(filters.description || appliedSearchQuery);
-  }, [mapCenter, appliedSearchQuery]);
+      if (filters.location) {
+        sessionStorage.removeItem("prevMapCenter");
+        sessionStorage.removeItem("prevMapZoom");
+        setZoomLevel(10);
+        setMapCenter([filters.location.lat, filters.location.lng]);
+      }
 
+      setListedFor(filters.listedFor);
+      setMinPriceBudget(filters.priceMin ?? 0);
+      setMaxPriceBudget(filters.priceMax ?? 900_000_000_000);
+      setCategory(filters.propertyType);
+      setSearchInput(filters.description ?? "");
+      setAppliedSearchQuery(filters.description ?? appliedSearchQuery);
+    },
+    [appliedSearchQuery]
+  );
+
+  // ── Effects ────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!mapBounds) return;
-
     const controller = new AbortController();
     fetchProperties(controller.signal);
-
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, [fetchProperties, mapBounds]);
 
   useEffect(() => {
@@ -152,70 +151,129 @@ export default function ExplorePage() {
     }
   }, [searchInput, appliedSearchQuery]);
 
-
+  // ─────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex-1 flex-col w-full h-screen overflow-hidden">
-      {/* Header */}
+    <div className="flex flex-col h-screen overflow-hidden">
       <Header />
 
-      {/* Map Section */}
-      <div className="relative flex-1">
-        <div className="relative top-0 z-50 lg:flex px-6 space-y-4 lg:space-y-0 lg:space-x-3 w-full lg:items-center justify-center pt-4 lg:pt-6 pb-2 bg-transparent">
-          <SearchBar
-            value={searchInput}
-            onChange={setSearchInput}
-            onSearch={onSearchClick}
-            onFilter={onFilter}
-          />
-          <NavigationTabs onChange={setCategory} value={category} />
-        </div>
-        <Map 
-          properties={properties} 
-          mapCenter={mapCenter} 
-          initialZoom={zoomLevel}
-          mapBounds={mapBounds}
-          setMapBounds={setMapBounds} 
-        />  
-        <div className="fixed bottom-12 right-0 left-0 m-auto pointer-events-none">
-          <div className="w-full px-6 mx-auto flex items-center justify-between mb-7">
-            {/* Add Agent Button */}
-            <div className="">
-                <Link href={"/property/add"}
-                  className={`text-white text-sm bg-primary z-10 pointer-events-auto p-2 shadow-lg hover:shadow-xl transition-shadow duration-300 outline-none ring-2 ring-offset-2 ring-secondary focus:text-secondary rounded-md`}
-                >
-                  List Property
-              </Link>
-            </div>
-            {/* Location Button */}
-              <button
-                className="bg-primary ms-auto z-10 pointer-events-auto p-2 shadow-lg hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
-                style={{
-                  borderRadius: '50%',
-                  width: '35px',
-                  height: '35px',
-                  padding: '0px',
-                }}
-                onClick={()=>onLocateMe()}
-                disabled={isSigningInUser}
-              >
-                <Image
-                  className="mx-auto"
-                  src="/icon/my_location.png"
-                  width={40}
-                  height={40}
-                  alt="my location"
-                  priority
-                  fetchPriority="high"
-                />
-              </button>
+      {/* ── Map fills the remaining height ────────────────────────────── */}
+      <div className="relative flex-1 overflow-hidden">
+
+        {/* Search bar — overlaid on the map at the top */}
+        <div className="absolute top-0 left-0 right-0 z-[500] px-4 pt-3 pb-2">
+          <div className="
+                           mx-auto max-w-[480px]">
+            <SearchBar
+              value={searchInput}
+              onChange={setSearchInput}
+              onSearch={onSearchClick}
+              onFilter={onFilter}
+            />
           </div>
         </div>
+
+        {/* Category tabs — below search, still above map */}
+        <div className="absolute top-[64px] left-0 right-0 z-[499] px-4">
+          <div className="backdrop-blur-sm rounded-xl
+                          shadow-[0_2px_10px_rgba(0,0,0,0.1)] px-2 py-1 mx-auto max-w-[480px]">
+            <NavigationTabs onChange={setCategory} value={category} />
+          </div>
+        </div>
+
+        {/* Leaflet map */}
+        <Map
+          properties={properties}
+          mapCenter={mapCenter}
+          initialZoom={zoomLevel}
+          mapBounds={mapBounds}
+          setMapBounds={setMapBounds}
+          onMarkerClick={(property: PropertyType) => setSelectedProperty(property)}
+        />
+
+        {/* Selected property peek card */}
+        {selectedProperty && (
+          <div className="absolute bottom-[70px] left-4 right-4 z-[500]
+                          bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)]
+                          p-3 flex items-center gap-3
+                          animate-in slide-in-from-bottom-4 duration-200">
+            {/* Property image */}
+            <div
+              className="w-16 h-16 rounded-xl bg-cover bg-center flex-shrink-0
+                         bg-[#e8f5ee]"
+              style={{
+                backgroundImage: selectedProperty.banner
+                  ? `url(${selectedProperty.banner})`
+                  : undefined,
+              }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-extrabold text-[#1a7a4a]">
+                {selectedProperty.currency === "NGN" ? "₦" : ""}
+                {selectedProperty.price?.toLocaleString()}
+                {selectedProperty.period && (
+                  <span className="text-[10px] font-normal text-[#9ca3af]">
+                    /{selectedProperty.period}
+                  </span>
+                )}
+              </p>
+              <p className="text-[12px] font-semibold text-[#111827] truncate">
+                {selectedProperty.title}
+              </p>
+              <p className="text-[10px] text-[#9ca3af] truncate flex items-center gap-1">
+                📍 {selectedProperty.address}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1.5 flex-shrink-0">
+              <Link
+                href={`/property/details/${selectedProperty._id}?slug=${selectedProperty.slug}`}
+                className="bg-[#1a7a4a] text-white text-[11px] font-bold
+                           px-3 py-1.5 rounded-lg text-center"
+              >
+                View
+              </Link>
+              <button
+                type="button"
+                onClick={() => setSelectedProperty(null)}
+                className="text-[11px] text-[#9ca3af] text-center"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Floating action buttons ──────────────────────────────────── */}
+        <div className="absolute bottom-[72px] right-4 z-[500] flex flex-col gap-2">
+          {/* Locate me */}
+          <button
+            onClick={onLocateMe}
+            disabled={isSigningInUser}
+            aria-label="My location"
+            className="w-10 h-10 rounded-full bg-white flex items-center justify-center
+                       shadow-[0_2px_12px_rgba(0,0,0,0.18)]
+                       hover:shadow-lg transition-shadow
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FiNavigation size={16} className="text-[#1a7a4a]" />
+          </button>
+        </div>
+
+        {/* ── List property button ─────────────────────────────────────── */}
+        <div className="absolute bottom-[72px] left-4 z-[500]">
+          <Link
+            href="/property/add"
+            className="inline-flex items-center gap-1.5 bg-primary text-white
+                       text-[13px] font-bold px-4 py-2.5 rounded-xl
+                       shadow-[0_4px_14px_rgba(26,122,74,0.4)]
+                       hover:shadow-[0_6px_18px_rgba(26,122,74,0.5)]
+                       transition-shadow"
+          >
+            ＋ List Property
+          </Link>
+        </div>
       </div>
-        
-      {/* Footer Navigation */}
+
       <Footer />
     </div>
   );
-};
-
-
+}

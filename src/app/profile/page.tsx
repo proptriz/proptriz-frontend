@@ -7,7 +7,6 @@ import Link from "next/link";
 import { AppContext } from "../../context/AppContextProvider";
 import { CursorResponse, PropertyReviewType, PropertyType, ReviewType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
-import logger from "../../../logger.config.mjs"
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Popup from "@/components/shared/Popup";
@@ -20,567 +19,546 @@ import { getPropertyUserReviewApi } from "@/services/reviewApi";
 import { useInfiniteCursorScroll } from "@/components/shared/useInfiniteCursorScroll";
 import { ReviewCardSkeleton } from "@/components/skeletons/ReviewCardSkeleton";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
-import { MdMenu } from "react-icons/md";
+import { SlMenu } from "react-icons/sl";
 
-export default function ProfileTransaction () {
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type ActiveTab = "Listings" | "receivedReviews" | "sentReviews";
+
+const TABS: { key: ActiveTab; label: string }[] = [
+  { key: "Listings",        label: "Listings" },
+  { key: "receivedReviews", label: "Received" },
+  { key: "sentReviews",     label: "Sent"     },
+];
+
+const MENU_ITEMS = [
+  { icon: "✏️", title: "Edit Profile",       link: "/profile/edit"         },
+  { icon: "🏠", title: "List New Property",  link: "/property/add"         },
+  { icon: "⭐", title: "Check Reviews",      link: "/property/edit"        },
+  { icon: "🤝", title: "Become an Agent",    link: "/profile/become-agent" },
+  { icon: "❓", title: "FAQ",                link: "/profile/faq"          },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function ProfileTransaction() {
   const { authUser } = useContext(AppContext);
-  const statusCountStyle = 'border-2 border-white py-2 rounded-xl font-[Montserrat]';
-  const [showStats, setShowStats] = useState(true);
-  const [receivedOrSent, setReceivedOrSent] = useState<string>('Listings');
-  const [refreshListedProp, setRefreshListedProp] = useState<boolean>(false);
-  const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
-  const [userSettings, setUserSettings] = useState<UserSettingsType | null>(null);
-  const [isReplyPop, setIsReplyPop] = useState<boolean>(false);
-  const [isConfirmPop, setIsConfirmPop] = useState<boolean>(false);
-  const [replyReview, setReplyReview] = useState<ReviewType | null>(null);
-  const [refreshReviews, setRefreshReviews] = useState<boolean>(false);
-  const [totalProperties, setTotalProperties] = useState<number>(0);
 
-  const menuItems = [
-    {title: 'Edit profile', link: '/profile/edit'},
-    {title: 'List new property', link: '/property/add'},
-    {title: ' Check reviews ', link: '/property/edit'},
-    {title: 'Become an Agent', link: '/profile/become-agent'},
-    {title: 'FAQ', link: '/profile/faq'},
-  ];
+  const [showStats, setShowStats]                 = useState(true);
+  const [activeTab, setActiveTab]                 = useState<ActiveTab>("Listings");
+  const [showSettingsMenu, setShowSettingsMenu]   = useState(false);
+  const [userSettings, setUserSettings]           = useState<UserSettingsType | null>(null);
+  const [isReplyPop, setIsReplyPop]               = useState(false);
+  const [isConfirmPop, setIsConfirmPop]           = useState(false);
+  const [pendingDeleteId, setPendingDeleteId]     = useState<string | null>(null);
+  const [replyReview, setReplyReview]             = useState<ReviewType | null>(null);
+  const [totalProperties, setTotalProperties]     = useState(0);
 
+  // ── Scroll-collapse stats ──────────────────────────────────────────────
   useEffect(() => {
-    const onScroll = () => {
-      setShowStats(window.scrollY <= 20); // only show near top
-    };
-
+    const onScroll = () => setShowStats(window.scrollY <= 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  
-  // Load user Settings
+  // ── Load user settings ─────────────────────────────────────────────────
   useEffect(() => {
     if (!authUser) return;
-    
-    // Fetch existing user settings if needed
-    const fetchUserSettings = async () => {
-      try {
-        // fetching user settings logic
-        const settings = await getUserSettings();
-        if (!settings) {
-          logger.warn("unable to fetch user settings")
-          return;
-        }
-
-        setUserSettings(settings);          
-
-      } catch (err) {
-        logger.error('Error fetching user settings', err);
-      }
-    };
-
-    if (authUser) {
-      fetchUserSettings();
-    }
+    getUserSettings()
+      .then((s) => { if (s) setUserSettings(s); })
+      .catch(() => {});
   }, [authUser]);
 
-  // Load properties
-  // useEffect(() => {
-  //   if (!authUser || loadingProperties) return;
-
-  //   setLoadingProperties(true);
-
-  //   const fetchListedProp = async () => {      
-  //     try {
-  //     const properties = await getUserListedProp();
-
-  //     setListedProperties(properties);
-  //     } catch (error) {
-  //       logger.error("❌ Error fetching listed properties:", error);
-  //     } finally {
-  //       setLoadingProperties(false)
-  //     }
-  //   }
-
-  //   fetchListedProp()
-  // }, [authUser])
-
-
-  const handleDelete = async (id: string) => {
-    const res = await deleteUserProperty(id);
-    if (!res.success) {
-      logger.error("Error deleting property:", res.message);
-      toast.error("Failed to delete property");
-      return;
-    }
-    const updatedProperties = listedProperties.filter((prop:any) => prop._id !== id);
-    // setListedProperties(updatedProperties);
-    toast.success("Property deleted successfully");
-    return
-  };
-
-  const showReply = (review: ReviewType)=>{
-    setIsReplyPop(!isReplyPop)
-    setReplyReview(review)
-  }
-
-  // Listed properties lazy loading
+  // ── Infinite scroll: listed properties ────────────────────────────────
   const {
     items: listedProperties,
     loading: loadingProp,
     hasMore: hasMoreProp,
-    setObserverTarget: setPropObserverTarget
+    setObserverTarget: setPropObserverTarget,
   } = useInfiniteCursorScroll({
     fetcher: async (cursor, signal): Promise<CursorResponse<PropertyType[]>> => {
-      const res = await getUserListedProp(
-        { cursor },
-        { signal }
-      );
-
-      if (!res) {
-        return {
-          items: [],
-          nextCursor: null
-        };
-      }
-
-      setTotalProperties(res.totalProperties)
-
-      return {
-        items: res.properties,
-        nextCursor: res.nextCursor
-      };
+      const res = await getUserListedProp({ cursor }, { signal });
+      if (!res) return { items: [], nextCursor: null };
+      setTotalProperties(res.totalProperties);
+      return { items: res.properties, nextCursor: res.nextCursor };
     },
-    
     enabled: true,
     isMissingRequired: authUser === null,
-    deps: [authUser]
+    deps: [authUser],
   });
 
-  // Sent Reviews lazy loading
-  const {
-    items: sentReviews,
-    loading: loadingsSent,
-    hasMore: hasMoreSent,
-    setObserverTarget
-  } = useInfiniteCursorScroll({
-    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyReviewType>> => {
-      const res = await getPropertyUserReviewApi(
-        { sentCursor: cursor },
-        { signal }
-      );
-
-      if (!res) {
-        return {
-          items: [],
-          nextCursor: null
-        };
-      }
-
-      return {
-        items: res.sent.reviews,
-        nextCursor: res.sent.nextCursor
-      };
-    },
-    
-    enabled: true,
-    isMissingRequired: authUser === null
-  });
-
-  // Received Reviews lazy loading
+  // ── Infinite scroll: received reviews ─────────────────────────────────
   const {
     items: receivedReviews,
     loading: loadingReceived,
     hasMore: hasMoreReceived,
-    setObserverTarget: setReceivedObserverTarget
+    setObserverTarget: setReceivedObserverTarget,
   } = useInfiniteCursorScroll({
-    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyReviewType>> => {
-      const res = await getPropertyUserReviewApi(
-        { receivedCursor: cursor },
-        { signal }
-      );
-
-      if (!res) {
-        return {
-          items: [],
-          nextCursor: null
-        };
-      }
-
-      return {
-        items: res.received.reviews,
-        nextCursor: res.received.nextCursor
-      };
+    fetcher: async (cursor, signal): Promise<CursorResponse<ReviewType[]>> => {
+      const res = await getPropertyUserReviewApi({ receivedCursor: cursor }, { signal });
+      if (!res) return { items: [], nextCursor: null };
+      return { items: res.received.reviews, nextCursor: res.received.nextCursor };
     },
     enabled: true,
-    isMissingRequired: authUser === null
-
+    isMissingRequired: authUser === null,
   });
 
-  if (!authUser) {
-    return <Splash showFooter={true} />;
-  }
+  // ── Infinite scroll: sent reviews ─────────────────────────────────────
+  const {
+    items: sentReviews,
+    loading: loadingsSent,
+    hasMore: hasMoreSent,
+    setObserverTarget,
+  } = useInfiniteCursorScroll({
+    fetcher: async (cursor, signal): Promise<CursorResponse<ReviewType[]>> => {
+      const res = await getPropertyUserReviewApi({ sentCursor: cursor }, { signal });
+      if (!res) return { items: [], nextCursor: null };
+      return { items: res.sent.reviews, nextCursor: res.sent.nextCursor };
+    },
+    enabled: true,
+    isMissingRequired: authUser === null,
+  });
 
+  // ── Delete handlers ────────────────────────────────────────────────────
+  const requestDelete = (id: string) => {
+    setPendingDeleteId(id);
+    setIsConfirmPop(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    const res = await deleteUserProperty(pendingDeleteId);
+    setIsConfirmPop(false);
+    setPendingDeleteId(null);
+    if (!res.success) {
+      toast.error("Failed to delete property");
+      return;
+    }
+    toast.success("Property deleted successfully");
+  };
+
+  const showReply = (review: ReviewType) => {
+    setReplyReview(review);
+    setIsReplyPop(true);
+  };
+
+  // ── Gate ────────────────────────────────────────────────────────────────
+  if (!authUser) return <Splash showFooter />;
+
+  // ── Tab counts ──────────────────────────────────────────────────────────
+  const tabCounts: Record<ActiveTab, number> = {
+    Listings:        listedProperties.length,
+    receivedReviews: receivedReviews.length,
+    sentReviews:     sentReviews.length,
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
   return (
-  <>
-    <div className="px-6 pb-24">
-      <header
-        className="fixed top-0 left-0 right-0 z-50 md:max-w-[650px] mx-auto bg-gradient-to-r from-gray-200 via-gray-100 to-gray-300"
-      >
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-6 py-4">
-          <BackButton />
+    <>
+      <div className="px-4 pb-24 bg-[#f5f7f9] min-h-screen">
 
-          <h1 className="text-xl font-bold truncate">
-            {userSettings?.brand || authUser?.display_name || "Profile"}
-          </h1>
-
-          <button
-            className="flex items-center gap-2 p-2 rounded-full"
-            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-          >
-            <div className="bg-white w-10 h-10 rounded-full p-0.5">
-              <Image
-                src={userSettings?.image || "/logo.png"}
-                height={40}
-                width={40}
-                alt="profile"
-                className="rounded-full w-full h-full object-cover"
-              />
-            </div>
-
-            <MdMenu size={22} />
-          </button>
-        </div>
-
-        {/* Status count — COLLAPSING */}
-        <div
-          className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
-            showStats ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-          }`}
+        {/* ── Sticky teal hero header ──────────────────────────────────── */}
+        <header
+          className="fixed top-0 left-0 right-0 z-50 md:max-w-[650px] mx-auto"
+          style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}
         >
-          <div className="px-6 pb-3 shadow-md">
-            <div className="grid grid-cols-3 gap-6 text-center shadow-sm rounded-lg p-3">
-              <div className={statusCountStyle}>
-                <p className="font-bold">{totalProperties}</p>
-                <p className="text-gray-500 text-sm">Properties</p>
-              </div>
+          {/* Top bar */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <BackButton />
 
-              <div className={statusCountStyle}>
-                <p className="font-bold">{4.5}</p>
-                <p className="text-gray-500 text-sm">Ratings</p>
-              </div>
-
-              <div className={statusCountStyle}>
-                <p className="font-bold">{25}</p>
-                <p className="text-gray-500 text-sm">Reviews</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs & action */}
-        <div className="px-6 pb-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-lg font-medium">
-              <span className="font-bold mr-1">
-                {receivedOrSent === "Listings"
-                  ? listedProperties.length
-                  : receivedOrSent === "receivedReviews"
-                  ? receivedReviews.length
-                  : sentReviews.length}
-              </span>
-              {receivedOrSent}
+            <p
+              className="font-extrabold text-white text-[16px] truncate"
+              style={{ fontFamily: "'Raleway', sans-serif" }}
+            >
+              {userSettings?.brand || authUser.display_name || "Profile"}
             </p>
 
-            <Link
-              href="/property/add"
-              className="text-sm bg-primary text-white px-3 py-2 rounded-md shadow"
-            >
-              Add Property
-            </Link>
-          </div>
-
-          {/* Toggle */}
-          <div className="flex bg-gray-200 rounded-full p-1">
-            {["Listings", "receivedReviews", "sentReviews"].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setReceivedOrSent(tab as any)}
-                className={`flex-1 py-2 rounded-full text-sm transition ${
-                  receivedOrSent === tab
-                    ? "bg-white text-primary font-medium"
-                    : "text-gray-600"
-                }`}
-              >
-                {tab === "Listings"
-                  ? "Listings"
-                  : tab === "receivedReviews"
-                  ? "Received"
-                  : "Sent"}
-              </button>
-            ))}
-          </div>
-        </div>
-      </header>
-
-      <div className="h-[300px]" />
-      {/* Listed Property  */}
-      {receivedOrSent==='Listings' &&  <section>
-        {!loadingProp && listedProperties.length === 0 && (
-          <p className="text-gray-500">No listed propery yet.</p>
-        )}
-
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {listedProperties.map((item: any, index: number) => {
-            const isLast = index === listedProperties.length - 1;
-      
-            return (
-              <div
-                key={item._id}
-                ref={isLast ? setPropObserverTarget : undefined}
-                className="relative group rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
-              >
-
-              {/* Property Card */}
-              <VerticalCard
-                id={item._id}
-                name={item.title}
-                price={item.price}
-                currency={item.currency}
-                category={item.category || ""}
-                address={item.address}
-                image={item.banner}
-                period={item.period || ""}
-                listed_for={item.listed_for || ""}
-                rating={item.average_rating}
-                expired={new Date(item.expired_by) < new Date()}
-              />
-              
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div className="flex items-center gap-4 bg-white/90 rounded-full px-5 py-3 shadow-lg backdrop-blur-md">
-                  {/* Preview */}
-                  <Link
-                    href={`/property/details/${item._id}`}
-                    aria-label="Preview Property"
-                    className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-indigo-600 transition-all duration-200"
-                  >
-                    <FaEye size={18} />
-                  </Link>
-
-                  {/* Edit */}
-                  <Link
-                  href={`/property/edit/${item._id}`}
-                  aria-label="Edit Property"
-                  className="p-3 rounded-full text-gray-700 hover:bg-gray-100 hover:text-green-600 transition-all duration-200"
-                  >
-                    <FaEdit size={18} />
-                  </Link>
-
-                  {/* Delete */}
-                  <button
-                    aria-label="Delete Property"
-                    onClick={() => handleDelete(item._id)}
-                    className="p-3 rounded-full text-red-600 hover:bg-gray-100 hover:text-red-700 transition-all duration-200"
-                  >
-                    <FaTrash size={18} />
-                  </button>
-                </div>
-              </div>            
-            </div>)             
-          })}
-
-          {loadingProp &&
-            Array.from({ length: 4 }).map((_, i) => (
-              <VerticalPropertyCardSkeleton key={i} />
-            ))
-          }
-          {!hasMoreProp && <p>No more listed properties</p>}
-        </div>
-      </section>}
-      
-      {/* User properties Reviews */}
-      {receivedOrSent==='receivedReviews' && <section>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between m-4">
-            <p className="text-lg mb-4 font-[Raleway]">
-              <span className="font-bold mr-1">
-                {receivedReviews.length}
-              </span> 
-              Reviews
-            </p>
-          </div>
-
-          {receivedReviews.length===0 && (
-            <p className="text-gray-500 m-4">No reviews yet.</p>
-          )}
-          
-          <div className="space-y-6 px-4">
-            {receivedReviews.map((review: any, index: number) => {
-              const isLast = index === receivedReviews.length - 1;
-
-              return (
-                <div
-                  key={review._id}
-                  ref={isLast ? setReceivedObserverTarget : undefined}
-                >
-                  <ReviewCard
-                    review={review}
-                    showReply={showReply}
-                    showPropDetails={true}
-                  />
-                </div> 
-              )             
-            })}
-          </div>
-          
-          {loadingReceived &&
-            Array.from({ length: 2 }).map((_, i) => (
-              <ReviewCardSkeleton key={i} showPropDetails />
-            ))
-          }
-
-          {!hasMoreReceived && <p>No more reviews</p>}
-        </div>
-      </section>}
-      
-      {/* User sent reviews  */}
-      {receivedOrSent==='sentReviews' && <section>
-        <div className="flex items-center justify-between m-4">
-          <p className="text-lg mb-4 font-[Raleway]">
-            <span className="font-bold mr-1">
-              {sentReviews.length}
-            </span> 
-            Reviews
-          </p>
-        </div>
-
-        {sentReviews.length===0 && (
-          <p className="text-gray-500 m-4">No reviews yet.</p>
-        )}
-
-        <div className="space-y-6 px-4">
-          {sentReviews.map((review: any, index: number) => {
-              const isLast = index === sentReviews.length - 1;
-
-            return (
-              <div
-                key={review._id}
-                ref={isLast ? setObserverTarget : undefined}
-              >
-                <ReviewCard
-                  review={review}
-                  showReply={showReply}
-                  showPropDetails={true}
-                />                
-              </div> 
-            )             
-          })}
-
-          {loadingsSent &&
-            Array.from({ length: 2 }).map((_, i) => (
-              <ReviewCardSkeleton key={i} showPropDetails />
-            ))
-          }
-          
-          {!hasMoreSent && <p>No more reviews</p>}
-        </div>
-      </section>}
-    </div>
-
-    {/* User Admin Popup */}
-    <Popup
-      header="User Administration"
-      toggle={showSettingsMenu}
-      setToggle={setShowSettingsMenu}
-      useMask={true}
-      hideReset={true}
-    >
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm w-full max-w-md mx-auto">
-        {/* Menu */}
-        <div>
-          <div className="flex flex-col items-center mb-2">
-            <div className="bg-white w-32 h-32 rounded-full p-1 mt-4">
-              <Image
-                src={userSettings?.image || "/logo.png"}
-                height={32}
-                width={32}
-                alt="profile"
-                className="rounded-full w-full h-full object-cover"
-              />                    
-            </div>                    
-            <div className="-mt-4 ml-12">
-              <span className="bg-green text-white text-xs px-2 py-1 rounded-full">
-                #1
-              </span>
-            </div>
-          </div>
-          <h2 className="font-bold text-2xl text-center">{userSettings?.brand || authUser?.display_name}</h2>
-          <p className="text-gray-500 mb-3 text-center">{userSettings?.email}</p>
-        </div>
-
-        <nav role="menu" aria-label="User settings" className="divide-y">
-          <ul className="px-2 py-2 space-y-1">
-            {menuItems.map((item, index) => (
-              <li key={index}>
-                <Link
-                  href={item.link}
-                  role="menuitem"
-                  tabIndex={0}
-                  onClick={() => setShowSettingsMenu(false)}
-                  className="block w-full text-left px-3 py-2 rounded-md text-primary shadow-sm hover:bg-primary hover:text-secondary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 transition"
-                >
-                  {item.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* Actions */}
-          <div className="px-3 py-3 bg-gray-50 flex items-center gap-3 justify-end">
-            <Link
-              href="/profile/edit"
-              onClick={() => setShowSettingsMenu(false)}
-              className="px-3 py-2 rounded-md bg-white border text-sm hover:text-white hover:bg-primary"
-            >
-              Manage account
-            </Link>
-
+            {/* Avatar + menu button */}
             <button
-              type="button"
-              onClick={() => setShowSettingsMenu(false)}
-              className="px-3 py-2 rounded-md bg-red-600 text-sm text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              onClick={() => setShowSettingsMenu(true)}
+              className="flex items-center gap-2 rounded-full
+                         bg-white/15 border border-white/25 pl-1 pr-3 py-1"
             >
-              Close
+              <div
+                className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border-2"
+                style={{ borderColor: "#f0a500" }}
+              >
+                <Image
+                  src={userSettings?.image || "/logo.png"}
+                  width={32} height={32}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <SlMenu size={14} className="text-white" />
             </button>
           </div>
+
+          {/* Collapsible stats grid */}
+          <div
+            className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
+              showStats ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="grid grid-cols-3 gap-2 px-4 pb-3">
+              {[
+                { val: totalProperties, lbl: "Properties"    },
+                { val: "4.9",           lbl: "Rating",  gold: true },
+                { val: 25,              lbl: "Reviews"         },
+              ].map((s) => (
+                <div
+                  key={s.lbl}
+                  className="text-center rounded-xl py-2.5 px-2"
+                  style={{
+                    background: "rgba(255,255,255,0.12)",
+                    border: "1.5px solid rgba(255,255,255,0.2)",
+                    backdropFilter: "blur(4px)",
+                  }}
+                >
+                  <p
+                    className="font-extrabold text-[20px] leading-none"
+                    style={{
+                      color: s.gold ? "#f0a500" : "white",
+                      fontFamily: "'Montserrat', sans-serif",
+                    }}
+                  >
+                    {s.val}
+                  </p>
+                  <p className="text-[10px] text-white/70 mt-1 font-medium">{s.lbl}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab sub-header */}
+          <div className="px-4 pb-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-white font-bold text-sm">
+                <span className="text-[#f0a500] mr-1">{tabCounts[activeTab]}</span>
+                {TABS.find((t) => t.key === activeTab)?.label}
+              </p>
+              <Link
+                href="/property/add"
+                className="text-[12px] font-bold px-3 py-1.5 rounded-lg"
+                style={{ background: "#f0a500", color: "#143d4d" }}
+              >
+                + Add Property
+              </Link>
+            </div>
+
+            {/* Tab pills */}
+            <div
+              className="flex rounded-full p-[3px]"
+              style={{ background: "rgba(0,0,0,0.2)" }}
+            >
+              {TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex-1 py-1.5 rounded-full text-[12px] font-semibold
+                              transition-all duration-200
+                              ${activeTab === tab.key
+                                ? "bg-white text-[#1e5f74] font-bold"
+                                : "text-white/60"
+                              }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </header>
+
+        {/* Spacer for fixed header */}
+        <div className={`${showStats ? "h-[220px]" : "h-[130px]"} transition-all duration-300`} />
+
+        {/* ── Listings tab ─────────────────────────────────────────────── */}
+        {activeTab === "Listings" && (
+          <section>
+            {!loadingProp && listedProperties.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-4xl mb-3">🏠</p>
+                <p className="font-bold text-[#111827]">No listings yet</p>
+                <p className="text-sm text-[#9ca3af] mt-1">Add your first property to get started</p>
+                <Link
+                  href="/property/add"
+                  className="inline-block mt-4 px-5 py-2.5 rounded-xl text-sm font-bold text-white"
+                  style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
+                >
+                  + List Property
+                </Link>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+              {listedProperties.map((item: PropertyType, index: number) => {
+                const isLast = index === listedProperties.length - 1;
+                return (
+                  <div
+                    key={item._id}
+                    ref={isLast ? setPropObserverTarget : undefined}
+                    className="relative group rounded-2xl overflow-hidden"
+                  >
+                    <VerticalCard
+                      id={item._id}
+                      name={item.title}
+                      price={item.price}
+                      currency={item.currency}
+                      category={item.category ?? ""}
+                      address={item.address}
+                      image={item.banner}
+                      period={item.period ?? ""}
+                      listed_for={item.listed_for ?? ""}
+                      rating={item.average_rating ?? 4.9}
+                      expired={new Date(item.expired_by ?? new Date()) < new Date()}
+                    />
+
+                    {/* Hover overlay with action buttons */}
+                    <div
+                      className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100
+                                 transition-opacity duration-300 flex items-center justify-center
+                                 rounded-2xl"
+                    >
+                      <div
+                        className="flex items-center gap-2 rounded-full px-4 py-2.5
+                                   shadow-lg backdrop-blur-sm"
+                        style={{ background: "rgba(255,255,255,0.92)" }}
+                      >
+                        <Link
+                          href={`/property/details/${item._id}`}
+                          className="w-8 h-8 rounded-full flex items-center justify-center
+                                     bg-[#e0f0f5] text-[#1e5f74]
+                                     hover:bg-[#1e5f74] hover:text-white transition-colors"
+                          aria-label="Preview"
+                        >
+                          <FaEye size={14} />
+                        </Link>
+                        <Link
+                          href={`/property/edit/${item._id}`}
+                          className="w-8 h-8 rounded-full flex items-center justify-center
+                                     bg-[#dcfce7] text-[#16a34a]
+                                     hover:bg-[#16a34a] hover:text-white transition-colors"
+                          aria-label="Edit"
+                        >
+                          <FaEdit size={14} />
+                        </Link>
+                        <button
+                          onClick={() => requestDelete(item._id)}
+                          className="w-8 h-8 rounded-full flex items-center justify-center
+                                     bg-[#fee2e2] text-[#ef4444]
+                                     hover:bg-[#ef4444] hover:text-white transition-colors"
+                          aria-label="Delete"
+                        >
+                          <FaTrash size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {loadingProp &&
+                Array.from({ length: 4 }).map((_, i) => (
+                  <VerticalPropertyCardSkeleton key={i} />
+                ))
+              }
+            </div>
+
+            {!hasMoreProp && listedProperties.length > 0 && (
+              <p className="text-center text-sm text-[#9ca3af] mt-6 py-2">
+                You've seen all your listings
+              </p>
+            )}
+          </section>
+        )}
+
+        {/* ── Received reviews tab ─────────────────────────────────────── */}
+        {activeTab === "receivedReviews" && (
+          <section>
+            {receivedReviews.length === 0 && !loadingReceived && (
+              <div className="text-center py-12">
+                <p className="text-4xl mb-3">⭐</p>
+                <p className="font-bold text-[#111827]">No reviews yet</p>
+                <p className="text-sm text-[#9ca3af] mt-1">Reviews from tenants will appear here</p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {receivedReviews.map((review: ReviewType, index: number) => {
+                const isLast = index === receivedReviews.length - 1;
+                return (
+                  <div key={review._id} ref={isLast ? setReceivedObserverTarget : undefined}>
+                    <ReviewCard
+                      review={review}
+                      showReply={showReply}
+                      showPropDetails
+                    />
+                  </div>
+                );
+              })}
+
+              {loadingReceived &&
+                Array.from({ length: 2 }).map((_, i) => (
+                  <ReviewCardSkeleton key={i} showPropDetails />
+                ))
+              }
+
+              {!hasMoreReceived && receivedReviews.length > 0 && (
+                <p className="text-center text-sm text-[#9ca3af] py-2">
+                  No more reviews
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ── Sent reviews tab ─────────────────────────────────────────── */}
+        {activeTab === "sentReviews" && (
+          <section>
+            {sentReviews.length === 0 && !loadingsSent && (
+              <div className="text-center py-12">
+                <p className="text-4xl mb-3">✍️</p>
+                <p className="font-bold text-[#111827]">No reviews sent yet</p>
+                <p className="text-sm text-[#9ca3af] mt-1">Your property reviews will appear here</p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {sentReviews.map((review: ReviewType, index: number) => {
+                const isLast = index === sentReviews.length - 1;
+                return (
+                  <div key={review._id} ref={isLast ? setObserverTarget : undefined}>
+                    <ReviewCard review={review} showReply={showReply} showPropDetails />
+                  </div>
+                );
+              })}
+
+              {loadingsSent &&
+                Array.from({ length: 2 }).map((_, i) => (
+                  <ReviewCardSkeleton key={i} showPropDetails />
+                ))
+              }
+
+              {!hasMoreSent && sentReviews.length > 0 && (
+                <p className="text-center text-sm text-[#9ca3af] py-2">
+                  No more reviews
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {/* ── Settings / user menu popup ─────────────────────────────────── */}
+      <Popup
+        header=""
+        toggle={showSettingsMenu}
+        setToggle={setShowSettingsMenu}
+        useMask
+        hideReset
+      >
+        {/* User info */}
+        <div className="flex items-center gap-4 pb-4 mb-2 border-b border-[#e5e7eb]">
+          <div
+            className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden border-[3px]"
+            style={{ borderColor: "#f0a500", boxShadow: "0 2px 12px rgba(240,165,0,0.3)" }}
+          >
+            <Image
+              src={userSettings?.image || "/logo.png"}
+              width={64} height={64}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="min-w-0">
+            <p
+              className="font-extrabold text-[17px] text-[#111827] truncate"
+              style={{ fontFamily: "'Raleway', sans-serif" }}
+            >
+              {userSettings?.brand || authUser.display_name}
+            </p>
+            <p className="text-[12px] text-[#9ca3af] truncate mt-0.5">{userSettings?.email}</p>
+            <span
+              className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold
+                         bg-[#fef3cd] text-[#c88400] px-2 py-0.5 rounded-full
+                         border border-[rgba(240,165,0,0.3)]"
+            >
+              🏆 Top Agent #1
+            </span>
+          </div>
+        </div>
+
+        {/* Menu items */}
+        <nav className="flex flex-col gap-0.5 my-2">
+          {MENU_ITEMS.map((item) => (
+            <Link
+              key={item.link}
+              href={item.link}
+              onClick={() => setShowSettingsMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#e0f0f5] transition-colors"
+            >
+              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center
+                              text-[15px] flex-shrink-0 bg-[#e0f0f5] text-[#1e5f74]">
+                {item.icon}
+              </div>
+              <span className="text-[13px] font-semibold text-[#111827]">{item.title}</span>
+            </Link>
+          ))}
         </nav>
-      </div>
 
-    </Popup>
+        {/* Footer */}
+        <div className="flex gap-2 pt-3 border-t border-[#e5e7eb] mt-1">
+          <Link
+            href="/profile/edit"
+            onClick={() => setShowSettingsMenu(false)}
+            className="flex-1 py-2.5 rounded-xl text-center text-[13px] font-bold
+                       bg-[#e0f0f5] text-[#1e5f74]"
+          >
+            ⚙️ Manage Account
+          </Link>
+          <button
+            type="button"
+            onClick={() => setShowSettingsMenu(false)}
+            className="flex-1 py-2.5 rounded-xl text-[13px] font-bold bg-[#fee2e2] text-[#ef4444]"
+          >
+            ✕ Close
+          </button>
+        </div>
+      </Popup>
 
-    {/* Reply Review Popup */}
-    {replyReview && <Popup
-      header="Reply Review"
-      toggle={isReplyPop}
-      setToggle={setIsReplyPop}
-      useMask={true}
-      hideReset={true}
-    >
-      <ReplyReview review={replyReview} />
-    </Popup>}
+      {/* ── Reply review popup ───────────────────────────────────────────── */}
+      {replyReview && (
+        <Popup header="Reply to Review" toggle={isReplyPop} setToggle={setIsReplyPop} useMask hideReset>
+          <ReplyReview review={replyReview} />
+        </Popup>
+      )}
 
-    <Popup
-      header="Confirm Delete"
-      toggle={isConfirmPop}
-      setToggle={setIsConfirmPop}
-      useMask={true}
-      hideReset={true}
-    >
-      <div>
-        <button>Close</button>
-        <button className="bg-red">Confirm</button>
-      </div>
-    </Popup>
-  </>
-  
-);
-};
-
+      {/* ── Confirm delete popup ─────────────────────────────────────────── */}
+      <Popup header="Delete Property" toggle={isConfirmPop} setToggle={setIsConfirmPop} useMask hideReset>
+        <div className="text-center py-2">
+          <p className="text-4xl mb-3">⚠️</p>
+          <p className="font-bold text-[#111827] text-[16px]">Are you sure?</p>
+          <p className="text-sm text-[#9ca3af] mt-1 mb-6">
+            This property will be permanently deleted. This action cannot be undone.
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => { setIsConfirmPop(false); setPendingDeleteId(null); }}
+              className="flex-1 py-3 rounded-xl text-[13px] font-bold bg-[#f3f4f6] text-[#4b5563]"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={confirmDelete}
+              className="flex-1 py-3 rounded-xl text-[13px] font-bold bg-[#ef4444] text-white"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </Popup>
+    </>
+  );
+}

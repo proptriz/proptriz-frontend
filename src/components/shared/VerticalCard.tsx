@@ -12,15 +12,15 @@ const formatDistance = (distance?: string | number): string | null => {
 
 const CURRENCY_SYMBOL: Record<CurrencyEnum, string> = {
   [CurrencyEnum.naira]:   "₦",
-  [CurrencyEnum.dollars]: "$",
-  [CurrencyEnum.pounds]:  "£",
-  [CurrencyEnum.euros]:   "€",
+  [CurrencyEnum.dollar]: "$",
+  [CurrencyEnum.pound]:  "£",
+  [CurrencyEnum.euro]:   "€",
 };
 
 const LISTED_FOR_STYLES: Record<string, string> = {
-  rent:       "text-[#1a7a4a] border-[#c6e8d5] bg-white",
-  sale:       "text-[#2563eb] border-[#dbeafe] bg-white",
-  commercial: "text-[#7c3aed] border-[#ede9fe] bg-white",
+  rent:       "text-[#1e5f74] border-[#b8dde8] bg-white",
+  sale:       "text-[#143d4d] border-[#e0f0f5] bg-[#e0f0f5]",
+  commercial: "text-[#c88400] border-[#fef3cd] bg-[#fef3cd]",
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -81,13 +81,13 @@ export const VerticalCard = ({
         <div className="absolute bottom-2 left-2 flex items-center gap-1
                         bg-black/55 backdrop-blur-[2px] text-white
                         text-[10px] font-medium px-2 py-1 rounded-md leading-none">
-          <span className="text-[#f5a623]">★</span>
+          <span className="text-[#f0a500]">★</span>
           {rating} · {category}
         </div>
 
         {/* Bottom-right: distance */}
         {distLabel && (
-          <span className="absolute bottom-2 right-2 bg-[#1a7a4a]/90 text-white
+          <span className="absolute bottom-2 right-2 bg-[#1e5f74]/90 text-white
                            text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none">
             {distLabel}
           </span>
@@ -100,7 +100,7 @@ export const VerticalCard = ({
         <div className="flex items-baseline gap-1">
           <span
             className={`text-[15px] font-extrabold ${
-              expired ? "text-red-500" : "text-[#1a7a4a]"
+              expired ? "text-red-500" : "text-[#1e5f74]"
             }`}
           >
             {symbol}{formatPrice(price)}

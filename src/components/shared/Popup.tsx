@@ -148,7 +148,7 @@ export default function Popup({
         onTouchEnd={handleTouchEnd}
       >
         {/* Gradient accent strip */}
-        <div className="h-1 bg-gradient-to-r from-[#1a7a4a] via-[#2ea06a] to-[#f5a623]" />
+        <div className="h-1 bg-gradient-to-r from-[#143d4d] via-[#1e5f74] to-[#f0a500]" />
 
         {/* Scrollable body */}
         <div className="bg-white h-[calc(100vh-150px)] overflow-y-auto overscroll-contain px-5 pb-8">
@@ -173,9 +173,9 @@ export default function Popup({
                     onClick={onReset}
                     className="
                       px-3.5 py-1.5 rounded-full
-                      bg-[#e8f5ee] text-[#1a7a4a]
+                      bg-[#e0f0f5] text-[#1e5f74]
                       text-xs font-semibold
-                      hover:bg-[#d1ead9] transition-colors
+                      hover:bg-[#b8dde8] transition-colors
                       flex items-center gap-1
                     "
                   >

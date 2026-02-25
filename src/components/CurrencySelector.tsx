@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { CurrencyEnum } from "@/types/property";
+import { CurrencyEnum } from "../types/property";
 
 interface CurrencySelectorProps {
   value: CurrencyEnum;
   onChange: (val: CurrencyEnum) => void;
 }
 
-const CURRENCY_OPTIONS: { key: string; value: CurrencyEnum; label: string }[] = [
-  { key: "naira", value: CurrencyEnum.naira, label: "Naira (₦)" },
-  { key: "dollars", value: CurrencyEnum.dollars, label: "Dollar ($)" },
-  { key: "euros", value: CurrencyEnum.euros, label: "Euro (€)" },
-  { key: "pounds", value: CurrencyEnum.pounds, label: "Pound (£)" },
+const CURRENCY_OPTIONS = [
+  { value: CurrencyEnum.naira,  label: "Naira (₦)"  },
+  { value: CurrencyEnum.dollar, label: "Dollar ($)" },
+  { value: CurrencyEnum.euro,   label: "Euro (€)"   },
+  { value: CurrencyEnum.pound,  label: "Pound (£)"  },
 ];
 
 export default function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
@@ -21,9 +21,7 @@ export default function CurrencySelector({ value, onChange }: CurrencySelectorPr
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -34,10 +32,11 @@ export default function CurrencySelector({ value, onChange }: CurrencySelectorPr
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 bg-[#1a7a4a] text-white rounded-[10px]
-                   px-3.5 py-[11px] text-sm font-semibold whitespace-nowrap"
+        className="flex items-center gap-1.5 text-white rounded-xl
+                   px-3.5 py-[11px] text-sm font-bold whitespace-nowrap"
+        style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
       >
-        {value} <span className="text-xs">▾</span>
+        {value} <span className="text-[10px] opacity-80">▾</span>
       </button>
 
       {open && (
@@ -45,12 +44,15 @@ export default function CurrencySelector({ value, onChange }: CurrencySelectorPr
                         rounded-xl shadow-xl z-50 overflow-hidden min-w-[140px]">
           {CURRENCY_OPTIONS.map((opt) => (
             <button
-              key={opt.key}
+              key={opt.value}
               type="button"
               onClick={() => { onChange(opt.value); setOpen(false); }}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-colors
-                          hover:bg-[#e8f5ee] hover:text-[#1a7a4a]
-                          ${value === opt.value ? "bg-[#e8f5ee] text-[#1a7a4a] font-semibold" : "text-[#4b5563]"}`}
+              className="w-full text-left px-4 py-2.5 text-sm transition-colors"
+              style={value === opt.value
+                ? { background: "#e0f0f5", color: "#1e5f74", fontWeight: 700 }
+                : { color: "#4b5563" }}
+              onMouseEnter={(e) => { if (value !== opt.value) { (e.currentTarget as HTMLButtonElement).style.background = "#e0f0f5"; (e.currentTarget as HTMLButtonElement).style.color = "#1e5f74"; } }}
+              onMouseLeave={(e) => { if (value !== opt.value) { (e.currentTarget as HTMLButtonElement).style.background = ""; (e.currentTarget as HTMLButtonElement).style.color = "#4b5563"; } }}
             >
               {opt.label}
             </button>

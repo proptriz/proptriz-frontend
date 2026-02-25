@@ -99,9 +99,9 @@ export interface UserSettingsType {
 
 export enum CurrencyEnum {
   naira = "NGN",
-  dollars="USD",
-  pounds = "GBP",
-  euros = "EUR",
+  dollar="USD",
+  pound = "GBP",
+  euro = "EUR",
 }
 
 export enum CategoryEnum {
@@ -123,7 +123,7 @@ export enum RenewalEnum {
   monthly = "monthly",
   yearly = "yearly",
   daily = "daily",
-  weekely = "weekly"
+  weekly = "weekly"
 }
 
 export enum NegotiableEnum {
@@ -208,41 +208,6 @@ export interface AgentType {
   status: string; // (available, unavilable)
   social_handles: {}[];
 };
-
-export interface PropertyReviewType {
-  id: string;
-  rating: number; // Rating score (0.0 to 5.0)
-  comment?: string; // user review text (optional)
-  review_giver: string; // Foreing key referencing userId
-  property: string; // Foreing key referencing property under review
-  images?: string[]; // URLs of reviewer upload (optional)
-  review_date: Date; // (auto)
-};
-
-export interface AgentReviewType {
-  id: string;
-  rating: number; // Rating score (0.0 to 5.0)
-  comment?: string; // user review text (optional)
-  review_giver: string; // Foreing key referencing userId
-  review_receiver: string; // Foreing key referencing property under review
-  images?: string[]; // URLs of reviewer upload (optional)
-  review_date: Date; // (auto)
-};
-
-export interface LandmarkType {
-  id: string;
-  title: string // what the landmark is called
-  property: string; // Foreing key referencing property
-  image?: string,
-  distance: number; // how far from referenced property (in km)
-  position_description: string, // derived from LocationProps
-  map_location?: {
-    type: 'Point';
-    coordinates: [number, number];
-  };
-  created_at: Date;
-  updated_at: Date
-}
 
 export type PaymentDataType = {
   amount: number;

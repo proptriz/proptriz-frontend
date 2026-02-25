@@ -5,9 +5,9 @@ import formatPrice from '@/utils/formatPrice';
 
 const currencySymbol: Record<CurrencyEnum, string> = {
   [CurrencyEnum.naira]: "₦",
-  [CurrencyEnum.dollars]: "$",
-  [CurrencyEnum.pounds]: "£",
-  [CurrencyEnum.euros]: "€",
+  [CurrencyEnum.dollar]: "$",
+  [CurrencyEnum.pound]: "£",
+  [CurrencyEnum.euro]: "€",
 };
 
 

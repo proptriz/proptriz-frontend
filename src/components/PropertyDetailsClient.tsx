@@ -6,7 +6,7 @@ import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft, FaRegHeart, FaStar } from "react-icons/fa";
-import { PropertyStatusEnum, PropertyType, ReviewType } from "@/types";
+import { PropertyType, ReviewType } from "@/types";
 import Link from "next/link";
 import { getCollocatedProperties } from "@/services/propertyApi";
 import Price from "@/components/shared/Price";
@@ -17,6 +17,7 @@ import ShareButton from "./ShareButton";
 import { getPropertyReviewsApi } from "@/services/reviewApi";
 import Popup from "./shared/Popup";
 import { AddReview } from "./AddReview";
+import { PropertyStatusEnum } from "@/types/property";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -94,7 +95,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
     return (
       <div className="flex items-center justify-center h-screen bg-[#f7f8fa]">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-[#e5e7eb] border-t-[#1a7a4a]
+          <div className="w-10 h-10 border-4 border-[#e0f0f5] border-t-[#1e5f74]
                           rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-[#4b5563]">Loading property…</p>
         </div>
@@ -110,7 +111,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
         <p className="text-sm text-[#9ca3af] text-center">{error}</p>
         <button
           onClick={() => router.back()}
-          className="mt-2 px-5 py-2.5 rounded-xl bg-[#1a7a4a] text-white text-sm font-bold"
+          className="mt-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold" style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
         >
           Go Back
         </button>
@@ -147,7 +148,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                        hover:bg-gray-50 transition-colors"
             aria-label="Back"
           >
-            ←
+            <FaArrowLeft className="text-[#4b5563] text-sm" />
           </button>
 
           {/* Top-right actions */}
@@ -169,11 +170,11 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
           <div className="absolute bottom-4 left-4 flex items-center gap-2 z-10">
             <div className="flex items-center gap-1.5 bg-black/55 backdrop-blur-[3px]
                             text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-              <FaStar className="text-[#f5a623]" />
+              <FaStar className="text-[#f0a500]" />
               {property.average_rating} · {property.category}
             </div>
             {property.listed_for && (
-              <span className="bg-[#f5a623] text-[#111] text-[11px] font-extrabold
+              <span className="bg-[#f0a500] text-[#111] text-[11px] font-extrabold
                                px-3 py-1.5 rounded-full capitalize">
                 For {property.listed_for}
               </span>
@@ -207,21 +208,21 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
 
           {/* Meta row: updated date + availability status */}
           <div className="flex items-center justify-between">
-            {property.updatedAt && <p className="text-sm text-[#9ca3af]">
-              Updated {formatDate(property.updatedAt.toString())}
-            </p>}
-            <span 
+            <p className="text-[11px] text-[#9ca3af]">
+              Updated {formatDate(property.updatedAt?.toString())}
+            </p>
+            <span
               className={`text-[11px] font-bold px-3 py-1 rounded-full border-[1.5px]
-                          ${property.status === PropertyStatusEnum.available
-                            ? "bg-[#e8f5ee] text-[#1a7a4a] border-[rgba(26,122,74,0.2)]"
+                          ${property.status === "available"
+                            ? "bg-[#e0f0f5] text-[#1e5f74] border-[rgba(30,95,116,0.25)]"
                             : property.status === PropertyStatusEnum.unavailable
                             ? "bg-red-50 text-red-500 border-red-200"
                             : "bg-amber-50 text-amber-600 border-amber-200"
                           }`}
             >
-              {property.status === PropertyStatusEnum.available ? "✅ Available"
+              {property.status === "available" ? "✅ Available"
                : property.status === PropertyStatusEnum.unavailable ? "❌ Unavailable"
-               :                                  "⏳ "+ PropertyStatusEnum[property.status]}
+               :                                  "⏳ " + property.status.charAt(0).toUpperCase() + property.status.slice(1)}
             </span>
           </div>
 
@@ -255,7 +256,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                 <div
                   key={i}
                   className="flex items-center gap-1.5 flex-shrink-0
-                             bg-[#e8f5ee] text-[#1a7a4a] border border-[rgba(26,122,74,0.2)]
+                             bg-[#e0f0f5] text-[#1e5f74] border border-[rgba(30,95,116,0.2)]
                              px-3 py-1.5 rounded-full text-[12px] font-semibold"
                 >
                   <span>{getFeatureEmoji(feat.name)}</span>
@@ -269,7 +270,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
           <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
             <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-2
                           flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1a7a4a] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
               Description
             </p>
             <PropertyDescription description={property.description} />
@@ -282,7 +283,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
               {/* SVG map visual — no /map-image.png dependency */}
               <div
                 className="h-[110px] relative flex items-center justify-center"
-                style={{ background: "linear-gradient(160deg,#1a3a2a,#0f2d1f)" }}
+                style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}
               >
                 <svg
                   className="absolute inset-0 w-full h-full opacity-15"
@@ -295,8 +296,8 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                   <line x1="144" y1="0" x2="144" y2="110" stroke="white" strokeWidth=".8"/>
                   <line x1="216" y1="0" x2="216" y2="110" stroke="white" strokeWidth=".8"/>
                   <line x1="288" y1="0" x2="288" y2="110" stroke="white" strokeWidth=".8"/>
-                  <path d="M0 55 Q90 42 180 58 Q270 72 360 50" stroke="#2ea06a" strokeWidth="4" fill="none" opacity=".5"/>
-                  <path d="M144 0 Q158 55 146 110" stroke="#2ea06a" strokeWidth="3" fill="none" opacity=".4"/>
+                  <path d="M0 55 Q90 42 180 58 Q270 72 360 50" stroke="#f0a500" strokeWidth="4" fill="none" opacity=".5"/>
+                  <path d="M144 0 Q158 55 146 110" stroke="#f0a500" strokeWidth="3" fill="none" opacity=".4"/>
                 </svg>
                 <span className="text-3xl relative z-10 drop-shadow-lg">📍</span>
               </div>
@@ -310,7 +311,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                     </p>
                   )}
                 </div>
-                <span className="text-[#1a7a4a] font-bold text-sm">→</span>
+                <span className="text-[#1e5f74] font-bold text-sm">→</span>
               </div>
             </div>
           </Link>
@@ -319,14 +320,14 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
           <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
             <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
                           flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1a7a4a] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
               Reviews
             </p>
 
             {/* Summary card */}
             <div
               className="rounded-xl p-3 flex items-center gap-3 mb-3"
-              style={{ background: "linear-gradient(135deg,#1a7a4a,#2ea06a)" }}
+              style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
             >
               <div>
                 <p className="text-[28px] font-extrabold text-white leading-none">
@@ -337,7 +338,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                     <FaStar
                       key={i}
                       className={i < Math.round(property.average_rating ?? 0)
-                        ? "text-[#f5a623]"
+                        ? "text-[#f0a500]"
                         : "text-white/30"}
                       size={12}
                     />
@@ -372,7 +373,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                 </div>
                 <Link
                   href={`/property/reviews/${propertyId}`}
-                  className="text-[12px] font-bold text-[#1a7a4a] block text-right mt-2"
+                  className="text-[12px] font-bold text-[#1e5f74] block text-right mt-2"
                 >
                   View all {reviews.length} reviews →
                 </Link>
@@ -385,7 +386,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
             <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
               <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
                             flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1a7a4a] inline-block" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
                 Nearby Properties
               </p>
               <div className="grid grid-cols-2 gap-3">

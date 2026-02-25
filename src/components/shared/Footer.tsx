@@ -40,14 +40,15 @@ const Footer: React.FC = () => {
               className="flex-1 flex flex-col items-center justify-center
                          gap-1 py-2.5 relative transition-colors duration-150
                          focus-visible:outline-none focus-visible:ring-2
-                         focus-visible:ring-[#1a7a4a] focus-visible:ring-inset"
+                         focus-visible:ring-[#1e5f74] focus-visible:ring-inset"
               aria-current={isActive ? "page" : undefined}
             >
               {/* Active top indicator bar */}
               {isActive && (
                 <span
                   className="absolute top-0 left-1/2 -translate-x-1/2
-                             w-5 h-[3px] rounded-b-full bg-[#1a7a4a]"
+                             w-5 h-[3px] rounded-b-full"
+                  style={{ background: "#f0a500" }}
                 />
               )}
 
@@ -63,7 +64,7 @@ const Footer: React.FC = () => {
               <span
                 className={`text-[10px] font-medium leading-none transition-colors
                             ${isActive
-                              ? "text-[#1a7a4a] font-bold"
+                              ? "text-[#1e5f74] font-bold"
                               : "text-[#9ca3af]"
                             }`}
               >

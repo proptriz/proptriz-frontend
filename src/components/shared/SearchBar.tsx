@@ -69,10 +69,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <>
-      <div className="w-full relative">
+      <div className="w-full md:max-w-[75%] lg:max-w-[50%] mx-auto lg:ml-0 relative">
 
         {/* ── Search bar ──────────────────────────────────────────────────── */}
-        <div className="flex items-center bg-white/95 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.14)]
+        <div className="flex items-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.14)]
                         px-3 py-2 gap-2">
           {/* Search icon */}
           <FiSearch className="text-[#9ca3af] flex-shrink-0" size={15} />
@@ -101,15 +101,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold
                         transition-all duration-200 flex-shrink-0
                         ${togglePopup
-                          ? "bg-[#1a7a4a] text-white"
-                          : "bg-[#e8f5ee] text-[#1e5f74] hover:bg-[#d1f0e0]"
+                          ? "text-white"
+                          : "bg-[#e0f0f5] text-[#1e5f74] hover:bg-[#b8dde8]"
                         }`}
+            style={togglePopup ? { background: "linear-gradient(135deg,#143d4d,#1e5f74)" } : undefined}
             aria-label="Open filters"
           >
             <LuSlidersHorizontal size={13} />
             Filter
             {activeFilterCount > 0 && (
-              <span className="min-w-[16px] h-4 rounded-full bg-[#f5a623] text-[#111]
+              <span className="min-w-[16px] h-4 rounded-full bg-[#f0a500] text-[#111]
                                text-[9px] font-extrabold flex items-center justify-center px-1">
                 {activeFilterCount}
               </span>
@@ -120,10 +121,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <button
             type="button"
             onClick={() => { onSearch(); setShowRecentSearch(false); }}
-            className="w-9 h-9 rounded-xl bg-[#1e5f74] flex items-center justify-center
+            className="w-9 h-9 rounded-xl flex items-center justify-center
                        text-white flex-shrink-0
-                       hover:bg-[#2ea06a] hover:shadow-[0_4px_14px_rgba(26,122,74,0.4)]
+                       hover:shadow-[0_4px_14px_rgba(30,95,116,0.4)]
                        transition-all duration-200"
+            style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
             aria-label="Search"
           >
             <FiSearch size={15} strokeWidth={2.5} />

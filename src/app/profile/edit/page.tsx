@@ -2,8 +2,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@/context/AppContextProvider';
-import { FaUser, FaEnvelope } from 'react-icons/fa';
-import { FaPencil } from 'react-icons/fa6';
+import { FaUser, FaEnvelope, FaCamera } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { UserSettingsType, UserTypeEnum } from '@/types';
 import ToggleCollapse from '@/components/shared/ToggleCollapse';
@@ -12,20 +11,32 @@ import Image from 'next/image';
 import { EmailInput, SelectInput, TextInput } from '@/components/shared/Input';
 import { PhoneInput } from '@/components/shared/PhoneInput';
 import Splash from '@/components/shared/Splash';
+import { BackButton } from '@/components/shared/buttons';
+
+// ─── Brand palette ────────────────────────────────────────────────────────────
+// Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
+// ─────────────────────────────────────────────────────────────────────────────
+
+const USER_TYPE_META: Record<string, { label: string; emoji: string; desc: string }> = {
+  [UserTypeEnum.Individual]: { label: "Individual",   emoji: "🏠", desc: "Personal property owner" },
+  [UserTypeEnum.Agent]:      { label: "Agent",        emoji: "🤝", desc: "Licensed property agent" },
+  company:                   { label: "Company",      emoji: "🏢", desc: "Real estate company" },
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
 
-  const [photo, setPhoto]                       = useState<File | undefined>();
-  const [existingPhotoUrl, setExistingPhotoUrl] = useState("/logo.png");
-  const [formData, setFormData]                 = useState<Partial<UserSettingsType>>({});
-  const [phone, setPhone]                       = useState("");
-  const [normalizedPhone, setNormalizedPhone]   = useState<string | null>(null);
-  const [whatsapp, setWhatsapp]                 = useState("");
+  const [photo, setPhoto]                           = useState<File | undefined>();
+  const [existingPhotoUrl, setExistingPhotoUrl]     = useState("/logo.png");
+  const [formData, setFormData]                     = useState<Partial<UserSettingsType>>({});
+  const [phone, setPhone]                           = useState("");
+  const [normalizedPhone, setNormalizedPhone]       = useState<string | null>(null);
+  const [whatsapp, setWhatsapp]                     = useState("");
   const [normalizedWhatsapp, setNormalizedWhatsapp] = useState<string | null>(null);
-  const [isLoading, setIsLoading]               = useState(false);
+  const [isLoading, setIsLoading]                   = useState(false);
+  const [photoPreview, setPhotoPreview]             = useState<string | null>(null);
 
   // ── Fetch existing settings ─────────────────────────────────────────────
   useEffect(() => {
@@ -66,7 +77,8 @@ const EditProfile = () => {
       return;
     }
     setPhoto(file);
-    toast.success("Profile photo selected");
+    setPhotoPreview(URL.createObjectURL(file));
+    toast.success("Photo selected — save to apply.");
   };
 
   const handleSubmit = async () => {
@@ -74,8 +86,8 @@ const EditProfile = () => {
       setIsLoading(true);
       formData.phone    = normalizedPhone ?? "";
       formData.whatsapp = normalizedWhatsapp ?? "";
-      const updated = addOrUpdateUserSettings(formData, photo);
-      // if (updated) toast.success("Profile updated successfully!");
+      await addOrUpdateUserSettings(formData, photo);
+      toast.success("Profile updated successfully!");
     } catch {
       toast.error("Failed to update profile.");
     } finally {
@@ -86,34 +98,81 @@ const EditProfile = () => {
   // ── Gate ─────────────────────────────────────────────────────────────────
   if (!authUser) return <Splash showFooter />;
 
+  const displayName  = formData.brand || authUser.display_name || "Your Name";
+  const displayEmail = formData.email || authUser.primary_email || "";
+  const userTypeMeta = USER_TYPE_META[formData.user_type ?? UserTypeEnum.Individual];
+
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="pb-8 bg-[#f5f7f9] min-h-screen">
+    <div className="pb-10 min-h-screen" style={{ background: "#f5f7f9" }}>
 
-      {/* ── Hero with avatar ─────────────────────────────────────────── */}
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <div
-        className="flex flex-col items-center px-4 pt-14 pb-6"
-        style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}
+        className="relative flex flex-col items-center px-4 pt-12 pb-8"
+        style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 100%)" }}
       >
-        {/* Avatar with gold ring + pencil */}
-        <div className="relative">
-          <div
-            className="w-24 h-24 rounded-full p-[3px] bg-white"
-            style={{ boxShadow: "0 4px 20px rgba(240,165,0,0.4), 0 0 0 4px rgba(240,165,0,0.2)" }}
+        {/* Decorative background rings */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+          <div style={{
+            position: "absolute", top: -60, right: -60,
+            width: 200, height: 200, borderRadius: "50%",
+            border: "1px solid rgba(240,165,0,0.12)",
+          }} />
+          <div style={{
+            position: "absolute", top: -20, right: -20,
+            width: 110, height: 110, borderRadius: "50%",
+            border: "1px solid rgba(240,165,0,0.08)",
+          }} />
+          <div style={{
+            position: "absolute", bottom: -40, left: -40,
+            width: 160, height: 160, borderRadius: "50%",
+            border: "1px solid rgba(255,255,255,0.06)",
+          }} />
+        </div>
+
+        {/* ── Top bar: back button + title ─────────────────────────────── */}
+        <div className="absolute top-4 left-0 right-0 flex items-center px-4 z-20">
+          <BackButton />
+          <p
+            className="absolute left-1/2 -translate-x-1/2 text-white/90
+                       text-[13px] font-bold tracking-wide"
+            style={{ fontFamily: "'Raleway', sans-serif" }}
           >
-            <div className="w-full h-full rounded-full overflow-hidden relative">
+            Edit Profile
+          </p>
+        </div>
+
+        {/* ── Avatar ───────────────────────────────────────────────────── */}
+        <div className="relative mt-6 z-10">
+          {/* Gold halo glow */}
+          <div style={{
+            position: "absolute", inset: -5, borderRadius: "50%",
+            background: "linear-gradient(135deg,#f0a500,#f8cc66)",
+            opacity: 0.3,
+          }} />
+
+          {/* White border + photo */}
+          <div style={{
+            width: 96, height: 96, borderRadius: "50%",
+            padding: 3, background: "white", position: "relative",
+            boxShadow: "0 6px 24px rgba(240,165,0,0.45), 0 0 0 4px rgba(240,165,0,0.18)",
+          }}>
+            <div style={{
+              width: "100%", height: "100%",
+              borderRadius: "50%", overflow: "hidden", position: "relative",
+            }}>
               <Image
-                src={photo ? URL.createObjectURL(photo) : existingPhotoUrl}
+                src={photoPreview ?? existingPhotoUrl}
                 fill
                 sizes="96px"
-                alt="Profile"
+                alt="Profile photo"
                 className="object-cover"
               />
             </div>
           </div>
 
-          {/* Invisible file input overlay */}
-          <label className="absolute inset-0 rounded-full cursor-pointer z-10">
+          {/* Camera upload overlay */}
+          <label className="absolute inset-0 rounded-full cursor-pointer z-10 flex items-end justify-end" title="Change photo">
             <input
               type="file"
               name="image"
@@ -121,35 +180,53 @@ const EditProfile = () => {
               className="sr-only"
               onChange={handleUpload}
             />
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center
+                         shadow-lg pointer-events-none"
+              style={{ background: "#f0a500", border: "2.5px solid white", marginBottom: 2, marginRight: 2 }}
+            >
+              <FaCamera className="text-white" size={12} />
+            </div>
           </label>
+        </div>
 
-          {/* Pencil badge */}
-          <div
-            className="absolute bottom-1 right-1 w-7 h-7 rounded-full flex items-center
-                       justify-center pointer-events-none z-20
-                       shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
-            style={{ background: "#f0a500" }}
+        {/* ── Name + badge ─────────────────────────────────────────────── */}
+        <div className="text-center mt-3 z-10">
+          <p
+            className="text-white font-extrabold text-[19px] tracking-tight leading-none"
+            style={{ fontFamily: "'Raleway', sans-serif" }}
           >
-            <FaPencil className="text-white" size={11} />
+            {displayName}
+          </p>
+
+          {displayEmail && (
+            <p className="text-white/60 text-[12px] mt-1">{displayEmail}</p>
+          )}
+
+          <div
+            className="inline-flex items-center gap-1.5 mt-2.5 px-3 py-1 rounded-full text-[11px] font-bold"
+            style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.85)" }}
+          >
+            <span>{userTypeMeta?.emoji}</span>
+            <span>{userTypeMeta?.label ?? "Member"}</span>
           </div>
         </div>
 
-        <p
-          className="text-white font-extrabold text-[18px] mt-3 tracking-tight"
-          style={{ fontFamily: "'Raleway', sans-serif" }}
-        >
-          {formData.brand || authUser.display_name || "Your Name"}
-        </p>
-        <p className="text-white/70 text-[12px] mt-0.5">
-          {formData.email || authUser.primary_email || ""}
-        </p>
+        {/* Curve separator into content */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-5 bg-[#f5f7f9]"
+          style={{ borderRadius: "28px 28px 0 0" }}
+        />
       </div>
 
-      {/* ── Form sections ────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-3 px-4 pt-4">
+      {/* ── Form sections ─────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 px-4 pt-3">
 
-        {/* Identity card */}
-        <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
+        {/* Identity */}
+        <div
+          className="bg-white rounded-2xl border border-[#e5e7eb] p-4"
+          style={{ boxShadow: "0 2px 12px rgba(30,95,116,0.06)" }}
+        >
           <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]
                         flex items-center gap-1.5 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
@@ -166,7 +243,7 @@ const EditProfile = () => {
               placeholder="Enter your full name or brand"
             />
             <SelectInput
-              label="Register as"
+              label="Account Type"
               value={formData.user_type ?? UserTypeEnum.Individual}
               onChange={onChange}
               name="user_type"
@@ -175,11 +252,17 @@ const EditProfile = () => {
                 value: t,
               }))}
             />
+            {userTypeMeta?.desc && (
+              <p className="text-[11px] text-[#9ca3af] pl-1 -mt-1">{userTypeMeta.desc}</p>
+            )}
           </div>
         </div>
 
-        {/* Contact details (collapsible) */}
-        <div className="bg-white rounded-2xl border border-[#e5e7eb] overflow-hidden">
+        {/* Contact */}
+        <div
+          className="bg-white rounded-2xl border border-[#e5e7eb] overflow-hidden"
+          style={{ boxShadow: "0 2px 12px rgba(30,95,116,0.06)" }}
+        >
           <ToggleCollapse header="📞 Contact Details" open>
             <div className="space-y-3 px-4 pb-4">
               <EmailInput
@@ -210,30 +293,34 @@ const EditProfile = () => {
           </ToggleCollapse>
         </div>
 
-        {/* Submit */}
+        {/* Save */}
         <button
           type="button"
           disabled={isLoading || !authUser}
           onClick={handleSubmit}
           className="w-full py-4 rounded-2xl text-white text-[15px] font-bold
-                     flex items-center justify-center gap-2
-                     transition-all duration-200 mt-2
+                     flex items-center justify-center gap-2.5
+                     transition-all duration-200 mt-1 active:scale-[0.98]
                      disabled:opacity-60 disabled:cursor-not-allowed"
           style={{
             background: "linear-gradient(135deg,#143d4d,#1e5f74)",
-            boxShadow: "0 4px 18px rgba(30,95,116,0.35)",
+            boxShadow: "0 4px 20px rgba(30,95,116,0.38)",
+            fontFamily: "'Raleway', sans-serif",
           }}
         >
           {isLoading ? (
             <>
-              <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin flex-shrink-0" />
               Updating…
             </>
           ) : (
-            "✓ Update Profile"
+            <>✓ Save Changes</>
           )}
         </button>
 
+        <p className="text-center text-[11px] text-[#9ca3af] pb-2">
+          Your information is only visible to parties you engage with.
+        </p>
       </div>
     </div>
   );

@@ -14,22 +14,31 @@ export enum ListForEnum {
 }
 
 export enum CurrencyEnum {
-  naira = "₦",
-  dollars = "$",
-  euros = "€",
-  pounds = "£",
+  naira = "NGN",
+  dollar="USD",
+  pound = "GBP",
+  euro = "EUR",
 }
 
+// export enum CurrencyEnum {
+//   naira = "₦",
+//   dollar = "$",
+//   euro = "€",
+//   pound = "£",
+// }
+
 export enum RenewalEnum {
-  weekly = "weekly",
   monthly = "monthly",
   yearly = "yearly",
+  daily = "daily",
+  weekly = "weekly"
 }
 
 export enum PropertyStatusEnum {
   available = "available",
-  reserved = "reserved",
-  taken = "taken",
+  sold = "sold",
+  rented = "rented",
+  unavailable = "unavailable",
   expired = "expired",
 }
 

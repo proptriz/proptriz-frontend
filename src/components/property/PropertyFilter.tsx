@@ -35,14 +35,14 @@ const getBudgetPresets = (listedFor: string, priceMax: number) => {
   ];
 };
 
-const CATEGORY_OPTIONS: { value: CategoryEnum; icon: string; label: string }[] = [
-  { value: CategoryEnum.house, icon: "🏠", label: "Apartment" },
-  { value: CategoryEnum.land, icon: "🏢", label: "Land" },
-  { value: CategoryEnum.hotel, icon: "🏪", label: "Hotel" },
-  { value: CategoryEnum.shortlet, icon: "🏡", label: "Shortlet" },
-  { value: CategoryEnum.office, icon: "🏘️", label: "Office" },
-  { value: CategoryEnum.shop, icon: "🏨", label: "Shop" },
-  { value: CategoryEnum.others, icon: "🏨", label: "Others" },
+const CATEGORIES: { label: string; value: CategoryEnum; icon: string }[] = [
+  { label: "House",    value: CategoryEnum.house,    icon: "🏠" },
+  { label: "Land",     value: CategoryEnum.land,     icon: "🏘️" },
+  { label: "Shortlet", value: CategoryEnum.shortlet, icon: "🌙" },
+  { label: "Hotel",    value: CategoryEnum.hotel,    icon: "🏨" },
+  { label: "Shop",     value: CategoryEnum.shop,     icon: "🏪" },
+  { label: "Office",   value: CategoryEnum.office,   icon: "🏢" },
+  { label: "Others",   value: CategoryEnum.others,   icon: "•••" },
 ];
 
 const LIST_FOR_OPTIONS = [
@@ -92,13 +92,13 @@ const stripNonDigit = (v: string) =>
 function MapThumb({ lat, lng }: { lat: number; lng: number }) {
   return (
     <div className="w-14 h-10 rounded-lg overflow-hidden flex-shrink-0 relative"
-         style={{ background: "linear-gradient(135deg,#1a3a2a,#0f2d1f)" }}>
+         style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}>
       <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 56 40" preserveAspectRatio="none">
         <line x1="0" y1="13" x2="56" y2="13" stroke="white" strokeWidth=".7"/>
         <line x1="0" y1="27" x2="56" y2="27" stroke="white" strokeWidth=".7"/>
         <line x1="18" y1="0" x2="18" y2="40" stroke="white" strokeWidth=".7"/>
         <line x1="38" y1="0" x2="38" y2="40" stroke="white" strokeWidth=".7"/>
-        <path d="M0 22 Q15 18 28 23 Q42 28 56 20" stroke="#2ea06a" strokeWidth="1.5" fill="none" opacity=".6"/>
+        <path d="M0 22 Q15 18 28 23 Q42 28 56 20" stroke="#f0a500" strokeWidth="1.5" fill="none" opacity=".6"/>
       </svg>
       <span className="relative z-10 flex items-center justify-center h-full text-base">📍</span>
     </div>
@@ -108,14 +108,14 @@ function MapThumb({ lat, lng }: { lat: number; lng: number }) {
 /** Active filter tag chip */
 function FilterTag({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 bg-[#e8f5ee] border border-[rgba(26,122,74,0.2)]
-                     text-[#1a7a4a] text-[11px] font-semibold px-2.5 py-1 rounded-full">
+    <span className="inline-flex items-center gap-1 bg-[#e0f0f5] border border-[rgba(30,95,116,0.2)]
+                     text-[#1e5f74] text-[11px] font-semibold px-2.5 py-1 rounded-full">
       {label}
       <button
         type="button"
         onClick={onRemove}
-        className="w-4 h-4 rounded-full bg-[rgba(26,122,74,0.2)] flex items-center justify-center
-                   hover:bg-[#1a7a4a] hover:text-white transition-colors"
+        className="w-4 h-4 rounded-full bg-[rgba(30,95,116,0.2)] flex items-center justify-center
+                   hover:bg-[#1e5f74] hover:text-white transition-colors"
       >
         <FiX size={9} strokeWidth={3} />
       </button>
@@ -300,8 +300,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
 
         <div className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl
                         px-3.5 py-2.5 transition-all duration-200
-                        focus-within:border-[#1a7a4a] focus-within:bg-white
-                        focus-within:shadow-[0_0_0_3px_rgba(26,122,74,0.1)]">
+                        focus-within:border-[#1e5f74] focus-within:bg-white
+                        focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]">
           <FiMapPin className="text-[#9ca3af] flex-shrink-0" size={15} />
           <input
             value={locationQuery}
@@ -323,14 +323,14 @@ const PropertyFilter: React.FC<FilterProps> = ({
         {/* Loading state */}
         {loadingLocation && (
           <div className="flex items-center gap-1.5 text-[11px] text-[#9ca3af] mt-1.5">
-            <div className="w-2.5 h-2.5 border-2 border-[#e5e7eb] border-t-[#1a7a4a] rounded-full animate-spin" />
+            <div className="w-2.5 h-2.5 border-2 border-[#e5e7eb] border-t-[#1e5f74] rounded-full animate-spin" />
             Searching location…
           </div>
         )}
 
         {/* Result card */}
         {locationResult && !loadingLocation && (
-          <div className="mt-2 bg-[#e8f5ee] border border-[rgba(26,122,74,0.2)] rounded-xl p-3
+          <div className="mt-2 bg-[#e0f0f5] border border-[rgba(30,95,116,0.2)] rounded-xl p-3
                           flex items-center gap-3">
             <MapThumb lat={locationResult.lat} lng={locationResult.lng} />
             <div className="flex-1 min-w-0">
@@ -346,8 +346,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
             <button
               type="button"
               onClick={() => { setLocationResult(null); setLocationQuery(""); }}
-              className="w-6 h-6 rounded-full bg-[rgba(26,122,74,0.15)] flex items-center justify-center
-                         hover:bg-[#1a7a4a] hover:text-white text-[#1a7a4a] transition-colors flex-shrink-0"
+              className="w-6 h-6 rounded-full bg-[rgba(30,95,116,0.15)] flex items-center justify-center
+                         hover:bg-[#1e5f74] hover:text-white text-[#1e5f74] transition-colors flex-shrink-0"
             >
               <FiX size={11} strokeWidth={3} />
             </button>
@@ -361,7 +361,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
           🏷️ Property Type
         </p>
         <div className="grid grid-cols-4 gap-1.5">
-          {CATEGORY_OPTIONS.map((cat) => (
+          {CATEGORIES.map((cat) => (
             <button
               key={cat.value}
               type="button"
@@ -369,8 +369,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
               className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border-[1.5px]
                           text-[10px] font-medium transition-all duration-200 cursor-pointer
                           ${filters.propertyType === cat.value
-                            ? "border-[#1a7a4a] bg-[#e8f5ee] text-[#1a7a4a] font-bold"
-                            : "border-[#e5e7eb] text-[#4b5563] bg-[#f9fafb] hover:border-[#2ea06a]"
+                            ? "border-[#1e5f74] bg-[#e0f0f5] text-[#1e5f74] font-bold"
+                            : "border-[#e5e7eb] text-[#4b5563] bg-[#f9fafb] hover:border-[#1e5f74]"
                           }`}
             >
               <span className="text-lg leading-none">{cat.icon}</span>
@@ -386,22 +386,26 @@ const PropertyFilter: React.FC<FilterProps> = ({
           🔑 Listed For
         </p>
         <div className="flex gap-1.5">
-          {LIST_FOR_OPTIONS.map((opt) => (
+          {LIST_FOR_OPTIONS.map((opt) => {
+            const listedActive = filters.listedFor === opt.value;
+            return (
             <button
               key={opt.value}
               type="button"
               onClick={() => setFilters((f) => ({ ...f, listedFor: opt.value }))}
               className={`flex-1 py-2.5 rounded-xl border-[1.5px] text-[13px] font-medium
                           transition-all duration-200
-                          ${filters.listedFor === opt.value
-                            ? "bg-[#1a7a4a] text-white border-[#1a7a4a] font-bold"
-                            : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#2ea06a]"
+                          ${listedActive
+                            ? "text-white border-[#1e5f74] font-bold"
+                            : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#1e5f74]"
                           }`}
+              style={listedActive ? { background: "linear-gradient(135deg,#143d4d,#1e5f74)" } : undefined}
             >
               <span className="mr-1">{opt.icon}</span>
               {opt.label}
             </button>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -428,8 +432,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
                 className={`px-3 py-1.5 rounded-full text-[11px] border-[1.5px] font-medium
                             transition-all duration-200
                             ${active
-                              ? "bg-[#f5a623] border-[#f5a623] text-[#111] font-bold"
-                              : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#2ea06a]"
+                              ? "bg-[#f0a500] border-[#f0a500] text-[#111] font-bold"
+                              : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#1e5f74]"
                             }`}
               >
                 {p.label}
@@ -453,8 +457,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
               key={field.label}
               className="bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl px-3 py-2.5
                          transition-all duration-200
-                         focus-within:border-[#1a7a4a] focus-within:bg-white
-                         focus-within:shadow-[0_0_0_3px_rgba(26,122,74,0.1)]"
+                         focus-within:border-[#1e5f74] focus-within:bg-white
+                         focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]"
             >
               <p className="text-[9px] font-bold text-[#9ca3af] uppercase tracking-[0.5px]">
                 {field.label}
@@ -474,7 +478,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
         {/* Summary */}
         <div className="mt-2.5 bg-[#f9fafb] rounded-lg px-3 py-2 flex items-center gap-1.5 text-[11px] text-[#4b5563]">
           🎯 Showing:{" "}
-          <span className="font-bold text-[#1a7a4a]">
+          <span className="font-bold text-[#1e5f74]">
             ₦{formatNum(filters.price[0])} —{" "}
             {filters.price[1] >= PRICE_MAX ? "No limit" : `₦${formatNum(filters.price[1])}`}
           </span>
@@ -488,8 +492,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
         </p>
         <div className="flex items-start gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl
                         px-3.5 py-3 transition-all duration-200
-                        focus-within:border-[#1a7a4a] focus-within:bg-white
-                        focus-within:shadow-[0_0_0_3px_rgba(26,122,74,0.1)]">
+                        focus-within:border-[#1e5f74] focus-within:bg-white
+                        focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]">
           <FiSearch className="text-[#9ca3af] flex-shrink-0 mt-0.5" size={14} />
           <input
             value={filters.description}
@@ -517,11 +521,11 @@ const PropertyFilter: React.FC<FilterProps> = ({
         <button
           type="submit"
           className="flex-1 py-3.5 rounded-xl font-bold text-sm text-white
-                     bg-gradient-to-br from-[#1a7a4a] to-[#2ea06a]
                      flex items-center justify-center gap-2
-                     shadow-[0_4px_16px_rgba(26,122,74,0.35)]
-                     hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(26,122,74,0.45)]
+                     shadow-[0_4px_16px_rgba(30,95,116,0.35)]
+                     hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(30,95,116,0.45)]
                      transition-all duration-200"
+          style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
         >
           <FiSearch size={15} strokeWidth={2.5} />
           {resultCount !== undefined

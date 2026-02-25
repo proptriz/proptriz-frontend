@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useContext, useEffect, useState } from "react";
-import { BackButton } from "@/components/shared/buttons";
+import { BackButton } from "@/components/shared/BackButton";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import Link from "next/link";
 import { AppContext } from "../../context/AppContextProvider";
-import { CursorResponse, PropertyReviewType, PropertyType, ReviewType, UserSettingsType } from "@/types";
+import { CursorResponse, PropertyType, ReviewType, UserSettingsType } from "@/types";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -310,7 +310,7 @@ export default function ProfileTransaction() {
                       period={item.period ?? ""}
                       listed_for={item.listed_for ?? ""}
                       rating={item.average_rating ?? 4.9}
-                      expired={new Date(item.expired_by ?? new Date()) < new Date()}
+                      expired={new Date(item.expired_by ?? "1970-01-01") < new Date()}
                     />
 
                     {/* Hover overlay with action buttons */}
@@ -336,8 +336,8 @@ export default function ProfileTransaction() {
                         <Link
                           href={`/property/edit/${item._id}`}
                           className="w-8 h-8 rounded-full flex items-center justify-center
-                                     bg-[#dcfce7] text-[#16a34a]
-                                     hover:bg-[#16a34a] hover:text-white transition-colors"
+                                     bg-[#e0f0f5] text-[#1e5f74]
+                                     hover:bg-[#1e5f74] hover:text-white transition-colors"
                           aria-label="Edit"
                         >
                           <FaEdit size={14} />

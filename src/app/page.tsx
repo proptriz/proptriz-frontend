@@ -161,8 +161,7 @@ export default function ExplorePage() {
 
         {/* Search bar — overlaid on the map at the top */}
         <div className="absolute top-0 left-0 right-0 z-[500] px-4 pt-3 pb-2">
-          <div className="
-                           mx-auto max-w-[480px]">
+          <div className="mx-auto max-w-[480px]">
             <SearchBar
               value={searchInput}
               onChange={setSearchInput}
@@ -174,7 +173,7 @@ export default function ExplorePage() {
 
         {/* Category tabs — below search, still above map */}
         <div className="absolute top-[64px] left-0 right-0 z-[499] px-4">
-          <div className="backdrop-blur-sm rounded-xl
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl
                           shadow-[0_2px_10px_rgba(0,0,0,0.1)] px-2 py-1 mx-auto max-w-[480px]">
             <NavigationTabs onChange={setCategory} value={category} />
           </div>
@@ -190,60 +189,8 @@ export default function ExplorePage() {
           onMarkerClick={(property: PropertyType) => setSelectedProperty(property)}
         />
 
-        {/* Selected property peek card */}
-        {selectedProperty && (
-          <div className="absolute bottom-[70px] left-4 right-4 z-[500]
-                          bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)]
-                          p-3 flex items-center gap-3
-                          animate-in slide-in-from-bottom-4 duration-200">
-            {/* Property image */}
-            <div
-              className="w-16 h-16 rounded-xl bg-cover bg-center flex-shrink-0
-                         bg-[#e8f5ee]"
-              style={{
-                backgroundImage: selectedProperty.banner
-                  ? `url(${selectedProperty.banner})`
-                  : undefined,
-              }}
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-[14px] font-extrabold text-[#1a7a4a]">
-                {selectedProperty.currency === "NGN" ? "₦" : ""}
-                {selectedProperty.price?.toLocaleString()}
-                {selectedProperty.period && (
-                  <span className="text-[10px] font-normal text-[#9ca3af]">
-                    /{selectedProperty.period}
-                  </span>
-                )}
-              </p>
-              <p className="text-[12px] font-semibold text-[#111827] truncate">
-                {selectedProperty.title}
-              </p>
-              <p className="text-[10px] text-[#9ca3af] truncate flex items-center gap-1">
-                📍 {selectedProperty.address}
-              </p>
-            </div>
-            <div className="flex flex-col gap-1.5 flex-shrink-0">
-              <Link
-                href={`/property/details/${selectedProperty._id}?slug=${selectedProperty.slug}`}
-                className="bg-[#1a7a4a] text-white text-[11px] font-bold
-                           px-3 py-1.5 rounded-lg text-center"
-              >
-                View
-              </Link>
-              <button
-                type="button"
-                onClick={() => setSelectedProperty(null)}
-                className="text-[11px] text-[#9ca3af] text-center"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* ── Floating action buttons ──────────────────────────────────── */}
-        <div className="absolute bottom-[72px] right-4 z-[500] flex flex-col gap-2">
+        <div className="absolute bottom-[72px] right-4 z-[300] flex flex-col gap-2">
           {/* Locate me */}
           <button
             onClick={onLocateMe}
@@ -254,19 +201,20 @@ export default function ExplorePage() {
                        hover:shadow-lg transition-shadow
                        disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FiNavigation size={16} className="text-[#1a7a4a]" />
+            <FiNavigation size={16} className="text-[#1e5f74]" />
           </button>
         </div>
 
         {/* ── List property button ─────────────────────────────────────── */}
-        <div className="absolute bottom-[72px] left-4 z-[500]">
+        <div className="absolute bottom-[72px] left-4 z-[400]">
           <Link
             href="/property/add"
-            className="inline-flex items-center gap-1.5 bg-primary text-white
+            className="inline-flex items-center gap-1.5 text-white
                        text-[13px] font-bold px-4 py-2.5 rounded-xl
-                       shadow-[0_4px_14px_rgba(26,122,74,0.4)]
-                       hover:shadow-[0_6px_18px_rgba(26,122,74,0.5)]
+                       shadow-[0_4px_14px_rgba(30,95,116,0.4)]
+                       hover:shadow-[0_6px_18px_rgba(30,95,116,0.5)]
                        transition-shadow"
+                style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
           >
             ＋ List Property
           </Link>

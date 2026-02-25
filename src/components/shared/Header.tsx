@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import React, { useContext, useState } from "react";
-import { IoClose } from "react-icons/io5";
 import { SlMenu } from "react-icons/sl";
 import Popup from "./Popup";
 import { AppContext } from "@/context/AppContextProvider";
 import Image from "next/image";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -34,25 +34,8 @@ const Header: React.FC = () => {
       >
         <div className="h-14 px-4 flex items-center justify-between md:max-w-[650px] mx-auto">
 
-          {/* Logo: gold circle + wordmark */}
-          <Link href="/" aria-label="PropTriz Home" className="flex items-center gap-2">
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center
-                         text-[#143d4d] font-black text-lg flex-shrink-0"
-              style={{
-                fontFamily: "'Raleway', sans-serif",
-                boxShadow: "0 2px 8px rgba(240,165,0,0.4)",
-              }}
-            >
-              <Image src={"/logo.png"} height={32} width={32} alt="logo" />
-            </div>
-            <span
-              className="text-white font-black text-[18px] tracking-tight"
-              style={{ fontFamily: "'Raleway', sans-serif" }}
-            >
-              <span style={{ color: "#f0a500" }}>Prop</span>Triz
-            </span>
-          </Link>
+          {/* Logo — full variant (mark + wordmark), light theme for teal header) */}
+          <BrandLogo variant="full" theme="light" size={36} linkTo="/" />
 
           {/* Menu button */}
           <button

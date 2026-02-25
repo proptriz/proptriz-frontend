@@ -10,10 +10,7 @@ interface PhotoUploadSectionProps {
 }
 
 export default function PhotoUploadSection({
-  photos,
-  maxPhotos = 5,
-  onUpload,
-  onRemove,
+  photos, maxPhotos = 8, onUpload, onRemove,
 }: PhotoUploadSectionProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -31,54 +28,63 @@ export default function PhotoUploadSection({
 
   return (
     <div className="bg-white rounded-2xl p-4 border border-[#e5e7eb]">
-      <p className="text-xs font-semibold text-[#4b5563] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+      <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
+                    flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "#1e5f74" }} />
         <span>📸</span> Property Photos
       </p>
 
       <div className="grid grid-cols-4 gap-2">
         {photos.map((photo, i) => (
-          <div
-            key={i}
-            className="aspect-square rounded-[10px] overflow-hidden relative group"
-          >
+          <div key={i} className="aspect-square rounded-xl overflow-hidden relative group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={URL.createObjectURL(photo)}
               alt={`photo-${i}`}
               className="w-full h-full object-cover"
             />
+            {/* Cover badge */}
             {i === 0 && (
-              <span className="absolute top-1 left-1 bg-[#f5a623] text-[#111] text-[9px] font-bold px-1.5 py-0.5 rounded">
+              <span
+                className="absolute top-1 left-1 text-[9px] font-extrabold
+                           px-1.5 py-0.5 rounded"
+                style={{ background: "#f0a500", color: "#143d4d" }}
+              >
                 COVER
               </span>
             )}
+            {/* Remove button */}
             <button
+              type="button"
               onClick={() => onRemove(i)}
-              className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-5 h-5 text-xs
-                         opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+              className="absolute top-1 right-1 bg-black/55 text-white rounded-full w-5 h-5
+                         text-xs flex items-center justify-center
+                         opacity-0 group-hover:opacity-100 transition-opacity"
             >
               ×
             </button>
           </div>
         ))}
 
+        {/* Upload slot */}
         {photos.length < maxPhotos && (
           <button
+            type="button"
             onClick={() => inputRef.current?.click()}
-            className="aspect-square rounded-[10px] border-2 border-dashed border-[#d1d5db]
-                       flex flex-col items-center justify-center gap-1 cursor-pointer
-                       text-[#9ca3af] text-[10px] bg-[#f9fafb]
-                       hover:border-[#2ea06a] hover:text-[#1a7a4a] transition-colors"
+            className="aspect-square rounded-xl border-2 border-dashed border-[#d1d5db]
+                       flex flex-col items-center justify-center gap-1
+                       text-[#9ca3af] text-[10px] bg-[#f9fafb] transition-colors"
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#1e5f74"; (e.currentTarget as HTMLButtonElement).style.color = "#1e5f74"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#d1d5db"; (e.currentTarget as HTMLButtonElement).style.color = "#9ca3af"; }}
           >
             <span className="text-2xl leading-none">+</span>
-            <span>Add more</span>
+            <span>Add photo</span>
           </button>
         )}
       </div>
 
-      <p className="text-[11px] text-[#9ca3af] mt-2 flex items-center gap-1">
-        <span>ℹ️</span>
-        Drag to reorder · First photo is cover · Max 5MB each
+      <p className="text-[11px] text-[#9ca3af] mt-2.5 flex items-center gap-1">
+        <span>ℹ️</span> First photo is cover · Max {maxPhotos} photos · 5 MB each
       </p>
 
       <input

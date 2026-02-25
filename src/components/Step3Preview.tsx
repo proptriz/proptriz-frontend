@@ -11,21 +11,26 @@ interface Step3PreviewProps {
   onOpenLocationPicker: () => void;
 }
 
-export default function Step3Preview({
-  data,
-  onUpdate,
-  onOpenLocationPicker,
-}: Step3PreviewProps) {
+export default function Step3Preview({ data, onUpdate, onOpenLocationPicker }: Step3PreviewProps) {
   return (
     <div className="flex flex-col gap-4">
+
       {/* Location */}
       <SectionCard icon="📍" title="Location">
         <div className="mb-3">
           <div
             className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
-                       rounded-[10px] px-3.5 py-3 transition-all duration-200
-                       focus-within:border-[#1a7a4a] focus-within:bg-white
-                       focus-within:shadow-[0_0_0_3px_rgba(26,122,74,0.1)]"
+                       rounded-xl px-3.5 py-3 transition-all duration-200"
+            onFocusCapture={(e) => {
+              e.currentTarget.style.borderColor = "#1e5f74";
+              e.currentTarget.style.background  = "white";
+              e.currentTarget.style.boxShadow   = "0 0 0 3px rgba(30,95,116,0.1)";
+            }}
+            onBlurCapture={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.background  = "#f9fafb";
+              e.currentTarget.style.boxShadow   = "none";
+            }}
           >
             <span className="text-[#9ca3af] text-base flex-shrink-0">🗺️</span>
             <input
@@ -33,7 +38,8 @@ export default function Step3Preview({
               placeholder="Street address, city…"
               value={data.address}
               onChange={(e) => onUpdate({ address: e.target.value })}
-              className="w-full outline-none bg-transparent text-sm text-[#111827] placeholder:text-[#9ca3af]"
+              className="w-full outline-none bg-transparent text-sm
+                         text-[#111827] placeholder:text-[#9ca3af]"
             />
           </div>
         </div>
@@ -44,10 +50,11 @@ export default function Step3Preview({
         />
       </SectionCard>
 
-      {/* Summary card */}
+      {/* Listing summary */}
       <SectionCard icon="👁️" title="Listing Summary">
         <div className="flex flex-col gap-3">
-          {/* Photos preview strip */}
+
+          {/* Photo strip */}
           {data.photos.length > 0 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {data.photos.map((photo, i) => (
@@ -56,15 +63,15 @@ export default function Step3Preview({
                   key={i}
                   src={URL.createObjectURL(photo)}
                   alt={`preview-${i}`}
-                  className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-[#e5e7eb]"
+                  className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border border-[#e5e7eb]"
                 />
               ))}
             </div>
           )}
 
-          {/* Key info */}
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <SummaryItem label="Title" value={data.title || "—"} />
+          {/* Key info grid */}
+          <div className="grid grid-cols-2 gap-2">
+            <SummaryItem label="Title"    value={data.title || "—"} />
             <SummaryItem label="Category" value={data.category} />
             <SummaryItem
               label="Price"
@@ -78,23 +85,24 @@ export default function Step3Preview({
             {data.listedFor === ListForEnum.rent && (
               <SummaryItem label="Period" value={data.renewPeriod} />
             )}
-            <SummaryItem label="Status" value={data.status} />
+            <SummaryItem label="Status"   value={data.status} />
             <SummaryItem label="Duration" value={`${data.duration} weeks`} />
             <SummaryItem
               label="Negotiable"
-              value={data.negotiable === NegotiableEnum.Negotiable ? "Yes" : "No"}
+              value={data.negotiable === NegotiableEnum.Negotiable ? "✅ Yes" : "🔒 No"}
             />
           </div>
 
           {/* Features */}
           {data.features.length > 0 && (
             <div className="pt-2 border-t border-[#e5e7eb]">
-              <p className="text-xs text-[#9ca3af] mb-1.5">Features</p>
-              <div className="flex gap-3">
-                {data.features.map((f) => (
+              <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1.5">Features</p>
+              <div className="flex flex-wrap gap-2">
+                {data.features.filter(f => f.name).map((f) => (
                   <span
                     key={f.name}
-                    className="text-xs font-medium text-[#4b5563] bg-[#f3f4f6] px-2 py-1 rounded-md"
+                    className="text-xs font-medium px-2.5 py-1 rounded-full"
+                    style={{ background: "#e0f0f5", color: "#1e5f74" }}
                   >
                     {f.name}: {f.quantity}
                   </span>
@@ -104,14 +112,15 @@ export default function Step3Preview({
           )}
 
           {/* Facilities */}
-          {data.facilities.length > 0 && (
+          {data.facilities.filter(Boolean).length > 0 && (
             <div className="pt-2 border-t border-[#e5e7eb]">
-              <p className="text-xs text-[#9ca3af] mb-1.5">Amenities</p>
+              <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1.5">Facilities</p>
               <div className="flex flex-wrap gap-1.5">
-                {data.facilities.map((f) => (
+                {data.facilities.filter(f => f && !f.startsWith("__custom_")).map((f) => (
                   <span
                     key={f}
-                    className="text-xs font-medium text-[#1a7a4a] bg-[#e8f5ee] px-2 py-0.5 rounded-full"
+                    className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                    style={{ background: "#fef3cd", color: "#c88400" }}
                   >
                     {f}
                   </span>
@@ -123,7 +132,7 @@ export default function Step3Preview({
           {/* Description */}
           {data.description && (
             <div className="pt-2 border-t border-[#e5e7eb]">
-              <p className="text-xs text-[#9ca3af] mb-1">Description</p>
+              <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1">Description</p>
               <p className="text-xs text-[#4b5563] leading-relaxed line-clamp-3">
                 {data.description}
               </p>
@@ -135,22 +144,15 @@ export default function Step3Preview({
   );
 }
 
-function SummaryItem({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
+function SummaryItem({ label, value, highlight }: {
+  label: string; value: string; highlight?: boolean;
 }) {
   return (
-    <div className="bg-[#f9fafb] rounded-lg px-3 py-2">
+    <div className="bg-[#f9fafb] rounded-xl px-3 py-2.5 border border-[#f0f0f0]">
       <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide">{label}</p>
       <p
-        className={`text-sm font-semibold mt-0.5 capitalize ${
-          highlight ? "text-[#1a7a4a]" : "text-[#111827]"
-        }`}
+        className="text-sm font-bold mt-0.5 capitalize"
+        style={{ color: highlight ? "#1e5f74" : "#111827" }}
       >
         {value}
       </p>

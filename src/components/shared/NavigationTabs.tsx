@@ -5,14 +5,14 @@ import React, { SetStateAction } from "react";
 // Emojis replace the icon components that were commented out — zero dependency,
 // visually consistent with the rest of the design system.
 
-const TABS: { name: string; value: CategoryEnum; icon: string }[] = [
-  { name: "House",    value: CategoryEnum.house,    icon: "🏠" },
-  { name: "Land",     value: CategoryEnum.land,     icon: "🏘️" },
-  { name: "Shortlet", value: CategoryEnum.shortlet, icon: "🌙" },
-  { name: "Hotel",    value: CategoryEnum.hotel,    icon: "🏨" },
-  { name: "Shop",     value: CategoryEnum.shop,     icon: "🏪" },
-  { name: "Office",   value: CategoryEnum.office,   icon: "🏢" },
-  { name: "Others",   value: CategoryEnum.others,   icon: "•••" },
+const CATEGORIES: { label: string; value: CategoryEnum; icon: string }[] = [
+  { label: "House",    value: CategoryEnum.house,    icon: "🏠" },
+  { label: "Land",     value: CategoryEnum.land,     icon: "🏘️" },
+  { label: "Shortlet", value: CategoryEnum.shortlet, icon: "🌙" },
+  { label: "Hotel",    value: CategoryEnum.hotel,    icon: "🏨" },
+  { label: "Shop",     value: CategoryEnum.shop,     icon: "🏪" },
+  { label: "Office",   value: CategoryEnum.office,   icon: "🏢" },
+  { label: "Others",   value: CategoryEnum.others,   icon: "•••" },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ const NavigationTabs: React.FC<NavigationTabsProps> = ({ value, onChange }) => {
       style={{ msOverflowStyle: "none", scrollbarWidth: "none" } as React.CSSProperties}
       aria-label="Property categories"
     >
-      {TABS.map((tab) => {
+      {CATEGORIES.map((tab) => {
         const isActive = value === tab.value;
         return (
           <button
@@ -42,12 +42,13 @@ const NavigationTabs: React.FC<NavigationTabsProps> = ({ value, onChange }) => {
             className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl border-[1.5px]
                         flex-shrink-0 text-[11px] font-medium transition-all duration-200
                         ${isActive
-                          ? "bg-[#1a7a4a] text-white border-[#1a7a4a] font-bold"
-                          : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#2ea06a] hover:text-[#1a7a4a]"
+                          ? "text-white border-[#1e5f74] font-bold"
+                          : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#1e5f74] hover:text-[#1e5f74]"
                         }`}
+            style={isActive ? { background: "linear-gradient(135deg,#143d4d,#1e5f74)" } : undefined}
           >
             <span className="text-[15px] leading-none">{tab.icon}</span>
-            {tab.name}
+            {tab.label}
           </button>
         );
       })}

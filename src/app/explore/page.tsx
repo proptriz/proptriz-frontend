@@ -132,7 +132,7 @@ export default function HomePage() {
       {/* ── Hero header ─────────────────────────────────────────────────── */}
       <div
         className="px-5 pt-14 pb-5"
-        style={{ background: "linear-gradient(180deg,#1a7a4a 0%,#145c38 100%)" }}
+        style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 100%)" }}
       >
         <p className="text-white/75 text-xs mb-1">Good day 👋</p>
         <h2
@@ -163,7 +163,7 @@ export default function HomePage() {
             {!showAll && listedProperties.length > PREVIEW_COUNT && (
               <button
                 onClick={() => setShowAll(true)}
-                className="text-[13px] font-semibold text-[#1a7a4a]"
+                className="text-[13px] font-semibold text-[#1e5f74]"
               >
                 View all →
               </button>
@@ -220,7 +220,7 @@ export default function HomePage() {
           <section className="mb-8">
             <div className="flex items-center justify-between px-4 mb-3">
               <h2 className="text-[15px] font-bold text-[#111827]">Featured Properties</h2>
-              <span className="text-[13px] font-semibold text-[#1a7a4a]">See all →</span>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">See all →</span>
             </div>
             <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
               {listedProperties.slice(0, 5).map((property) => (
@@ -248,24 +248,24 @@ export default function HomePage() {
           <div className="flex gap-3">
             <div
               className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
-              style={{ background: "linear-gradient(135deg,#2d1b69,#7c3aed)" }}
+              style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
             >
               <div className="text-white text-xs font-bold leading-snug">
                 🎃 End of Year<br />
                 <span className="opacity-75 font-normal">Up to 66% off</span>
               </div>
-              <span className="absolute top-2 right-2 bg-[#f5a623] text-[#111] text-[9px]
+              <span className="absolute top-2 right-2 bg-[#f0a500] text-[#143d4d] text-[9px]
                                font-extrabold px-2 py-0.5 rounded-md">SALE</span>
             </div>
             <div
               className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
-              style={{ background: "linear-gradient(135deg,#065f46,#10b981)" }}
+              style={{ background: "linear-gradient(135deg,#a06500,#f0a500)" }}
             >
               <div className="text-white text-xs font-bold leading-snug">
                 ☀️ Summer Deals<br />
-                <span className="opacity-75 font-normal">Discounts await</span>
+                <span className="opacity-80 font-normal">Discounts await</span>
               </div>
-              <span className="absolute top-2 right-2 bg-white text-[#10b981] text-[9px]
+              <span className="absolute top-2 right-2 bg-white text-[#143d4d] text-[9px]
                                font-extrabold px-2 py-0.5 rounded-md">NEW</span>
             </div>
           </div>
@@ -276,7 +276,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="text-[15px] font-bold text-[#111827]">Top Locations</h2>
             <Link href="/location/list">
-              <span className="text-[13px] font-semibold text-[#1a7a4a]">More →</span>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">More →</span>
             </Link>
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
@@ -286,7 +286,7 @@ export default function HomePage() {
                                 px-3 py-2 shadow-[0_1px_6px_rgba(0,0,0,0.08)]
                                 flex-shrink-0 cursor-pointer
                                 hover:shadow-md transition-shadow">
-                  <div className="w-8 h-8 rounded-full bg-[#e8f5ee] overflow-hidden flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-[#e0f0f5] overflow-hidden flex-shrink-0">
                     <Image
                       src={location.image}
                       width={32}
@@ -309,7 +309,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="text-[15px] font-bold text-[#111827]">Top Agents</h2>
             <Link href="/agent/list">
-              <span className="text-[13px] font-semibold text-[#1a7a4a]">View all →</span>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">View all →</span>
             </Link>
           </div>
           <div className="flex gap-5 px-4 overflow-x-auto pb-1 scrollbar-hide">
@@ -322,7 +322,7 @@ export default function HomePage() {
               <div key={agent.name} className="text-center flex-shrink-0">
                 <div
                   className="w-14 h-14 rounded-full bg-white mx-auto mb-1
-                             border-2 border-[#e8f5ee]
+                             border-2 border-[#e0f0f5]
                              shadow-[0_2px_10px_rgba(0,0,0,0.1)] overflow-hidden
                              flex items-center justify-center"
                 >

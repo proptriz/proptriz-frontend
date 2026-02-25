@@ -7,163 +7,220 @@ import Image from "next/image";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { ReviewType } from "@/types";
 
-// Enable the relativeTime plugin
+// ─── Brand palette ────────────────────────────────────────────────────────────
+// Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
+// ─────────────────────────────────────────────────────────────────────────────
+
 dayjs.extend(relativeTime);
 
+// ─── Star renderer ────────────────────────────────────────────────────────────
+const Stars = ({ rating, size = 12 }: { rating: number; size?: number }) => (
+  <div className="flex items-center gap-0.5">
+    {Array.from({ length: 5 }).map((_, i) =>
+      i < Math.floor(rating) ? (
+        <FaStar key={i} size={size} style={{ color: "#f0a500" }} />
+      ) : (
+        <FaRegStar key={i} size={size} style={{ color: "#d1d5db" }} />
+      )
+    )}
+  </div>
+);
+
+// ─── ReviewCard ───────────────────────────────────────────────────────────────
 export const ReviewCard: React.FC<{
   review: ReviewType;
-  showReply?: (review:ReviewType) => void;
-  showPropDetails?: boolean
-}> = ({ 
-  review, 
-  showReply, 
-  showPropDetails = false
-}) => {
+  showReply?: (review: ReviewType) => void;
+  showPropDetails?: boolean;
+}> = ({ review, showReply, showPropDetails = false }) => {
   const [relativeTimeString, setRelativeTimeString] = useState("");
 
   useEffect(() => {
-    // Update the relative time string every minute
-    const updateRelativeTime = () => {
-      setRelativeTimeString(dayjs(review.createdAt).fromNow());
-    };  
-
-    updateRelativeTime();
-    const interval = setInterval(updateRelativeTime, 60000);
-    
-    return () => clearInterval(interval); 
+    const update = () => setRelativeTimeString(dayjs(review.createdAt).fromNow());
+    update();
+    const id = setInterval(update, 60_000);
+    return () => clearInterval(id);
   }, [review]);
 
-  if (!review) {
-    return <div> Missing Review </div>
-  }
+  if (!review) return null;
 
   return (
-    <div className="border border-[#DCDFD9] rounded-2xl">
-      {showPropDetails && <div className="p-3 rounded-lg flex items-center h-16 bg-white">
-        <Image 
-          src={review.property.banner || '/logo.png'}
-          width={50} 
-          height={50} 
-          className="rounded-lg" 
-          alt={'property'}
-        />
-
-        <div className="ml-2 space-y-1"> 
-          <p className="font-bold">{review.property.title}</p>                                
-          
-          <div  className="flex items-center">
-            <span className="font-bold mr-2">{review.property.average_rating}</span>
-            <HiOutlineLocationMarker />
-            <p className="text-gray-500 text-sm"> {review.property.address}</p>
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 2px 12px rgba(30,95,116,0.06)",
+        background: "white",
+      }}
+    >
+      {/* Optional property context strip */}
+      {showPropDetails && (
+        <div
+          className="flex items-center gap-3 px-3 py-2.5"
+          style={{ background: "#f5f7f9", borderBottom: "1px solid #e5e7eb" }}
+        >
+          <div
+            className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0"
+            style={{ border: "1.5px solid #e5e7eb" }}
+          >
+            <Image
+              src={review.property.banner || "/logo.png"}
+              width={48}
+              height={48}
+              className="w-full h-full object-cover"
+              alt="property"
+            />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[13px] font-bold text-[#111827] truncate">
+              {review.property.title}
+            </p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <Stars rating={review.property.average_rating ?? 4.9} size={10} />
+              <span
+                className="text-[11px] font-bold"
+                style={{ color: "#f0a500" }}
+              >
+                {review.property.average_rating?.toFixed(1)}
+              </span>
+              <span className="text-[#d1d5db]">·</span>
+              <HiOutlineLocationMarker
+                size={11}
+                style={{ color: "#9ca3af", flexShrink: 0 }}
+              />
+              <p className="text-[11px] text-[#9ca3af] truncate">
+                {review.property.address}
+              </p>
+            </div>
           </div>
         </div>
-      </div>}
-      
-      <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-3" key={review._id} >
-        <div className="flex items-start space-x-3">
-          <img
-            src={review.sender?.avatar || '/avatar.png'}
-            alt="Reviewer"
-            className="w-10 h-10 rounded-full"
-          />
-          
-          <div className="flex-1 relative">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold">{review.sender?.display_name}</h3>
-              
-              <div className="flex text-yellow-500">
-                {Array.from({ length: 5 }).map((_, index) =>
-                  index < Math.floor(review.rating) ? (
-                  <FaStar key={index} />
-                  ) : (
-                  <FaRegStar key={index} />
-                  )
-                )}
-              </div>
-            </div>
-            <p className="text-sm text-gray-700">{review.comment}</p>
+      )}
 
-            {/* Review Images */}
+      {/* Review body */}
+      <div className="p-3.5">
+        <div className="flex items-start gap-3">
+          {/* Avatar */}
+          <div
+            className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0"
+            style={{ border: "2px solid #e0f0f5" }}
+          >
+            <img
+              src={review.sender?.avatar || "/avatar.png"}
+              alt={review.sender?.display_name || "Reviewer"}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            {/* Name + stars row */}
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[13px] font-bold text-[#111827] truncate">
+                {review.sender?.display_name}
+              </p>
+              <Stars rating={review.rating} />
+            </div>
+
+            {/* Comment */}
+            <p className="text-[13px] text-[#4b5563] leading-relaxed">
+              {review.comment}
+            </p>
+
+            {/* Review image */}
             {review.image && (
-              <div className="flex space-x-3 mt-2">
+              <div className="mt-2.5">
                 <img
                   src={review.image}
-                  alt="Review Image"
-                  className="w-16 h-16 rounded-lg object-cover"
+                  alt="Review photo"
+                  className="w-20 h-20 rounded-xl object-cover"
+                  style={{ border: "1px solid #e5e7eb" }}
                 />
               </div>
             )}
 
-            {/* Date-Time */}
-            <div className="text-xs text-gray-400 my-4 flex relative">
-              <span>Reviewed {relativeTimeString}</span>
+            {/* Footer: date + reply */}
+            <div className="flex items-center justify-between mt-3">
+              <span className="text-[11px]" style={{ color: "#9ca3af" }}>
+                {relativeTimeString}
+              </span>
 
-              <button 
-                className="ms-auto text-primary" 
-                onClick={() => showReply && showReply(review)}
-              >
-                Reply ({review.reply_count || 0})
-              </button>
+              {showReply && (
+                <button
+                  onClick={() => showReply(review)}
+                  className="flex items-center gap-1 text-[11px] font-bold
+                             px-2.5 py-1 rounded-full transition-all duration-150
+                             active:scale-95"
+                  style={{ background: "#e0f0f5", color: "#1e5f74" }}
+                >
+                  💬 Reply ({review.reply_count ?? 0})
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
     </div>
-    
   );
 };
 
+// ─── ReplyCard ────────────────────────────────────────────────────────────────
 interface ReplyCardProps {
   id: string;
   sender: string;
   comment: string;
   senderAvatar: string;
-  reviewDate: string; // ISO 8601 date string
+  reviewDate: string;
 }
+
 export const ReplyCard: React.FC<ReplyCardProps> = ({
   id,
   sender,
   comment,
   senderAvatar,
-  reviewDate
+  reviewDate,
 }) => {
   const [relativeTimeString, setRelativeTimeString] = useState("");
 
   useEffect(() => {
-    // Update the relative time string every minute
-    const updateRelativeTime = () => {
-        setRelativeTimeString(dayjs(reviewDate).fromNow());
-    };  
-
-    updateRelativeTime();
-    const interval = setInterval(updateRelativeTime, 60000);
-    
-    return () => clearInterval(interval); 
+    const update = () => setRelativeTimeString(dayjs(reviewDate).fromNow());
+    update();
+    const id = setInterval(update, 60_000);
+    return () => clearInterval(id);
   }, [reviewDate]);
 
   return (
-    <div className="flex flex-col space-y-3 card-bg p-3 text-sm rounded-xl mt-5" key={id}>
-      <div className="flex items-start space-x-3">
+    <div
+      key={id}
+      className="flex items-start gap-2.5 p-3 rounded-xl"
+      style={{ background: "#f5f7f9", border: "1px solid #e5e7eb" }}
+    >
+      {/* Avatar with teal accent border */}
+      <div
+        className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-0.5"
+        style={{ border: "1.5px solid #e0f0f5" }}
+      >
         <img
-          src={senderAvatar || '/avatar.png'}
-          alt="Reviewer"
-          className="w-7 h-7 rounded-full"
+          src={senderAvatar || "/avatar.png"}
+          alt={sender}
+          className="w-full h-full object-cover"
         />
-        
-        <div className="flex-1 relative">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold">{sender}</h3>
-          </div>
-          
-          <p className="text-sm text-gray-700">{comment}</p>
-          
-          {/* Date-Time */}
-          <div className="text-xs text-gray-500 my-4 flex relative">
-            <span>Reviewed {relativeTimeString}</span>
-          </div>
-        </div>
       </div>
-            
+
+      <div className="flex-1 min-w-0">
+        {/* Sender + thread indicator */}
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span
+            className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0"
+            style={{ background: "#1e5f74" }}
+          />
+          <p className="text-[12px] font-bold text-[#111827]">{sender}</p>
+        </div>
+
+        <p className="text-[12px] text-[#4b5563] leading-relaxed">{comment}</p>
+
+        <p className="text-[10px] mt-1.5" style={{ color: "#9ca3af" }}>
+          {relativeTimeString}
+        </p>
+      </div>
     </div>
   );
 };

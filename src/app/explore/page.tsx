@@ -281,7 +281,7 @@ export default function HomePage() {
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
             {topLocation.map((location, key) => (
-              <Link href="/location/list" key={key}>
+              <Link href="#" key={key}>
                 <div className="flex items-center gap-2 bg-white rounded-full
                                 px-3 py-2 shadow-[0_1px_6px_rgba(0,0,0,0.08)]
                                 flex-shrink-0 cursor-pointer

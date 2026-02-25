@@ -22,13 +22,13 @@ const Footer: React.FC = () => {
 
   return (
     <footer
-      className="fixed bottom-0 left-0 w-full z-20
+      className="sticky bottom-0 left-0 w-full z-20
                  bg-white border-t border-[#e5e7eb]
                  shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="flex items-stretch max-w-[480px] mx-auto">
+      <div className="flex items-stretch mx-auto">
         {MENUS.map((menu) => {
           const isActive = pathname === menu.link ||
             (menu.link !== "/" && pathname.startsWith(menu.link));

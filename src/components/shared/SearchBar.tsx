@@ -69,7 +69,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <>
-      <div className="w-full md:max-w-[75%] lg:max-w-[50%] mx-auto lg:ml-0 relative">
+      <div className="w-full relative">
 
         {/* ── Search bar ──────────────────────────────────────────────────── */}
         <div className="flex items-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.14)]

@@ -118,11 +118,11 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
       {/* ── Photos ────────────────────────────────────────────────────────── */}
       <SectionCard icon="📸" title="Property Photos">
         <p className="text-[11px] text-[#9ca3af] mb-2.5 leading-relaxed">
-          Add up to 8 photos. The first photo will be your listing cover image.
+          Add up to 5 photos. The first photo will be your listing cover image.
         </p>
         <PhotoUploadSection
           photos={data.photos}
-          maxPhotos={8}
+          maxPhotos={5}
           onUpload={(files) => onUpdate({ photos: [...data.photos, ...files] })}
           onRemove={(i) => onUpdate({ photos: data.photos.filter((_, idx) => idx !== i) })}
         />

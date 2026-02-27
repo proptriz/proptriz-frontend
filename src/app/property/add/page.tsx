@@ -1,380 +1,441 @@
-'use client';
+"use client";
 
-import { useState, useContext } from "react";
-import { IoHomeOutline } from "react-icons/io5";
-import { FaArrowLeft } from "react-icons/fa6";
-import { ScreenName } from "@/components/shared/LabelCards";
-import { SelectButton, TextareaInput, TextInput } from "@/components/shared/Input";
-import ToggleButtons from "@/components/ToggleButtons";
-import PhotoUploadSection from "@/components/property/PhotoUploadSection";
-import AddPropertyDetails from "@/components/property/AddDetailsSection";
-import { AppContext } from "@/context/AppContextProvider";
-import { categories, styles } from "@/constant";
-import { createProperty } from "@/services/propertyApi";
-import { CategoryEnum, CurrencyEnum, Feature, ListForEnum, NegotiableEnum, PropertyStatusEnum, RenewalEnum } from "@/types";
-import { toast } from "react-toastify";
-import logger from "../../../../logger.config.mjs"
-import Popup from "@/components/shared/Popup";
-import { IoMdArrowDropdown } from "react-icons/io";
-import { HiOutlineLocationMarker } from "react-icons/hi";
-import Splash from "@/components/shared/Splash";
-import { CgDetailsMore } from "react-icons/cg";
-import Counter from "@/components/Counter";
-import PropertyLocationModal from "@/components/property/PropertyLocationSection";
-import { OutlineButton } from "@/components/shared/buttons";
+import { useState, useContext, useCallback } from "react";
+import { useRouter }      from "next/navigation";
+import { toast }          from "react-toastify";
+
+import {
+  CategoryEnum, CurrencyEnum, ListForEnum, NegotiableEnum,
+  PropertyStatusEnum, RenewalEnum,
+  type PropertyFormData, type WizardStep,
+} from "@/types/property";
+
+import StepProgress from "@/components/StepProgress";
+import Step1Basics  from "@/components/Step1Basics";
+import Step2Details from "@/components/Step2Details";
+import Step3Preview from "@/components/Step3Preview";
+import Splash       from "@/components/shared/Splash";
+import BrandLogo    from "@/components/shared/BrandLogo";
+
+import { AppContext }         from "@/context/AppContextProvider";
+import PropertyLocationModal  from "@/components/property/PropertyLocationSection";
+import { createProperty, updatePropertyImage } from "@/services/propertyApi";
+import { compressImage }      from "@/utils/compressImage";
+import getUserPosition         from "@/utils/getUserPosition";
+import logger                  from "../../../../logger.config.mjs";
+
+// ─── Upload stage ─────────────────────────────────────────────────────────────
+
+type UploadStage = "idle" | "creating" | "uploading" | "done";
+
+// ─── Default form state ───────────────────────────────────────────────────────
+
+const DEFAULT_FORM: PropertyFormData = {
+  title:       "",
+  description: "",
+  address:     "",
+  price:       "0",
+  currency:    CurrencyEnum.naira,
+  listedFor:   ListForEnum.rent,
+  category:    CategoryEnum.house,
+  status:      PropertyStatusEnum.available,
+  renewPeriod: RenewalEnum.yearly,
+  negotiable:  NegotiableEnum.Negotiable,
+  duration:    4,
+  features:    [],
+  facilities:  [],
+  coordinates: [9.0820, 8.6753],
+  photos:      [],
+};
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+
+function validateStep(step: WizardStep, data: PropertyFormData): string | null {
+  if (step === 1) {
+    if (!data.title.trim())                     return "Please enter a property title.";
+    if (!data.price || Number(data.price) <= 0) return "Please enter a valid price.";
+    if (!data.address.trim())                   return "Please enter the property address.";
+  }
+  if (step === 2) {
+    if (data.photos.length === 0) return "Please add at least one property photo.";
+  }
+  return null;
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AddPropertyPage() {
+  const router       = useRouter();
   const { authUser } = useContext(AppContext);
-  const [propertyTitle, setPropertyTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [propertyAddress, setPropertyAddress] = useState<string>("");
-  const [price, setPrice] = useState<string>("0.00");
-  const [renewPeriod, setRenewPeriod] = useState<RenewalEnum>(RenewalEnum.yearly);
-  const [listedFor, setListedFor] = useState<ListForEnum>(ListForEnum.rent);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.naira);
-  const [category, setCategory] = useState<CategoryEnum>(CategoryEnum.house);
-  const [propertyStatus, setPropertStatus] = useState<PropertyStatusEnum>(PropertyStatusEnum.available);
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
-  const [features, setFeatures] = useState<Feature[]>([]);
-  const [facilities, setFacilities] = useState<string[]>([]);
+
+  const [formData, setFormData]       = useState<PropertyFormData>(DEFAULT_FORM);
+  const [currentStep, setCurrentStep] = useState<WizardStep>(1);
+  const [openLocPicker, setOpenLocPicker] = useState(false);
   const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
-  const [propCoordinates, setPropCoordinates] = useState<[number, number]>(userCoordinates);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [togglePopup, setTogglePopup] = useState(false);
-  const [duration, setDuration] = useState<number>(1)
-  const [openLocPicker, setOpenLocPicker] = useState<boolean>(false)
 
-  const maxPhotos = 1;
+  // ── Upload progress ──────────────────────────────────────────────────────
+  const [uploadStage,    setUploadStage]    = useState<UploadStage>("idle");
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
 
-  const listingTypes = [
-    { title: "Sale", value: "sale" },
-    { title: "Rent", value: "rent" },
-  ];
+  const isSubmitting = uploadStage !== "idle" && uploadStage !== "done";
 
-  const reset = () => {
-    setPropertyTitle("");
-    setPropertyAddress("");
-    setPrice("0.00");
-    setCurrency(CurrencyEnum.naira);
-    setListedFor(ListForEnum.rent);
-    setCategory(CategoryEnum.house);
-    setRenewPeriod(RenewalEnum.yearly);
-    setNegotiable(NegotiableEnum.Negotiable);
-    setPropertStatus(PropertyStatusEnum.available);
-    setPhotos([]);
-    setFeatures([]);
-    setFacilities([]);
-    setPropCoordinates(userCoordinates);
-    setDescription("")
-    setDuration(1)
-  }
-  const handleLocationSelect = (lat: number, lng: number,) => {
-    // Save to form state, API, etc.
-    setPropCoordinates([lat, lng])
-    toast.success(`Location selected: (${lat}, ${lng})`, { position: "top-right" });
-    logger.info("Selected coordinates:", lat, lng);
-  };
+  const update = useCallback((partial: Partial<PropertyFormData>) => {
+    setFormData((prev) => ({ ...prev, ...partial }));
+  }, []);
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
-
-    const uploadedFiles = Array.from(event.target.files);
-    const validFiles = uploadedFiles.filter(
-      (file) => file.type.startsWith("image/") && file.size <= 5 * 1024 * 1024
-    );
-
-    if (photos.length + validFiles.length > maxPhotos) {
-      alert(`You can only upload up to ${maxPhotos} photos.`);
-      return;
-    }
-
-    setPhotos((prevPhotos) => [...prevPhotos, ...validFiles]);
-  };
-
-  const removePhoto = (index: number) => {
-    setPhotos((prevPhotos) => prevPhotos.filter((_, i) => i !== index));
-  };
-
-  // ✅ Submit Handler
-  const handleSubmit = async () => {
-    if (!propertyTitle || !listedFor || !category || !price || !photos.length) {
-      toast.warn("Please fill in all required fields and upload at least one photo.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("title", propertyTitle);
-    formData.append("price", price.toString());
-    formData.append("currency", currency);
-    formData.append("address", propertyAddress);
-    formData.append("listed_for", listedFor);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("duration", duration.toString());
-    formData.append("negotiable", negotiable === NegotiableEnum.Negotiable ? "true" : "false");
-    formData.append("status", propertyStatus);
-    formData.append("latitude", String(propCoordinates?.[0] || userCoordinates[0]));
-    formData.append("longitude", String(propCoordinates?.[1] || userCoordinates[1]));
-    // ✅ Properly serialize structured data
-    formData.append("features", JSON.stringify(features)); // Array of { name, quantity }
-    formData.append("env_facilities", JSON.stringify(facilities)); // Array of strings
-
-    if (listedFor === ListForEnum.rent) {
-      formData.append("period", renewPeriod.toLowerCase()); // monthly/yearly
-    }
-
-    photos.forEach((photo) => {
-      formData.append("images", photo); 
-    });
-
+  // ── GPS ──────────────────────────────────────────────────────────────────
+  const openLocationPicker = useCallback(async () => {
     try {
-      setIsLoading(true);
-      const response = await createProperty(formData);
-      logger.info("Property created:", {response});
-      toast.success("Property successfully added!");
-      reset();
-    } catch (error: any) {
-      logger.error(error);
-      toast.error(error.response?.data?.message || "Failed to add property.");
-    } finally {
-      setIsLoading(false);
+      const coords = await getUserPosition();
+      setUserCoordinates(coords);
+    } catch (err) {
+      logger.warn("getUserPosition failed:", err);
     }
+    setOpenLocPicker(true);
+  }, []);
+
+  // ── Navigation ──────────────────────────────────────────────────────────
+  const goNext = () => {
+    const err = validateStep(currentStep, formData);
+    if (err) { toast.warn(err); return; }
+    if (currentStep < 3) setCurrentStep((p) => (p + 1) as WizardStep);
   };
 
-  if (!authUser) {
-    return <Splash showFooter/>;
-  }
+  const goBack = () => {
+    if (currentStep > 1) setCurrentStep((p) => (p - 1) as WizardStep);
+    else router.back();
+  };
 
+  const handleLocationSelect = useCallback((lat: number, lng: number) => {
+    update({ coordinates: [lat, lng] });
+    toast.success(`Location pinned: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
+  }, [update]);
+
+  // ── Phase 2: sequential per-photo upload with compression ────────────────
+  const uploadPhotosSequentially = async (
+    propertyId: string,
+    photos: File[]
+  ): Promise<{ success: number; failed: number }> => {
+    let success = 0;
+    let failed  = 0;
+
+    for (let i = 0; i < photos.length; i++) {
+      setUploadProgress({ current: i + 1, total: photos.length });
+      try {
+        const compressed = await compressImage(photos[i]);
+        const res = await updatePropertyImage(propertyId, compressed);
+        if (!res?.success) throw new Error("Upload rejected by server");
+        success++;
+        logger.info(`Photo ${i + 1}/${photos.length} uploaded → ${propertyId}`);
+      } catch (err) {
+        failed++;
+        logger.warn(`Photo ${i + 1}/${photos.length} failed:`, err);
+        // Non-fatal: continue with remaining photos
+      }
+    }
+    return { success, failed };
+  };
+
+  // ── Submit ──────────────────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    if (!authUser) {
+      toast.error("Please login to list a property.");
+      return;
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // Phase 1 — create property record (text fields only, zero photos)
+    // A fast, lightweight request. Even on a poor connection this almost
+    // never times out. The property exists in the DB after this call.
+    // ────────────────────────────────────────────────────────────────────
+    setUploadStage("creating");
+
+    const fd = new FormData();
+    fd.append("title",          formData.title);
+    fd.append("price",          formData.price);
+    fd.append("currency",       formData.currency);
+    fd.append("address",        formData.address);
+    fd.append("listed_for",     formData.listedFor);
+    fd.append("category",       formData.category);
+    fd.append("description",    formData.description);
+    fd.append("duration",       formData.duration.toString());
+    fd.append("negotiable",     String(formData.negotiable === NegotiableEnum.Negotiable));
+    fd.append("status",         formData.status);
+    fd.append("latitude",       String(formData.coordinates[0]));
+    fd.append("longitude",      String(formData.coordinates[1]));
+    fd.append("features",       JSON.stringify(formData.features));
+    fd.append("env_facilities", JSON.stringify(
+      formData.facilities.filter((f) => f && !f.startsWith("__custom_"))
+    ));
+    if (formData.listedFor === ListForEnum.rent) {
+      fd.append("period", formData.renewPeriod.toLowerCase());
+    }
+    // ← NO photo bytes in this request
+
+    let newPropertyId: string;
+    try {
+      const result = await createProperty(fd);
+      newPropertyId = result._id;
+      logger.info("Property created (text-only):", result);
+    } catch (err: unknown) {
+      logger.error("createProperty failed:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to create property.");
+      setUploadStage("idle");
+      return;
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // Phase 2 — upload each photo independently, compressed
+    // One HTTP request per photo. A single failure doesn't block the rest.
+    // Photos are compressed client-side in a Web Worker before sending.
+    // ────────────────────────────────────────────────────────────────────
+    if (formData.photos.length > 0) {
+      setUploadStage("uploading");
+      setUploadProgress({ current: 0, total: formData.photos.length });
+
+      const { success, failed } = await uploadPhotosSequentially(
+        newPropertyId,
+        formData.photos
+      );
+
+      if (failed > 0) {
+        toast.warn(
+          `${success} photo${success !== 1 ? "s" : ""} uploaded. ` +
+          `${failed} couldn't be uploaded — add them later via Edit Property.`
+        );
+      } else {
+        toast.success("Property listed with all photos! 🎉");
+      }
+    } else {
+      toast.success("Property successfully listed! 🎉");
+    }
+
+    setUploadStage("done");
+    // Brief pause so the user can read the final state
+    await new Promise((r) => setTimeout(r, 700));
+
+    // Reset and redirect
+    setFormData(DEFAULT_FORM);
+    setCurrentStep(1);
+    setUploadStage("idle");
+    setUploadProgress({ current: 0, total: 0 });
+    router.push("/property/add");
+  };
+
+  // ── CTA label reflects exact stage ──────────────────────────────────────
+  const ctaLabel =
+    uploadStage === "creating"
+      ? "Creating listing…"
+    : uploadStage === "uploading"
+      ? `Uploading photo ${uploadProgress.current} of ${uploadProgress.total}…`
+    : uploadStage === "done"
+      ? "Done! Redirecting…"
+    : currentStep === 1
+      ? "Add Photos & Details →"
+    : currentStep === 2
+      ? "Preview Listing →"
+    : "Publish Property 🎉";
+
+  if (!authUser) return <Splash showFooter />;
+
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-    <div className="relative pb-16 mx-auto w-full">
-      <ScreenName title="Add Property" />
+      <div
+        className="min-h-screen pb-10"
+        style={{ background: "#f5f7f9", fontFamily: "'DM Sans', sans-serif" }}
+      >
 
-      <div className="p-6">
-        <h2 className="text-xl mb-7">
-          Hi {authUser?.display_name || "User"}, Fill Details of your <span className="font-semibold">property</span>
-        </h2>
-
-        {/* Photo Upload */}
-        <PhotoUploadSection
-          photos={photos}
-          maxPhotos={maxPhotos}
-          handlePhotoUpload={handlePhotoUpload}
-          removePhoto={removePhoto}
-        />
-
-        {/* Property Category */}
-        <h3 className={styles.H2}>Property Category</h3>
-        <SelectButton<CategoryEnum> 
-          list={categories} 
-          setValue={setCategory} 
-          name="category" 
-          value={category} 
-        />
-
-        <div className="mt-4 space-y-4">
-          {/* Property Title */}
-          <TextInput
-            label="Property title"
-            icon={<IoHomeOutline />}
-            id="title"
-            name="title"
-            value={propertyTitle}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPropertyTitle(e.target.value)}
-            placeholder="Property title here"
-          />
-
-          {/* Listed For */}
-          <div className="">
-            <SelectButton<ListForEnum> 
-              list={listingTypes} 
-              setValue={setListedFor} 
-              name="listedFor" 
-              value={listedFor} 
-              label="Listed For" 
-            />
+        {/* ── Teal hero header ──────────────────────────────────────────── */}
+        <div
+          className="px-5 pt-14 pb-0"
+          style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 100%)" }}
+        >
+          <div className="absolute inset-x-0 top-0 overflow-hidden h-36 pointer-events-none" aria-hidden>
+            <div style={{ position: "absolute", top: -40, right: -40, width: 180, height: 180, borderRadius: "50%", border: "1px solid rgba(240,165,0,0.12)" }} />
+            <div style={{ position: "absolute", top: 20,  right: 60,  width: 100, height: 100, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.06)" }} />
           </div>
 
-          {/* Price */}
-          <div>
-            <label className={styles.H2} htmlFor={"price"}>
-              {listedFor === ListForEnum.rent ? "Rent Price" : "Sell Price"}
-            </label>
-            <div 
-            className="flex items-center p-[10px] w-full rounded-md border-[1px]
-              bg-gray-100 border-primary
-              focus-within:border-secondary
-              focus-within:bg-white
-              transition-colors
-              "
+          <div className="flex items-center gap-3.5 pb-5 relative z-10">
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={isSubmitting}
+              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0
+                         text-white bg-white/15 border border-white/25 transition-all
+                         hover:bg-white/25 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Go back"
             >
-              <input
-                name="price"
-                id="price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                type="number"
-                placeholder="Property price here"
-                className="w-full outline-none bg-transparent"
-              />
-              <button 
-                className="text-gray-500 text-lg px-3 flex items-center gap-1"
-                onClick={() => setTogglePopup(!togglePopup)}
+              ←
+            </button>
+
+            <div className="flex-1 min-w-0">
+              <h1 className="text-white text-[22px] font-black leading-tight"
+                  style={{ fontFamily: "'Raleway', sans-serif" }}>
+                Add Property
+              </h1>
+              <p className="text-white/70 text-[13px] mt-0.5 truncate">
+                Hi {authUser.display_name ?? "there"}, let&apos;s list your space
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <BrandLogo variant="mark" theme="light" size={36} linkTo="/" />
+              <span
+                className="text-white font-black text-[15px] tracking-tight hidden md:inline-block"
+                style={{ fontFamily: "'Raleway', sans-serif" }}
               >
-                {currency}
-                <IoMdArrowDropdown />          
-              </button>
+                <span style={{ color: "#f0a500" }}>Prop</span>Triz
+              </span>
             </div>
           </div>
 
-          <div>
-            {listedFor === ListForEnum.rent && (
-              <ToggleButtons<RenewalEnum>
-                label="Tenancy Period"
-                options={Object.values(RenewalEnum)}
-                selected={renewPeriod}
-                onChange={setRenewPeriod}
-              />
-            )} 
-          </div>
-
-          <TextareaInput
-            label="Property Description (optional)"
-            id='description'
-            icon={<CgDetailsMore />}
-            name="description"
-            value={description}
-            onChange={(e:React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
-            placeholder="Enter Property details here"
-            className="w-full outline-none card-bg"
-          />
-
-          <div className="gap-4 items-center mt-4">
-            <label htmlFor="duration"  className={styles.H2}>Listing Duration (in weeks)</label>
-            <div 
-              className="flex items-center w-full px-2 rounded-md border-[1px]
-              bg-gray-100 border-primary
-              focus-within:border-secondary
-              focus-within:bg-white
-              transition-colors
-              "
-            >
-              <input
-                type="number"
-                name="duration"
-                id="duration"
-                placeholder="Enter listing duration (in weeks)"
-                value={duration}
-                min={1}
-                max={50}
-                readOnly
-                onChange={(e:React.ChangeEvent<HTMLInputElement>) => {setDuration(parseInt(e.target.value) || 1)}}
-                className="w-full outline-none p-1 bg-transparent"
-              />
-              <Counter
-                label=""
-                value={duration}
-                onIncrement={() => setDuration(duration < 50 ? duration + 1 : 50)}
-                onDecrement={() => setDuration(duration > 1 ? duration - 1 : 1)}
-              />
-            </div>
-          </div>
-
-          {/* Availability status */}
-          <div>
-            <ToggleButtons<PropertyStatusEnum>
-              label="Availability status"
-              options={Object.values(PropertyStatusEnum).filter(status => status !== PropertyStatusEnum.expired)}
-              selected={propertyStatus}
-              onChange={setPropertStatus}
-            />
-          </div>
+          <StepProgress currentStep={currentStep} />
         </div>
 
-        {/* Property Location & Address */}
-        {/* Address */}
-        <div className="mt-4">
-          <TextInput 
-            label="Property Address"
-            icon={<HiOutlineLocationMarker />}
-            name="address"
-            id="address"
-            value={propertyAddress}
-            onChange={(e:React.ChangeEvent<HTMLInputElement>) => setPropertyAddress(e.target.value)}
-            placeholder="Enter property Address"
-          />
-        </div>
-
-        <div className="w-full flex justify-end mt-4">
-          <OutlineButton 
-            onClick={()=>setOpenLocPicker(true)}
-          >
-            Pick property location
-          </OutlineButton>
-        </div>
-
-        {/* Property Details */}
-        <AddPropertyDetails 
-          listingCategory={category} 
-          onNegotiableChange={setNegotiable}
-          onFeaturesChange={setFeatures}
-          onFacilitiesChange={setFacilities}
-        />
-
-        {/* Submit Buttons */}
-        <div className="w-full mx-auto">
-          <div className="flex mt-16 gap-5 bottom-3">
-            <button className="px-2 py-2 bg-white rounded-full flex items-center shadow-md">
-              <FaArrowLeft className="text-xl" />
-            </button>
-
-            { authUser ? <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className={`px-4 py-2 rounded-md w-full text-white ${
-                isLoading ? "bg-gray-400" : "bg-green"
-              }`}
-            >
-              {isLoading ? "Adding..." : "Add Property"}
-            </button> : <button
-              disabled
-              className="px-4 py-2 rounded-md w-full text-white bg-gray-400" 
-            >
-              Add (Login on Pi Browser)
-            </button>
-            }
-          </div>
-        </div>
-      </div>
-
-    </div>
-    <PropertyLocationModal
-      isOpen={openLocPicker}
-      onClose={() => setOpenLocPicker(false)}
-      userCoordinates={userCoordinates}
-      fallbackCoordinates={[9.082, 8.6753]} // Nigeria default
-      onLocationSelect={handleLocationSelect}
-    />
-    
-    {/* Currency popup */}
-    <Popup header="Select currency" toggle={togglePopup} setToggle={setTogglePopup} useMask={true}>
-      <div className="my-3">
-        {Object.entries(CurrencyEnum).map(([key, value]) => (
-          <button
-            key={value}
-            onClick={() => {
-              setCurrency(value);
-              setTogglePopup(false);
+        {/* ── Upload progress banner ─────────────────────────────────────── */}
+        {isSubmitting && (
+          <div
+            className="mx-4 mt-3 px-4 py-3 rounded-2xl flex items-center gap-3"
+            style={{
+              background: "linear-gradient(135deg,#143d4d,#1e5f74)",
+              boxShadow:  "0 4px 16px rgba(30,95,116,0.28)",
             }}
-            className="w-full text-left p-3 border-b last:border-b-0 hover:bg-primary hover:text-white transition-colors cursor-pointer"
           >
-            {key.charAt(0).toUpperCase() + key.slice(1)} ({value})
-          </button>
-        ))}
+            {/* Spinner */}
+            <div
+              className="w-8 h-8 rounded-full border-[3px] animate-spin flex-shrink-0"
+              style={{ borderColor: "rgba(255,255,255,0.2)", borderTopColor: "white" }}
+            />
 
+            {/* Text */}
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-[13px] font-bold leading-tight truncate">
+                {uploadStage === "creating"
+                  ? "Creating your listing…"
+                  : `Uploading photo ${uploadProgress.current} of ${uploadProgress.total}`}
+              </p>
+              <p className="text-white/55 text-[11px] mt-0.5">
+                {uploadStage === "creating"
+                  ? "Saving title, price & location — this is fast"
+                  : "Photos compressed & sent one by one for reliability"}
+              </p>
+            </div>
+
+            {/* Photo progress dots */}
+            {uploadStage === "uploading" && uploadProgress.total > 0 && (
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {Array.from({ length: uploadProgress.total }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-full transition-all duration-300"
+                    style={{
+                      width:      i < uploadProgress.current ? 8 : 5,
+                      height:     i < uploadProgress.current ? 8 : 5,
+                      background: i < uploadProgress.current
+                        ? "#f0a500"
+                        : "rgba(255,255,255,0.25)",
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Form body ─────────────────────────────────────────────────── */}
+        <div className="px-4 pt-5 pb-4">
+          {currentStep === 1 && (
+            <Step1Basics
+              data={formData}
+              onUpdate={update}
+              onOpenLocationPicker={openLocationPicker}
+            />
+          )}
+          {currentStep === 2 && (
+            <Step2Details data={formData} onUpdate={update} />
+          )}
+          {currentStep === 3 && (
+            <Step3Preview
+              data={formData}
+              onUpdate={update}
+              onOpenLocationPicker={openLocationPicker}
+            />
+          )}
+        </div>
+
+        {/* ── Bottom action bar ──────────────────────────────────────────── */}
+        <div className="flex items-center gap-3 px-4 mt-4 pb-6">
+          {currentStep > 1 && (
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={isSubmitting}
+              className="w-[50px] h-[50px] rounded-full bg-white border-[1.5px] border-[#e5e7eb]
+                         flex items-center justify-center text-lg text-[#4b5563] flex-shrink-0
+                         shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all active:scale-95
+                         disabled:opacity-40 disabled:cursor-not-allowed"
+              onMouseEnter={(e) => {
+                if (!isSubmitting)
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#1e5f74";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "#e5e7eb";
+              }}
+              aria-label="Previous step"
+            >
+              ←
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={currentStep < 3 ? goNext : handleSubmit}
+            disabled={isSubmitting}
+            className="flex-1 py-[14px] rounded-xl text-white text-[15px] font-bold
+                       flex items-center justify-center gap-2.5
+                       transition-all duration-200 active:scale-[0.98]
+                       disabled:cursor-not-allowed"
+            style={{
+              background:  "linear-gradient(135deg,#143d4d 0%,#1e5f74 100%)",
+              boxShadow:   isSubmitting ? "none" : "0 4px 20px rgba(30,95,116,0.4)",
+              opacity:     isSubmitting ? 0.75 : 1,
+              fontFamily:  "'Raleway', sans-serif",
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting)
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 6px 24px rgba(30,95,116,0.55)";
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting)
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 4px 20px rgba(30,95,116,0.4)";
+            }}
+          >
+            {isSubmitting && (
+              <svg
+                className="animate-spin h-4 w-4 text-white flex-shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path  className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+              </svg>
+            )}
+            <span className="truncate">{ctaLabel}</span>
+          </button>
+        </div>
       </div>
-    </Popup>
+
+      {/* ── Location picker modal ─────────────────────────────────────────── */}
+      <PropertyLocationModal
+        isOpen={openLocPicker}
+        onClose={() => setOpenLocPicker(false)}
+        userCoordinates={formData.coordinates}
+        fallbackCoordinates={userCoordinates}
+        onLocationSelect={handleLocationSelect}
+      />
     </>
   );
 }

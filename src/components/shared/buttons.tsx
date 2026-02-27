@@ -9,8 +9,14 @@ export const BackButton = ()=> {
   const router = useRouter();
 
   return (
-    <button className="top-5 left-0 text-xl" onClick={()=>router.back()}>
-      <FaArrowLeft className="text-xl" />
+    <button
+      type="button"
+      onClick={router.back}
+      className="w-9 h-9 rounded-full flex items-center justify-center
+                 text-white text-sm cursor-pointer transition-colors
+                 bg-white/15 border border-white/25 hover:bg-white/25"
+    >
+      ←
     </button>
   )
 }

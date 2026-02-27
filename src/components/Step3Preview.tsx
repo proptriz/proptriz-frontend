@@ -1,0 +1,161 @@
+"use client";
+
+import type { PropertyFormData } from "../types/property";
+import { ListForEnum, NegotiableEnum } from "../types/property";
+import SectionCard from "./SectionCard";
+import MapPreview from "./MapPreview";
+
+interface Step3PreviewProps {
+  data: PropertyFormData;
+  onUpdate: (partial: Partial<PropertyFormData>) => void;
+  onOpenLocationPicker: () => void;
+}
+
+export default function Step3Preview({ data, onUpdate, onOpenLocationPicker }: Step3PreviewProps) {
+  return (
+    <div className="flex flex-col gap-4">
+
+      {/* Location */}
+      <SectionCard icon="📍" title="Location">
+        <div className="mb-3">
+          <div
+            className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
+                       rounded-xl px-3.5 py-3 transition-all duration-200"
+            onFocusCapture={(e) => {
+              e.currentTarget.style.borderColor = "#1e5f74";
+              e.currentTarget.style.background  = "white";
+              e.currentTarget.style.boxShadow   = "0 0 0 3px rgba(30,95,116,0.1)";
+            }}
+            onBlurCapture={(e) => {
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.background  = "#f9fafb";
+              e.currentTarget.style.boxShadow   = "none";
+            }}
+          >
+            <span className="text-[#9ca3af] text-base flex-shrink-0">🗺️</span>
+            <input
+              type="text"
+              placeholder="Street address, city…"
+              value={data.address}
+              onChange={(e) => onUpdate({ address: e.target.value })}
+              className="w-full outline-none bg-transparent text-sm
+                         text-[#111827] placeholder:text-[#9ca3af]"
+            />
+          </div>
+        </div>
+        <MapPreview
+          address={data.address}
+          coordinates={data.coordinates}
+          onChangeLocation={onOpenLocationPicker}
+        />
+      </SectionCard>
+
+      {/* Listing summary */}
+      <SectionCard icon="👁️" title="Listing Summary">
+        <div className="flex flex-col gap-3">
+
+          {/* Photo strip */}
+          {data.photos.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {data.photos.map((photo, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src={URL.createObjectURL(photo)}
+                  alt={`preview-${i}`}
+                  className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border border-[#e5e7eb]"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Key info grid */}
+          <div className="grid grid-cols-2 gap-2">
+            <SummaryItem label="Title"    value={data.title || "—"} />
+            <SummaryItem label="Category" value={data.category} />
+            <SummaryItem
+              label="Price"
+              value={`${data.currency}${Number(data.price).toLocaleString()}`}
+              highlight
+            />
+            <SummaryItem
+              label="Listed For"
+              value={data.listedFor === ListForEnum.rent ? "Rent" : "Sale"}
+            />
+            {data.listedFor === ListForEnum.rent && (
+              <SummaryItem label="Period" value={data.renewPeriod} />
+            )}
+            <SummaryItem label="Status"   value={data.status} />
+            <SummaryItem label="Duration" value={`${data.duration} weeks`} />
+            <SummaryItem
+              label="Negotiable"
+              value={data.negotiable === NegotiableEnum.Negotiable ? "✅ Yes" : "🔒 No"}
+            />
+          </div>
+
+          {/* Features */}
+          {data.features.length > 0 && (
+            <div className="pt-2 border-t border-[#e5e7eb]">
+              <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1.5">Features</p>
+              <div className="flex flex-wrap gap-2">
+                {data.features.filter(f => f.name).map((f) => (
+                  <span
+                    key={f.name}
+                    className="text-xs font-medium px-2.5 py-1 rounded-full"
+                    style={{ background: "#e0f0f5", color: "#1e5f74" }}
+                  >
+                    {f.name}: {f.quantity}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Facilities */}
+          {data.facilities.filter(Boolean).length > 0 && (
+            <div className="pt-2 border-t border-[#e5e7eb]">
+              <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1.5">Facilities</p>
+              <div className="flex flex-wrap gap-1.5">
+                {data.facilities.filter(f => f && !f.startsWith("__custom_")).map((f) => (
+                  <span
+                    key={f}
+                    className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                    style={{ background: "#fef3cd", color: "#c88400" }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Description */}
+          {data.description && (
+            <div className="pt-2 border-t border-[#e5e7eb]">
+              <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1">Description</p>
+              <p className="text-xs text-[#4b5563] leading-relaxed line-clamp-3">
+                {data.description}
+              </p>
+            </div>
+          )}
+        </div>
+      </SectionCard>
+    </div>
+  );
+}
+
+function SummaryItem({ label, value, highlight }: {
+  label: string; value: string; highlight?: boolean;
+}) {
+  return (
+    <div className="bg-[#f9fafb] rounded-xl px-3 py-2.5 border border-[#f0f0f0]">
+      <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide">{label}</p>
+      <p
+        className="text-sm font-bold mt-0.5 capitalize"
+        style={{ color: highlight ? "#1e5f74" : "#111827" }}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}

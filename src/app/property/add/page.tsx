@@ -236,7 +236,7 @@ export default function AddPropertyPage() {
       ? "Preview Listing →"
     : "Publish Property 🎉";
 
-  if (!authUser) return <Splash />;
+  if (!authUser) return <Splash showFooter />;
 
   // ─────────────────────────────────────────────────────────────────────────
   return (

@@ -8,7 +8,6 @@ import { CategoryEnum, Feature, NegotiableEnum } from "@/types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-/** Emoji map for known facility names — no icon library needed */
 const FACILITY_ICONS: Record<string, string> = {
   "Parking Lot":       "🅿️",
   "Pet Allowed":       "🐾",
@@ -37,19 +36,43 @@ const CATEGORY_FEATURES: Record<string, Feature[]> = {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AddPropertyDetailsProps {
-  listingCategory: CategoryEnum;
-  existingFeatures?: Feature[];
+  listingCategory:     CategoryEnum;
+  existingFeatures?:   Feature[];
   existingFacilities?: string[];
   onNegotiableChange?: (value: NegotiableEnum) => void;
-  onFeaturesChange?: (features: Feature[]) => void;
+  onFeaturesChange?:   (features: Feature[]) => void;
   onFacilitiesChange?: (facilities: string[]) => void;
+}
+
+// ─── Stable custom facility type ─────────────────────────────────────────────
+//
+//  ROOT CAUSE OF THE BUG:
+//    customFacilities was string[]. Every input was keyed by its array index.
+//    When the user typed a character, setState ran, React re-rendered, and
+//    because the keys were positional (0, 1, 2…) React couldn't guarantee
+//    it was looking at the same DOM node — so it unmounted and remounted
+//    the focused input, stealing focus.
+//
+//  FIX:
+//    Each custom facility is now { id, value }. The id is assigned exactly
+//    once when the entry is created and never changes. Keying the JSX element
+//    by id means React always reconciles to the same DOM node regardless of
+//    how many siblings are added or removed around it → focus is never lost.
+//
+type CustomFacility = { id: string; value: string };
+
+function makeId(): string {
+  return `cf_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+}
+function makeCustomFacility(value = ""): CustomFacility {
+  return { id: makeId(), value };
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 interface FeatureRowProps {
-  feature: Feature;
-  index: number;
+  feature:  Feature;
+  index:    number;
   onChange: (index: number, key: keyof Feature, value: string | number) => void;
   onRemove: (index: number) => void;
 }
@@ -59,16 +82,13 @@ function FeatureRow({ feature, index, onChange, onRemove }: FeatureRowProps) {
     <div
       className="flex items-center gap-2 px-3 py-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
                  rounded-xl transition-all duration-200
-                 focus-within:border-[#1a7a4a] focus-within:bg-white
-                 focus-within:shadow-[0_0_0_3px_rgba(26,122,74,0.08)]"
+                 focus-within:border-[#1e5f74] focus-within:bg-white
+                 focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.08)]"
     >
-      {/* Drag handle hint */}
-      <span className="text-[#d1d5db] text-sm cursor-grab select-none flex-shrink-0"
-            title="Drag to reorder">
+      <span className="text-[#d1d5db] text-sm cursor-grab select-none flex-shrink-0" title="Drag to reorder">
         ⠿
       </span>
 
-      {/* Name input */}
       <input
         type="text"
         placeholder="e.g. Swimming Pool, Garden…"
@@ -78,17 +98,14 @@ function FeatureRow({ feature, index, onChange, onRemove }: FeatureRowProps) {
                    placeholder:text-[#9ca3af] min-w-0"
       />
 
-      {/* Inline counter */}
       <div className="flex items-center border-[1.5px] border-[#e5e7eb] rounded-lg overflow-hidden flex-shrink-0">
         <button
           type="button"
           onClick={() => onChange(index, "quantity", Math.max(1, feature.quantity - 1))}
           className="w-7 h-7 flex items-center justify-center text-base
-                     bg-[#e8f5ee] text-[#1a7a4a] font-light
-                     hover:bg-[#2ea06a] hover:text-white transition-colors"
-        >
-          −
-        </button>
+                     bg-[#e0f0f5] text-[#1e5f74]
+                     hover:bg-[#1e5f74] hover:text-white transition-colors"
+        >−</button>
         <span className="w-7 text-center text-[13px] font-bold text-[#111827]">
           {feature.quantity}
         </span>
@@ -96,14 +113,11 @@ function FeatureRow({ feature, index, onChange, onRemove }: FeatureRowProps) {
           type="button"
           onClick={() => onChange(index, "quantity", feature.quantity + 1)}
           className="w-7 h-7 flex items-center justify-center text-base
-                     bg-[#e8f5ee] text-[#1a7a4a] font-light
-                     hover:bg-[#2ea06a] hover:text-white transition-colors"
-        >
-          +
-        </button>
+                     bg-[#e0f0f5] text-[#1e5f74]
+                     hover:bg-[#1e5f74] hover:text-white transition-colors"
+        >+</button>
       </div>
 
-      {/* Remove button */}
       <button
         type="button"
         onClick={() => onRemove(index)}
@@ -111,7 +125,7 @@ function FeatureRow({ feature, index, onChange, onRemove }: FeatureRowProps) {
                    flex-shrink-0 hover:bg-red-500 hover:text-white transition-colors"
         aria-label={`Remove ${feature.name}`}
       >
-        <IoClose size={13} strokeWidth={2} />
+        <IoClose size={13} />
       </button>
     </div>
   );
@@ -121,7 +135,7 @@ function FeatureRow({ feature, index, onChange, onRemove }: FeatureRowProps) {
 
 export default function AddPropertyDetails({
   listingCategory,
-  existingFeatures = [],
+  existingFeatures   = [],
   existingFacilities = [],
   onNegotiableChange,
   onFeaturesChange,
@@ -130,70 +144,68 @@ export default function AddPropertyDetails({
 
   const categoryDefaults = CATEGORY_FEATURES[listingCategory] ?? [];
 
-  // ── State ──────────────────────────────────────────────────────────────────
   const [negotiable, setNegotiable] = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
 
-  /** Single source of truth — merge existing or fall back to category defaults */
   const [features, setFeatures] = useState<Feature[]>(
     existingFeatures.length > 0 ? existingFeatures : categoryDefaults
   );
 
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>(existingFacilities);
-  const [customFacilities, setCustomFacilities]     = useState<string[]>([]);
+
+  // Stable entries — id assigned once, never changes
+  const [customFacilities, setCustomFacilities] = useState<CustomFacility[]>(() =>
+    existingFacilities
+      .filter((f) => !DEFAULT_FACILITIES.includes(f))
+      .map((f) => makeCustomFacility(f))
+  );
 
   // ── Notify parent ──────────────────────────────────────────────────────────
   useEffect(() => { onNegotiableChange?.(negotiable); }, [negotiable, onNegotiableChange]);
   useEffect(() => { onFeaturesChange?.(features); }, [features, onFeaturesChange]);
   useEffect(() => {
-    onFacilitiesChange?.([...selectedFacilities, ...customFacilities.filter(Boolean)]);
+    onFacilitiesChange?.([
+      ...selectedFacilities,
+      ...customFacilities.map((c) => c.value).filter(Boolean),
+    ]);
   }, [selectedFacilities, customFacilities, onFacilitiesChange]);
 
   // ── Feature handlers ───────────────────────────────────────────────────────
   const handleFeatureChange = useCallback(
-    (index: number, key: keyof Feature, value: string | number) => {
+    (index: number, key: keyof Feature, value: string | number) =>
       setFeatures((prev) => {
-        const updated = [...prev];
-        updated[index] = { ...updated[index], [key]: value };
-        return updated;
-      });
-    },
+        const next = [...prev];
+        next[index] = { ...next[index], [key]: value };
+        return next;
+      }),
     []
   );
+  const handleAddFeature    = useCallback(() =>
+    setFeatures((prev) => [...prev, { name: "", quantity: 1 }]), []);
+  const handleRemoveFeature = useCallback((index: number) =>
+    setFeatures((prev) => prev.filter((_, i) => i !== index)), []);
 
-  const handleAddFeature = useCallback(() => {
-    setFeatures((prev) => [...prev, { name: "", quantity: 1 }]);
-  }, []);
-
-  const handleRemoveFeature = useCallback((index: number) => {
-    setFeatures((prev) => prev.filter((_, i) => i !== index));
-  }, []);
-
-  // ── Facility handlers ──────────────────────────────────────────────────────
-  const toggleFacility = useCallback((facility: string) => {
+  // ── Standard facility toggle ───────────────────────────────────────────────
+  const toggleFacility = useCallback((facility: string) =>
     setSelectedFacilities((prev) =>
       prev.includes(facility)
         ? prev.filter((f) => f !== facility)
         : [...prev, facility]
-    );
-  }, []);
+    ), []);
 
-  const handleAddCustomFacility = useCallback(() => {
-    setCustomFacilities((prev) => [...prev, ""]);
-  }, []);
+  // ── Custom facility handlers (keyed by stable id, not index) ──────────────
+  const handleAddCustomFacility = useCallback(() =>
+    setCustomFacilities((prev) => [...prev, makeCustomFacility()]), []);
 
-  const handleCustomFacilityChange = useCallback((index: number, value: string) => {
-    setCustomFacilities((prev) => {
-      const updated = [...prev];
-      updated[index] = value;
-      return updated;
-    });
-  }, []);
+  // Mutates only the matching entry by id — all other entries are untouched,
+  // their keys are unchanged, their DOM nodes are NOT remounted.
+  const handleCustomFacilityChange = useCallback((id: string, value: string) =>
+    setCustomFacilities((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, value } : c))
+    ), []);
 
-  const handleRemoveCustomFacility = useCallback((index: number) => {
-    setCustomFacilities((prev) => prev.filter((_, i) => i !== index));
-  }, []);
+  const handleRemoveCustomFacility = useCallback((id: string) =>
+    setCustomFacilities((prev) => prev.filter((c) => c.id !== id)), []);
 
-  // ── All visible facilities (built-in + any extra from existingFacilities) ──
   const extraExisting = existingFacilities.filter((f) => !DEFAULT_FACILITIES.includes(f));
   const allFacilities = [...DEFAULT_FACILITIES, ...extraExisting];
 
@@ -204,16 +216,17 @@ export default function AddPropertyDetails({
 
         {/* ── Negotiable ──────────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
-          <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1a7a4a] inline-block" />
+          <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
+                        flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
             Price Negotiation
           </p>
 
           <div className="flex gap-2">
-            {[
-              { value: NegotiableEnum.Negotiable,    label: "✅ Negotiable",  },
-              { value: NegotiableEnum.NonNegotiable, label: "🔒 Fixed Price", },
-            ].map((opt) => (
+            {([
+              { value: NegotiableEnum.Negotiable,    label: "✅ Negotiable"  },
+              { value: NegotiableEnum.NonNegotiable, label: "🔒 Fixed Price" },
+            ] as const).map((opt) => (
               <button
                 key={opt.value}
                 type="button"
@@ -221,8 +234,8 @@ export default function AddPropertyDetails({
                 className={`flex-1 py-2.5 rounded-xl border-[1.5px] text-[13px] font-medium
                             transition-all duration-200
                             ${negotiable === opt.value
-                              ? "bg-[#1a7a4a] text-white border-[#1a7a4a] font-bold"
-                              : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#2ea06a]"
+                              ? "bg-[#1e5f74] text-white border-[#1e5f74] font-bold"
+                              : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#1e5f74]"
                             }`}
               >
                 {opt.label}
@@ -239,21 +252,20 @@ export default function AddPropertyDetails({
 
         {/* ── Property Features ────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
-          <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1a7a4a] inline-block" />
+          <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
+                        flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
             Property Features
           </p>
 
-          {/* Category defaults badge */}
           {existingFeatures.length === 0 && categoryDefaults.length > 0 && (
-            <div className="inline-flex items-center gap-1.5 bg-[#e8f5ee] text-[#1a7a4a]
+            <div className="inline-flex items-center gap-1.5 bg-[#e0f0f5] text-[#1e5f74]
                             text-[11px] font-bold px-3 py-1 rounded-full mb-3">
               {listingCategory === "house" ? "🏠" : listingCategory === "land" ? "🏘️" : "🏢"}
               {listingCategory.charAt(0).toUpperCase() + listingCategory.slice(1)} defaults loaded
             </div>
           )}
 
-          {/* Feature list — single source, no duplicate .map() */}
           <div className="flex flex-col gap-2">
             {features.map((feature, index) => (
               <FeatureRow
@@ -266,96 +278,76 @@ export default function AddPropertyDetails({
             ))}
           </div>
 
-          {/* Add feature */}
           <button
             type="button"
             onClick={handleAddFeature}
-            className="w-full mt-3 flex items-center justify-center gap-2
-                       py-2.5 rounded-xl border-[1.5px] border-dashed border-[#1a7a4a]
-                       text-[#1a7a4a] text-[12px] font-semibold
-                       bg-transparent hover:bg-[#e8f5ee] hover:border-solid
+            className="w-full mt-3 flex items-center justify-center gap-2 py-2.5
+                       rounded-xl border-[1.5px] border-dashed border-[#1e5f74]
+                       text-[#1e5f74] text-[12px] font-semibold
+                       bg-transparent hover:bg-[#e0f0f5] hover:border-solid
                        transition-all duration-200"
           >
-            <FaPlus size={10} />
-            Add feature
+            <FaPlus size={10} /> Add feature
           </button>
         </div>
 
         {/* ── Facilities ───────────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
-          <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1a7a4a] inline-block" />
+          <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
+                        flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
             Environment &amp; Facilities
           </p>
 
-          {/* Standard facility chips */}
+          {/* Standard chips */}
           <div className="flex flex-wrap gap-2">
             {allFacilities.map((facility) => {
-              const isSelected = selectedFacilities.includes(facility);
-              const icon = FACILITY_ICONS[facility];
+              const selected = selectedFacilities.includes(facility);
               return (
                 <button
                   key={facility}
                   type="button"
                   onClick={() => toggleFacility(facility)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                              border-[1.5px] text-[11px] font-medium
-                              transition-all duration-200
-                              ${isSelected
-                                ? "border-[#1a7a4a] bg-[#e8f5ee] text-[#1a7a4a] font-bold"
-                                : "border-[#e5e7eb] bg-[#f9fafb] text-[#4b5563] hover:border-[#2ea06a]"
+                              border-[1.5px] text-[11px] font-medium transition-all duration-200
+                              ${selected
+                                ? "border-[#1e5f74] bg-[#e0f0f5] text-[#1e5f74] font-bold"
+                                : "border-[#e5e7eb] bg-[#f9fafb] text-[#4b5563] hover:border-[#1e5f74]"
                               }`}
                 >
-                  {icon && <span>{icon}</span>}
+                  {FACILITY_ICONS[facility] && <span>{FACILITY_ICONS[facility]}</span>}
                   {facility}
                 </button>
               );
             })}
-
-            {/* Custom facility chips (already saved) */}
-            {customFacilities
-              .filter(Boolean)
-              .map((fac, i) => (
-                <span
-                  key={`custom-${i}`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                             border-[1.5px] border-dashed border-[#f5a623]
-                             bg-[#fffbeb] text-[#92400e] text-[11px] font-medium"
-                >
-                  ✨ {fac}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveCustomFacility(i)}
-                    className="text-[#d97706] hover:text-[#92400e] transition-colors ml-0.5"
-                  >
-                    <IoClose size={11} />
-                  </button>
-                </span>
-              ))
-            }
           </div>
 
-          {/* Custom facility inputs (being typed) */}
-          {customFacilities.map((fac, index) => (
+          {/* ── Custom facility inputs ────────────────────────────────────────
+               key={entry.id}  ← the only thing that matters for the fix.
+               id is set once at creation; React maps the same key → same
+               DOM <input> → browser never unmounts the focused element.
+          ───────────────────────────────────────────────────────────────── */}
+          {customFacilities.map((entry) => (
             <div
-              key={`input-${index}`}
+              key={entry.id}
               className="flex items-center gap-2 mt-3 px-3 py-2.5
-                         bg-[#fffbeb] border-[1.5px] border-dashed border-[#f5a623]
+                         bg-[#fffbeb] border-[1.5px] border-dashed border-[#f0a500]
                          rounded-xl transition-all duration-200
-                         focus-within:border-solid focus-within:shadow-[0_0_0_3px_rgba(245,166,35,0.12)]"
+                         focus-within:border-solid
+                         focus-within:shadow-[0_0_0_3px_rgba(240,165,0,0.12)]"
             >
               <span className="text-[#d97706] text-sm flex-shrink-0">✏️</span>
               <input
                 type="text"
                 placeholder="Custom facility name…"
-                value={fac}
-                onChange={(e) => handleCustomFacilityChange(index, e.target.value)}
+                value={entry.value}
+                onChange={(e) => handleCustomFacilityChange(entry.id, e.target.value)}
                 className="flex-1 bg-transparent border-none outline-none
                            text-sm text-[#111827] placeholder:text-[#d97706]"
               />
               <button
                 type="button"
-                onClick={() => handleRemoveCustomFacility(index)}
+                onClick={() => handleRemoveCustomFacility(entry.id)}
                 className="text-[#f59e0b] hover:text-red-500 transition-colors flex-shrink-0"
                 aria-label="Remove"
               >
@@ -364,17 +356,15 @@ export default function AddPropertyDetails({
             </div>
           ))}
 
-          {/* Add custom facility */}
           <button
             type="button"
             onClick={handleAddCustomFacility}
-            className="w-full mt-3 flex items-center justify-center gap-2
-                       py-2.5 rounded-xl border-[1.5px] border-dashed border-[#f5a623]
+            className="w-full mt-3 flex items-center justify-center gap-2 py-2.5
+                       rounded-xl border-[1.5px] border-dashed border-[#f0a500]
                        text-[#92400e] text-[12px] font-semibold bg-[#fffbeb]
                        hover:bg-[#fef3c7] hover:border-solid transition-all duration-200"
           >
-            <FaPlus size={10} />
-            Add Custom Facility
+            <FaPlus size={10} /> Add Custom Facility
           </button>
         </div>
 

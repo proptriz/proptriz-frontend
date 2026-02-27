@@ -1,22 +1,29 @@
 import { CurrencyEnum, PropertyProps } from "@/types";
 import formatPrice from "@/utils/formatPrice";
 
-const formatDistance = (distance?: string | number) => {
-  if (!distance) return null;
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-  const meters = typeof distance === "string"
-    ? Number(distance)
-    : distance;
-
+const formatDistance = (distance?: string | number): string | null => {
+  if (distance === undefined || distance === null) return null;
+  const meters = typeof distance === "string" ? Number(distance) : distance;
   if (Number.isNaN(meters)) return null;
-
-  if (meters < 1000) {
-    return `${Math.round(meters)} m`;
-  }
-
-  return `${(meters / 1000).toFixed(1)} km`;
+  return meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`;
 };
 
+const CURRENCY_SYMBOL: Record<CurrencyEnum, string> = {
+  [CurrencyEnum.naira]:   "₦",
+  [CurrencyEnum.dollar]: "$",
+  [CurrencyEnum.pound]:  "£",
+  [CurrencyEnum.euro]:   "€",
+};
+
+const LISTED_FOR_STYLES: Record<string, string> = {
+  rent:       "text-[#1e5f74] border-[#b8dde8] bg-white",
+  sale:       "text-[#143d4d] border-[#e0f0f5] bg-[#e0f0f5]",
+  commercial: "text-[#c88400] border-[#fef3cd] bg-[#fef3cd]",
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export const VerticalCard = ({
   id,
@@ -30,59 +37,93 @@ export const VerticalCard = ({
   period,
   listed_for,
   distance,
-  expired
-}: PropertyProps ) => {
+  expired,
+}: PropertyProps) => {
+  const symbol    = CURRENCY_SYMBOL[currency as CurrencyEnum] ?? "";
+  const distLabel = formatDistance(distance);
+  const badgeStyle =
+    LISTED_FOR_STYLES[listed_for?.toLowerCase() ?? ""] ??
+    LISTED_FOR_STYLES.rent;
+
   return (
-    <div className="bg-white p-3 rounded-2xl shadow-md" key={id}>
-      <div className="w-full bg-cover bg-center h-48 rounded-xl relative" style={{ backgroundImage: `url(${image})`}}>
-        {/* Listed For */}
-        <div className="absolute top-2 left-2 font-bold bg-white text-primary text-sm px-2 py-1 rounded-lg">
-          For {listed_for}
-        </div>
-        
-        {/* Property Type */}
-        <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded-lg">
-          <span className="text-yellow-500">★</span>
-          {rating} | {category}
-        </div>
-      </div>
-      
-      <div className="mt-3 gap-1">
-        <p className="flex text-primary items-center text-lg">
-          <span className=""> 
-            {currency===CurrencyEnum.naira ? "₦" : currency===CurrencyEnum.dollars ? "$" : currency===CurrencyEnum.pounds ? "£" : currency===CurrencyEnum.euros ? "€" : ""}
-          </span> 
-          
-          <span className="font-semibold"> 
-            {formatPrice(price)}
+    <div
+      key={id}
+      className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] overflow-hidden
+                 transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
+    >
+      {/* ── Image area ─────────────────────────────────────────────────────── */}
+      <div
+        className="relative h-36 bg-cover bg-center"
+        style={{ backgroundImage: `url(${image})` }}
+      >
+        {/* Gradient scrim for legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-t-2xl" />
+
+        {/* Listed-for badge */}
+        {listed_for && (
+          <span
+            className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1
+                        rounded-[6px] border-[1.5px] leading-none ${badgeStyle}`}
+          >
+            For {listed_for}
           </span>
-          
-          <span className="text-xs ms-1">
-            {period}
-          </span>
-          
-          {expired && <span className="ms-auto bg-red-800 text-white text-sm p-1 rounded-md">
+        )}
+
+        {/* Expired badge */}
+        {expired && (
+          <span className="absolute top-2 right-2 bg-red-500 text-white text-[9px]
+                           font-bold px-1.5 py-0.5 rounded-md leading-none">
             Expired
-          </span>}
-        </p>                    
-        
-        <p className="text-md font-semibold">
-          {name}
-        </p>
-        
-        <div className="flex space-x-2">
-          <p className="text-gray-500 text-sm">
-            {address}
-          </p>
+          </span>
+        )}
+
+        {/* Bottom-left: rating + category */}
+        <div className="absolute bottom-2 left-2 flex items-center gap-1
+                        bg-black/55 backdrop-blur-[2px] text-white
+                        text-[10px] font-medium px-2 py-1 rounded-md leading-none">
+          <span className="text-[#f0a500]">★</span>
+          {rating} · {category}
         </div>
 
-        {distance && (
-          <div className="inline-flex items-center card-bg rounded-md text-xs px-2 py-1 mt-2 w-fit">
-            {formatDistance(distance)}
-          </div>
+        {/* Bottom-right: distance */}
+        {distLabel && (
+          <span className="absolute bottom-2 right-2 bg-[#1e5f74]/90 text-white
+                           text-[9px] font-bold px-1.5 py-0.5 rounded-md leading-none">
+            {distLabel}
+          </span>
         )}
       </div>
-    </div>
-  )
-}
 
+      {/* ── Body ───────────────────────────────────────────────────────────── */}
+      <div className="px-3 pt-2.5 pb-3">
+        {/* Price row */}
+        <div className="flex items-baseline gap-1">
+          <span
+            className={`text-[15px] font-extrabold ${
+              expired ? "text-red-500" : "text-[#1e5f74]"
+            }`}
+          >
+            {symbol}{formatPrice(price)}
+          </span>
+          {period && (
+            <span className="text-[10px] text-[#9ca3af] font-normal">
+              /{period}
+            </span>
+          )}
+        </div>
+
+        {/* Name */}
+        <p className="text-[12px] font-semibold text-[#111827] mt-0.5
+                      truncate leading-snug">
+          {name}
+        </p>
+
+        {/* Address */}
+        <p className="text-[10px] text-[#9ca3af] mt-1 truncate flex items-center gap-1">
+          <span>📍</span>
+          {address}
+        </p>
+      </div>
+    </div>
+  );
+};

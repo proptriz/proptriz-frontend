@@ -6,7 +6,7 @@ const Price = ({price, currency, tenancyPeriod="", }: {price: number, currency?:
     <div className="" >                  
       <p className="text-2xl text-right font-semibold text-primary flex items-center">
         <span className="">
-          {currency===CurrencyEnum.naira ? "₦" : currency===CurrencyEnum.dollars ? "$" : currency===CurrencyEnum.pounds ? "£" : currency===CurrencyEnum.euros ? "€" : ""}
+          {currency===CurrencyEnum.naira ? "₦" : currency===CurrencyEnum.dollar ? "$" : currency===CurrencyEnum.pound ? "£" : currency===CurrencyEnum.euro ? "€" : ""}
         </span>
         { formatPrice(price) }
       </p>

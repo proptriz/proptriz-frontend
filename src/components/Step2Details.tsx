@@ -138,8 +138,8 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
         <TogglePills<PropertyStatusEnum>
           options={[
             { label: "Available", value: PropertyStatusEnum.available, icon: "✅" },
-            { label: "Reserved",  value: PropertyStatusEnum.rented,    icon: "⏳" },
-            { label: "Taken",     value: PropertyStatusEnum.sold,      icon: "❌" },
+            { label: "Rented",  value: PropertyStatusEnum.rented,    icon: "⏳" },
+            { label: "Unavailable",     value: PropertyStatusEnum.unavailable,      icon: "❌" },
           ]}
           value={data.status}
           onChange={(val) => onUpdate({ status: val })}

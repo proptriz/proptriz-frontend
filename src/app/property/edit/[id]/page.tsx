@@ -23,6 +23,7 @@ import PropertyLocationModal    from "@/components/property/PropertyLocationSect
 import { getPropertyById, updateProperty, deleteUserProperty } from "@/services/propertyApi";
 import getUserPosition           from "@/utils/getUserPosition";
 import logger                    from "../../../../../logger.config.mjs";
+import { BackButton } from "@/components/shared/BackButton";
 
 // ─── Facility data ────────────────────────────────────────────────────────────
 
@@ -332,16 +333,7 @@ export default function EditPropertyPage({
           </div>
 
           <div className="flex items-center gap-3.5 relative z-10">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0
-                         text-white bg-white/15 border border-white/25 hover:bg-white/25
-                         active:scale-95 transition-all"
-              aria-label="Go back"
-            >
-              ←
-            </button>
+            <BackButton />
 
             <div className="flex-1 min-w-0">
               <h1 className="text-white text-[20px] font-black leading-tight"

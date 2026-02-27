@@ -1,52 +1,51 @@
-
 "use client";
-import React, { SetStateAction, useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import * as L from 'leaflet';
-import type { LatLngExpression } from 'leaflet';
-import { PropertyType } from '@/types'
+
+import React, { SetStateAction, useEffect, useMemo, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import * as L from "leaflet";
+import type { LatLngExpression } from "leaflet";
+import { ListForEnum, PropertyType } from "@/types";
 import debounce from "lodash.debounce";
-import MapMarkerPopup from './MapMarkerPopup';
+import MapMarkerPopup from "./MapMarkerPopup";
+import { createPriceIcon } from "./PriceMarkerIcon";
 
-const propertyIcon = L.icon({
-  iconUrl: '/pin.png',
-  // shadowUrl: '/pin.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+// ─── User-location icon ───────────────────────────────────────────────────────
+// Replaced brittle /location/location-banner.png with an inline SVG data-URL
+// so the user dot always renders even if the image asset is missing.
+const locationIcon = L.divIcon({
+  className: "",
+  html: `<div style="
+    width:16px;height:16px;
+    background:#3b82f6;
+    border:3px solid white;
+    border-radius:50%;
+    box-shadow:0 0 0 6px rgba(59,130,246,0.25);
+  "></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
 });
 
-const locationIcon = L.icon({
-  iconUrl: '/location/location-banner.png',
-  iconSize: [35, 41],
-  iconAnchor: [12, 41],
-});
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 interface MapUpdaterProps {
   center: LatLngExpression;
   zoom: number;
 }
 
-// This component updates the map view
+/** Restores saved map position from sessionStorage on mount, then sets to center/zoom */
 const MapUpdater = ({ center, zoom }: MapUpdaterProps) => {
   const map = useMap();
-  
   useEffect(() => {
-    // ✅ Restore state on mount
-    const savedCenter = sessionStorage.getItem('prevMapCenter');
-    const savedZoom = sessionStorage.getItem('prevMapZoom');
-    
+    const savedCenter = sessionStorage.getItem("prevMapCenter");
+    const savedZoom   = sessionStorage.getItem("prevMapZoom");
     if (savedCenter && savedZoom) {
       const [lat, lng] = JSON.parse(savedCenter);
       map.setView([lat, lng], parseInt(savedZoom, 10));
-      
     } else {
       map.setView(center, zoom);
     }
   }, [center, zoom, map]);
-  
   return null;
 };
 
@@ -54,45 +53,37 @@ interface MapBoundsUpdaterProps {
   onBoundsChange: (bounds: L.LatLngBounds) => void;
 }
 
+/** Fires onBoundsChange on every move/zoom end, debounced 500ms */
 const MapBoundsUpdater: React.FC<MapBoundsUpdaterProps> = ({ onBoundsChange }) => {
   const map = useMap();
 
-  const debouncedUpdateBounds = useMemo(
+  const debouncedUpdate = useMemo(
     () =>
       debounce(() => {
-        const currentCenter = map.getCenter();
-        const currentZoom = map.getZoom();
-
-        // Persist into sessionStorage
-        sessionStorage.setItem(
-          'prevMapCenter',
-          JSON.stringify([currentCenter.lat, currentCenter.lng])
-        );
-        sessionStorage.setItem('prevMapZoom', currentZoom.toString());
-
-        const bounds = map.getBounds();
-        onBoundsChange(bounds);
+        const c = map.getCenter();
+        sessionStorage.setItem("prevMapCenter", JSON.stringify([c.lat, c.lng]));
+        sessionStorage.setItem("prevMapZoom", map.getZoom().toString());
+        onBoundsChange(map.getBounds());
       }, 500),
     [map, onBoundsChange]
   );
 
   useEffect(() => {
-    // listen to map events
-    map.on("moveend", debouncedUpdateBounds);
-    map.on("zoomend", debouncedUpdateBounds);
-
-    // trigger on mount
-    debouncedUpdateBounds();
+    map.on("moveend", debouncedUpdate);
+    map.on("zoomend", debouncedUpdate);
+    debouncedUpdate(); // initial trigger
 
     return () => {
-      map.off("moveend", debouncedUpdateBounds);
-      map.off("zoomend", debouncedUpdateBounds);
-      debouncedUpdateBounds.cancel(); // ✅ cleanup debounce
+      map.off("moveend", debouncedUpdate);
+      map.off("zoomend", debouncedUpdate);
+      debouncedUpdate.cancel();
     };
-  }, [map, debouncedUpdateBounds]);
+  }, [map, debouncedUpdate]);
 
   return null;
 };
+
+// ─── Main Map component ───────────────────────────────────────────────────────
 
 interface MapProps {
   properties: PropertyType[];
@@ -100,63 +91,91 @@ interface MapProps {
   initialZoom?: number;
   mapBounds?: L.LatLngBounds | null;
   setMapBounds?: React.Dispatch<SetStateAction<L.LatLngBounds | null>>;
-  searchLabel?: string;
+  /** Called when a property marker is tapped — use this for the peek card */
+  onMarkerClick?: (property: PropertyType) => void;
 }
 
-const Map: React.FC<MapProps> = ({ 
-  properties, 
+const Map: React.FC<MapProps> = ({
+  properties,
   mapCenter,
   initialZoom = 7,
-  setMapBounds  = () => {},
+  setMapBounds = () => {},
+  onMarkerClick = () => {},
 }) => {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  /** Nigeria/West-Africa bounding box prevents panning off continent */
   const africaBounds: L.LatLngBoundsExpression = [
-    [-35, -20], // South-West (latitude, longitude)
-    [38, 55],   // North-East
+    [-35, -20],
+    [38, 55],
   ];
 
+  const handleMarkerClick = (property: PropertyType) => {
+    setSelectedId(property._id);
+    onMarkerClick(property); // notify parent (e.g. show peek card in ExplorePage)
+  };
+
+  const handlePopupClose = () => {
+    setSelectedId(null);
+  };
+
   return (
-    <div className="absolute h-full w-full z-0" style={{ minHeight: 400, height: '100%', overflow: 'hidden' }}>
-      
-      {/* Map Container */}
+    <div
+      className="absolute inset-0 z-0"
+      style={{ minHeight: 400, overflow: "hidden" }}
+    >
       <MapContainer
-        center={mapCenter ?? [9.082, 8.6753]} 
+        center={mapCenter ?? [9.082, 8.6753]}
+        zoom={initialZoom}
         zoomControl={false}
         maxBounds={africaBounds}
         maxBoundsViscosity={1.0}
-        className="w-full flex-1 fixed bottom-0 h-full left-0 right-0"
+        className="w-full h-full"
       >
+        {/* Map tiles */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
+        {/* Restore/update position */}
         {mapCenter && (
-          <MapUpdater
-            center={mapCenter as LatLngExpression}
-            zoom={initialZoom}
-          />
+          <MapUpdater center={mapCenter as LatLngExpression} zoom={initialZoom} />
         )}
-        {/* Capture bounds */}
+
+        {/* Bounds updater */}
         {mapCenter && <MapBoundsUpdater onBoundsChange={setMapBounds} />}
 
-        {/* User Location Marker */}
+        {/* User location marker */}
         {mapCenter && (
-          <Marker position={mapCenter as LatLngExpression} icon={locationIcon as any} />
+          <Marker
+            position={mapCenter as LatLngExpression}
+            icon={locationIcon}
+            zIndexOffset={1000}
+          />
         )}
 
-        {properties.map(property => (
+        {/* Property markers — price pins, colour-coded by listing type */}
+        {properties.map((property) => (
           <Marker
             key={property._id}
-            position={[property.latitude, property.longitude]  as LatLngExpression}
-            icon={propertyIcon as any}
+            position={[property.latitude, property.longitude] as LatLngExpression}
+            icon={createPriceIcon({
+              price: property.price,
+              listedFor: property.listed_for as ListForEnum,
+              isSelected: selectedId === property._id,
+            })}
+            eventHandlers={{
+              click: () => handleMarkerClick(property),
+              popupclose: handlePopupClose,
+            }}
           >
-            <Popup 
-              closeButton={true}
+            <Popup
+              closeButton
               minWidth={200}
-              maxWidth={250}
+              maxWidth={260}
               className="custom-popup"
-              offset={L.point(0, -3)}
+              offset={L.point(0, -4)}
             >
               <MapMarkerPopup property={property} />
             </Popup>

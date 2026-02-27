@@ -59,10 +59,8 @@ export const createProperty = async (formData: FormData): Promise<PropertyType> 
   for (const [key, value] of formData) {
     logger.info(`${key}:`, value);
   }
-  const response = await axiosClient.post("/property/add", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return response.data;
+  const response = await axiosClient.post("/property/add", formData);
+  return response.data.property;
 };
 
 export const updateProperty = async (id: string, data: Partial<PropertyType>): Promise<PropertyType | undefined> => {

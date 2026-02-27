@@ -9,11 +9,11 @@ const getCurrencySymbol = (currency?: CurrencyEnum) => {
   switch (currency) {
     case CurrencyEnum.naira:
       return "₦";
-    case CurrencyEnum.dollars:
+    case CurrencyEnum.dollar:
       return "$";
-    case CurrencyEnum.pounds:
+    case CurrencyEnum.pound:
       return "£";
-    case CurrencyEnum.euros:
+    case CurrencyEnum.euro:
       return "€";
     default:
       return "";

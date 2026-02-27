@@ -91,3 +91,34 @@ p .count-label {
   height: 100% !important;
   width: 100% !important;
 }
+
+.price-marker-wrapper {
+  background: transparent;
+  border: none;
+}
+
+.price-marker-inner {
+  color: white;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  border: 2px solid white;
+  transition: all 0.2s ease;
+  transform-origin: center;
+}
+
+/* Hover animation */
+.price-marker-inner:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Selected highlight */
+.price-marker-selected {
+  transform: scale(1.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 2px solid #facc15;
+}

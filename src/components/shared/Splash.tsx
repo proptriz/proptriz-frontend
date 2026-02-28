@@ -30,7 +30,7 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
 
   return (
     <div
-      className="flex flex-col min-h-screen"
+      className="flex flex-col h-screen overflow-hidden" 
       style={{
         background: "linear-gradient(160deg,#f5f7f9 0%,#eaf2f5 55%,#f5f7f9 100%)",
         fontFamily: "'DM Sans', sans-serif",

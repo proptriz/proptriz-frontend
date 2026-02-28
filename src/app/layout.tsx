@@ -131,7 +131,7 @@ export default function RootLayout({
           Splash, AddProperty, and Profile hero pages exactly.
         */}
         <div
-          className="w-full min-h-screen"
+          className="w-full h-full"
           style={{
             background:
               "linear-gradient(160deg,#f5f7f9 0%,#eaf2f5 50%,#f5f7f9 100%)",

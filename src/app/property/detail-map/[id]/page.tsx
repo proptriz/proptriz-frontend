@@ -60,7 +60,7 @@ export default function PropertyMap({
   )
     
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-screen-safe">
       {/* Map Section */}
       {property && <div className="">
         {/* Top Buttons */}

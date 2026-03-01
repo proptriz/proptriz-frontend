@@ -176,7 +176,7 @@ export default function AddPropertyPage() {
     try {
       const result = await createProperty(fd);
       newPropertyId = result._id;
-      logger.info("Property created (text-only):", result);
+      logger.info("Property created (text-only):", newPropertyId);
     } catch (err: unknown) {
       logger.error("createProperty failed:", err);
       toast.error(err instanceof Error ? err.message : "Failed to create property.");
@@ -242,7 +242,7 @@ export default function AddPropertyPage() {
   return (
     <>
       <div
-        className="min-h-screen pb-10"
+        className="page-scroll pb-10"
         style={{ background: "#f5f7f9", fontFamily: "'DM Sans', sans-serif" }}
       >
 

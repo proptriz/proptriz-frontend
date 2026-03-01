@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { BackButton } from "@/components/shared/BackButton";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import Link from "next/link";
@@ -20,6 +20,7 @@ import { useInfiniteCursorScroll } from "@/components/shared/useInfiniteCursorSc
 import { ReviewCardSkeleton } from "@/components/skeletons/ReviewCardSkeleton";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import { SlMenu } from "react-icons/sl";
+import ConfirmSheet from "@/components/shared/ConfirmSheet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -34,31 +35,44 @@ const TABS: { key: ActiveTab; label: string }[] = [
 const MENU_ITEMS = [
   { icon: "✏️", title: "Edit Profile",       link: "/profile/edit"         },
   { icon: "🏠", title: "List New Property",  link: "/property/add"         },
-  { icon: "⭐", title: "Check Reviews",      link: "/property/edit"        },
   { icon: "🤝", title: "Become an Agent",    link: "/profile/become-agent" },
   { icon: "❓", title: "FAQ",                link: "/profile/faq"          },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ProfileTransaction() {
+export default function ProfilePage() {
   const { authUser } = useContext(AppContext);
 
-  const [showStats, setShowStats]                 = useState(true);
-  const [activeTab, setActiveTab]                 = useState<ActiveTab>("Listings");
-  const [showSettingsMenu, setShowSettingsMenu]   = useState(false);
-  const [userSettings, setUserSettings]           = useState<UserSettingsType | null>(null);
-  const [isReplyPop, setIsReplyPop]               = useState(false);
-  const [isConfirmPop, setIsConfirmPop]           = useState(false);
-  const [pendingDeleteId, setPendingDeleteId]     = useState<string | null>(null);
-  const [replyReview, setReplyReview]             = useState<ReviewType | null>(null);
-  const [totalProperties, setTotalProperties]     = useState(0);
+  const [showStats, setShowStats]               = useState(true);
+  const [activeTab, setActiveTab]               = useState<ActiveTab>("Listings");
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [userSettings, setUserSettings]         = useState<UserSettingsType | null>(null);
+  const [isReplyPop, setIsReplyPop]             = useState(false);
+  const [isDeleting, setIsDeleting]             = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId]   = useState<string | null>(null);
+  const [replyReview, setReplyReview]           = useState<ReviewType | null>(null);
+  const [totalProperties, setTotalProperties]   = useState(0);
+
+  /*
+    scrollRef points to the page's own scrollable container div.
+
+    WHY: globals.css sets `body > div:first-child { overflow: hidden }` so the
+    document itself never scrolls — the inner `.page-scroll` div scrolls instead.
+    `window.scrollY` is therefore always 0, so `window.addEventListener('scroll')`
+    never fires. We must listen on the element that actually scrolls.
+  */
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // ── Scroll-collapse stats ──────────────────────────────────────────────
   useEffect(() => {
-    const onScroll = () => setShowStats(window.scrollY <= 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onScroll = () => setShowStats(el.scrollTop <= 20);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
   // ── Load user settings ─────────────────────────────────────────────────
@@ -122,13 +136,15 @@ export default function ProfileTransaction() {
   // ── Delete handlers ────────────────────────────────────────────────────
   const requestDelete = (id: string) => {
     setPendingDeleteId(id);
-    setIsConfirmPop(true);
+    setShowDeleteConfirm(true);
   };
 
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
+    setIsDeleting(true);
     const res = await deleteUserProperty(pendingDeleteId);
-    setIsConfirmPop(false);
+    setIsDeleting(false);
+    setShowDeleteConfirm(false);
     setPendingDeleteId(null);
     if (!res.success) {
       toast.error("Failed to delete property");
@@ -155,7 +171,13 @@ export default function ProfileTransaction() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      <div className="px-4 pb-24 bg-[#f5f7f9] min-h-screen">
+      {/*
+        scrollRef is attached here — this is the element that actually scrolls.
+        The parent layout has `page-scroll` (overflow-y: auto) so the document
+        doesn't scroll; we need to observe THIS div's scrollTop instead of
+        window.scrollY.
+      */}
+      <div ref={scrollRef} className="px-4 pb-24 bg-[#f5f7f9] h-full overflow-y-auto">
 
         {/* ── Sticky teal hero header ──────────────────────────────────── */}
         <header
@@ -202,24 +224,24 @@ export default function ProfileTransaction() {
           >
             <div className="grid grid-cols-3 gap-2 px-4 pb-3">
               {[
-                { val: totalProperties, lbl: "Properties"    },
-                { val: "4.9",           lbl: "Rating",  gold: true },
-                { val: 25,              lbl: "Reviews"         },
+                { val: totalProperties, lbl: "Properties"              },
+                { val: "4.9",           lbl: "Rating",    gold: true   },
+                { val: 25,              lbl: "Reviews"                 },
               ].map((s) => (
                 <div
                   key={s.lbl}
                   className="text-center rounded-xl py-2.5 px-2"
                   style={{
-                    background: "rgba(255,255,255,0.12)",
-                    border: "1.5px solid rgba(255,255,255,0.2)",
+                    background:     "rgba(255,255,255,0.12)",
+                    border:         "1.5px solid rgba(255,255,255,0.2)",
                     backdropFilter: "blur(4px)",
                   }}
                 >
                   <p
                     className="font-extrabold text-[20px] leading-none"
                     style={{
-                      color: s.gold ? "#f0a500" : "white",
-                      fontFamily: "'Montserrat', sans-serif",
+                      color:      s.gold ? "#f0a500" : "white",
+                      fontFamily: "'Raleway', sans-serif",
                     }}
                   >
                     {s.val}
@@ -388,11 +410,7 @@ export default function ProfileTransaction() {
                 const isLast = index === receivedReviews.length - 1;
                 return (
                   <div key={review._id} ref={isLast ? setReceivedObserverTarget : undefined}>
-                    <ReviewCard
-                      review={review}
-                      showReply={showReply}
-                      showPropDetails
-                    />
+                    <ReviewCard review={review} showReply={showReply} showPropDetails />
                   </div>
                 );
               })}
@@ -404,9 +422,7 @@ export default function ProfileTransaction() {
               }
 
               {!hasMoreReceived && receivedReviews.length > 0 && (
-                <p className="text-center text-sm text-[#9ca3af] py-2">
-                  No more reviews
-                </p>
+                <p className="text-center text-sm text-[#9ca3af] py-2">No more reviews</p>
               )}
             </div>
           </section>
@@ -440,9 +456,7 @@ export default function ProfileTransaction() {
               }
 
               {!hasMoreSent && sentReviews.length > 0 && (
-                <p className="text-center text-sm text-[#9ca3af] py-2">
-                  No more reviews
-                </p>
+                <p className="text-center text-sm text-[#9ca3af] py-2">No more reviews</p>
               )}
             </div>
           </section>
@@ -495,7 +509,8 @@ export default function ProfileTransaction() {
               key={item.link}
               href={item.link}
               onClick={() => setShowSettingsMenu(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#e0f0f5] transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl
+                         hover:bg-[#e0f0f5] transition-colors"
             >
               <div className="w-8 h-8 rounded-[10px] flex items-center justify-center
                               text-[15px] flex-shrink-0 bg-[#e0f0f5] text-[#1e5f74]">
@@ -528,37 +543,32 @@ export default function ProfileTransaction() {
 
       {/* ── Reply review popup ───────────────────────────────────────────── */}
       {replyReview && (
-        <Popup header="Reply to Review" toggle={isReplyPop} setToggle={setIsReplyPop} useMask hideReset>
+        <Popup
+          header="Reply to Review"
+          toggle={isReplyPop}
+          setToggle={setIsReplyPop}
+          useMask
+          hideReset
+        >
           <ReplyReview review={replyReview} />
         </Popup>
       )}
 
-      {/* ── Confirm delete popup ─────────────────────────────────────────── */}
-      <Popup header="Delete Property" toggle={isConfirmPop} setToggle={setIsConfirmPop} useMask hideReset>
-        <div className="text-center py-2">
-          <p className="text-4xl mb-3">⚠️</p>
-          <p className="font-bold text-[#111827] text-[16px]">Are you sure?</p>
-          <p className="text-sm text-[#9ca3af] mt-1 mb-6">
-            This property will be permanently deleted. This action cannot be undone.
-          </p>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => { setIsConfirmPop(false); setPendingDeleteId(null); }}
-              className="flex-1 py-3 rounded-xl text-[13px] font-bold bg-[#f3f4f6] text-[#4b5563]"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={confirmDelete}
-              className="flex-1 py-3 rounded-xl text-[13px] font-bold bg-[#ef4444] text-white"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </Popup>
+      {/* ── Delete confirmation sheet ─────────────────────────────────────
+          Replaces the old <Popup> confirm dialog with the reusable ConfirmSheet.
+          Same UX as EditPropertyPage and any other screen that needs it.
+      ──────────────────────────────────────────────────────────────────── */}
+      <ConfirmSheet
+        open={showDeleteConfirm}
+        onClose={() => { setShowDeleteConfirm(false); setPendingDeleteId(null); }}
+        onConfirm={confirmDelete}
+        title="Delete this listing?"
+        description="This property will be permanently deleted. This action cannot be undone."
+        confirmLabel="Yes, Delete Listing"
+        confirmColor="#ef4444"
+        loading={isDeleting}
+        loadingLabel="Deleting…"
+      />
     </>
   );
 }

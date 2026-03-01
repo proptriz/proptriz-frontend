@@ -2,123 +2,306 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROPTRIZ GLOBAL STYLESHEET
+   Tailwind base + component overrides + custom utilities
+
+   Brand palette (all components use these values):
+     Teal dark  #143d4d   — hero headers, CTA gradient start
+     Teal       #1e5f74   — primary interactive, borders, focus rings
+     Teal light #e0f0f5   — teal tint backgrounds, selected chip bg
+     Gold       #f0a500   — accent, sale pins, cover badge, active nav
+     Gold dark  #c88400   — gold text on light backgrounds
+     Gold tint  #fef3c7   — gold tint backgrounds, negotiable tag
+     Ink        #111827   — primary text
+     Slate      #4b5563   — secondary text
+     Muted      #9ca3af   — placeholder, hint text
+     Border     #e5e7eb   — default border
+     Surface    #f9fafb   — input / card background
+     Canvas     #f5f7f9   — page background
+     Canvas alt #eaf2f5   — page background mid-gradient stop
+
+   Typography:
+     Body     — DM Sans (var(--font-dm-sans)), loaded via next/font
+     Headings — Raleway (var(--font-raleway)), loaded via next/font
+═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ─── 1. CSS CUSTOM PROPERTIES ─────────────────────────────────────────────── */
+
 :root {
-  --default-primary-color: #164e66;
+  /* Brand tokens — referenced by components via var() */
+  --color-teal-dark:   #143d4d;
+  --color-teal:        #1e5f74;
+  --color-teal-light:  #e0f0f5;
+  --color-gold:        #f0a500;
+  --color-gold-dark:   #c88400;
+  --color-gold-tint:   #fef3c7;
+  --color-ink:         #111827;
+  --color-slate:       #4b5563;
+  --color-muted:       #9ca3af;
+  --color-border:      #e5e7eb;
+  --color-surface:     #f9fafb;
+  --color-canvas:      #f5f7f9;
+
+  /* Page background gradient — applied to body in layout.tsx */
+  --gradient-page: linear-gradient(160deg, #f5f7f9 0%, #eaf2f5 50%, #f5f7f9 100%);
+
+  /* CTA gradient — teal dark → teal */
+  --gradient-cta:  linear-gradient(135deg, #143d4d 0%, #1e5f74 100%);
+
+  /*
+    --vh: real mobile viewport height unit.
+
+    Set by <Script id="vh-fix" strategy="beforeInteractive"> in layout.tsx:
+      document.documentElement.style.setProperty('--vh', innerHeight * 0.01 + 'px')
+
+    On mobile Safari / Android Chrome, `100vh` includes the collapsing
+    address bar (~50-80px), making the page taller than what's visible.
+    window.innerHeight returns the true visible height. Storing 1/100th
+    of it lets h-screen-safe stay within the actual visible area.
+    Fallback: 1dvh (supported in all modern mobile browsers).
+  */
+  --vh: 1dvh;
+
+  /* Legacy variables — kept for any older components not yet migrated */
+  --default-primary-color:   #164e66;
   --default-secondary-color: #f6c367;
-  --default-tertiary-color: #808080;
-  --default-bg-color: #ebf1ed;
+  --default-tertiary-color:  #808080;
+  --default-bg-color:        #ebf1ed;
 }
 
-html, body, #__next { height: 100%; }
 
-* {
+/* ─── 2. FULL-HEIGHT CHAIN ──────────────────────────────────────────────────
+  
+  WHY:
+    Next.js App Router (v13+) does not render a `#__next` div.
+    The old rule `html, body, #__next { height: 100% }` left the actual
+    App Router hydration root div at `height: auto` — it would grow with
+    content, making the document scrollable and hiding Footer below the fold.
+
+  HOW:
+    `body > div:first-child` reliably targets the App Router root div.
+    Next.js always injects exactly one direct div child of body as its root.
+
+    `overflow: hidden` on this chain means the DOCUMENT never scrolls.
+
+  SCROLLABLE PAGES (EditPropertyPage, AddPropertyPage, ProfilePage etc.):
+    These pages must set `overflow-y-auto` on their OWN root element, e.g.:
+      <div className="min-h-full overflow-y-auto pb-10">
+    Their content then scrolls within the viewport, not the document.
+    Using `min-h-screen` still works visually but `min-h-full` is preferred
+    because `min-h-screen` can trigger 100vh issues on mobile.
+
+  VIEWPORT-LOCKED PAGES (ExplorePage, Splash):
+    Use `h-screen-safe` (defined below) on their root element.
+    They get exactly the visible screen — no scrollbar, Footer always visible.
+─────────────────────────────────────────────────────────────────────────── */
+
+html,
+body,
+body > div:first-child {
+  height: 100%;
+  overflow: hidden;
+}
+
+
+/* ─── 3. RESET ──────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* remove leaflet attribution control */
+
+/* ─── 4. CUSTOM TAILWIND UTILITIES ─────────────────────────────────────────── */
+
+@layer utilities {
+
+  /*
+    h-screen-safe
+    ─────────────
+    Use instead of h-screen on any component that must fill EXACTLY the
+    visible mobile viewport (ExplorePage, Splash).
+
+    100vh includes browser chrome on mobile → too tall → content hidden.
+    calc(var(--vh) * 100) uses the JS-measured real visible height.
+    Cascade: browser reads both declarations and applies the second if valid.
+  */
+  .h-screen-safe {
+    height: 100vh;                        /* desktop / SSR fallback            */
+    height: calc(var(--vh, 1dvh) * 100); /* JS real height — wins on mobile   */
+  }
+
+  /*
+    page-scroll
+    ───────────
+    Apply to the root div of any SCROLLABLE page (Edit, Add, Profile etc.)
+    instead of `min-h-screen`. Fills at least the full visible height and
+    scrolls within the viewport (body is overflow:hidden so the document
+    itself won't scroll — the page must own its own scroll).
+  */
+  .page-scroll {
+    min-height: calc(var(--vh, 1dvh) * 100);
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Smooth scroll momentum on iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Brand gradient shortcuts */
+  .bg-gradient-cta  { background: var(--gradient-cta); }
+  .bg-gradient-page { background: var(--gradient-page); }
+
+  /* Teal focus ring — apply to interactive elements */
+  .ring-teal {
+    --tw-ring-color: rgba(30, 95, 116, 0.25);
+  }
+}
+
+
+/* ─── 5. MAP / LEAFLET ──────────────────────────────────────────────────────── */
+
+/* Hide the "Leaflet | © OpenStreetMap" attribution bar */
 .leaflet-control-attribution {
   display: none !important;
 }
 
-h1 {
-  font-size: 25px;
-  font-weight: bold;
+/*
+  Leaflet's default DivIcon renders a white rectangle behind custom markers.
+  The new createPriceIcon() renders an inline-styled pill+tail — this
+  rule ensures no white square leaks around it.
+*/
+.leaflet-div-icon {
+  background: none  !important;
+  border:     none  !important;
 }
 
-h4 {
-  /* font-family: 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; */
-  font-size: 14px;
-  color: gray;
-}
-
-.nav_item {
-  width: 35px;
-  height: 35px;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.nav_item:active {
-  width: 35px;
-  height: 35px;
-  border: none;
-  border-radius: 50%;
-  background-color: #d0d0d086;
-}
-
-.badge_dot {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 8px;
-  height: 8px;
-  background: #ff3b30; /* iOS red tone */
-  border-radius: 50%;
-  /* Gold border ring around the badge */
-  box-shadow: 0 0 0 2px var(--default-tertiary-color);
-}
-
-
-.card-bg {
-  background-color: #DCDFD9;
-}
-
-.text-green {
-  color: var(--default-primary-color);
-}
-
-.bg-green {
-  background-color: var(--default-primary-color);
-}
-
-p .count-label {
-  font-family: 'Montserrat';
-  font-size: 14px;
-}
-
+/*
+  .map-container-fix
+  ──────────────────
+  Wrap the Leaflet container in a `relative` div with this class.
+  Leaflet needs explicit pixel dimensions; this pattern fills the parent.
+  Used in ExplorePage where the map div is `relative flex-1`.
+*/
 .map-container-fix .leaflet-container {
   position: absolute !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   height: 100% !important;
-  width: 100% !important;
+  width:  100% !important;
 }
+
+
+/* ─── 6. PRICE PIN MARKERS (legacy compatibility) ───────────────────────────
+  
+  The new createPriceIcon() generates fully inline-styled HTML so these
+  classes are no longer the source of truth for pin appearance. They are
+  kept here so any older marker code still renders acceptably.
+
+  New color semantics (matches createPriceIcon.ts):
+    Rent → teal  (#1e5f74)
+    Sale → gold  (#f0a500)
+──────────────────────────────────────────────────────────────────────────── */
 
 .price-marker-wrapper {
   background: transparent;
-  border: none;
+  border:     none;
 }
 
 .price-marker-inner {
-  color: white;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 12px;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  border: 2px solid white;
-  transition: all 0.2s ease;
-  transform-origin: center;
+  color:          white;
+  padding:        5px 12px;
+  border-radius:  999px;
+  font-family:    var(--font-raleway, 'Raleway', sans-serif);
+  font-weight:    800;
+  font-size:      12px;
+  white-space:    nowrap;
+  box-shadow:     0 3px 10px rgba(0, 0, 0, 0.22);
+  border:         2px solid rgba(255, 255, 255, 0.9);
+  transition:     transform 0.15s ease, box-shadow 0.15s ease;
+  transform-origin: center bottom; /* scale from the anchor point */
 }
 
-/* Hover animation */
 .price-marker-inner:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transform:  scale(1.08);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* Selected highlight */
+/* Selected: white ring matching createPriceIcon selected state */
 .price-marker-selected {
-  transform: scale(1.15);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  border: 2px solid #facc15;
+  transform:  scale(1.15);
+  box-shadow: 0 0 0 3px white, 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Listed-for color variants */
+.price-marker-rent { background: var(--color-teal); }
+.price-marker-sale { background: var(--color-gold); color: var(--color-teal-dark); }
+
+
+/* ─── 7. NAVIGATION ITEM (legacy header icon buttons) ───────────────────── */
+
+.nav_item {
+  width:            35px;
+  height:           35px;
+  border:           none;
+  background-color: transparent;
+  cursor:           pointer;
+  display:          flex;
+  justify-content:  center;
+  align-items:      center;
+  border-radius:    50%;
+  transition:       background-color 0.15s ease;
+}
+
+.nav_item:active {
+  background-color: rgba(208, 208, 208, 0.53);
+}
+
+
+/* ─── 8. BADGE DOT ─────────────────────────────────────────────────────────── */
+
+.badge_dot {
+  position:     absolute;
+  top:          -2px;
+  right:        -2px;
+  width:        8px;
+  height:       8px;
+  background:   #ff3b30;
+  border-radius: 50%;
+  /* Teal ring instead of gray — matches brand */
+  box-shadow:   0 0 0 2px var(--color-teal-light);
+}
+
+
+/* ─── 9. TYPOGRAPHY ─────────────────────────────────────────────────────────── */
+
+h1 {
+  font-family: var(--font-raleway, 'Raleway', sans-serif);
+  font-size:   25px;
+  font-weight: 900;
+  color:       var(--color-ink);
+}
+
+h4 {
+  font-size: 14px;
+  color:     var(--color-slate);
+}
+
+
+/* ─── 10. LEGACY UTILITY CLASSES ────────────────────────────────────────────
+  
+  These were used by the old design and may still appear in unmigrated
+  components. They now map to brand tokens for consistency.
+  Delete each one as the corresponding component is migrated.
+──────────────────────────────────────────────────────────────────────────── */
+
+.card-bg    { background-color: #dcdfd9; }                         /* old card bg — replace with bg-white + border  */
+.text-green { color:            var(--color-teal); }               /* migrated: use text-[#1e5f74] inline            */
+.bg-green   { background-color: var(--color-teal); }              /* migrated: use bg-gradient-cta inline           */
+
+p .count-label {
+  font-size: 14px;                                                  /* Montserrat removed — DM Sans is the body font  */
 }

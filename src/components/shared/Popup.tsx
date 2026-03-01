@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useCallback, ReactNode } from "react";
+import { useEffect, useRef, useCallback, ReactNode, useState } from "react";
+import { createPortal } from "react-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,10 @@ export default function Popup({
   resetLabel = "Reset",
   children,
 }: PopupProps) {
+  // Portal mount guard — createPortal needs the DOM to exist (SSR safe)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const startY    = useRef<number | null>(null);
   const startX    = useRef<number | null>(null);
   const startTime = useRef<number | null>(null);
@@ -115,7 +120,9 @@ export default function Popup({
   };
 
   // ─────────────────────────────────────────────────────────────────────────
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <>
       {/* ── Backdrop ──────────────────────────────────────────────────────── */}
       <div
@@ -207,6 +214,7 @@ export default function Popup({
           {children}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

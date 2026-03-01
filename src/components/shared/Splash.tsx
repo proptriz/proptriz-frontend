@@ -207,7 +207,7 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
       {/* flex-shrink-0 keeps Footer pinned at the bottom of the fixed-height
           container; it will never be pushed below the viewport */}
       {showFooter && (
-        <footer className="flex-shrink-0 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <footer className="flex-shrink-0 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <Footer />
         </footer>
       )}

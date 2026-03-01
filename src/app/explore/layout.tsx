@@ -6,7 +6,7 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="w-full h-full md:max-w-[650px] mx-auto" >
+    <div className="w-full h-full md:max-w-[650px] mx-auto page-scroll" >
       {children}
     </div> 
   );

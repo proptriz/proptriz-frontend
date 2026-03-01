@@ -29,7 +29,7 @@ const Header: React.FC = () => {
     <>
       {/* ── Sticky header bar ─────────────────────────────────────────── */}
       <header
-        className="sticky top-0 z-20 w-full border-b border-black/10"
+        className="sticky top-0 z-[40] w-full border-b border-black/10"
         style={{ background: "linear-gradient(135deg,#143d4d 0%,#1e5f74 100%)" }}
       >
         <div className="h-14 px-4 flex items-center justify-between mx-auto">

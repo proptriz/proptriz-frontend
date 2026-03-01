@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
 
   return (
     <footer
-      className="sticky bottom-0 left-0 w-full z-20
+      className="fixed bottom-0 left-0 w-full z-[40]
                  bg-white border-t border-[#e5e7eb]
                  shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
       role="navigation"

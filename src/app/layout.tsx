@@ -10,12 +10,6 @@ import GoogleScriptLoader from "@/components/GoogleScriptLoader";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 
-// ─── Fonts ────────────────────────────────────────────────────────────────────
-// DM Sans  — body copy: clean, readable, slightly geometric.
-// Raleway  — headings & brand wordmark: strong personality, matches logo style.
-// Both are loaded via next/font for zero-FOUT via CSS variables.
-// ─────────────────────────────────────────────────────────────────────────────
-
 const dmSans = DM_Sans({
   weight:   ["400", "500", "600", "700"],
   subsets:  ["latin"],
@@ -30,22 +24,17 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 
-// ─── SEO metadata ─────────────────────────────────────────────────────────────
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://proptriz.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-
   title: {
     default:  "Proptriz Hub",
     template: "%s | Proptriz Hub",
   },
-
   description:
     "Proptriz — a Web3-integrated platform for discovering trusted properties near you. Rent, buy, or invest with confidence.",
-
   alternates: { canonical: SITE_URL },
-
   keywords: [
     "property", "properties", "land", "apartment", "hotel", "shortlet",
     "office", "shop", "properties in nigeria", "apartments for rent",
@@ -53,9 +42,7 @@ export const metadata: Metadata = {
     "pi property", "nigeria real estate", "real estate in nigeria",
     "apartment in lagos", "apartments in abuja", "Nigeria",
   ],
-
   authors: [{ name: "Proptriz Team" }],
-
   openGraph: {
     title:       "Proptriz Hub",
     description: "Discover trusted properties near you — for rent, sale, and investment.",
@@ -63,21 +50,14 @@ export const metadata: Metadata = {
     siteName:    "Proptriz Hub",
     type:        "website",
     locale:      "en_US",
-    images: [{
-      url:    `${SITE_URL}/logo.png`,
-      width:  1200,
-      height: 630,
-      alt:    "Proptriz Hub",
-    }],
+    images: [{ url: `${SITE_URL}/logo.png`, width: 1200, height: 630, alt: "Proptriz Hub" }],
   },
-
   twitter: {
     card:        "summary_large_image",
     title:       "Proptriz Hub",
     description: "Discover trusted properties near you — for rent, sale, and investment.",
     images:      [`${SITE_URL}/logo.png`],
   },
-
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -86,7 +66,6 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
-
   manifest: "/site.webmanifest",
 };
 
@@ -97,19 +76,49 @@ export const viewport: Viewport = {
   userScalable:  false,
 };
 
-// ─── Root layout ──────────────────────────────────────────────────────────────
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
+    // NOTE: no className on <html> — globals.css owns height:100% there.
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${dmSans.variable} ${raleway.variable} antialiased`}
         style={{
           fontFamily: "var(--font-dm-sans), sans-serif",
           color: "#111827",
+          // The background gradient lives on body so it always covers the
+          // full visual area regardless of what the page renders.
+          background: "linear-gradient(160deg,#f5f7f9 0%,#eaf2f5 50%,#f5f7f9 100%)",
         }}
       >
+        {/*
+          ── --vh custom property: the real mobile viewport fix ────────────────
+          
+          iOS Safari and Android Chrome report `window.innerHeight` as the
+          true visible viewport height — EXCLUDING the collapsing browser chrome.
+          `100vh` in CSS includes that chrome, so it's too tall on mobile.
+
+          This script runs before paint (strategy="beforeInteractive") and sets
+          `--vh` to 1/100th of the real inner height. Components use either:
+            • `h-screen-safe` utility  (defined in globals.css, uses dvh + --vh)
+            • `calc(var(--vh, 1dvh) * 100)` in inline styles
+
+          The resize listener keeps it accurate when the address bar
+          shows/hides as the user scrolls other pages.
+        */}
+        <Script id="vh-fix" strategy="beforeInteractive">
+          {`
+            function setVh() {
+              document.documentElement.style.setProperty(
+                '--vh', window.innerHeight * 0.01 + 'px'
+              );
+            }
+            setVh();
+            window.addEventListener('resize', setVh);
+          `}
+        </Script>
+
         {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-0T7BSEVRN9"
@@ -124,40 +133,26 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/*
-          Brand background gradient:
-          Replaces the old flat gray-200/gray-100/gray-300 gradient.
-          Subtle teal tint (#eaf2f5) reads as premium and matches the
-          Splash, AddProperty, and Profile hero pages exactly.
-        */}
-        <div
-          className="w-full min-h-screen"
-          style={{
-            background:
-              "linear-gradient(160deg,#f5f7f9 0%,#eaf2f5 50%,#f5f7f9 100%)",
-          }}
-        >
-          <AppContextProvider>
-            <GoogleScriptLoader />
-            {children}
+        <AppContextProvider>
+          <GoogleScriptLoader />
+          {children}
 
-            <ToastContainer
-              position="bottom-center"
-              autoClose={4500}
-              hideProgressBar={false}
-              closeOnClick
-              pauseOnHover
-              draggable
-              toastStyle={{
-                borderRadius: 14,
-                fontFamily:   "var(--font-dm-sans), sans-serif",
-                fontSize:     13,
-                fontWeight:   500,
-                boxShadow:    "0 8px 32px rgba(0,0,0,0.12)",
-              }}
-            />
-          </AppContextProvider>
-        </div>
+          <ToastContainer
+            position="bottom-center"
+            autoClose={4500}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnHover
+            draggable
+            toastStyle={{
+              borderRadius: 14,
+              fontFamily:   "var(--font-dm-sans), sans-serif",
+              fontSize:     13,
+              fontWeight:   500,
+              boxShadow:    "0 8px 32px rgba(0,0,0,0.12)",
+            }}
+          />
+        </AppContextProvider>
       </body>
     </html>
   );

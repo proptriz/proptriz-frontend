@@ -153,7 +153,7 @@ export default function ExplorePage() {
 
   // ─────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen-safe overflow-hidden">
       <Header />
 
       {/* ── Map fills the remaining height ────────────────────────────── */}

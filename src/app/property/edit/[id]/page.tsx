@@ -24,6 +24,7 @@ import { getPropertyById, updateProperty, deleteUserProperty } from "@/services/
 import getUserPosition           from "@/utils/getUserPosition";
 import logger                    from "../../../../../logger.config.mjs";
 import { BackButton } from "@/components/shared/BackButton";
+import ConfirmSheet from "@/components/shared/ConfirmSheet";
 
 // ─── Facility data ────────────────────────────────────────────────────────────
 
@@ -277,7 +278,7 @@ export default function EditPropertyPage({
   // ── Loading / error screens ──────────────────────────────────────────────
   if (isFetching) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4"
+      <div className="h-screen-safe flex flex-col items-center justify-center gap-4"
            style={{ background: "#f5f7f9", fontFamily: "'DM Sans', sans-serif" }}>
         <div className="w-12 h-12 rounded-full border-4 border-[#e0f0f5] animate-spin"
              style={{ borderTopColor: "#1e5f74" }} />
@@ -288,7 +289,7 @@ export default function EditPropertyPage({
 
   if (fetchError || !property) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6"
+      <div className="h-screen-safe flex flex-col items-center justify-center gap-4 px-6"
            style={{ background: "#f5f7f9", fontFamily: "'DM Sans', sans-serif" }}>
         <span className="text-4xl">🏚️</span>
         <p className="text-[14px] font-semibold text-[#4b5563] text-center">
@@ -318,7 +319,7 @@ export default function EditPropertyPage({
   return (
     <>
       <div
-        className="min-h-screen pb-12"
+        className="page-scroll pb-12"
         style={{ background: "#f5f7f9", fontFamily: "'DM Sans', sans-serif" }}
       >
 
@@ -812,57 +813,21 @@ export default function EditPropertyPage({
         onLocationSelect={handleLocationSelect}
       />
 
-      {/* ── Delete confirmation sheet ────────────────────────────────────── */}
-      {showDeleteConfirm && (
-        <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-end"
-          onClick={() => setShowDeleteConfirm(false)}
-        >
-          <div
-            className="bg-white w-full rounded-t-3xl p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-10 h-1 bg-[#e5e7eb] rounded-full mx-auto mb-5" />
-            <div className="flex flex-col items-center text-center mb-6">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-3"
-                   style={{ background: "#fff5f5" }}>
-                🗑️
-              </div>
-              <h2 className="text-[17px] font-black text-[#111827] mb-1"
-                  style={{ fontFamily: "'Raleway', sans-serif" }}>
-                Delete this listing?
-              </h2>
-              <p className="text-[13px] text-[#6b7280] leading-relaxed max-w-xs">
-                <strong className="text-[#111827]">{property.title}</strong> will be
-                permanently removed. This action cannot be undone.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <button
-                type="button"
-                disabled={isDeleting}
-                onClick={handleDelete}
-                className="w-full py-3.5 rounded-xl text-white font-bold text-sm
-                           flex items-center justify-center gap-2 transition-all
-                           disabled:opacity-60"
-                style={{ background: "#ef4444" }}
-              >
-                {isDeleting
-                  ? <><Spinner color="white" size={16} /> Deleting…</>
-                  : "Yes, Delete Listing"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="w-full py-3.5 rounded-xl text-[#4b5563] font-semibold text-sm
-                           border border-[#e5e7eb] bg-white transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── Delete confirmation sheet ─────────────────────────────────────── */}
+      <ConfirmSheet
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete this listing?"
+        description={
+          <><strong className="text-[#111827]">{property.title}</strong> will be
+          permanently removed. This action cannot be undone.</>
+        }
+        confirmLabel="Yes, Delete Listing"
+        confirmColor="#ef4444"
+        loading={isDeleting}
+        loadingLabel="Deleting…"
+      />
     </>
   );
 }

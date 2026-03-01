@@ -7,10 +7,6 @@ import Footer from "./Footer";
 import GoogleLoginButton from "../GoogleLoginButton";
 import { BrandLogo } from "@/components/shared/BrandLogo";
 
-// ─── Brand palette ────────────────────────────────────────────────────────────
-// Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
-// ─────────────────────────────────────────────────────────────────────────────
-
 const STAGE_LABELS: Record<string, string> = {
   auto_login:             "Checking session…",
   pi_sdk_loading:         "Loading Pi SDK…",
@@ -29,25 +25,37 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
     : null;
 
   return (
+    /*
+      h-screen-safe (defined in globals.css):
+        height: 100vh               ← legacy fallback
+        height: calc(var(--vh)*100) ← JS-measured real inner height
+        height: 100dvh              ← modern browsers (last wins)
+
+      This means Splash is always exactly the visible area —
+      no taller, no shorter — on every mobile browser.
+
+      overflow-hidden: prevents any child from adding scroll to this
+      container. The <main> below uses overflow-y-auto so content that
+      doesn't fit on very small screens can still scroll internally.
+    */
     <div
-      className="flex flex-col min-h-screen"
+      className="flex flex-col h-screen-safe overflow-hidden"
       style={{
         background: "linear-gradient(160deg,#f5f7f9 0%,#eaf2f5 55%,#f5f7f9 100%)",
         fontFamily: "'DM Sans', sans-serif",
       }}
     >
-      <main className="flex-grow flex items-center justify-center p-4">
+      {/* flex-1 + overflow-y-auto: fills space between top and Footer,
+          scrolls internally on tiny devices rather than overflowing out */}
+      <main className="flex-1 overflow-y-auto flex items-center justify-center p-4">
 
-        {/* ── Signing-in loading state ───────────────────────────────── */}
+        {/* ── Signing-in state ─────────────────────────────────────────── */}
         {isSigningInUser ? (
           <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
-
-            {/* Pulsing stacked logo */}
             <div style={{ animation: "splashPulse 1.6s ease-in-out infinite" }}>
               <BrandLogo variant="stacked" theme="dark" size={88} />
             </div>
 
-            {/* Spinner + stage badge */}
             {stageLabel && (
               <div className="flex flex-col items-center gap-3">
                 <div
@@ -74,17 +82,15 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
           <div
             className="w-full max-w-md animate-in fade-in zoom-in duration-500"
             style={{
-              background: "white",
+              background:   "white",
               borderRadius: 28,
-              padding: "36px 28px 28px",
-              border: "1px solid #e5e7eb",
-              boxShadow: "0 20px 64px rgba(30,95,116,0.12), 0 4px 16px rgba(0,0,0,0.04)",
+              padding:      "36px 28px 28px",
+              border:       "1px solid #e5e7eb",
+              boxShadow:    "0 20px 64px rgba(30,95,116,0.12), 0 4px 16px rgba(0,0,0,0.04)",
             }}
           >
-            {/* Brand header — stacked: logo + wordmark + tagline */}
             <div className="flex flex-col items-center mb-9">
               <BrandLogo variant="stacked" theme="dark" size={76} />
-
               {stageLabel && (
                 <span
                   className="mt-5 px-4 py-1.5 rounded-full text-[11px] font-bold
@@ -96,37 +102,28 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
               )}
             </div>
 
-            {/* Login options */}
             <div className="flex flex-col gap-4">
-
-              {/* Google */}
               <div className="flex justify-center w-full transition-transform active:scale-[0.98]">
                 <GoogleLoginButton />
               </div>
 
-              {/* Divider */}
               <div className="relative flex items-center py-1">
                 <div className="flex-grow border-t border-[#f0f0f0]" />
-                <span
-                  style={{
-                    flexShrink: 0, margin: "0 14px",
-                    fontSize: 10, fontWeight: 900,
-                    color: "#9ca3af", textTransform: "uppercase",
-                    letterSpacing: "0.2em",
-                  }}
-                >
+                <span style={{
+                  flexShrink: 0, margin: "0 14px",
+                  fontSize: 10, fontWeight: 900,
+                  color: "#9ca3af", textTransform: "uppercase",
+                  letterSpacing: "0.2em",
+                }}>
                   or
                 </span>
                 <div className="flex-grow border-t border-[#f0f0f0]" />
               </div>
 
-              {/* Pi Network */}
               <div
                 style={{
-                  borderRadius: 18,
-                  border: "1.5px solid #e5e7eb",
-                  background: "#fafcff",
-                  padding: "18px 16px",
+                  borderRadius: 18, border: "1.5px solid #e5e7eb",
+                  background: "#fafcff", padding: "18px 16px",
                   transition: "border-color 0.2s, box-shadow 0.2s",
                 }}
                 onMouseEnter={(e) => {
@@ -139,7 +136,6 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
                 }}
               >
                 <div className="flex flex-col items-center gap-4 text-center">
-
                   <div
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
                     style={{
@@ -208,8 +204,10 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
         )}
       </main>
 
+      {/* flex-shrink-0 keeps Footer pinned at the bottom of the fixed-height
+          container; it will never be pushed below the viewport */}
       {showFooter && (
-        <footer className="pb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <footer className="flex-shrink-0 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <Footer />
         </footer>
       )}

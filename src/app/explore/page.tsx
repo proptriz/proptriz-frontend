@@ -126,7 +126,7 @@ export default function HomePage() {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f8fa] pb-16">
+    <div className="flex flex-col min-h-screen bg-[#f7f8fa]">
       <Header />
 
       {/* ── Hero header ─────────────────────────────────────────────────── */}

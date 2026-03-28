@@ -9,13 +9,12 @@ import {
   FiX, FiCheck, FiPlus, FiList, FiMap,
   FiEdit2, FiTrash2, FiRefreshCw, FiAlertCircle,
 } from "react-icons/fi";
-import Popup from "../shared/Popup";
+import Popup from "./shared/Popup";
 import {
   searchLandmarks,
   createLandmark,
   updateLandmark,
 } from "@/services/landmarkApi";
-import type { LandmarkResponse } from "@/services/landmarkApi";
 import type { LocalLandmark, ExternalLandmark } from "@/components/LandmarksPickerMap";
 
 const LocationPickerMap = dynamic(
@@ -510,7 +509,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
   useEffect(() => {
     if (!pendingPin) { setDbSearchResults([]); return; }
 
-    // Debounce 350ms
+    // Debounce 500ms
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(async () => {
       if (searchCtrlRef.current) searchCtrlRef.current.abort();
@@ -529,7 +528,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
       );
       setDbSearchLoading(false);
       if (results) setDbSearchResults(results as ExternalLandmark[]);
-    }, 350);
+    }, 500);
 
     return () => {
       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);

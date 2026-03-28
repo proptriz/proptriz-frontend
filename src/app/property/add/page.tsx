@@ -16,9 +16,10 @@ import Step2Details from "@/components/Step2Details";
 import Step3Preview from "@/components/Step3Preview";
 import Splash       from "@/components/shared/Splash";
 import BrandLogo    from "@/components/shared/BrandLogo";
+import type { Landmark }     from "@/components/PropertyLocationModal";
 
 import { AppContext }         from "@/context/AppContextProvider";
-import PropertyLocationModal  from "@/components/property/PropertyLocationSection";
+import PropertyLocationModal from "@/components/PropertyLocationModal";
 import { createProperty, updatePropertyImage } from "@/services/propertyApi";
 import { compressImage }      from "@/utils/compressImage";
 import getUserPosition         from "@/utils/getUserPosition";
@@ -72,6 +73,7 @@ export default function AddPropertyPage() {
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [openLocPicker, setOpenLocPicker] = useState(false);
   const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [landmarks, setLandmarks] = useState<Landmark[]>([]);
 
   // ── Upload progress ──────────────────────────────────────────────────────
   const [uploadStage,    setUploadStage]    = useState<UploadStage>("idle");
@@ -435,6 +437,8 @@ export default function AddPropertyPage() {
         userCoordinates={formData.coordinates}
         fallbackCoordinates={userCoordinates}
         onLocationSelect={handleLocationSelect}
+        onLandmarksSelect={(selected) => setLandmarks(selected)}
+        initialLandmarks={landmarks}
       />
     </>
   );

@@ -167,23 +167,21 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
   const [position, setPosition] = useState<LatLngExpression>(initialCenter);
 
   return (
-    <div className="absolute h-full w-full" style={{ minHeight: 400 }}>
+    <div className="w-full h-full" style={{ minHeight: 400 }}>
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
         scrollWheelZoom
         zoomControl={false}
         maxBounds={NIGERIA_BOUNDS}
-        className="w-full fixed bottom-0 h-full left-0 right-0"
+        className="w-full h-full"
+        style={{ position: "relative", zIndex: 0 }}
       >
-        {/*
-          CartoDB Positron tiles — clean, light, minimal.
-          Matches the brand's teal-tinted neutral palette far better than
-          the colourful OSM standard style. Free with attribution.
-        */}
+        
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          maxZoom={19}
         />
 
         <MapSearchController

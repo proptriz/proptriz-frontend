@@ -155,6 +155,19 @@ export interface PropertyFilterPayload {
   description?: string;
 }
 
+export interface Landmark {
+  id:       string;
+  name:     string;
+  lat:      number;
+  lng:      number;
+  category: LandmarkCategory;
+}
+
+export type LandmarkCategory =
+  | "school" | "hospital" | "market"  | "transport"
+  | "mall"   | "bank"     | "restaurant" | "park"
+  | "place_of_worship"    | "other";
+
 export interface PropertyType {
   _id: string;
   banner: string; // URL of the property image or image with index = 0
@@ -182,6 +195,7 @@ export interface PropertyType {
   distance?: string;
   average_rating?: number;
   review_count?: number;
+  landmarks?: any[];
   status: PropertyStatusEnum; // (available, sold, unavailable, rented)
   createdAt?: Date;
   updatedAt?: Date;

@@ -64,8 +64,7 @@ export interface PropertyFormData {
   renewPeriod: RenewalEnum;
   negotiable: NegotiableEnum;
   duration: number;
-  features: Feature[];
-  facilities: string[];
+  features: string[];
   coordinates: [number, number];
   photos: File[];
 }

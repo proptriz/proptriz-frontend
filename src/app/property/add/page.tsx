@@ -16,9 +16,10 @@ import Step2Details from "@/components/Step2Details";
 import Step3Preview from "@/components/Step3Preview";
 import Splash       from "@/components/shared/Splash";
 import BrandLogo    from "@/components/shared/BrandLogo";
+import type { Landmark }     from "@/components/PropertyLocationModal";
 
 import { AppContext }         from "@/context/AppContextProvider";
-import PropertyLocationModal  from "@/components/property/PropertyLocationSection";
+import PropertyLocationModal from "@/components/PropertyLocationModal";
 import { createProperty, updatePropertyImage } from "@/services/propertyApi";
 import { compressImage }      from "@/utils/compressImage";
 import getUserPosition         from "@/utils/getUserPosition";
@@ -43,7 +44,6 @@ const DEFAULT_FORM: PropertyFormData = {
   negotiable:  NegotiableEnum.Negotiable,
   duration:    4,
   features:    [],
-  facilities:  [],
   coordinates: [9.0820, 8.6753],
   photos:      [],
 };
@@ -72,6 +72,7 @@ export default function AddPropertyPage() {
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [openLocPicker, setOpenLocPicker] = useState(false);
   const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [landmarks, setLandmarks] = useState<Landmark[]>([]);
 
   // ── Upload progress ──────────────────────────────────────────────────────
   const [uploadStage,    setUploadStage]    = useState<UploadStage>("idle");
@@ -163,9 +164,8 @@ export default function AddPropertyPage() {
     fd.append("status",         formData.status);
     fd.append("latitude",       String(formData.coordinates[0]));
     fd.append("longitude",      String(formData.coordinates[1]));
-    fd.append("features",       JSON.stringify(formData.features));
-    fd.append("env_facilities", JSON.stringify(
-      formData.facilities.filter((f) => f && !f.startsWith("__custom_"))
+    fd.append("features", JSON.stringify(
+      formData.features.filter((f) => f && !f.startsWith("__custom_"))
     ));
     if (formData.listedFor === ListForEnum.rent) {
       fd.append("period", formData.renewPeriod.toLowerCase());
@@ -435,6 +435,8 @@ export default function AddPropertyPage() {
         userCoordinates={formData.coordinates}
         fallbackCoordinates={userCoordinates}
         onLocationSelect={handleLocationSelect}
+        onLandmarksSelect={(selected) => setLandmarks(selected)}
+        initialLandmarks={landmarks}
       />
     </>
   );

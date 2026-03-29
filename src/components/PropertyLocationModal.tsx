@@ -105,7 +105,7 @@ const StepIndicator: React.FC<{ step: 1 | 2 }> = ({ step }) => (
         2
       </div>
       <span className={`text-xs font-semibold ${step === 2 ? "text-[#1e5f74]" : "text-[#9ca3af]"}`}>
-        Landmarks
+        Facilities
       </span>
     </div>
   </div>
@@ -296,7 +296,7 @@ const LandmarkFormBody: React.FC<{
       {saving
         ? <><FiRefreshCw size={14} className="animate-spin" /> Saving…</>
         : mode === "add"
-          ? <><FiPlus size={14} /> Add Landmark</>
+          ? <><FiPlus size={14} /> Add Nearby Facilities</>
           : <><FiCheck size={14} /> Save Changes</>}
     </button>
   </div>
@@ -395,7 +395,7 @@ const LandmarkList: React.FC<{
     return (
       <div className="flex flex-col items-center py-8 gap-2 opacity-60">
         <span className="text-4xl">📍</span>
-        <p className="text-sm font-semibold text-[#6b7280]">No landmarks added yet</p>
+        <p className="text-sm font-semibold text-[#6b7280]">No facilities added yet</p>
         <p className="text-xs text-[#9ca3af] text-center">
           Tap the map to pin nearby schools, hospitals, transport stops, and more.
         </p>
@@ -789,7 +789,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                     className="flex-1 py-3 rounded-xl bg-[#1e5f74] hover:bg-[#143d4d]
                                text-white text-sm font-bold flex items-center
                                justify-center gap-2 shadow-md active:scale-95 transition-all">
-                    Next: Add Landmarks <FiChevronRight size={15} />
+                    Next: Add Nearby Facilities <FiChevronRight size={15} />
                   </button>
                 </div>
               </div>
@@ -806,7 +806,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                 <div className="px-4 pt-4 pb-3 border-b border-[#e5e7eb] bg-white shrink-0">
                   <div className="flex items-center gap-2 mb-1">
                     <FiNavigation size={14} className="text-[#1e5f74]" />
-                    <h3 className="text-sm font-bold text-[#111827]">Nearby Landmarks</h3>
+                    <h3 className="text-sm font-bold text-[#111827]">Nearby Facilities</h3>
                     <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full
                                      bg-[#e0f0f5] text-[#1e5f74] ml-auto">
                       Optional
@@ -996,7 +996,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
 
       {/* ════ ADD POPUP ════ */}
       <Popup
-        header="Add Landmark"
+        header="Add Nearby Facilities"
         toggle={!!pendingPin}
         setToggle={(v) => { if (!v) closeAddPopup(); }}
         onClose={closeAddPopup}

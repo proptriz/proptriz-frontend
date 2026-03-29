@@ -209,9 +209,8 @@ export default function PropertyMap({
             <div key={i}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
                          bg-white shadow-sm border border-[#e5e7eb] shrink-0">
-              <span className="text-sm leading-none">{getFeatureEmoji(feat.name)}</span>
-              <span className="text-xs font-semibold text-[#374151] whitespace-nowrap">
-                {feat.quantity} {feat.name}
+              <span className="text-sm leading-none">{getFeatureEmoji(feat)}</span>
+              <span className="text-xs font-semibold text-[#374151] whitespace-nowrap">{feat}
               </span>
             </div>
           ))}
@@ -393,17 +392,17 @@ export default function PropertyMap({
               })}
 
               {/* Road access */}
-              {!lmLoading && property.env_facilities && property.env_facilities?.length > 0 && (
+              {!lmLoading && property.features && property.features?.length > 0 && (
                 <div className="mt-2 pt-3 border-t border-[#e5e7eb]">
                   <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider mb-2">
                     Road Access & Environment
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {property.env_facilities.map((fac: string, i: number) => (
+                    {property.features.map((ft: string, i: number) => (
                       <span key={i}
                         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full
                                    bg-white border border-[#e5e7eb] text-xs font-semibold text-[#374151]">
-                        🛣️ {fac}
+                        🛣️ {ft}
                       </span>
                     ))}
                   </div>
@@ -426,10 +425,9 @@ export default function PropertyMap({
                       <div key={i}
                         className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
                                    bg-[#f9fafb] border border-[#e5e7eb]">
-                        <span className="text-lg leading-none shrink-0">{getFeatureEmoji(feat.name)}</span>
+                        <span className="text-lg leading-none shrink-0">{getFeatureEmoji(feat)}</span>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-[#111827]">{feat.quantity}</p>
-                          <p className="text-[10px] text-[#9ca3af] truncate">{feat.name}</p>
+                          <p className="text-[10px] text-[#9ca3af] truncate">{feat}</p>
                         </div>
                       </div>
                     ))}

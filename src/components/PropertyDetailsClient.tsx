@@ -259,8 +259,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                              bg-[#e0f0f5] text-[#1e5f74] border border-[rgba(30,95,116,0.2)]
                              px-3 py-1.5 rounded-full text-[12px] font-semibold"
                 >
-                  <span>{getFeatureEmoji(feat.name)}</span>
-                  {feat.quantity} {feat.name}
+                  <span>{getFeatureEmoji(feat)}</span>{feat}
                 </div>
               ))}
             </div>

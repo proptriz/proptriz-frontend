@@ -19,7 +19,7 @@ import MapPreview   from "@/components/MapPreview";
 import ImageManager from "@/components/ImageManager";
 
 import { AppContext }           from "@/context/AppContextProvider";
-import PropertyLocationModal    from "@/components/property/PropertyLocationSection";
+import PropertyLocationModal from "@/components/PropertyLocationModal";
 import { getPropertyById, updateProperty, deleteUserProperty } from "@/services/propertyApi";
 import getUserPosition           from "@/utils/getUserPosition";
 import logger                    from "../../../../../logger.config.mjs";
@@ -28,7 +28,7 @@ import ConfirmSheet from "@/components/shared/ConfirmSheet";
 
 // ─── Facility data ────────────────────────────────────────────────────────────
 
-const FACILITY_ICONS: Record<string, string> = {
+const FEATURE_ICONS: Record<string, string> = {
   "Parking Lot":       "🅿️",
   "Pet Allowed":       "🐾",
   "Garden":            "🌿",
@@ -41,7 +41,7 @@ const FACILITY_ICONS: Record<string, string> = {
   "Drainage System":   "🚿",
   "Security Services": "🔒",
 };
-const DEFAULT_FACILITIES = Object.keys(FACILITY_ICONS);
+const DEFAULT_FEATURES = Object.keys(FEATURE_ICONS);
 
 const CATEGORIES = [
   { value: CategoryEnum.house,    icon: "🏠", label: "House"    },
@@ -123,8 +123,7 @@ export default function EditPropertyPage({
   const [formData,    setFormData]    = useState<Partial<PropertyType>>({});
   const [currency,    setCurrency]    = useState<CurrencyEnum>(CurrencyEnum.naira);
   const [negotiable,  setNegotiable]  = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
-  const [features,    setFeatures]    = useState<Feature[]>([]);
-  const [facilities,  setFacilities]  = useState<string[]>([]);
+  const [features,    setFeatures]    = useState<string[]>([]);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
   const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
 
@@ -173,8 +172,7 @@ export default function EditPropertyPage({
           setPropCoordinates([res.latitude, res.longitude]);
         setCurrency(res.currency ?? CurrencyEnum.naira);
         setNegotiable(res.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
-        setFeatures(res.features       ?? []);
-        setFacilities(res.env_facilities ?? []);
+        setFeatures(res.features ?? []);
       } catch (err: unknown) {
         if (mounted) {
           logger.error("getPropertyById failed:", err);
@@ -188,22 +186,12 @@ export default function EditPropertyPage({
     return () => { mounted = false; };
   }, [propertyId]);
 
-  // ── Feature helpers ──────────────────────────────────────────────────────
-  const updateFeatureName = (i: number, name: string) => {
-    const next = [...features]; next[i] = { ...next[i], name }; setFeatures(next);
-  };
-  const updateFeatureQty = (i: number, qty: number) => {
-    const next = [...features]; next[i] = { ...next[i], quantity: Math.max(1, qty) }; setFeatures(next);
-  };
-  const removeFeature = (i: number) => setFeatures((p) => p.filter((_, idx) => idx !== i));
-  const addFeature    = ()          => setFeatures((p) => [...p, { name: "", quantity: 1 }]);
-
-  // ── Facility helpers ─────────────────────────────────────────────────────
-  const toggleFacility       = (l: string)                => setFacilities((p) => p.includes(l) ? p.filter((f) => f !== l) : [...p, l]);
-  const addCustomFacility    = ()                          => setFacilities((p) => [...p, `__custom_${Date.now()}`]);
-  const updateCustomFacility = (old: string, val: string) => setFacilities((p) => p.map((f) => f === old ? val : f));
-  const removeCustomFacility = (val: string)               => setFacilities((p) => p.filter((f) => f !== val));
-  const customFacilities     = facilities.filter((f) => !DEFAULT_FACILITIES.includes(f));
+  // ── Feature helpers ─────────────────────────────────────────────────────
+  const toggleFeature       = (l: string)                => setFeatures((p) => p.includes(l) ? p.filter((f) => f !== l) : [...p, l]);
+  const addCustomFeature    = ()                          => setFeatures((p) => [...p, `__custom_${Date.now()}`]);
+  const updateCustomFeature = (old: string, val: string) => setFeatures((p) => p.map((f) => f === old ? val : f));
+  const removeCustomFeature = (val: string)               => setFeatures((p) => p.filter((f) => f !== val));
+  const customFeatures     = features.filter((f) => !DEFAULT_FEATURES.includes(f));
 
   // ── Save (text fields only — photos handled by ImageManager) ────────────
   //
@@ -227,8 +215,7 @@ export default function EditPropertyPage({
       negotiable:     negotiable === NegotiableEnum.Negotiable,
       latitude:       propCoordinates[0],
       longitude:      propCoordinates[1],
-      features,
-      env_facilities: facilities.filter((f) => f && !f.startsWith("__custom_")),
+      features:       features.filter((f) => f && !f.startsWith("__custom_")),
       period:         formData.listed_for === ListForEnum.rent ? formData.period : undefined,
       user:           undefined, // never overwrite ownership
       images:         undefined, // never overwrite images via this endpoint
@@ -245,7 +232,6 @@ export default function EditPropertyPage({
         setCurrency(updated.currency ?? CurrencyEnum.naira);
         setNegotiable(updated.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
         setFeatures(updated.features       ?? []);
-        setFacilities(updated.env_facilities ?? []);
         if (typeof updated.latitude === "number" && typeof updated.longitude === "number")
           setPropCoordinates([updated.latitude, updated.longitude]);
         logger.info("Property updated:", updated._id);
@@ -256,7 +242,7 @@ export default function EditPropertyPage({
     } finally {
       setIsSaving(false);
     }
-  }, [authUser, formData, currency, negotiable, propCoordinates, features, facilities, propertyId]);
+  }, [authUser, formData, currency, negotiable, propCoordinates, features, propertyId]);
 
   // ── Delete ───────────────────────────────────────────────────────────────
   const handleDelete = useCallback(async () => {
@@ -597,81 +583,15 @@ export default function EditPropertyPage({
           </EditSection>
 
           {/* Features */}
-          <EditSection icon="🛏️" title="Property Features">
-            <div className="flex flex-col gap-2">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 px-3 py-2.5 bg-[#f9fafb]
-                             border-[1.5px] border-[#e5e7eb] rounded-xl transition-all"
-                  onFocusCapture={(e) => { e.currentTarget.style.borderColor="#1e5f74"; e.currentTarget.style.background="white"; e.currentTarget.style.boxShadow="0 0 0 3px rgba(30,95,116,0.08)"; }}
-                  onBlurCapture={(e)  => { e.currentTarget.style.borderColor="#e5e7eb"; e.currentTarget.style.background="#f9fafb"; e.currentTarget.style.boxShadow="none"; }}
-                >
-                  <span className="text-[#d1d5db] select-none flex-shrink-0 cursor-grab">⠿</span>
-                  <input
-                    type="text"
-                    placeholder="Feature name"
-                    value={feature.name}
-                    onChange={(e) => updateFeatureName(index, e.target.value)}
-                    className="flex-1 bg-transparent outline-none text-sm
-                               text-[#111827] placeholder:text-[#9ca3af] min-w-0"
-                  />
-                  <div className="flex items-center border-[1.5px] border-[#e5e7eb] rounded-lg overflow-hidden flex-shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => updateFeatureQty(index, feature.quantity - 1)}
-                      className="w-7 h-7 flex items-center justify-center transition-colors"
-                      style={{ background:"#e0f0f5", color:"#1e5f74" }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background="#1e5f74"; (e.currentTarget as HTMLButtonElement).style.color="white"; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background="#e0f0f5"; (e.currentTarget as HTMLButtonElement).style.color="#1e5f74"; }}
-                    >−</button>
-                    <span className="w-7 text-center text-[13px] font-bold text-[#111827]">
-                      {feature.quantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => updateFeatureQty(index, feature.quantity + 1)}
-                      className="w-7 h-7 flex items-center justify-center transition-colors"
-                      style={{ background:"#e0f0f5", color:"#1e5f74" }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background="#1e5f74"; (e.currentTarget as HTMLButtonElement).style.color="white"; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background="#e0f0f5"; (e.currentTarget as HTMLButtonElement).style.color="#1e5f74"; }}
-                    >+</button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeFeature(index)}
-                    className="w-6 h-6 rounded-full bg-red-50 text-red-400 flex items-center
-                               justify-center flex-shrink-0 hover:bg-red-500 hover:text-white transition-colors"
-                  >
-                    <IoClose size={12} />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={addFeature}
-              className="w-full mt-3 flex items-center justify-center gap-2 py-2.5
-                         rounded-xl border-[1.5px] border-dashed text-[12px] font-semibold
-                         bg-transparent transition-all"
-              style={{ borderColor:"#1e5f74", color:"#1e5f74" }}
-              onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.background = "#e0f0f5"}
-              onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.background = "transparent"}
-            >
-              <FaPlus size={10} /> Add Feature
-            </button>
-          </EditSection>
-
-          {/* Facilities */}
           <EditSection icon="🌿" title="Environment & Facilities">
             <div className="flex flex-wrap gap-2 mb-3">
-              {DEFAULT_FACILITIES.map((facility) => {
-                const selected = facilities.includes(facility);
+              {DEFAULT_FEATURES.map((feature) => {
+                const selected = features.includes(feature);
                 return (
                   <button
-                    key={facility}
+                    key={feature}
                     type="button"
-                    onClick={() => toggleFacility(facility)}
+                    onClick={() => toggleFeature(feature)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
                                border-[1.5px] text-[11px] font-medium transition-all"
                     style={selected
@@ -680,16 +600,16 @@ export default function EditPropertyPage({
                     onMouseEnter={(e) => { if (!selected) (e.currentTarget as HTMLButtonElement).style.borderColor="#1e5f74"; }}
                     onMouseLeave={(e) => { if (!selected) (e.currentTarget as HTMLButtonElement).style.borderColor="#e5e7eb"; }}
                   >
-                    <span>{FACILITY_ICONS[facility]}</span>
-                    {facility}
+                    <span>{FEATURE_ICONS[feature]}</span>
+                    {feature}
                   </button>
                 );
               })}
             </div>
 
-            {customFacilities.map((fac) => (
+            {customFeatures.map((ft) => (
               <div
-                key={fac}
+                key={ft}
                 className="flex items-center gap-2 mt-2 px-3 py-2.5 bg-[#fffbeb]
                            border-[1.5px] border-dashed border-[#f0a500] rounded-xl transition-all"
                 onFocusCapture={(e) => { e.currentTarget.style.borderStyle="solid"; e.currentTarget.style.boxShadow="0 0 0 3px rgba(240,165,0,0.12)"; }}
@@ -698,15 +618,15 @@ export default function EditPropertyPage({
                 <span className="text-[#d97706] text-sm flex-shrink-0">✏️</span>
                 <input
                   type="text"
-                  placeholder="Custom facility name…"
-                  value={fac.startsWith("__custom_") ? "" : fac}
-                  onChange={(e) => updateCustomFacility(fac, e.target.value)}
+                  placeholder="Custom feature name…"
+                  value={ft.startsWith("__custom_") ? "" : ft}
+                  onChange={(e) => updateCustomFeature(ft, e.target.value)}
                   className="flex-1 bg-transparent outline-none text-sm
                              text-[#111827] placeholder:text-[#d97706]"
                 />
                 <button
                   type="button"
-                  onClick={() => removeCustomFacility(fac)}
+                  onClick={() => removeCustomFeature(ft)}
                   className="text-[#f59e0b] hover:text-red-500 transition-colors flex-shrink-0"
                 >
                   <IoClose size={14} />
@@ -716,14 +636,14 @@ export default function EditPropertyPage({
 
             <button
               type="button"
-              onClick={addCustomFacility}
+              onClick={addCustomFeature}
               className="w-full mt-3 flex items-center justify-center gap-2 py-2.5
                          rounded-xl border-[1.5px] border-dashed text-[12px] font-semibold transition-all"
               style={{ borderColor:"#f0a500", color:"#c88400", background:"#fffbeb" }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background="#fef3c7"; (e.currentTarget as HTMLButtonElement).style.borderStyle="solid"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background="#fffbeb"; (e.currentTarget as HTMLButtonElement).style.borderStyle="dashed"; }}
             >
-              <FaPlus size={10} /> Add Custom Facility
+              <FaPlus size={10} /> Add Custom Feature
             </button>
           </EditSection>
 

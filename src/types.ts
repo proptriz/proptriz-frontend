@@ -187,11 +187,7 @@ export interface PropertyType {
   user: UserSettingsType;
   latitude: number;
   longitude: number;
-  features?: {
-    name: string;
-    quantity: number;
-  }[];
-  env_facilities?: string[];
+  features?: string[];
   distance?: string;
   average_rating?: number;
   review_count?: number;

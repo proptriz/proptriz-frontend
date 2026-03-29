@@ -94,29 +94,11 @@ export default function Step3Preview({ data, onUpdate, onOpenLocationPicker }: S
           </div>
 
           {/* Features */}
-          {data.features.length > 0 && (
+          {data.features.filter(Boolean).length > 0 && (
             <div className="pt-2 border-t border-[#e5e7eb]">
               <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1.5">Features</p>
-              <div className="flex flex-wrap gap-2">
-                {data.features.filter(f => f.name).map((f) => (
-                  <span
-                    key={f.name}
-                    className="text-xs font-medium px-2.5 py-1 rounded-full"
-                    style={{ background: "#e0f0f5", color: "#1e5f74" }}
-                  >
-                    {f.name}: {f.quantity}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Facilities */}
-          {data.facilities.filter(Boolean).length > 0 && (
-            <div className="pt-2 border-t border-[#e5e7eb]">
-              <p className="text-[10px] text-[#9ca3af] uppercase tracking-wide mb-1.5">Facilities</p>
               <div className="flex flex-wrap gap-1.5">
-                {data.facilities.filter(f => f && !f.startsWith("__custom_")).map((f) => (
+                {data.features.filter(f => f && !f.startsWith("__custom_")).map((f) => (
                   <span
                     key={f}
                     className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"

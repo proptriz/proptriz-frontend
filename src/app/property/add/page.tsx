@@ -44,7 +44,6 @@ const DEFAULT_FORM: PropertyFormData = {
   negotiable:  NegotiableEnum.Negotiable,
   duration:    4,
   features:    [],
-  facilities:  [],
   coordinates: [9.0820, 8.6753],
   photos:      [],
 };
@@ -165,9 +164,8 @@ export default function AddPropertyPage() {
     fd.append("status",         formData.status);
     fd.append("latitude",       String(formData.coordinates[0]));
     fd.append("longitude",      String(formData.coordinates[1]));
-    fd.append("features",       JSON.stringify(formData.features));
-    fd.append("env_facilities", JSON.stringify(
-      formData.facilities.filter((f) => f && !f.startsWith("__custom_"))
+    fd.append("features", JSON.stringify(
+      formData.features.filter((f) => f && !f.startsWith("__custom_"))
     ));
     if (formData.listedFor === ListForEnum.rent) {
       fd.append("period", formData.renewPeriod.toLowerCase());

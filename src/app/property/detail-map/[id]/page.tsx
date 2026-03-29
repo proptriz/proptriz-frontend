@@ -64,7 +64,7 @@ export default function PropertyMap({
   const [error,          setError]          = useState<string | null>(null);
   const [saved,          setSaved]          = useState(false);
   const [snap,           setSnap]           = useState<SheetSnap>("peek");
-  const [activeTab,      setActiveTab]      = useState<"landmarks" | "details">("landmarks");
+  const [activeTab,      setActiveTab]      = useState<"facilities" | "details">("facilities");
   /** id of a landmark being verified — shows a spinner on that row */
   const [verifyingId,    setVerifyingId]    = useState<string | null>(null);
 
@@ -209,9 +209,8 @@ export default function PropertyMap({
             <div key={i}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
                          bg-white shadow-sm border border-[#e5e7eb] shrink-0">
-              <span className="text-sm leading-none">{getFeatureEmoji(feat.name)}</span>
-              <span className="text-xs font-semibold text-[#374151] whitespace-nowrap">
-                {feat.quantity} {feat.name}
+              <span className="text-sm leading-none">{getFeatureEmoji(feat)}</span>
+              <span className="text-xs font-semibold text-[#374151] whitespace-nowrap">{feat}
               </span>
             </div>
           ))}
@@ -280,11 +279,11 @@ export default function PropertyMap({
 
         {/* Tab bar */}
         <div className="shrink-0 flex border-b border-[#e5e7eb]">
-          {(["landmarks", "details"] as const).map(tab => (
+          {(["facilities", "details"] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`flex-1 py-2.5 text-xs font-bold transition-colors relative
                           ${activeTab === tab ? "text-[#1e5f74]" : "text-[#9ca3af] hover:text-[#374151]"}`}>
-              {tab === "landmarks" ? "📍 Nearby Landmarks" : "🏠 Property Details"}
+              {tab === "facilities" ? "📍 Nearby Facilities" : "🏠 Property Details"}
               {activeTab === tab && (
                 <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5
                                   bg-[#f0a500] rounded-full" />
@@ -297,7 +296,7 @@ export default function PropertyMap({
         <div className="flex-1 overflow-y-auto overscroll-contain">
 
           {/* ═══ LANDMARKS TAB ═══ */}
-          {activeTab === "landmarks" && (
+          {activeTab === "facilities" && (
             <div className="px-4 py-3 space-y-2">
 
               {/* Loading skeleton */}
@@ -313,9 +312,9 @@ export default function PropertyMap({
               {!lmLoading && landmarks.length === 0 && (
                 <div className="flex flex-col items-center py-8 gap-2 opacity-60">
                   <span className="text-4xl">🗺️</span>
-                  <p className="text-sm font-semibold text-[#6b7280]">No landmarks nearby</p>
+                  <p className="text-sm font-semibold text-[#6b7280]">No facilities nearby</p>
                   <p className="text-xs text-[#9ca3af] text-center">
-                    No landmarks have been added within 2 km of this property yet.
+                    No facilities have been added within 2 km of this property yet.
                   </p>
                 </div>
               )}
@@ -393,17 +392,17 @@ export default function PropertyMap({
               })}
 
               {/* Road access */}
-              {!lmLoading && property.env_facilities && property.env_facilities?.length > 0 && (
+              {!lmLoading && property.features && property.features?.length > 0 && (
                 <div className="mt-2 pt-3 border-t border-[#e5e7eb]">
                   <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider mb-2">
                     Road Access & Environment
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {property.env_facilities.map((fac: string, i: number) => (
+                    {property.features.map((ft: string, i: number) => (
                       <span key={i}
                         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full
                                    bg-white border border-[#e5e7eb] text-xs font-semibold text-[#374151]">
-                        🛣️ {fac}
+                        🛣️ {ft}
                       </span>
                     ))}
                   </div>
@@ -426,10 +425,9 @@ export default function PropertyMap({
                       <div key={i}
                         className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
                                    bg-[#f9fafb] border border-[#e5e7eb]">
-                        <span className="text-lg leading-none shrink-0">{getFeatureEmoji(feat.name)}</span>
+                        <span className="text-lg leading-none shrink-0">{getFeatureEmoji(feat)}</span>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-[#111827]">{feat.quantity}</p>
-                          <p className="text-[10px] text-[#9ca3af] truncate">{feat.name}</p>
+                          <p className="text-[10px] text-[#9ca3af] truncate">{feat}</p>
                         </div>
                       </div>
                     ))}

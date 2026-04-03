@@ -6,6 +6,7 @@
 import axiosClient from "@/config/client";
 import logger from "logger.config.mjs";
 import { LandmarkCategory } from "@/components/PropertyLocationModal";
+import { ApiSuccess } from "@/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RESPONSE TYPES  (mirrors LandmarkResponse from landmark.service.ts)
@@ -26,11 +27,7 @@ export interface LandmarkResponse {
   updatedAt:      string;
 }
 
-interface ApiSuccess<T> {
-  success: true;
-  data:    T;
-  count?:  number;
-}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERNAL HELPER

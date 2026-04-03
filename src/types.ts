@@ -225,3 +225,9 @@ export type PaymentDataType = {
   metadata: {
   }
 };
+
+export interface ApiSuccess<T> {
+  success: true;
+  data:    T;
+  count?:  number;
+}

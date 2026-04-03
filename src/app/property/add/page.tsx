@@ -14,7 +14,7 @@ import StepProgress        from "@/components/StepProgress";
 import Step1Basics         from "@/components/Step1Basics";
 import Step2Details        from "@/components/Step2Details";
 import Step3Preview        from "@/components/Step3Preview";
-import ListWithAI          from "@/components/property/ListwithAI";
+import ListWithAI          from "@/components/property/ListWithAI";
 import PublishSuccessModal from "@/components/property/PublishSuccessModal";
 import Splash              from "@/components/shared/Splash";
 import BrandLogo           from "@/components/shared/BrandLogo";

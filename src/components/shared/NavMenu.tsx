@@ -12,6 +12,7 @@ import { AppContext } from "@/context/AppContextProvider";
 // Keep sorted by frequency of use.
 
 const MENU_ITEMS = [
+  { icon: "🏠", title: "Home",  link: "/"         },
   { icon: "👤", title: "My Profile",         link: "/profile"              },
   { icon: "✏️", title: "Edit Profile",       link: "/profile/edit"         },
   { icon: "🏠", title: "List New Property",  link: "/property/add"         },

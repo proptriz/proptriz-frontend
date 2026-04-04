@@ -68,7 +68,7 @@ export default function PublishSuccessModal({
       icon:    "👁️",
       label:   "View Your Listing",
       sub:     "See how it looks to buyers",
-      onClick: () => { onClose(); router.push(`/property/${propertyId}`); },
+      onClick: () => { onClose(); router.push(`/property/details/${propertyId}`); },
     },
     {
       icon:    "👤",

@@ -8,7 +8,7 @@
 
 import axiosClient from "@/config/client";
 import logger      from "../../logger.config.mjs";
-import type { PropertyFormData, Feature } from "@/types/property";
+import type { PropertyFormData, Feature, CategoryEnum, RenewalEnum, PropertyStatusEnum, ListForEnum, CurrencyEnum } from "@/types/property";
 
 // ─── Backend response shape ────────────────────────────────────────────────
 // Mirrors NormalisedProperty from runExtractProperty.ts.
@@ -19,11 +19,11 @@ export interface ExtractedPropertyData {
   description:  string;
   address:      string;
   price:        string;
-  currency:     "₦" | "$" | "£" | "€";
-  listedFor:    "rent" | "sale";
-  category:     "house" | "apartment" | "commercial" | "villa" | "land" | "hotel";
-  status:       "available" | "reserved" | "taken" | "expired";
-  renewPeriod:  "weekly" | "monthly" | "yearly";
+  currency:     CurrencyEnum
+  listedFor:    ListForEnum
+  category:     CategoryEnum;
+  status:       PropertyStatusEnum;
+  renewPeriod:  RenewalEnum;
   negotiable:   "negotiable" | "non-negotiable";
   duration:     number;
   features:     string[];
@@ -72,15 +72,15 @@ export async function extractPropertyApi(
     const msg =
       (err as any)?.response?.data?.message ??
       (err instanceof Error ? err.message : "Network error — please try again.");
-    logger.error("[extractPropertyApi] request failed:", msg);
+    // logger.error("[extractPropertyApi] request failed:", msg);
     throw new Error(msg);
   }
 
   const { success, propertyData, message } = res.data;
 
   if (!success || !propertyData) {
-    logger.error("[extractPropertyApi] backend reported failure:", message);
-    throw new Error(message ?? "AI extraction failed — please try again.");
+    // logger.error("[extractPropertyApi] backend reported failure:", message);
+    throw new Error("AI extraction failed — please try again.");
   }
 
   logger.info("[extractPropertyApi] received normalised data:", propertyData);

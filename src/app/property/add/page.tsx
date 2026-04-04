@@ -571,6 +571,7 @@ export default function AddPropertyPage() {
         isOpen={successModal}
         propertyId={publishedId}
         propertyTitle={publishedTitle}
+        onClose={()=>setSuccessModal(false)}
       />
     </>
   );

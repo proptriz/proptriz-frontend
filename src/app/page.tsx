@@ -6,7 +6,7 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import propertyService from "@/services/propertyApi";
-import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
+import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types/property";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
 import Header from "@/components/shared/Header";

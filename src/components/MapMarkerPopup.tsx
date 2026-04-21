@@ -1,15 +1,8 @@
 import Link from "next/link";
-import { CurrencyEnum, PropertyType } from "@/types";
+import { CURRENCY_SYMBOL, CurrencyEnum, PropertyType } from "@/types/property";
 import formatPrice from "@/utils/formatPrice";
 
-// ─── Currency & category data ─────────────────────────────────────────────────
-
-const CURRENCY_SYMBOL: Record<CurrencyEnum, string> = {
-  [CurrencyEnum.naira]:   "₦",
-  [CurrencyEnum.dollar]: "$",
-  [CurrencyEnum.pound]:  "£",
-  [CurrencyEnum.euro]:   "€",
-};
+// ─── category data ─────────────────────────────────────────────────
 
 const CATEGORY_ICON: Record<string, string> = {
   house:    "🏠",

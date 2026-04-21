@@ -8,9 +8,8 @@ import { FaPlus }          from "react-icons/fa";
 
 import {
   CategoryEnum, CurrencyEnum, ListForEnum, NegotiableEnum,
-  PropertyStatusEnum, RenewalEnum,
-  type Feature, type PropertyType,
-} from "@/types";
+  PropertyStatusEnum, RenewalEnum, type PropertyType,
+} from "@/types/property";
 
 import TogglePills  from "@/components/TogglePills";
 import Counter      from "@/components/Counter";
@@ -121,7 +120,7 @@ export default function EditPropertyPage({
 
   // ── Editable fields ──────────────────────────────────────────────────────
   const [formData,    setFormData]    = useState<Partial<PropertyType>>({});
-  const [currency,    setCurrency]    = useState<CurrencyEnum>(CurrencyEnum.naira);
+  const [currency,    setCurrency]    = useState<CurrencyEnum>(CurrencyEnum.ngn);
   const [negotiable,  setNegotiable]  = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features,    setFeatures]    = useState<string[]>([]);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
@@ -170,7 +169,7 @@ export default function EditPropertyPage({
         setFormData(res);
         if (typeof res.latitude === "number" && typeof res.longitude === "number")
           setPropCoordinates([res.latitude, res.longitude]);
-        setCurrency(res.currency ?? CurrencyEnum.naira);
+        setCurrency(res.currency ?? CurrencyEnum.ngn);
         setNegotiable(res.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
         setFeatures(res.features ?? []);
       } catch (err: unknown) {
@@ -229,7 +228,7 @@ export default function EditPropertyPage({
         toast.success("Property details updated! ✅");
         setProperty(updated);
         setFormData(updated);
-        setCurrency(updated.currency ?? CurrencyEnum.naira);
+        setCurrency(updated.currency ?? CurrencyEnum.ngn);
         setNegotiable(updated.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
         setFeatures(updated.features       ?? []);
         if (typeof updated.latitude === "number" && typeof updated.longitude === "number")

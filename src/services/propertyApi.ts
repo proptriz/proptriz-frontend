@@ -1,6 +1,6 @@
 import axiosClient from "@/config/client";
 import logger from "../../logger.config.mjs"
-import { PropertyType } from "@/types";
+import { PropertyType } from "@/types/property";
 import { handleApiError } from "@/utils/errorHandler";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api/v1";

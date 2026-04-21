@@ -11,7 +11,7 @@ import {
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { getPropertyById }                   from "@/services/propertyApi";
 import { getNearLandmarks, verifyLandmark }  from "@/services/landmarkApi";
-import { PropertyType }                       from "@/types";
+import { PropertyType }                       from "@/types/property";
 import logger                                 from "logger.config.mjs";
 import Price                                  from "@/components/shared/Price";
 import { LANDMARK_CATEGORIES }               from "@/components/PropertyLocationModal";

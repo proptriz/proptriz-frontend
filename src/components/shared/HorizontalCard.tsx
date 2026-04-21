@@ -3,24 +3,24 @@ import { FaStar } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import Image from "next/image";
 import formatPrice from "@/utils/formatPrice";
-import { CurrencyEnum, PropertyProps } from "@/types";
+import { CategoryEnum, CURRENCY_SYMBOL, CurrencyEnum } from "@/types/property";
 
-const getCurrencySymbol = (currency?: CurrencyEnum) => {
-  switch (currency) {
-    case CurrencyEnum.naira:
-      return "₦";
-    case CurrencyEnum.dollar:
-      return "$";
-    case CurrencyEnum.pound:
-      return "£";
-    case CurrencyEnum.euro:
-      return "€";
-    default:
-      return "";
-  }
-};
+export interface HorizontalCardProps {
+  id: string,
+  image: string; // URL of the property image
+  name: string; // Title of the property
+  rating: number; // Rating of the property
+  address: string; // Location of the property
+  price: number; // Price per month
+  currency: CurrencyEnum;
+  category: CategoryEnum; // Property type (e.g., "Apartment")
+  period: string;
+  listed_for: string;
+  distance?: string;
+  expired?: boolean
+}
 
-const HorizontalCard: React.FC<PropertyProps> = ({
+const HorizontalCard: React.FC<HorizontalCardProps> = ({
   id,
   image,
   name,
@@ -88,7 +88,7 @@ const HorizontalCard: React.FC<PropertyProps> = ({
         {/* Price row */}
         <div className="flex items-center mt-2">
           <span className="text-primary font-semibold text-base">
-            {getCurrencySymbol(currency)}
+            {CURRENCY_SYMBOL[currency as CurrencyEnum] ?? ""}
             {formatPrice(price)}
           </span>
 
@@ -121,7 +121,7 @@ export const HorizontalCard2 = ({
     currency,
     category,
     period
-  }: PropertyProps)=>{
+  }: HorizontalCardProps)=>{
     return(
         <div className="grid grid-cols-2 min-w-[70%] md:min-w-[40%] space-x-3 bg-[#DCDFD9] p-2 rounded-lg shadow-md items-center" >
             <Image

@@ -1,4 +1,4 @@
-import { CategoryEnum } from "@/types";
+import { CategoryEnum } from "@/types/property";
 import React, { SetStateAction } from "react";
 
 // ─── Tab definitions with emoji icons ─────────────────────────────────────────
@@ -6,7 +6,7 @@ import React, { SetStateAction } from "react";
 // visually consistent with the rest of the design system.
 
 const CATEGORIES: { label: string; value: CategoryEnum; icon: string }[] = [
-  { label: "House",    value: CategoryEnum.house,    icon: "🏠" },
+  { label: "Apartment",    value: CategoryEnum.house,    icon: "🏠" },
   { label: "Land",     value: CategoryEnum.land,     icon: "🏘️" },
   { label: "Shortlet", value: CategoryEnum.shortlet, icon: "🌙" },
   { label: "Hotel",    value: CategoryEnum.hotel,    icon: "🏨" },

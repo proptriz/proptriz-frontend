@@ -1,4 +1,4 @@
-import { ListForEnum, LocationProps, CategoryEnum } from "./types";
+import { ListForEnum, CategoryEnum } from "./types/property";
 
 export const categories: { title: string; value: CategoryEnum }[] =
     Object.entries(CategoryEnum)
@@ -15,29 +15,6 @@ export const topLocation = [
     { image: '/avatar.png', name: 'Garki Abuja' },
     { image: '/avatar.png', name: 'Jimeta Yola' },
 ]
-
-export const locations: LocationProps[] = [
-    {   
-        id: '01',
-        distance: 2.5,
-        address: 'from Srengseng, Kembangan, West Jakarta City, Jakarta 11630',
-    },
-    {   
-        id: '02',
-        distance: 3.2,
-        address: 'from Kebon Jeruk, Jakarta 11530',
-    },
-    {   
-        id: '03',
-        distance: 5.0,
-        address: 'from Tanah Abang, Central Jakarta 10250',
-    },
-    {
-        id: '04',
-        distance: 5.0,
-        address: 'from Tanah Abang, Central Jakarta 10250',
-    },
-];
 
 export const reviews = [
     {reviewer: '', image: '/avatar.png', rating: 5.0, comment: ''},

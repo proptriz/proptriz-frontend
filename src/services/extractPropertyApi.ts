@@ -8,7 +8,7 @@
 
 import axiosClient from "@/config/client";
 import logger      from "../../logger.config.mjs";
-import type { PropertyFormData, Feature, CategoryEnum, RenewalEnum, PropertyStatusEnum, ListForEnum, CurrencyEnum } from "@/types/property";
+import type { CategoryEnum, RenewalEnum, PropertyStatusEnum, ListForEnum, CurrencyEnum } from "@/types/property";
 
 // ─── Backend response shape ────────────────────────────────────────────────
 // Mirrors NormalisedProperty from runExtractProperty.ts.

@@ -5,7 +5,7 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import { getNearestProperties } from "@/services/propertyApi";
-import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
+import { CategoryEnum, PropertyFilterPayload, PropertyType} from "@/types/property";
 import Header from "@/components/shared/Header";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import Link from "next/link";

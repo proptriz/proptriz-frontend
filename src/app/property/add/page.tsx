@@ -44,7 +44,7 @@ const DEFAULT_FORM: PropertyFormData = {
   description: "",
   address:     "",
   price:       "0",
-  currency:    CurrencyEnum.naira,
+  currency:    CurrencyEnum.ngn,
   listedFor:   ListForEnum.rent,
   category:    CategoryEnum.house,
   status:      PropertyStatusEnum.available,

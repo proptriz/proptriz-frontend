@@ -5,7 +5,7 @@ import Link from "next/link";
 import SearchBar from "@/components/shared/SearchBar";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import propertyService from "@/services/propertyApi";
-import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
+import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types/property";
 import logger from "../../../../logger.config.mjs"
 import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";

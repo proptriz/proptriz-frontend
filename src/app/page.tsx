@@ -14,6 +14,7 @@ import Header from "@/components/shared/Header";
 import Link from "next/link";
 import { FiNavigation } from "react-icons/fi";
 import type L from "leaflet";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
@@ -21,6 +22,7 @@ const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 export default function ExplorePage() {
   const { authUser, isSigningInUser } = useContext(AppContext);
+  const { t } = useLanguage();
 
   const [properties, setProperties]             = useState<PropertyType[]>([]);
   const [searchInput, setSearchInput]           = useState("");
@@ -196,7 +198,7 @@ export default function ExplorePage() {
           <button
             onClick={onLocateMe}
             disabled={isSigningInUser}
-            aria-label="My location"
+            aria-label={t("map_my_location")}
             className="w-10 h-10 rounded-full bg-white flex items-center justify-center
                        shadow-[0_2px_12px_rgba(0,0,0,0.18)]
                        hover:shadow-lg transition-shadow
@@ -217,7 +219,7 @@ export default function ExplorePage() {
                        transition-shadow"
                 style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
           >
-            ＋ List Property
+            {t("map_list_property")}
           </Link>
         </div>
       </div>

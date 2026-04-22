@@ -13,6 +13,7 @@ import { getPropertyById } from "@/services/propertyApi";
 import Link from "next/link";
 import { AddReview } from "@/components/AddReview";
 import { BackButton } from "@/components/shared/buttons";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
@@ -55,6 +56,7 @@ const PropertyReviews = ({
   params: Promise<{ id: string }>;
 }) => {
   const { id: propertyId } = use(params);
+  const { t } = useLanguage();
 
   const [property, setProperty]               = useState<PropertyType | null>(null);
   const [reviews, setReviews]                 = useState<ReviewType[]>([]);
@@ -226,7 +228,7 @@ const PropertyReviews = ({
       {/* ── Reply popup ───────────────────────────────────────────────── */}
       {replyReview && (
         <Popup
-          header="Replies"
+          header={t("rev_replies_header")}
           toggle={isReplyPop}
           setToggle={setIsReplyPop}
           useMask
@@ -239,7 +241,7 @@ const PropertyReviews = ({
       {/* ── Add review popup ──────────────────────────────────────────── */}
       {property && (
         <Popup
-          header="Write a Review"
+          header={t("rev_write_header")}
           toggle={reviewPopup}
           setToggle={setReviewPopup}
           useMask

@@ -26,6 +26,8 @@ import { createProperty, updatePropertyImage } from "@/services/propertyApi";
 import { compressImage }       from "@/utils/compressImage";
 import getUserPosition          from "@/utils/getUserPosition";
 import logger                   from "../../../../logger.config.mjs";
+import { useLanguage }          from "@/i18n/LanguageContext";
+import { interpolate }          from "@/i18n/translations";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -60,14 +62,14 @@ const DEFAULT_FORM: PropertyFormData = {
 // STEP VALIDATION  (only applies to manual steps 1 and 2)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function validateStep(step: WizardStep, data: PropertyFormData): string | null {
+function validateStep(step: WizardStep, data: PropertyFormData, t: any): string | null {
   if (step === 1) {
-    if (!data.title.trim())                     return "Please enter a property title.";
-    if (!data.price || Number(data.price) <= 0) return "Please enter a valid price.";
-    if (!data.address.trim())                   return "Please enter the property address.";
+    if (!data.title.trim())                     return t("add_val_title");
+    if (!data.price || Number(data.price) <= 0) return t("add_val_price");
+    if (!data.address.trim())                   return t("add_val_address");
   }
   if (step === 2) {
-    if (data.photos.length === 0) return "Please add at least one property photo.";
+    if (data.photos.length === 0) return t("add_val_photos");
   }
   return null;
 }
@@ -79,6 +81,7 @@ function validateStep(step: WizardStep, data: PropertyFormData): string | null {
 export default function AddPropertyPage() {
   const router       = useRouter();
   const { authUser } = useContext(AppContext);
+  const { t }        = useLanguage();
 
   // ── Wizard state ─────────────────────────────────────────────────────────
   const [view,      setView]      = useState<WizardView>(1);
@@ -119,14 +122,14 @@ export default function AddPropertyPage() {
 
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     update({ coordinates: [lat, lng] });
-    toast.success(`Location pinned: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
+    toast.success(`${t("add_toast_pinned")}: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
   }, [update]);
 
   // ── Navigation ────────────────────────────────────────────────────────────
 
   const goNext = () => {
     if (view === "ai") return;                               // AI step uses its own button
-    const err = validateStep(view as WizardStep, formData);
+    const err = validateStep(view as WizardStep, formData, t);
     if (err) { toast.warn(err); return; }
     if ((view as number) < 3) setView((v) => ((v as number) + 1) as WizardStep);
   };
@@ -176,7 +179,7 @@ export default function AddPropertyPage() {
 
   // ── Submit ────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    if (!authUser) { toast.error("Please login to list a property."); return; }
+    if (!authUser) { toast.error(t("add_val_login")); return; }
 
     setUploadStage("creating");
 
@@ -203,7 +206,7 @@ export default function AddPropertyPage() {
       const result  = await createProperty(fd);
       newPropertyId = result._id;
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to create property.");
+      toast.error(err instanceof Error ? err.message : t("add_toast_failed"));
       setUploadStage("idle");
       return;
     }
@@ -215,15 +218,12 @@ export default function AddPropertyPage() {
         newPropertyId, formData.photos
       );
       if (failed > 0) {
-        toast.warn(
-          `${success} photo${success !== 1 ? "s" : ""} uploaded. ` +
-          `${failed} failed — add via Edit Property.`
-        );
+        toast.warn(interpolate(t("add_toast_photos_warn"), { s: success, f: failed }));
       } else {
-        toast.success("Property listed with all photos! 🎉");
+        toast.success(t("add_toast_listed_photos"));
       }
     } else {
-      toast.success("Property successfully listed! 🎉");
+      toast.success(t("add_toast_listed"));
     }
 
     setUploadStage("done");
@@ -247,12 +247,12 @@ export default function AddPropertyPage() {
 
   // ── CTA label ─────────────────────────────────────────────────────────────
   const ctaLabel =
-    uploadStage === "creating"    ? "Creating listing…"
-    : uploadStage === "uploading" ? `Uploading photo ${uploadProgress.current} of ${uploadProgress.total}…`
-    : uploadStage === "done"      ? "Published! ✨"
-    : view === 1                  ? "Add Photos & Details →"
-    : view === 2                  ? "Preview Listing →"
-    : "Publish Property 🎉";
+    uploadStage === "creating"    ? t("add_cta_creating")
+    : uploadStage === "uploading" ? interpolate(t("add_cta_uploading"), { cur: uploadProgress.current, total: uploadProgress.total })
+    : uploadStage === "done"      ? t("add_cta_published")
+    : view === 1                  ? t("add_cta_next")
+    : view === 2                  ? t("add_cta_preview")
+    : t("add_cta_publish");
 
   if (!authUser) return <Splash showFooter />;
 
@@ -308,11 +308,11 @@ export default function AddPropertyPage() {
                       className="text-white text-[22px] font-black leading-tight"
                       style={{ fontFamily: "'Raleway', sans-serif" }}
                     >
-                      List with AI
+                      {t("add_ai_title")}
                     </h1>
                   </div>
                   <p className="text-white/70 text-[13px] mt-0.5">
-                    Describe your property — AI fills the form
+                    {t("add_ai_subtitle")}
                   </p>
                 </>
               ) : (
@@ -321,10 +321,10 @@ export default function AddPropertyPage() {
                     className="text-white text-[22px] font-black leading-tight"
                     style={{ fontFamily: "'Raleway', sans-serif" }}
                   >
-                    Add Property
+                    {t("add_title")}
                   </h1>
                   <p className="text-white/70 text-[13px] mt-0.5 truncate">
-                    Hi {authUser.display_name ?? "there"}, let&apos;s list your space
+                    {interpolate(t("add_subtitle"), { name: authUser.display_name ?? "there" })}
                   </p>
                 </>
               )}
@@ -360,7 +360,7 @@ export default function AddPropertyPage() {
                   <path d="M19 16L19.9 18.9L22 20L19.9 21.1L19 24L18.1 21.1L16 20L18.1 18.9L19 16Z" fill="#f0a500" opacity="0.6" />
                   <path d="M5 3L5.7 5.3L8 6L5.7 6.7L5 9L4.3 6.7L2 6L4.3 5.3L5 3Z" fill="#f0a500" opacity="0.5" />
                 </svg>
-                ✨ List with AI — describe it, we fill the form
+                {t("add_ai_entry")}
               </button>
             </div>
           )}
@@ -386,10 +386,10 @@ export default function AddPropertyPage() {
             </svg>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-bold text-[#92400e] leading-tight">
-                ✨ AI filled your listing
+{t("add_ai_filled")}
               </p>
               <p className="text-[11px] text-[#b45309] mt-0.5">
-                Review the details below — edit anything before publishing.
+{t("add_ai_filled_sub")}
               </p>
             </div>
             <button
@@ -420,13 +420,13 @@ export default function AddPropertyPage() {
             <div className="flex-1 min-w-0">
               <p className="text-white text-[13px] font-bold leading-tight truncate">
                 {uploadStage === "creating"
-                  ? "Creating your listing…"
-                  : `Uploading photo ${uploadProgress.current} of ${uploadProgress.total}`}
+                  ? t("add_banner_creating")
+                  : interpolate(t("add_banner_uploading"), { cur: uploadProgress.current, total: uploadProgress.total })}
               </p>
               <p className="text-white/55 text-[11px] mt-0.5">
                 {uploadStage === "creating"
-                  ? "Saving title, price & location — this is fast"
-                  : "Photos compressed & sent one by one for reliability"}
+                  ? t("add_banner_creating_sub")
+                  : t("add_banner_uploading_sub")}
               </p>
             </div>
             {uploadStage === "uploading" && uploadProgress.total > 0 && (
@@ -571,7 +571,7 @@ export default function AddPropertyPage() {
         isOpen={successModal}
         propertyId={publishedId}
         propertyTitle={publishedTitle}
-        onClose={()=>setSuccessModal(false)}
+        onClose={() => setSuccessModal(false)}
       />
     </>
   );

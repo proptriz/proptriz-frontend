@@ -9,6 +9,7 @@ import { AppContext } from "@/context/AppContextProvider";
 import Splash from "./shared/Splash";
 import { toast } from "react-toastify";
 import logger from "../../logger.config.mjs";
+import { useLanguage } from "@/i18n/LanguageContext";
 import Image from "next/image";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
@@ -25,6 +26,7 @@ export function AddReview({
   propOwner: string;
 }) {
   const { authUser } = useContext(AppContext);
+  const { t } = useLanguage();
 
   const [rating, setRating]           = useState<RatingScaleEnum>(RatingScaleEnum.HAPPY);
   const [comment, setComment]         = useState("");
@@ -37,16 +39,16 @@ export function AddReview({
     if (!file) return;
 
     if (!["image/png", "image/jpeg", "image/jpg"].includes(file.type)) {
-      toast.error("Invalid file type. Please select a PNG or JPG image.");
+      toast.error(t("rev_add_photo_invalid"));
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("File is too large. Maximum size is 2 MB.");
+      toast.error(t("rev_add_photo_large"));
       return;
     }
     setPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
-    toast.success("Photo added to review.");
+    toast.success(t("rev_add_photo_added"));
   };
 
   const removePhoto = () => {
@@ -63,11 +65,11 @@ export function AddReview({
 
   const handleSubmit = async () => {
     if (!authUser) {
-      toast.error("You must be logged in to submit a review.");
+      toast.error(t("rev_add_login"));
       return;
     }
     if (propOwner === authUser._id) {
-      toast.warn("You cannot rate your own property.");
+      toast.warn(t("rev_add_own"));
       return;
     }
 
@@ -76,12 +78,12 @@ export function AddReview({
     const newReview = await addReviewApi(propertyId, rating, comment, photo);
 
     if (!newReview) {
-      toast.error("Failed to submit review. Please try again.");
+      toast.error(t("rev_add_failed"));
       setIsSubmitting(false);
       return;
     }
 
-    toast.success("Review submitted successfully!");
+    toast.success(t("rev_add_success"));
     resetForm();
     setIsSubmitting(false);
     setRefreshReviews(true);
@@ -121,7 +123,7 @@ export function AddReview({
           name="comment"
           value={comment}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
-          placeholder="Share your experience with this property…"
+          placeholder={t("rev_add_placeholder")}
           className="w-full outline-none"
         />
       </div>
@@ -176,7 +178,7 @@ export function AddReview({
           >
             <span className="text-3xl leading-none" style={{ color: "#9ca3af" }}>📷</span>
             <span className="text-[10px] mt-1.5 font-medium" style={{ color: "#9ca3af" }}>
-              Add photo
+              {t("rev_add_photo")}
             </span>
             <input
               type="file"
@@ -207,10 +209,10 @@ export function AddReview({
         {isSubmitting ? (
           <>
             <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-            Submitting…
+            {t("rev_add_submitting")}
           </>
         ) : (
-          "✓ Submit Review"
+t("rev_add_submit")
         )}
       </button>
     </div>

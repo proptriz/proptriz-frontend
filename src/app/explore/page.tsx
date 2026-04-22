@@ -1,3 +1,4 @@
+// /app/explore/page.tsx
 'use client';
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from "react";
@@ -14,6 +15,7 @@ import HorizontalCard from "@/components/shared/HorizontalCard";
 import { topLocation } from "@/constant";
 import Image from "next/image";
 import getUserPosition from "@/utils/getUserPosition";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -21,7 +23,9 @@ const PREVIEW_COUNT = 4; // 2 rows × 2 cols
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default function HomePage() {
+export default function Page() {
+  const { t } = useLanguage();
+
   const [draftQuery, setDraftQuery]           = useState("");
   const [searchQuery, setSearchQuery]         = useState("");
   const [category, setCategory]               = useState<CategoryEnum>(CategoryEnum.house);
@@ -139,7 +143,7 @@ export default function HomePage() {
           className="text-white text-[22px] font-extrabold leading-tight mb-4"
           style={{ fontFamily: "'Raleway', sans-serif" }}
         >
-          Find your next<br />perfect home
+          {t("home_greeting")}<br />perfect home
         </h2>
         <SearchBar
           value={draftQuery}
@@ -159,13 +163,13 @@ export default function HomePage() {
         {/* ── Nearby Properties ─────────────────────────────────────────── */}
         <section className="px-4 pt-5 mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">Nearby Properties</h2>
+            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_nearby")}</h2>
             {!showAll && listedProperties.length > PREVIEW_COUNT && (
               <button
                 onClick={() => setShowAll(true)}
                 className="text-[13px] font-semibold text-[#1e5f74]"
               >
-                View all →
+                {t("home_see_all")} →
               </button>
             )}
           </div>
@@ -219,8 +223,8 @@ export default function HomePage() {
         {listedProperties.length > 0 && (
           <section className="mb-8">
             <div className="flex items-center justify-between px-4 mb-3">
-              <h2 className="text-[15px] font-bold text-[#111827]">Featured Properties</h2>
-              <span className="text-[13px] font-semibold text-[#1e5f74]">See all →</span>
+              <h2 className="text-[15px] font-bold text-[#111827]">{t("home_featured")}</h2>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_see_all")} →</span>
             </div>
             <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
               {listedProperties.slice(0, 5).map((property) => (
@@ -274,9 +278,9 @@ export default function HomePage() {
         {/* ── Top Locations ─────────────────────────────────────────────── */}
         <section className="mb-8">
           <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">Top Locations</h2>
+            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_locations")}</h2>
             <Link href="/location/list">
-              <span className="text-[13px] font-semibold text-[#1e5f74]">More →</span>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_more")}</span>
             </Link>
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
@@ -307,9 +311,9 @@ export default function HomePage() {
         {/* ── Top Agents ────────────────────────────────────────────────── */}
         <section className="mb-8">
           <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">Top Agents</h2>
+            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_agents")}</h2>
             <Link href="/agent/list">
-              <span className="text-[13px] font-semibold text-[#1e5f74]">View all →</span>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_view_all")}</span>
             </Link>
           </div>
           <div className="flex gap-5 px-4 overflow-x-auto pb-1 scrollbar-hide">

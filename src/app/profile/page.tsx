@@ -22,28 +22,32 @@ import { ReviewCardSkeleton } from "@/components/skeletons/ReviewCardSkeleton";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import { SlMenu } from "react-icons/sl";
 import ConfirmSheet from "@/components/shared/ConfirmSheet";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type ActiveTab = "Listings" | "receivedReviews" | "sentReviews";
 
-const TABS: { key: ActiveTab; label: string }[] = [
-  { key: "Listings",        label: "Listings" },
-  { key: "receivedReviews", label: "Received" },
-  { key: "sentReviews",     label: "Sent"     },
-];
-
-const MENU_ITEMS = [
-  { icon: "✏️", title: "Edit Profile",       link: "/profile/edit"         },
-  { icon: "🏠", title: "List New Property",  link: "/property/add"         },
-  { icon: "🤝", title: "Become an Agent",    link: "/profile/become-agent" },
-  { icon: "❓", title: "FAQ",                link: "/profile/faq"          },
-];
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
-  const { authUser } = useContext(AppContext);
+  const { authUser }  = useContext(AppContext);
+  const { t, openPicker, locale, } = useLanguage();
+
+  // Tab definitions use translation keys — built inside component so t() is available
+  const TABS: { key: ActiveTab; label: string }[] = [
+    { key: "Listings",        label: t("profile_listings") },
+    { key: "receivedReviews", label: t("profile_received") },
+    { key: "sentReviews",     label: t("profile_sent")     },
+  ];
+
+  // Menu items in the settings popup
+  const MENU_ITEMS = [
+    { icon: "✏️", labelKey: "menu_edit_profile"  as const, link: "/profile/edit"         },
+    { icon: "🏠", labelKey: "menu_list_property" as const, link: "/property/add"         },
+    { icon: "🤝", labelKey: "menu_become_agent"  as const, link: "/profile/become-agent" },
+    { icon: "❓", labelKey: "menu_faq"           as const, link: "/profile/faq"          },
+  ];
 
   const [showStats, setShowStats]               = useState(true);
   const [activeTab, setActiveTab]               = useState<ActiveTab>("Listings");
@@ -56,21 +60,12 @@ export default function ProfilePage() {
   const [replyReview, setReplyReview]           = useState<ReviewType | null>(null);
   const [totalProperties, setTotalProperties]   = useState(0);
 
-  /*
-    scrollRef points to the page's own scrollable container div.
-
-    WHY: globals.css sets `body > div:first-child { overflow: hidden }` so the
-    document itself never scrolls — the inner `.page-scroll` div scrolls instead.
-    `window.scrollY` is therefore always 0, so `window.addEventListener('scroll')`
-    never fires. We must listen on the element that actually scrolls.
-  */
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // ── Scroll-collapse stats ──────────────────────────────────────────────
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-
     const onScroll = () => setShowStats(el.scrollTop <= 20);
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
@@ -148,10 +143,10 @@ export default function ProfilePage() {
     setShowDeleteConfirm(false);
     setPendingDeleteId(null);
     if (!res.success) {
-      toast.error("Failed to delete property");
+      toast.error(t("profile_delete_fail"));
       return;
     }
-    toast.success("Property deleted successfully");
+    toast.success(t("profile_delete_success"));
   };
 
   const showReply = (review: ReviewType) => {
@@ -159,10 +154,8 @@ export default function ProfilePage() {
     setIsReplyPop(true);
   };
 
-  // ── Gate ────────────────────────────────────────────────────────────────
   if (!authUser) return <Splash showFooter />;
 
-  // ── Tab counts ──────────────────────────────────────────────────────────
   const tabCounts: Record<ActiveTab, number> = {
     Listings:        listedProperties.length,
     receivedReviews: receivedReviews.length,
@@ -172,12 +165,6 @@ export default function ProfilePage() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      {/*
-        scrollRef is attached here — this is the element that actually scrolls.
-        The parent layout has `page-scroll` (overflow-y: auto) so the document
-        doesn't scroll; we need to observe THIS div's scrollTop instead of
-        window.scrollY.
-      */}
       <div ref={scrollRef} className="px-4 pb-24 bg-[#f5f7f9] h-full overflow-y-auto">
 
         {/* ── Sticky teal hero header ──────────────────────────────────── */}
@@ -193,7 +180,7 @@ export default function ProfilePage() {
               className="font-extrabold text-white text-[16px] truncate"
               style={{ fontFamily: "'Raleway', sans-serif" }}
             >
-              {userSettings?.brand || authUser.display_name || "Profile"}
+              {userSettings?.brand || authUser.display_name || t("nav_profile")}
             </p>
 
             {/* Avatar + menu button */}
@@ -225,9 +212,9 @@ export default function ProfilePage() {
           >
             <div className="grid grid-cols-3 gap-2 px-4 pb-3">
               {[
-                { val: totalProperties, lbl: "Properties"              },
-                { val: "4.9",           lbl: "Rating",    gold: true   },
-                { val: 25,              lbl: "Reviews"                 },
+                { val: totalProperties, lbl: t("profile_properties")          },
+                { val: "4.9",           lbl: t("profile_rating"),  gold: true },
+                { val: 25,              lbl: t("profile_reviews")             },
               ].map((s) => (
                 <div
                   key={s.lbl}
@@ -258,14 +245,14 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between">
               <p className="text-white font-bold text-sm">
                 <span className="text-[#f0a500] mr-1">{tabCounts[activeTab]}</span>
-                {TABS.find((t) => t.key === activeTab)?.label}
+                {TABS.find((tab) => tab.key === activeTab)?.label}
               </p>
               <Link
                 href="/property/add"
                 className="text-[12px] font-bold px-3 py-1.5 rounded-lg"
                 style={{ background: "#f0a500", color: "#143d4d" }}
               >
-                + Add Property
+                {t("profile_add_property")}
               </Link>
             </div>
 
@@ -301,14 +288,14 @@ export default function ProfilePage() {
             {!loadingProp && listedProperties.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-4xl mb-3">🏠</p>
-                <p className="font-bold text-[#111827]">No listings yet</p>
-                <p className="text-sm text-[#9ca3af] mt-1">Add your first property to get started</p>
+                <p className="font-bold text-[#111827]">{t("profile_no_listings")}</p>
+                <p className="text-sm text-[#9ca3af] mt-1">{t("profile_no_listings_sub")}</p>
                 <Link
                   href="/property/add"
                   className="inline-block mt-4 px-5 py-2.5 rounded-xl text-sm font-bold text-white"
                   style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
                 >
-                  + List Property
+                  {t("profile_list_property")}
                 </Link>
               </div>
             )}
@@ -389,7 +376,7 @@ export default function ProfilePage() {
 
             {!hasMoreProp && listedProperties.length > 0 && (
               <p className="text-center text-sm text-[#9ca3af] mt-6 py-2">
-                You've seen all your listings
+                {t("profile_seen_all")}
               </p>
             )}
           </section>
@@ -401,8 +388,8 @@ export default function ProfilePage() {
             {receivedReviews.length === 0 && !loadingReceived && (
               <div className="text-center py-12">
                 <p className="text-4xl mb-3">⭐</p>
-                <p className="font-bold text-[#111827]">No reviews yet</p>
-                <p className="text-sm text-[#9ca3af] mt-1">Reviews from tenants will appear here</p>
+                <p className="font-bold text-[#111827]">{t("profile_no_received")}</p>
+                <p className="text-sm text-[#9ca3af] mt-1">{t("profile_no_received_sub")}</p>
               </div>
             )}
 
@@ -423,7 +410,9 @@ export default function ProfilePage() {
               }
 
               {!hasMoreReceived && receivedReviews.length > 0 && (
-                <p className="text-center text-sm text-[#9ca3af] py-2">No more reviews</p>
+                <p className="text-center text-sm text-[#9ca3af] py-2">
+                  {t("profile_no_more")}
+                </p>
               )}
             </div>
           </section>
@@ -435,8 +424,8 @@ export default function ProfilePage() {
             {sentReviews.length === 0 && !loadingsSent && (
               <div className="text-center py-12">
                 <p className="text-4xl mb-3">✍️</p>
-                <p className="font-bold text-[#111827]">No reviews sent yet</p>
-                <p className="text-sm text-[#9ca3af] mt-1">Your property reviews will appear here</p>
+                <p className="font-bold text-[#111827]">{t("profile_no_sent")}</p>
+                <p className="text-sm text-[#9ca3af] mt-1">{t("profile_no_sent_sub")}</p>
               </div>
             )}
 
@@ -457,7 +446,9 @@ export default function ProfilePage() {
               }
 
               {!hasMoreSent && sentReviews.length > 0 && (
-                <p className="text-center text-sm text-[#9ca3af] py-2">No more reviews</p>
+                <p className="text-center text-sm text-[#9ca3af] py-2">
+                  {t("profile_no_more")}
+                </p>
               )}
             </div>
           </section>
@@ -498,7 +489,7 @@ export default function ProfilePage() {
                          bg-[#fef3cd] text-[#c88400] px-2 py-0.5 rounded-full
                          border border-[rgba(240,165,0,0.3)]"
             >
-              🏆 Top Agent #1
+              🏆 {t("profile_top_agent")}
             </span>
           </div>
         </div>
@@ -517,9 +508,27 @@ export default function ProfilePage() {
                               text-[15px] flex-shrink-0 bg-[#e0f0f5] text-[#1e5f74]">
                 {item.icon}
               </div>
-              <span className="text-[13px] font-semibold text-[#111827]">{item.title}</span>
+              <span className="text-[13px] font-semibold text-[#111827]">
+                {t(item.labelKey)}
+              </span>
             </Link>
           ))}
+
+          {/* Language selector row */}
+          <button
+            type="button"
+            onClick={() => { setShowSettingsMenu(false); openPicker(); }}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl
+                       hover:bg-[#e0f0f5] transition-colors w-full text-left"
+          >
+            <div className="w-8 h-8 rounded-[10px] flex items-center justify-center
+                            text-[18px] flex-shrink-0 bg-[#e0f0f5]">
+              {locale === "en" ? "🇬🇧" : locale === "fr" ? "🇫🇷" : "🇰🇪"}
+            </div>
+            <span className="text-[13px] font-semibold text-[#111827]">
+              {t("menu_language")}
+            </span>
+          </button>
         </nav>
 
         {/* Footer */}
@@ -530,22 +539,22 @@ export default function ProfilePage() {
             className="flex-1 py-2.5 rounded-xl text-center text-[13px] font-bold
                        bg-[#e0f0f5] text-[#1e5f74]"
           >
-            ⚙️ Manage Account
+            ⚙️ {t("profile_manage_account")}
           </Link>
           <button
             type="button"
             onClick={() => setShowSettingsMenu(false)}
             className="flex-1 py-2.5 rounded-xl text-[13px] font-bold bg-[#fee2e2] text-[#ef4444]"
           >
-            ✕ Close
+            ✕ {t("common_close")}
           </button>
         </div>
       </Popup>
 
-      {/* ── Reply review popup ───────────────────────────────────────────── */}
+      {/* ── Reply review popup ─────────────────────────────────────────── */}
       {replyReview && (
         <Popup
-          header="Reply to Review"
+          header={t("profile_reply_review")}
           toggle={isReplyPop}
           setToggle={setIsReplyPop}
           useMask
@@ -555,20 +564,17 @@ export default function ProfilePage() {
         </Popup>
       )}
 
-      {/* ── Delete confirmation sheet ─────────────────────────────────────
-          Replaces the old <Popup> confirm dialog with the reusable ConfirmSheet.
-          Same UX as EditPropertyPage and any other screen that needs it.
-      ──────────────────────────────────────────────────────────────────── */}
+      {/* ── Delete confirmation sheet ─────────────────────────────────── */}
       <ConfirmSheet
         open={showDeleteConfirm}
         onClose={() => { setShowDeleteConfirm(false); setPendingDeleteId(null); }}
         onConfirm={confirmDelete}
-        title="Delete this listing?"
-        description="This property will be permanently deleted. This action cannot be undone."
-        confirmLabel="Yes, Delete Listing"
+        title={t("profile_delete_title")}
+        description={t("profile_delete_desc")}
+        confirmLabel={t("profile_delete_confirm")}
         confirmColor="#ef4444"
         loading={isDeleting}
-        loadingLabel="Deleting…"
+        loadingLabel={t("profile_delete_loading")}
       />
     </>
   );

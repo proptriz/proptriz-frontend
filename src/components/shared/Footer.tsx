@@ -3,22 +3,22 @@
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
-
-// ─── Menu definitions ─────────────────────────────────────────────────────────
-// Renamed "Promotion" → "Explore" to match the route and user mental model.
-// Emoji icons replaces the multi-library icon imports.
-
-const MENUS = [
-  { name: "Map",     icon: "📍", activeIcon: "📍", link: "/"             },
-  { name: "Explore", icon: "🏠", activeIcon: "🏠", link: "/explore"      },
-  { name: "Saved",   icon: "🤍", activeIcon: "❤️",  link: "/property/list" },
-  { name: "Profile", icon: "👤", activeIcon: "👤", link: "/profile"      },
-] as const;
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Component ────────────────────────────────────────────────────────────────
+// Nav labels are translated via t().  The emoji icons are language-neutral so
+// they stay constant — only the text label below each icon changes.
 
 const Footer: React.FC = () => {
-  const pathname = usePathname();
+  const pathname   = usePathname();
+  const { t }      = useLanguage();
+
+  const MENUS = [
+    { labelKey: "nav_map"     as const, icon: "📍", activeIcon: "📍", link: "/"             },
+    { labelKey: "nav_explore" as const, icon: "🏠", activeIcon: "🏠", link: "/explore"      },
+    { labelKey: "nav_saved"   as const, icon: "🤍", activeIcon: "❤️",  link: "/property/list" },
+    { labelKey: "nav_profile" as const, icon: "👤", activeIcon: "👤", link: "/profile"      },
+  ] as const;
 
   return (
     <footer
@@ -30,7 +30,8 @@ const Footer: React.FC = () => {
     >
       <div className="flex items-stretch mx-auto">
         {MENUS.map((menu) => {
-          const isActive = pathname === menu.link ||
+          const isActive =
+            pathname === menu.link ||
             (menu.link !== "/" && pathname.startsWith(menu.link));
 
           return (
@@ -43,7 +44,7 @@ const Footer: React.FC = () => {
                          focus-visible:ring-[#1e5f74] focus-visible:ring-inset"
               aria-current={isActive ? "page" : undefined}
             >
-              {/* Active top indicator bar */}
+              {/* Active indicator bar */}
               {isActive && (
                 <span
                   className="absolute top-0 left-1/2 -translate-x-1/2
@@ -60,15 +61,12 @@ const Footer: React.FC = () => {
                 {isActive ? menu.activeIcon : menu.icon}
               </span>
 
-              {/* Label */}
+              {/* Translated label */}
               <span
                 className={`text-[10px] font-medium leading-none transition-colors
-                            ${isActive
-                              ? "text-[#1e5f74] font-bold"
-                              : "text-[#9ca3af]"
-                            }`}
+                            ${isActive ? "text-[#1e5f74] font-bold" : "text-[#9ca3af]"}`}
               >
-                {menu.name}
+                {t(menu.labelKey)}
               </span>
             </Link>
           );

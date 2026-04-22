@@ -1,42 +1,43 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { PropertyStatusEnum } from "../types/property";
+import { PropertyStatusEnum }    from "../types/property";
 import type { PropertyFormData } from "../types/property";
-import SectionCard from "./SectionCard";
-import TogglePills from "./TogglePills";
-import PhotoUploadSection from "./PhotoUploadSection";
-import { FaPlus } from "react-icons/fa6";
-import { IoClose } from "react-icons/io5";
+import SectionCard               from "./SectionCard";
+import TogglePills               from "./TogglePills";
+import PhotoUploadSection        from "./PhotoUploadSection";
+import { FaPlus }                from "react-icons/fa6";
+import { IoClose }               from "react-icons/io5";
+import { useLanguage }          from "@/i18n/LanguageContext";
 
-// ─── Facility data ────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// PRESET FEATURES
+// Shown as toggleable pills in the Property Features section.
+// These are merged together with user-typed custom entries in data.features.
+// ─────────────────────────────────────────────────────────────────────────────
 
-const FEATURE_ICONS: Record<string, string> = {
-  "Parking Lot":       "🅿️",
-  "Pet Allowed":       "🐾",
-  "Garden":            "🌿",
-  "Gym":               "🏋️",
-  "Park":              "🏞️",
-  "Home Theatre":      "🎬",
-  "Kid's Friendly":    "👶",
-  "Electricity":       "⚡",
-  "Water Supply":      "💧",
-  "Drainage System":   "🚿",
-  "Security Services": "🔒",
-};
+const PRESET_FEATURES: { label: string; icon: string }[] = [
+  { label: "Parking Lot",       icon: "🅿️" },
+  { label: "Garden",            icon: "🌿" },
+  { label: "Gym",               icon: "🏋️" },
+  { label: "Swimming Pool",     icon: "🏊" },
+  { label: "Home Theatre",      icon: "🎬" },
+  { label: "Kids Friendly",     icon: "👶" },
+  { label: "24hr Electricity",  icon: "⚡" },
+  { label: "Water Supply",      icon: "💧" },
+  { label: "Security Services", icon: "🔒" },
+  { label: "CCTV",              icon: "📹" },
+  { label: "Generator",         icon: "🔋" },
+  { label: "Wifi / Internet",   icon: "📶" },
+  { label: "Boys Quarter",      icon: "🏠" },
+  { label: "Pet Allowed",       icon: "🐾" },
+];
 
-const DEFAULT_FEATURES = Object.keys(FEATURE_ICONS);
+const PRESET_LABELS = new Set(PRESET_FEATURES.map((f) => f.label));
 
-// ─── Custom feature entry ─────────────────────────────────────────────────────
-
-interface CustomFeatureEntry {
-  /** Stable identity — never mutated after creation */
-  token: string;
-  /** User-typed text — mutable */
-  value: string;
-}
-
-// ─── Focus helpers ────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// FOCUS HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
 
 const onFocusTeal = (el: HTMLElement) => {
   el.style.borderColor = "#1e5f74";
@@ -49,125 +50,97 @@ const onBlurTeal = (el: HTMLElement) => {
   el.style.boxShadow   = "none";
 };
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// STABLE CUSTOM ENTRY  (avoids lost-focus bug — key is token, not value)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface CustomEntry {
+  token: string;   // stable identity — never mutated after creation
+  value: string;   // what the user typed — mutated freely
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROPS
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface Step2Props {
-  data: PropertyFormData;
+  data:     PropertyFormData;
   onUpdate: (partial: Partial<PropertyFormData>) => void;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Merge the preset-toggle list + custom entries into the flat string[]
- * that PropertyFormData.features expects.
- *
- * Custom entries whose value is blank are excluded — they will not be
- * sent to the backend until the user has actually typed something.
- */
-function buildFeaturesArray(
-  presetSelected: string[],
-  customEntries:  CustomFeatureEntry[],
-): string[] {
-  const customs = customEntries
-    .map((e) => e.value.trim())
-    .filter(Boolean);
-  return [...presetSelected, ...customs];
+/** Merge preset toggles + non-empty custom values into data.features */
+function buildFeatures(presets: string[], customs: CustomEntry[]): string[] {
+  const customValues = customs.map((e) => e.value.trim()).filter(Boolean);
+  return [...presets, ...customValues];
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function Step2Details({ data, onUpdate }: Step2Props) {
+  const { t } = useLanguage();
 
-  // ── Preset selection (from DEFAULT_FEATURES) ──────────────────────────────
-  //
-  // Seed from data.features on first render: any value that matches a preset
-  // label goes here; anything else is treated as a custom entry below.
-
+  // ── Seed preset selection from data.features ──────────────────────────────
   const [presetSelected, setPresetSelected] = useState<string[]>(() =>
-    data.features.filter((f) => DEFAULT_FEATURES.includes(f))
+    data.features.filter((f) => PRESET_LABELS.has(f))
   );
 
-  // ── Custom entries — stable token + mutable value ─────────────────────────
-
-  const [customEntries, setCustomEntries] = useState<CustomFeatureEntry[]>(() =>
+  // ── Seed custom entries from data.features ────────────────────────────────
+  const [customEntries, setCustomEntries] = useState<CustomEntry[]>(() =>
     data.features
-      .filter((f) => !DEFAULT_FEATURES.includes(f))
-      .map((value) => ({
-        token: `__custom_${Date.now()}_${Math.random()}`,
-        value,
-      }))
+      .filter((f) => !PRESET_LABELS.has(f))
+      .map((value) => ({ token: `__c_${Date.now()}_${Math.random()}`, value }))
   );
 
-  // ── Shared updater: called whenever preset or custom state changes ─────────
-  //
-  // Keeps data.features in sync so the parent always has the latest flat list.
-
-  const syncFeatures = useCallback(
-    (nextPreset: string[], nextCustom: CustomFeatureEntry[]) => {
-      onUpdate({ features: buildFeaturesArray(nextPreset, nextCustom) });
+  const sync = useCallback(
+    (nextPreset: string[], nextCustom: CustomEntry[]) => {
+      onUpdate({ features: buildFeatures(nextPreset, nextCustom) });
     },
     [onUpdate],
   );
 
   // ── Preset toggle ─────────────────────────────────────────────────────────
-
-  const toggleFeature = useCallback(
-    (label: string) => {
-      const next = presetSelected.includes(label)
-        ? presetSelected.filter((f) => f !== label)
-        : [...presetSelected, label];
-      setPresetSelected(next);
-      syncFeatures(next, customEntries);
-    },
-    [presetSelected, customEntries, syncFeatures],
-  );
+  const togglePreset = useCallback((label: string) => {
+    const next = presetSelected.includes(label)
+      ? presetSelected.filter((f) => f !== label)
+      : [...presetSelected, label];
+    setPresetSelected(next);
+    sync(next, customEntries);
+  }, [presetSelected, customEntries, sync]);
 
   // ── Custom entry handlers ─────────────────────────────────────────────────
-
-  const addCustomFeature = useCallback(() => {
-    const entry: CustomFeatureEntry = {
-      token: `__custom_${Date.now()}`,
-      value: "",
-    };
+  const addCustom = useCallback(() => {
+    const entry: CustomEntry = { token: `__c_${Date.now()}`, value: "" };
     const next = [...customEntries, entry];
     setCustomEntries(next);
-    // No need to sync yet — empty value won't be included in the array
+    // No sync yet — empty value excluded from array
   }, [customEntries]);
 
-  /**
-   * Update the *value* of an entry identified by its stable token.
-   * The token (and therefore the key) never changes → no remount → no lost focus.
-   */
-  const updateCustomFeature = useCallback(
-    (token: string, newValue: string) => {
-      const next = customEntries.map((e) =>
-        e.token === token ? { ...e, value: newValue } : e,
-      );
-      setCustomEntries(next);
-      syncFeatures(presetSelected, next);
-    },
-    [customEntries, presetSelected, syncFeatures],
-  );
+  const updateCustom = useCallback((token: string, value: string) => {
+    const next = customEntries.map((e) => e.token === token ? { ...e, value } : e);
+    setCustomEntries(next);
+    sync(presetSelected, next);
+  }, [customEntries, presetSelected, sync]);
 
-  const removeCustomFeature = useCallback(
-    (token: string) => {
-      const next = customEntries.filter((e) => e.token !== token);
-      setCustomEntries(next);
-      syncFeatures(presetSelected, next);
-    },
-    [customEntries, presetSelected, syncFeatures],
-  );
+  const removeCustom = useCallback((token: string) => {
+    const next = customEntries.filter((e) => e.token !== token);
+    setCustomEntries(next);
+    sync(presetSelected, next);
+  }, [customEntries, presetSelected, sync]);
 
   // ─────────────────────────────────────────────────────────────────────────
-
   return (
     <div className="flex flex-col gap-4">
 
       {/* ── Photos ──────────────────────────────────────────────────────── */}
-      <SectionCard icon="📸" title="Property Photos">
+      <SectionCard icon="📸" title={t("s2_photos")}>
         <p className="text-[11px] text-[#9ca3af] mb-2.5 leading-relaxed">
-          Add up to 5 photos. The first photo will be your listing cover image.
+          {t("s2_photos_sub")}
         </p>
         <PhotoUploadSection
           photos={data.photos}
@@ -177,18 +150,18 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
         />
         {data.photos.length === 0 && (
           <p className="text-[11px] text-amber-500 mt-2 flex items-center gap-1">
-            💡 Properties with photos get 3× more views
+            💡 {t("s2_photos_tip")}
           </p>
         )}
       </SectionCard>
 
       {/* ── Listing Status ───────────────────────────────────────────────── */}
-      <SectionCard icon="📋" title="Listing Status">
+      <SectionCard icon="📋" title={t("s2_status")}>
         <TogglePills<PropertyStatusEnum>
           options={[
-            { label: "Available",   value: PropertyStatusEnum.available,   icon: "✅" },
-            { label: "Rented",      value: PropertyStatusEnum.rented,      icon: "⏳" },
-            { label: "Unavailable", value: PropertyStatusEnum.unavailable, icon: "❌" },
+            { label: t("s2_status_available"), value: PropertyStatusEnum.available,   icon: "✅" },
+            { label: t("s2_status_rented"),    value: PropertyStatusEnum.rented,      icon: "⏳" },
+            { label: t("s2_status_unavail"),   value: PropertyStatusEnum.unavailable, icon: "❌" },
           ]}
           value={data.status}
           onChange={(val) => onUpdate({ status: val })}
@@ -196,7 +169,7 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
       </SectionCard>
 
       {/* ── Description ─────────────────────────────────────────────────── */}
-      <SectionCard icon="📝" title="Description">
+      <SectionCard icon="📝" title={t("s2_description")}>
         <div
           className="flex items-start gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
                      rounded-xl px-3.5 py-3 transition-all duration-200"
@@ -206,7 +179,7 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
           <span className="text-[#9ca3af] text-base pt-0.5 flex-shrink-0">📝</span>
           <textarea
             rows={4}
-            placeholder="Describe the property, its features and neighbourhood… what makes it special?"
+            placeholder={t("s2_description_ph")}
             value={data.description}
             onChange={(e) => onUpdate({ description: e.target.value })}
             className="w-full outline-none bg-transparent text-sm
@@ -215,18 +188,26 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
         </div>
       </SectionCard>
 
-      {/* ── Property Features ───────────────────────────────────────────── */}
-      <SectionCard icon="🌿" title="Property Features">
+      {/* ── Property Features & Facilities ──────────────────────────────── */}
+      {/*
+        Features and facilities are now a single string[] field.
+        Preset pills let the user toggle common amenities quickly.
+        Custom entries handle anything not in the preset list.
+      */}
+      <SectionCard icon="🌿" title={t("s2_features")}>
+        <p className="text-[11px] text-[#9ca3af] mb-3 leading-relaxed">
+          {t("s2_features_sub")}
+        </p>
 
         {/* Preset toggles */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {DEFAULT_FEATURES.map((feature) => {
-            const selected = presetSelected.includes(feature);
+          {PRESET_FEATURES.map(({ label, icon }) => {
+            const selected = presetSelected.includes(label);
             return (
               <button
-                key={feature}
+                key={label}
                 type="button"
-                onClick={() => toggleFeature(feature)}
+                onClick={() => togglePreset(label)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
                            border-[1.5px] text-[11px] font-medium transition-all duration-200"
                 style={
@@ -243,17 +224,14 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
                     (e.currentTarget as HTMLButtonElement).style.borderColor = "#e5e7eb";
                 }}
               >
-                <span>{FEATURE_ICONS[feature]}</span>
-                {feature}
+                <span>{icon}</span>
+                {label}
               </button>
             );
           })}
         </div>
 
-        {/* Custom entries
-            key={entry.token} — STABLE identity, never changes between keystrokes.
-            The token is set once at creation and never mutated, so React always
-            reconciles this as the same DOM node regardless of what the user types. */}
+        {/* Custom entries — key={token} is stable so focus is never lost */}
         {customEntries.map((entry) => (
           <div
             key={entry.token}
@@ -271,15 +249,15 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
             <span className="text-[#d97706] text-sm flex-shrink-0">✏️</span>
             <input
               type="text"
-              placeholder="Custom feature name…"
+              placeholder={t("s2_custom_ph")}
               value={entry.value}
-              onChange={(e) => updateCustomFeature(entry.token, e.target.value)}
+              onChange={(e) => updateCustom(entry.token, e.target.value)}
               className="flex-1 bg-transparent border-none outline-none
                          text-sm text-[#111827] placeholder:text-[#d97706]"
             />
             <button
               type="button"
-              onClick={() => removeCustomFeature(entry.token)}
+              onClick={() => removeCustom(entry.token)}
               className="text-[#f59e0b] hover:text-red-500 transition-colors flex-shrink-0"
             >
               <IoClose size={14} />
@@ -290,21 +268,21 @@ export default function Step2Details({ data, onUpdate }: Step2Props) {
         {/* Add custom */}
         <button
           type="button"
-          onClick={addCustomFeature}
+          onClick={addCustom}
           className="w-full mt-3 flex items-center justify-center gap-2
                      py-2.5 rounded-xl border-[1.5px] border-dashed
                      text-[12px] font-semibold transition-all duration-200"
           style={{ borderColor: "#f0a500", color: "#c88400", background: "#fffbeb" }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background    = "#fef3c7";
-            (e.currentTarget as HTMLButtonElement).style.borderStyle   = "solid";
+            (e.currentTarget as HTMLButtonElement).style.background  = "#fef3c7";
+            (e.currentTarget as HTMLButtonElement).style.borderStyle = "solid";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background    = "#fffbeb";
-            (e.currentTarget as HTMLButtonElement).style.borderStyle   = "dashed";
+            (e.currentTarget as HTMLButtonElement).style.background  = "#fffbeb";
+            (e.currentTarget as HTMLButtonElement).style.borderStyle = "dashed";
           }}
         >
-          <FaPlus size={10} /> Add Custom Feature
+          <FaPlus size={10} /> {t("s2_add_custom")}
         </button>
       </SectionCard>
     </div>

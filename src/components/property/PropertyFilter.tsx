@@ -2,8 +2,9 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FiSearch, FiMapPin, FiX } from "react-icons/fi";
-import { LuSlidersHorizontal } from "react-icons/lu";
 import { CategoryEnum, PropertyFilterPayload } from "@/types/property";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { interpolate } from "@/i18n/translations";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -15,41 +16,27 @@ const PRICE_LIMITS = {
 const getPriceMax = (listedFor: string): number =>
   listedFor === "rent" ? PRICE_LIMITS.rent : PRICE_LIMITS.sale;
 
-const getBudgetPresets = (listedFor: string, priceMax: number) => {
+// Price presets use ₦ amounts which are currency-specific — labels stay as-is.
+// The "Any" label is translated via t("filter_any") at render time.
+const getRawBudgetPresets = (listedFor: string, priceMax: number) => {
   if (listedFor === "rent") {
     return [
-      { label: "Any",          min: 0,          max: priceMax     },
-      { label: "Under ₦100k",  min: 0,          max: 100_000      },
-      { label: "Under ₦500k",  min: 100_000,    max: 500_000      },
-      { label: "₦500k–₦2M",   min: 500_000,    max: 2_000_000    },
-      { label: "₦2M–₦5M",     min: 2_000_000,  max: 5_000_000    },
-      { label: "₦5M+",         min: 5_000_000,  max: priceMax     },
+      { label: "any",          min: 0,          max: priceMax  },
+      { label: "Under ₦100k",  min: 0,          max: 100_000   },
+      { label: "Under ₦500k",  min: 100_000,    max: 500_000   },
+      { label: "₦500k–₦2M",   min: 500_000,    max: 2_000_000 },
+      { label: "₦2M–₦5M",     min: 2_000_000,  max: 5_000_000 },
+      { label: "₦5M+",         min: 5_000_000,  max: priceMax  },
     ];
   }
   return [
-    { label: "Any",          min: 0,            max: priceMax       },
-    { label: "Under ₦5M",   min: 0,            max: 5_000_000      },
-    { label: "₦5M–₦20M",   min: 5_000_000,    max: 20_000_000     },
-    { label: "₦20M–₦100M", min: 20_000_000,   max: 100_000_000    },
-    { label: "₦100M+",      min: 100_000_000,  max: priceMax       },
+    { label: "any",          min: 0,            max: priceMax      },
+    { label: "Under ₦5M",   min: 0,            max: 5_000_000     },
+    { label: "₦5M–₦20M",   min: 5_000_000,    max: 20_000_000    },
+    { label: "₦20M–₦100M", min: 20_000_000,   max: 100_000_000   },
+    { label: "₦100M+",      min: 100_000_000,  max: priceMax      },
   ];
 };
-
-const CATEGORIES: { label: string; value: CategoryEnum; icon: string }[] = [
-  { label: "House",    value: CategoryEnum.house,    icon: "🏠" },
-  { label: "Land",     value: CategoryEnum.land,     icon: "🏘️" },
-  { label: "Shortlet", value: CategoryEnum.shortlet, icon: "🌙" },
-  { label: "Hotel",    value: CategoryEnum.hotel,    icon: "🏨" },
-  { label: "Shop",     value: CategoryEnum.shop,     icon: "🏪" },
-  { label: "Office",   value: CategoryEnum.office,   icon: "🏢" },
-  { label: "Others",   value: CategoryEnum.others,   icon: "•••" },
-];
-
-const LIST_FOR_OPTIONS = [
-  { value: "all",  label: "All",  icon: "🌐" },
-  { value: "rent", label: "Rent", icon: "🔑" },
-  { value: "sale", label: "Sale", icon: "🏷️" },
-] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -57,42 +44,39 @@ type ListedFor = "all" | "sale" | "rent";
 
 interface LocationResult {
   query: string;
-  lat: number;
-  lng: number;
-  name: string;
-  lga?: string;
+  lat:   number;
+  lng:   number;
+  name:  string;
+  lga?:  string;
   state?: string;
 }
 
 interface FilterState {
   propertyType: CategoryEnum;
-  listedFor: ListedFor;
-  price: [number, number];
-  description: string;
+  listedFor:    ListedFor;
+  price:        [number, number];
+  description:  string;
 }
 
 interface FilterProps {
-  onFilter: (filters: PropertyFilterPayload) => void;
-  /** Optional: number of matching results to display in header */
-  resultCount?: number;
+  onFilter:        (filters: PropertyFilterPayload) => void;
+  resultCount?:    number;
   setTogglePopup?: (value: boolean) => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const formatNum = (n: number) =>
-  n.toLocaleString("en-NG");
-
-const stripNonDigit = (v: string) =>
-  v.replace(/[^\d]/g, "");
+const formatNum = (n: number) => n.toLocaleString("en-NG");
+const stripNonDigit = (v: string) => v.replace(/[^\d]/g, "");
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-/** Tiny inline map thumbnail built from SVG — no external dependency */
 function MapThumb({ lat, lng }: { lat: number; lng: number }) {
   return (
-    <div className="w-14 h-10 rounded-lg overflow-hidden flex-shrink-0 relative"
-         style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}>
+    <div
+      className="w-14 h-10 rounded-lg overflow-hidden flex-shrink-0 relative"
+      style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}
+    >
       <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 56 40" preserveAspectRatio="none">
         <line x1="0" y1="13" x2="56" y2="13" stroke="white" strokeWidth=".7"/>
         <line x1="0" y1="27" x2="56" y2="27" stroke="white" strokeWidth=".7"/>
@@ -105,11 +89,12 @@ function MapThumb({ lat, lng }: { lat: number; lng: number }) {
   );
 }
 
-/** Active filter tag chip */
 function FilterTag({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 bg-[#e0f0f5] border border-[rgba(30,95,116,0.2)]
-                     text-[#1e5f74] text-[11px] font-semibold px-2.5 py-1 rounded-full">
+    <span
+      className="inline-flex items-center gap-1 bg-[#e0f0f5] border border-[rgba(30,95,116,0.2)]
+                 text-[#1e5f74] text-[11px] font-semibold px-2.5 py-1 rounded-full"
+    >
       {label}
       <button
         type="button"
@@ -130,21 +115,39 @@ const PropertyFilter: React.FC<FilterProps> = ({
   resultCount,
   setTogglePopup,
 }) => {
+  const { t } = useLanguage();
   const abortRef = useRef<AbortController | null>(null);
 
-  const [locationQuery, setLocationQuery]   = useState("");
-  const [locationResult, setLocationResult] = useState<LocationResult | null>(null);
+  const [locationQuery,   setLocationQuery]   = useState("");
+  const [locationResult,  setLocationResult]  = useState<LocationResult | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
 
   const [filters, setFilters] = useState<FilterState>({
     propertyType: CategoryEnum.house,
-    listedFor: "all",
-    price: [0, PRICE_LIMITS.sale],
-    description: "",
+    listedFor:    "all",
+    price:        [0, PRICE_LIMITS.sale],
+    description:  "",
   });
 
   const PRICE_MAX      = getPriceMax(filters.listedFor);
-  const BUDGET_PRESETS = getBudgetPresets(filters.listedFor, PRICE_MAX);
+  const RAW_PRESETS    = getRawBudgetPresets(filters.listedFor, PRICE_MAX);
+
+  // Category options with translated labels
+  const CATEGORIES = [
+    { labelKey: "cat_apartment" as const, value: CategoryEnum.house,    icon: "🏠" },
+    { labelKey: "cat_land"      as const, value: CategoryEnum.land,     icon: "🏘️" },
+    { labelKey: "cat_shortlet"  as const, value: CategoryEnum.shortlet, icon: "🌙" },
+    { labelKey: "cat_hotel"     as const, value: CategoryEnum.hotel,    icon: "🏨" },
+    { labelKey: "cat_shop"      as const, value: CategoryEnum.shop,     icon: "🏪" },
+    { labelKey: "cat_office"    as const, value: CategoryEnum.office,   icon: "🏢" },
+    { labelKey: "cat_others"    as const, value: CategoryEnum.others,   icon: "•••"},
+  ];
+
+  const LIST_FOR_OPTIONS = [
+    { value: "all"  as const, labelKey: "filter_all"  as const, icon: "🌐" },
+    { value: "rent" as const, labelKey: "filter_rent" as const, icon: "🔑" },
+    { value: "sale" as const, labelKey: "filter_sale" as const, icon: "🏷️" },
+  ];
 
   // ── Clamp price when listedFor changes ──────────────────────────────────────
   useEffect(() => {
@@ -154,10 +157,9 @@ const PropertyFilter: React.FC<FilterProps> = ({
     }));
   }, [filters.listedFor, PRICE_MAX]);
 
-  // ── Forward geocoding (Nominatim, debounced) ─────────────────────────────────
+  // ── Forward geocoding ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!locationQuery || locationQuery.length < 3) return;
-
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -168,24 +170,21 @@ const PropertyFilter: React.FC<FilterProps> = ({
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?` +
             new URLSearchParams({
-              q: locationQuery,
-              format: "json",
-              addressdetails: "1",
-              countrycodes: "ng",
-              limit: "1",
+              q: locationQuery, format: "json",
+              addressdetails: "1", countrycodes: "ng", limit: "1",
             }),
-          { signal: controller.signal, headers: { "Accept-Language": "en" } }
+          { signal: controller.signal, headers: { "Accept-Language": "en" } },
         );
         const data = await res.json();
         if (!data?.length) return;
         const item = data[0];
         setLocationResult({
-          query:  locationQuery,
-          lat:    Number(item.lat),
-          lng:    Number(item.lon),
-          name:   item.display_name.split(",")[0],
-          lga:    item.address?.county || item.address?.city_district,
-          state:  item.address?.state,
+          query: locationQuery,
+          lat:   Number(item.lat),
+          lng:   Number(item.lon),
+          name:  item.display_name.split(",")[0],
+          lga:   item.address?.county || item.address?.city_district,
+          state: item.address?.state,
         });
       } catch (err) {
         if ((err as Error).name !== "AbortError") console.error("Geocoding error", err);
@@ -202,7 +201,6 @@ const PropertyFilter: React.FC<FilterProps> = ({
     const n = Number(stripNonDigit(raw) || 0);
     setFilters((f) => ({ ...f, price: [Math.min(n, f.price[1]), f.price[1]] }));
   };
-
   const handleMaxChange = (raw: string) => {
     const n = Number(stripNonDigit(raw) || PRICE_MAX);
     setFilters((f) => ({
@@ -211,9 +209,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
     }));
   };
 
-  // ── Active filter tag helpers ────────────────────────────────────────────────
+  // ── Active filter tags ───────────────────────────────────────────────────────
   const activeTags: { label: string; onRemove: () => void }[] = [];
-
   if (locationResult) {
     activeTags.push({
       label: `📍 ${locationResult.name}`,
@@ -228,15 +225,14 @@ const PropertyFilter: React.FC<FilterProps> = ({
   }
   if (filters.listedFor !== "all") {
     activeTags.push({
-      label: filters.listedFor === "rent" ? "🔑 Rent" : "🏷️ Sale",
+      label: filters.listedFor === "rent" ? `🔑 ${t("filter_rent")}` : `🏷️ ${t("filter_sale")}`,
       onRemove: () => setFilters((f) => ({ ...f, listedFor: "all" })),
     });
   }
-  const isDefaultPrice =
-    filters.price[0] === 0 && filters.price[1] >= PRICE_MAX;
+  const isDefaultPrice = filters.price[0] === 0 && filters.price[1] >= PRICE_MAX;
   if (!isDefaultPrice) {
     activeTags.push({
-      label: `₦${formatNum(filters.price[0])} – ${filters.price[1] >= PRICE_MAX ? "Max" : `₦${formatNum(filters.price[1])}`}`,
+      label: `₦${formatNum(filters.price[0])} – ${filters.price[1] >= PRICE_MAX ? t("filter_no_limit") : `₦${formatNum(filters.price[1])}`}`,
       onRemove: () => setFilters((f) => ({ ...f, price: [0, PRICE_MAX] })),
     });
   }
@@ -280,14 +276,11 @@ const PropertyFilter: React.FC<FilterProps> = ({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col" noValidate>
 
-      {/* ── Section helper ── */}
-      {/* Wrap each section in a consistent container */}
-
-      {/* ── Active filter tags ──────────────────────────────────────────────── */}
+      {/* Active tags */}
       {activeTags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {activeTags.map((t) => (
-            <FilterTag key={t.label} label={t.label} onRemove={t.onRemove} />
+          {activeTags.map((tag) => (
+            <FilterTag key={tag.label} label={tag.label} onRemove={tag.onRemove} />
           ))}
         </div>
       )}
@@ -295,18 +288,19 @@ const PropertyFilter: React.FC<FilterProps> = ({
       {/* ── Location ────────────────────────────────────────────────────────── */}
       <div className="mb-5">
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-2 flex items-center gap-1">
-          📍 Location
+          📍 {t("filter_location")}
         </p>
-
-        <div className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl
-                        px-3.5 py-2.5 transition-all duration-200
-                        focus-within:border-[#1e5f74] focus-within:bg-white
-                        focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]">
+        <div
+          className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl
+                     px-3.5 py-2.5 transition-all duration-200
+                     focus-within:border-[#1e5f74] focus-within:bg-white
+                     focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]"
+        >
           <FiMapPin className="text-[#9ca3af] flex-shrink-0" size={15} />
           <input
             value={locationQuery}
             onChange={(e) => setLocationQuery(e.target.value)}
-            placeholder="Search city, area or landmark…"
+            placeholder={t("filter_location_ph")}
             className="flex-1 bg-transparent outline-none text-sm text-[#111827] placeholder:text-[#9ca3af]"
           />
           {locationQuery && (
@@ -320,18 +314,18 @@ const PropertyFilter: React.FC<FilterProps> = ({
           )}
         </div>
 
-        {/* Loading state */}
         {loadingLocation && (
           <div className="flex items-center gap-1.5 text-[11px] text-[#9ca3af] mt-1.5">
             <div className="w-2.5 h-2.5 border-2 border-[#e5e7eb] border-t-[#1e5f74] rounded-full animate-spin" />
-            Searching location…
+            {t("filter_searching")}
           </div>
         )}
 
-        {/* Result card */}
         {locationResult && !loadingLocation && (
-          <div className="mt-2 bg-[#e0f0f5] border border-[rgba(30,95,116,0.2)] rounded-xl p-3
-                          flex items-center gap-3">
+          <div
+            className="mt-2 bg-[#e0f0f5] border border-[rgba(30,95,116,0.2)] rounded-xl p-3
+                       flex items-center gap-3"
+          >
             <MapThumb lat={locationResult.lat} lng={locationResult.lng} />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#111827] truncate">{locationResult.name}</p>
@@ -358,7 +352,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
       {/* ── Property Type ────────────────────────────────────────────────────── */}
       <div className="mb-5">
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-2">
-          🏷️ Property Type
+          🏷️ {t("filter_prop_type")}
         </p>
         <div className="grid grid-cols-4 gap-1.5">
           {CATEGORIES.map((cat) => (
@@ -374,7 +368,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
                           }`}
             >
               <span className="text-lg leading-none">{cat.icon}</span>
-              {cat.label}
+              <span className="whitespace-nowrap text-center">{t(cat.labelKey)}</span>
             </button>
           ))}
         </div>
@@ -383,27 +377,27 @@ const PropertyFilter: React.FC<FilterProps> = ({
       {/* ── Listed For ───────────────────────────────────────────────────────── */}
       <div className="mb-5">
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-2">
-          🔑 Listed For
+          🔑 {t("filter_listed_for")}
         </p>
         <div className="flex gap-1.5">
           {LIST_FOR_OPTIONS.map((opt) => {
-            const listedActive = filters.listedFor === opt.value;
+            const isActive = filters.listedFor === opt.value;
             return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setFilters((f) => ({ ...f, listedFor: opt.value }))}
-              className={`flex-1 py-2.5 rounded-xl border-[1.5px] text-[13px] font-medium
-                          transition-all duration-200
-                          ${listedActive
-                            ? "text-white border-[#1e5f74] font-bold"
-                            : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#1e5f74]"
-                          }`}
-              style={listedActive ? { background: "linear-gradient(135deg,#143d4d,#1e5f74)" } : undefined}
-            >
-              <span className="mr-1">{opt.icon}</span>
-              {opt.label}
-            </button>
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setFilters((f) => ({ ...f, listedFor: opt.value }))}
+                className={`flex-1 py-2.5 rounded-xl border-[1.5px] text-[13px] font-medium
+                            transition-all duration-200
+                            ${isActive
+                              ? "text-white border-[#1e5f74] font-bold"
+                              : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#1e5f74]"
+                            }`}
+                style={isActive ? { background: "linear-gradient(135deg,#143d4d,#1e5f74)" } : undefined}
+              >
+                <span className="mr-1">{opt.icon}</span>
+                {t(opt.labelKey)}
+              </button>
             );
           })}
         </div>
@@ -413,17 +407,18 @@ const PropertyFilter: React.FC<FilterProps> = ({
       <div className="mb-5">
         <div className="flex items-center justify-between mb-2">
           <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]">
-            💰 Price Budget
+            💰 {t("filter_price_budget")}
           </p>
           <span className="text-[10px] text-[#9ca3af]">
-            ₦ / {filters.listedFor === "rent" ? "year" : "total"}
+            ₦ / {filters.listedFor === "rent" ? t("filter_per_year") : t("filter_per_total")}
           </span>
         </div>
 
         {/* Preset chips */}
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {BUDGET_PRESETS.map((p) => {
-            const active = filters.price[0] === p.min && filters.price[1] === p.max;
+          {RAW_PRESETS.map((p) => {
+            const isActive = filters.price[0] === p.min && filters.price[1] === p.max;
+            const label    = p.label === "any" ? t("filter_any") : p.label;
             return (
               <button
                 key={p.label}
@@ -431,43 +426,48 @@ const PropertyFilter: React.FC<FilterProps> = ({
                 onClick={() => setFilters((f) => ({ ...f, price: [p.min, p.max] }))}
                 className={`px-3 py-1.5 rounded-full text-[11px] border-[1.5px] font-medium
                             transition-all duration-200
-                            ${active
+                            ${isActive
                               ? "bg-[#f0a500] border-[#f0a500] text-[#111] font-bold"
                               : "bg-[#f9fafb] text-[#4b5563] border-[#e5e7eb] hover:border-[#1e5f74]"
                             }`}
               >
-                {p.label}
+                {label}
               </button>
             );
           })}
         </div>
 
-        {/* Min / max inputs */}
+        {/* Min/max inputs */}
         <div className="grid grid-cols-2 gap-2.5">
           {[
-            { label: "Min Price", value: filters.price[0] || "", handler: handleMinChange, placeholder: "₦ 0" },
             {
-              label: "Max Price",
-              value: filters.price[1] >= PRICE_MAX ? "" : filters.price[1],
-              handler: handleMaxChange,
-              placeholder: "No limit",
+              labelKey: "filter_min_price" as const,
+              value:    filters.price[0] || "",
+              handler:  handleMinChange,
+              ph:       "₦ 0",
+            },
+            {
+              labelKey: "filter_max_price" as const,
+              value:    filters.price[1] >= PRICE_MAX ? "" : filters.price[1],
+              handler:  handleMaxChange,
+              ph:       t("filter_no_limit"),
             },
           ].map((field) => (
             <div
-              key={field.label}
+              key={field.labelKey}
               className="bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl px-3 py-2.5
                          transition-all duration-200
                          focus-within:border-[#1e5f74] focus-within:bg-white
                          focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]"
             >
               <p className="text-[9px] font-bold text-[#9ca3af] uppercase tracking-[0.5px]">
-                {field.label}
+                {t(field.labelKey)}
               </p>
               <input
                 inputMode="numeric"
                 value={field.value}
                 onChange={(e) => field.handler(e.target.value)}
-                placeholder={field.placeholder}
+                placeholder={field.ph}
                 className="w-full bg-transparent outline-none text-sm font-semibold text-[#111827]
                            placeholder:text-[#9ca3af] mt-0.5"
               />
@@ -477,10 +477,10 @@ const PropertyFilter: React.FC<FilterProps> = ({
 
         {/* Summary */}
         <div className="mt-2.5 bg-[#f9fafb] rounded-lg px-3 py-2 flex items-center gap-1.5 text-[11px] text-[#4b5563]">
-          🎯 Showing:{" "}
+          🎯 {t("filter_showing")}{" "}
           <span className="font-bold text-[#1e5f74]">
             ₦{formatNum(filters.price[0])} —{" "}
-            {filters.price[1] >= PRICE_MAX ? "No limit" : `₦${formatNum(filters.price[1])}`}
+            {filters.price[1] >= PRICE_MAX ? t("filter_no_limit") : `₦${formatNum(filters.price[1])}`}
           </span>
         </div>
       </div>
@@ -488,26 +488,28 @@ const PropertyFilter: React.FC<FilterProps> = ({
       {/* ── Keywords ─────────────────────────────────────────────────────────── */}
       <div className="mb-6">
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-2">
-          ✏️ Keywords
+          ✏️ {t("filter_keywords")}
         </p>
-        <div className="flex items-start gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl
-                        px-3.5 py-3 transition-all duration-200
-                        focus-within:border-[#1e5f74] focus-within:bg-white
-                        focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]">
+        <div
+          className="flex items-start gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb] rounded-xl
+                     px-3.5 py-3 transition-all duration-200
+                     focus-within:border-[#1e5f74] focus-within:bg-white
+                     focus-within:shadow-[0_0_0_3px_rgba(30,95,116,0.1)]"
+        >
           <FiSearch className="text-[#9ca3af] flex-shrink-0 mt-0.5" size={14} />
           <input
             value={filters.description}
             onChange={(e) => setFilters((f) => ({ ...f, description: e.target.value }))}
-            placeholder="e.g. furnished, fenced, parking lot…"
+            placeholder={t("filter_keywords_ph")}
             className="flex-1 bg-transparent outline-none text-sm text-[#111827] placeholder:text-[#9ca3af]"
           />
         </div>
         <p className="text-[10px] text-[#9ca3af] mt-1.5 flex items-center gap-1">
-          💡 Separate terms with commas for best results
+          💡 {t("filter_keywords_hint")}
         </p>
       </div>
 
-      {/* ── Sticky actions bar ───────────────────────────────────────────────── */}
+      {/* ── Sticky actions ───────────────────────────────────────────────────── */}
       <div className="sticky bottom-0 bg-white pt-3 border-t border-[#f3f4f6] flex gap-2.5 -mx-5 px-5 pb-1">
         <button
           type="button"
@@ -515,7 +517,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
           className="px-4 py-3.5 rounded-xl bg-[#f3f4f6] text-[#4b5563]
                      font-semibold text-sm hover:bg-[#e5e7eb] transition-colors"
         >
-          ↺ Reset
+          {t("filter_reset")}
         </button>
 
         <button
@@ -529,8 +531,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
         >
           <FiSearch size={15} strokeWidth={2.5} />
           {resultCount !== undefined
-            ? `Show ${resultCount.toLocaleString()} results`
-            : "Apply Filters"}
+            ? interpolate(t("filter_show_results"), { n: resultCount.toLocaleString() })
+            : t("filter_apply")}
         </button>
       </div>
     </form>

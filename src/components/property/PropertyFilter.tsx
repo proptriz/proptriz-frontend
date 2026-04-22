@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FiSearch, FiMapPin, FiX } from "react-icons/fi";
 import { LuSlidersHorizontal } from "react-icons/lu";
-import { CategoryEnum, PropertyFilterPayload } from "@/types";
+import { CategoryEnum, PropertyFilterPayload } from "@/types/property";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

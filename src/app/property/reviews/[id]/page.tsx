@@ -3,7 +3,8 @@
 import React, { use, useEffect, useState } from "react";
 import { ReviewCard } from "@/components/shared/Cards";
 import HorizontalCard from "@/components/shared/HorizontalCard";
-import { PropertyType, ReviewType } from "@/types";
+import { PropertyType } from "@/types/property";
+import { ReviewType } from "@/types";
 import Popup from "@/components/shared/Popup";
 import ReplyReview from "@/components/ReplyReview";
 import { getPropertyReviewsApi } from "@/services/reviewApi";

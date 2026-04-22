@@ -7,8 +7,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
-import type { LatLngExpression } from "leaflet";
-import { PropertyType } from "@/types";
+import { PropertyType } from "@/types/property";
 import { LANDMARK_CATEGORIES } from "@/components/PropertyLocationModal";
 import type { ExternalLandmark } from "@/components/LandmarksPickerMap";
 import logger from "logger.config.mjs";

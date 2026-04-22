@@ -1,4 +1,5 @@
-import { PropertyType, UserSettingsType, UserTypeEnum } from "@/types";
+import { UserSettingsType, UserTypeEnum } from "@/types";
+import { PropertyType } from "@/types/property";
 import { generateWhatsAppLink } from "@/utils/generateWhatsappLink";
 import { Call3DIcon, GmailMinimalIcon, WhatsAppMinimalIcon } from "./Icons";
 import { normalizePhone } from "@/utils/normalizePhone";

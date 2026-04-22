@@ -5,7 +5,7 @@ import { FiSearch } from "react-icons/fi";
 import { LuSlidersHorizontal } from "react-icons/lu";
 import Popup from "./Popup";
 import PropertyFilter from "../property/PropertyFilter";
-import { PropertyFilterPayload } from "@/types";
+import { PropertyFilterPayload } from "@/types/property";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

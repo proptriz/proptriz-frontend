@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import type { LatLngExpression } from "leaflet";
-import { ListForEnum, PropertyType } from "@/types";
+import { ListForEnum, PropertyType } from "@/types/property";
 import debounce from "lodash.debounce";
 import MapMarkerPopup from "./MapMarkerPopup";
 import { createPriceIcon } from "./PriceMarkerIcon";

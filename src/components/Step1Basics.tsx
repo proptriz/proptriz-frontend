@@ -2,7 +2,7 @@
 
 import {
   CategoryEnum, ListForEnum, RenewalEnum,
-  NegotiableEnum, PropertyStatusEnum,
+  NegotiableEnum,
 } from "../types/property";
 import type { PropertyFormData } from "../types/property";
 import SectionCard from "./SectionCard";
@@ -10,18 +10,7 @@ import TogglePills from "./TogglePills";
 import Counter from "./Counter";
 import PriceInput from "./PriceInput";
 import MapPreview from "./MapPreview";
-
-// ─── Category config ──────────────────────────────────────────────────────────
-
-const CATEGORIES = [
-  { value: CategoryEnum.house,   icon: "🏠", label: "House"   },
-  { value: CategoryEnum.shortlet,icon: "🛎️", label: "Shortlet"},
-  { value: CategoryEnum.hotel,   icon: "🏨", label: "Hotel"   },
-  { value: CategoryEnum.office,  icon: "🏢", label: "Office"  },
-  { value: CategoryEnum.land,    icon: "🏘️", label: "Land"   },
-  { value: CategoryEnum.shop,    icon: "🏪", label: "Shop"    },
-  { value: CategoryEnum.others,  icon: "🏗️", label: "Others" },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Focus helpers ────────────────────────────────────────────────────────────
 
@@ -47,11 +36,23 @@ interface Step1Props {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: Step1Props) {
+  const { t } = useLanguage();
+
+  const CATEGORIES = [
+    { value: CategoryEnum.house,    icon: "🏠", labelKey: "cat_apartment" as const },
+    { value: CategoryEnum.shortlet, icon: "🛎️", labelKey: "cat_shortlet"  as const },
+    { value: CategoryEnum.hotel,    icon: "🏨", labelKey: "cat_hotel"     as const },
+    { value: CategoryEnum.office,   icon: "🏢", labelKey: "cat_office"    as const },
+    { value: CategoryEnum.land,     icon: "🏘️", labelKey: "cat_land"      as const },
+    { value: CategoryEnum.shop,     icon: "🏪", labelKey: "cat_shop"      as const },
+    { value: CategoryEnum.others,   icon: "🏗️", labelKey: "cat_others"   as const },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
 
       {/* ── Property Type ─────────────────────────────────────────────────── */}
-      <SectionCard icon="🏷️" title="Property Type">
+      <SectionCard icon="🏷️" title={t("s1_prop_type")}>
         <div className="grid grid-cols-4 gap-2">
           {CATEGORIES.map((cat) => {
             const active = data.category === cat.value;
@@ -70,7 +71,7 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
                 onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.borderColor = "#e5e7eb"; }}
               >
                 <span className="text-lg">{cat.icon}</span>
-                {cat.label}
+                {t(cat.labelKey)}
               </button>
             );
           })}
@@ -78,7 +79,7 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
       </SectionCard>
 
       {/* ── Property Title ────────────────────────────────────────────────── */}
-      <SectionCard icon="✏️" title="Property Title">
+      <SectionCard icon="✏️" title={t("s1_prop_title")}>
         <div
           className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
                      rounded-xl px-3.5 py-3 transition-all duration-200"
@@ -88,7 +89,7 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
           <span className="text-[#9ca3af] text-base flex-shrink-0">🏠</span>
           <input
             type="text"
-            placeholder="e.g. Modern 3-Bed Duplex in Lekki"
+            placeholder={t("s1_prop_title_ph")}
             value={data.title}
             onChange={(e) => onUpdate({ title: e.target.value })}
             className="w-full outline-none bg-transparent text-sm
@@ -97,27 +98,27 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
         </div>
         {!data.title && (
           <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1">
-            ⚠️ Title is required
+            {t("add_val_title")}
           </p>
         )}
       </SectionCard>
 
       {/* ── Pricing ───────────────────────────────────────────────────────── */}
-      <SectionCard icon="💰" title="Pricing">
+      <SectionCard icon="💰" title={t("s1_pricing")}>
         <div className="flex flex-col gap-3.5">
 
           <TogglePills<ListForEnum>
-            label="Listed For *"
+            label={t("s1_listed_for")}
             options={[
-              { label: "For Rent", value: ListForEnum.rent, icon: "🔑" },
-              { label: "For Sale", value: ListForEnum.sale, icon: "🏷️" },
+              { label: t("s1_for_rent"), value: ListForEnum.rent, icon: "🔑" },
+              { label: t("s1_for_sale"), value: ListForEnum.sale, icon: "🏷️" },
             ]}
             value={data.listedFor}
             onChange={(val) => onUpdate({ listedFor: val })}
           />
 
           <PriceInput
-            label={data.listedFor === ListForEnum.rent ? "Rent Price" : "Sell Price"}
+            label={data.listedFor === ListForEnum.rent ? t("s1_rent_price") : t("s1_sell_price")}
             value={data.price}
             onChange={(val) => onUpdate({ price: val })}
             currency={data.currency}
@@ -127,12 +128,12 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
           {/* Tenancy period — rent only */}
           {data.listedFor === ListForEnum.rent && (
             <TogglePills<RenewalEnum>
-              label="Tenancy Period"
+              label={t("s1_tenancy_period")}
               options={[
-                { label: "Daily",   value: RenewalEnum.daily   },
-                { label: "Weekly",  value: RenewalEnum.weekly  },
-                { label: "Monthly", value: RenewalEnum.monthly },
-                { label: "Yearly",  value: RenewalEnum.yearly  },
+                { label: t("s1_period_daily"),   value: RenewalEnum.daily   },
+                { label: t("s1_period_weekly"),  value: RenewalEnum.weekly  },
+                { label: t("s1_period_monthly"), value: RenewalEnum.monthly },
+                { label: t("s1_period_yearly"),  value: RenewalEnum.yearly  },
               ]}
               value={data.renewPeriod}
               onChange={(val) => onUpdate({ renewPeriod: val })}
@@ -143,12 +144,12 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
           <div className="flex items-center justify-between pt-3 border-t border-[#e5e7eb]">
             <div>
               <p className="text-sm font-semibold text-[#111827]">
-                {data.negotiable === NegotiableEnum.Negotiable ? "✅ Negotiable" : "🔒 Fixed Price"}
+                {data.negotiable === NegotiableEnum.Negotiable ? t("s1_negotiable") : t("s1_fixed_price")}
               </p>
               <p className="text-xs text-[#9ca3af] mt-0.5">
                 {data.negotiable === NegotiableEnum.Negotiable
-                  ? "Buyers can propose a different price"
-                  : "The listed price is final"}
+                  ? t("s1_negotiable_sub")
+                  : t("s1_fixed_sub")}
               </p>
             </div>
             <button
@@ -174,16 +175,16 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
       </SectionCard>
 
       {/* ── Listing Duration ──────────────────────────────────────────────── */}
-      <SectionCard icon="📅" title="Listing Duration">
+      <SectionCard icon="📅" title={t("s1_duration")}>
         <p className="text-[11px] text-[#9ca3af] mb-2.5 leading-relaxed">
-          How many weeks should this listing stay active before it expires?
+          {t("s3_duration_sub")}
         </p>
         <Counter
-          label="Duration"
+          label={t("s1_duration_label")}
           value={data.duration}
           min={1}
           max={52}
-          suffix="weeks"
+          suffix={t("s1_duration_suffix")}
           onIncrement={() => onUpdate({ duration: Math.min(52, data.duration + 1) })}
           onDecrement={() => onUpdate({ duration: Math.max(1, data.duration - 1) })}
         />
@@ -206,7 +207,7 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
       </SectionCard>
 
       {/* ── Location ──────────────────────────────────────────────────────── */}
-      <SectionCard icon="📍" title="Property Location">
+      <SectionCard icon="📍" title={t("s1_location")}>
         {/* Address text input */}
         <div
           className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
@@ -217,7 +218,7 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
           <span className="text-[#9ca3af] text-base flex-shrink-0">🗺️</span>
           <input
             type="text"
-            placeholder="Street address, area, city…"
+            placeholder={t("s1_location_ph")}
             value={data.address}
             onChange={(e) => onUpdate({ address: e.target.value })}
             className="w-full outline-none bg-transparent text-sm

@@ -1,4 +1,4 @@
-import { CurrencyEnum, PropertyProps } from "@/types";
+import { CategoryEnum, CURRENCY_SYMBOL, CurrencyEnum } from "@/types/property";
 import formatPrice from "@/utils/formatPrice";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -10,18 +10,26 @@ const formatDistance = (distance?: string | number): string | null => {
   return meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`;
 };
 
-const CURRENCY_SYMBOL: Record<CurrencyEnum, string> = {
-  [CurrencyEnum.naira]:   "₦",
-  [CurrencyEnum.dollar]: "$",
-  [CurrencyEnum.pound]:  "£",
-  [CurrencyEnum.euro]:   "€",
-};
-
 const LISTED_FOR_STYLES: Record<string, string> = {
   rent:       "text-[#1e5f74] border-[#b8dde8] bg-white",
   sale:       "text-[#143d4d] border-[#e0f0f5] bg-[#e0f0f5]",
   commercial: "text-[#c88400] border-[#fef3cd] bg-[#fef3cd]",
 };
+
+interface VerticalCardProps {
+  id: string,
+  image: string; // URL of the property image
+  name: string; // Title of the property
+  rating: number; // Rating of the property
+  address: string; // Location of the property
+  price: number; // Price per month
+  currency: CurrencyEnum;
+  category: CategoryEnum; // Property type (e.g., "Apartment")
+  period: string;
+  listed_for: string;
+  distance?: string;
+  expired?: boolean
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -38,7 +46,7 @@ export const VerticalCard = ({
   listed_for,
   distance,
   expired,
-}: PropertyProps) => {
+}: VerticalCardProps) => {
   const symbol    = CURRENCY_SYMBOL[currency as CurrencyEnum] ?? "";
   const distLabel = formatDistance(distance);
   const badgeStyle =

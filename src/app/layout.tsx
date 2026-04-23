@@ -6,6 +6,8 @@ import Script from "next/script";
 import AppContextProvider from "../context/AppContextProvider";
 import { ToastContainer } from "react-toastify";
 import GoogleScriptLoader from "@/components/GoogleScriptLoader";
+import { LanguageProvider } from "@/i18n/LanguageContext";
+import LanguagePickerModal  from "@/components/LanguagePickerModal";
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -133,26 +135,31 @@ export default function RootLayout({
           `}
         </Script>
 
-        <AppContextProvider>
-          <GoogleScriptLoader />
-          {children}
+        <LanguageProvider>
+          <AppContextProvider>
+            <GoogleScriptLoader />
+            {children}
 
-          <ToastContainer
-            position="bottom-center"
-            autoClose={4500}
-            hideProgressBar={false}
-            closeOnClick
-            pauseOnHover
-            draggable
-            toastStyle={{
-              borderRadius: 14,
-              fontFamily:   "var(--font-dm-sans), sans-serif",
-              fontSize:     13,
-              fontWeight:   500,
-              boxShadow:    "0 8px 32px rgba(0,0,0,0.12)",
-            }}
-          />
-        </AppContextProvider>
+            {/* Language picker modal — available everywhere via useLanguage().openPicker() */}
+            <LanguagePickerModal />
+
+            <ToastContainer
+              position="bottom-center"
+              autoClose={4500}
+              hideProgressBar={false}
+              closeOnClick
+              pauseOnHover
+              draggable
+              toastStyle={{
+                borderRadius: 14,
+                fontFamily:   "var(--font-dm-sans), sans-serif",
+                fontSize:     13,
+                fontWeight:   500,
+                boxShadow:    "0 8px 32px rgba(0,0,0,0.12)",
+              }}
+            />
+          </AppContextProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

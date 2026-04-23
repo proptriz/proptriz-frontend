@@ -8,9 +8,8 @@ import { FaPlus }          from "react-icons/fa";
 
 import {
   CategoryEnum, CurrencyEnum, ListForEnum, NegotiableEnum,
-  PropertyStatusEnum, RenewalEnum,
-  type Feature, type PropertyType,
-} from "@/types";
+  PropertyStatusEnum, RenewalEnum, type PropertyType,
+} from "@/types/property";
 
 import TogglePills  from "@/components/TogglePills";
 import Counter      from "@/components/Counter";
@@ -25,6 +24,8 @@ import getUserPosition           from "@/utils/getUserPosition";
 import logger                    from "../../../../../logger.config.mjs";
 import { BackButton } from "@/components/shared/BackButton";
 import ConfirmSheet from "@/components/shared/ConfirmSheet";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { interpolate } from "@/i18n/translations";
 
 // ─── Facility data ────────────────────────────────────────────────────────────
 
@@ -113,6 +114,17 @@ export default function EditPropertyPage({
   const { id: propertyId } = use(params);
   const router             = useRouter();
   const { authUser }       = useContext(AppContext);
+  const { t }              = useLanguage();
+
+  const CATEGORIES = [
+    { value: CategoryEnum.house,    icon: "🏠", labelKey: "cat_apartment" as const },
+    { value: CategoryEnum.shortlet, icon: "🛎️", labelKey: "cat_shortlet"  as const },
+    { value: CategoryEnum.hotel,    icon: "🏨", labelKey: "cat_hotel"     as const },
+    { value: CategoryEnum.office,   icon: "🏢", labelKey: "cat_office"    as const },
+    { value: CategoryEnum.land,     icon: "🏘️", labelKey: "cat_land"      as const },
+    { value: CategoryEnum.shop,     icon: "🏪", labelKey: "cat_shop"      as const },
+    { value: CategoryEnum.others,   icon: "🏗️", labelKey: "cat_others"   as const },
+  ];
 
   // ── Fetched data ─────────────────────────────────────────────────────────
   const [property,   setProperty]   = useState<PropertyType | null>(null);
@@ -121,7 +133,7 @@ export default function EditPropertyPage({
 
   // ── Editable fields ──────────────────────────────────────────────────────
   const [formData,    setFormData]    = useState<Partial<PropertyType>>({});
-  const [currency,    setCurrency]    = useState<CurrencyEnum>(CurrencyEnum.naira);
+  const [currency,    setCurrency]    = useState<CurrencyEnum>(CurrencyEnum.ngn);
   const [negotiable,  setNegotiable]  = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features,    setFeatures]    = useState<string[]>([]);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
@@ -150,7 +162,7 @@ export default function EditPropertyPage({
 
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setPropCoordinates([lat, lng]);
-    toast.success(`Location updated: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
+    toast.success(`${t("add_toast_pinned")}: (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
   }, []);
 
   // ── Fetch property ───────────────────────────────────────────────────────
@@ -164,19 +176,19 @@ export default function EditPropertyPage({
       try {
         const res = await getPropertyById(propertyId);
         if (!mounted) return;
-        if (!res?._id) { setFetchError("Property not found."); return; }
+        if (!res?._id) { setFetchError(t("edt_not_found")); return; }
 
         setProperty(res);
         setFormData(res);
         if (typeof res.latitude === "number" && typeof res.longitude === "number")
           setPropCoordinates([res.latitude, res.longitude]);
-        setCurrency(res.currency ?? CurrencyEnum.naira);
+        setCurrency(res.currency ?? CurrencyEnum.ngn);
         setNegotiable(res.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
         setFeatures(res.features ?? []);
       } catch (err: unknown) {
         if (mounted) {
           logger.error("getPropertyById failed:", err);
-          setFetchError("Failed to load property. Please go back and try again.");
+          setFetchError(t("edt_error"));
         }
       } finally {
         if (mounted) setIsFetching(false);
@@ -202,12 +214,12 @@ export default function EditPropertyPage({
   //
   const handleSave = useCallback(async () => {
     if (!authUser) {
-      toast.error("Please log in on Pi Browser to update this property.");
+      toast.error(t("edt_login_save"));
       return;
     }
-    if (!formData.title?.trim())                     { toast.warn("Please enter a property title."); return; }
-    if (!formData.price || Number(formData.price) <= 0) { toast.warn("Please enter a valid price."); return; }
-    if (!formData.address?.trim())                   { toast.warn("Please enter the property address."); return; }
+    if (!formData.title?.trim())                     { toast.warn(t("edt_val_title")); return; }
+    if (!formData.price || Number(formData.price) <= 0) { toast.warn(t("edt_val_price")); return; }
+    if (!formData.address?.trim())                   { toast.warn(t("edt_val_address")); return; }
 
     const payload: Partial<PropertyType> = {
       ...formData,
@@ -226,10 +238,10 @@ export default function EditPropertyPage({
       const updated = await updateProperty(propertyId, payload);
 
       if (updated) {
-        toast.success("Property details updated! ✅");
+        toast.success(t("edt_updated"));
         setProperty(updated);
         setFormData(updated);
-        setCurrency(updated.currency ?? CurrencyEnum.naira);
+        setCurrency(updated.currency ?? CurrencyEnum.ngn);
         setNegotiable(updated.negotiable ? NegotiableEnum.Negotiable : NegotiableEnum.NonNegotiable);
         setFeatures(updated.features       ?? []);
         if (typeof updated.latitude === "number" && typeof updated.longitude === "number")
@@ -238,7 +250,7 @@ export default function EditPropertyPage({
       }
     } catch (err: unknown) {
       logger.error("updateProperty failed:", err);
-      toast.error(err instanceof Error ? err.message : "Unexpected error occurred.");
+      toast.error(err instanceof Error ? err.message : t("edt_failed"));
     } finally {
       setIsSaving(false);
     }
@@ -246,15 +258,15 @@ export default function EditPropertyPage({
 
   // ── Delete ───────────────────────────────────────────────────────────────
   const handleDelete = useCallback(async () => {
-    if (!authUser) { toast.error("Please log in on Pi Browser to delete this property."); return; }
+    if (!authUser) { toast.error(t("edt_login_save")); return; }
     try {
       setIsDeleting(true);
       await deleteUserProperty(propertyId);
-      toast.success("Listing deleted.");
+      toast.success(t("edt_deleted"));
       router.replace("/profile");
     } catch (err: unknown) {
       logger.error("deleteProperty failed:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to delete property.");
+      toast.error(err instanceof Error ? err.message : t("edt_failed"));
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -268,7 +280,7 @@ export default function EditPropertyPage({
            style={{ background: "#f5f7f9", fontFamily: "'DM Sans', sans-serif" }}>
         <div className="w-12 h-12 rounded-full border-4 border-[#e0f0f5] animate-spin"
              style={{ borderTopColor: "#1e5f74" }} />
-        <p className="text-[13px] text-[#9ca3af]">Loading property…</p>
+        <p className="text-[13px] text-[#9ca3af]">{t("edt_loading")}</p>
       </div>
     );
   }
@@ -279,7 +291,7 @@ export default function EditPropertyPage({
            style={{ background: "#f5f7f9", fontFamily: "'DM Sans', sans-serif" }}>
         <span className="text-4xl">🏚️</span>
         <p className="text-[14px] font-semibold text-[#4b5563] text-center">
-          {fetchError ?? "Property not found."}
+          {fetchError ?? t("edt_not_found")}
         </p>
         <button
           type="button"
@@ -287,7 +299,7 @@ export default function EditPropertyPage({
           className="px-5 py-2.5 rounded-xl text-white text-sm font-bold"
           style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
         >
-          ← Go Back
+          {t("edt_go_back")}
         </button>
       </div>
     );
@@ -325,7 +337,7 @@ export default function EditPropertyPage({
             <div className="flex-1 min-w-0">
               <h1 className="text-white text-[20px] font-black leading-tight"
                   style={{ fontFamily: "'Raleway', sans-serif" }}>
-                Edit Property
+                {t("edt_title")}
               </h1>
               <p className="text-white/65 text-[12px] mt-0.5 truncate">
                 {formData.title ?? property.title ?? "Update your listing"}
@@ -357,7 +369,7 @@ export default function EditPropertyPage({
             >
               <span className="text-sm">⚠️</span>
               <p className="text-[12px] text-red-200 font-semibold">
-                This listing has expired. Extend the duration below to reactivate it.
+                {t("edt_expired_warn")}
               </p>
             </div>
           )}
@@ -370,7 +382,7 @@ export default function EditPropertyPage({
         <div className="flex flex-col gap-4 px-4 pt-2">
 
           {/* Category */}
-          <EditSection icon="🏷️" title="Property Type">
+          <EditSection icon="🏷️" title={t("edt_prop_type")}>
             <div className="grid grid-cols-4 gap-2">
               {CATEGORIES.map((cat) => {
                 const active = formData.category === cat.value;
@@ -388,7 +400,7 @@ export default function EditPropertyPage({
                     onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.borderColor = "#e5e7eb"; }}
                   >
                     <span className="text-lg">{cat.icon}</span>
-                    {cat.label}
+                    {t(cat.labelKey)}
                   </button>
                 );
               })}
@@ -396,7 +408,7 @@ export default function EditPropertyPage({
           </EditSection>
 
           {/* Title */}
-          <EditSection icon="✏️" title="Property Title">
+          <EditSection icon="✏️" title={t("edt_prop_title_sec")}>
             <div
               className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
                          rounded-xl px-3.5 py-3 transition-all"
@@ -406,7 +418,7 @@ export default function EditPropertyPage({
               <span className="text-[#9ca3af] flex-shrink-0">🏠</span>
               <input
                 type="text"
-                placeholder="e.g. Modern 3-Bed Duplex in Lekki"
+                placeholder={t("edt_prop_title_ph")}
                 value={formData.title ?? ""}
                 onChange={(e) => updateForm("title", e.target.value)}
                 className="w-full outline-none bg-transparent text-sm text-[#111827]
@@ -416,19 +428,19 @@ export default function EditPropertyPage({
           </EditSection>
 
           {/* Pricing */}
-          <EditSection icon="💰" title="Pricing">
+          <EditSection icon="💰" title={t("edt_pricing")}>
             <div className="flex flex-col gap-3.5">
               <TogglePills<ListForEnum>
-                label="Listed For *"
+                label={t("s1_listed_for")}
                 options={[
-                  { label: "For Rent", value: ListForEnum.rent, icon: "🔑" },
-                  { label: "For Sale", value: ListForEnum.sale, icon: "🏷️" },
+                  { label: t("edt_for_rent"), value: ListForEnum.rent, icon: "🔑" },
+                  { label: t("edt_for_sale"), value: ListForEnum.sale, icon: "🏷️" },
                 ]}
                 value={(formData.listed_for ?? ListForEnum.rent) as ListForEnum}
                 onChange={(val) => updateForm("listed_for", val)}
               />
               <PriceInput
-                label={formData.listed_for === ListForEnum.rent ? "Rent Price" : "Sell Price"}
+                label={formData.listed_for === ListForEnum.rent ? t("edt_rent_price") : t("edt_sell_price")}
                 value={String(formData.price ?? "0")}
                 onChange={(val) => updateForm("price", val)}
                 currency={currency}
@@ -451,7 +463,7 @@ export default function EditPropertyPage({
               <div className="flex items-center justify-between pt-3 border-t border-[#e5e7eb]">
                 <div>
                   <p className="text-sm font-semibold text-[#111827]">
-                    {negotiable === NegotiableEnum.Negotiable ? "✅ Negotiable" : "🔒 Fixed Price"}
+                    {negotiable === NegotiableEnum.Negotiable ? t("edt_negotiable") : t("edt_fixed_price")}
                   </p>
                   <p className="text-xs text-[#9ca3af] mt-0.5">
                     {negotiable === NegotiableEnum.Negotiable
@@ -482,7 +494,7 @@ export default function EditPropertyPage({
           </EditSection>
 
           {/* Duration */}
-          <EditSection icon="📅" title="Listing Duration">
+          <EditSection icon="📅" title={t("edt_duration")}>
             {isExpired && (
               <div
                 className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3"
@@ -490,15 +502,15 @@ export default function EditPropertyPage({
               >
                 <span>⏰</span>
                 <p className="text-[11px] text-amber-700 font-semibold">
-                  Increase the duration to extend your listing&apos;s active period.
+                  {t("edt_duration_warn")}
                 </p>
               </div>
             )}
             <Counter
-              label="Duration"
+              label={t("s1_duration_label")}
               value={formData.duration ?? 4}
               min={1} max={52}
-              suffix="weeks"
+              suffix={t("s1_duration_suffix")}
               onIncrement={() => updateForm("duration", Math.min(52, (formData.duration ?? 4) + 1))}
               onDecrement={() => updateForm("duration", Math.max(1,  (formData.duration ?? 4) - 1))}
             />
@@ -520,7 +532,7 @@ export default function EditPropertyPage({
           </EditSection>
 
           {/* Status */}
-          <EditSection icon="📋" title="Availability Status">
+          <EditSection icon="📋" title={t("edt_status")}>
             <TogglePills<PropertyStatusEnum>
               options={Object.values(PropertyStatusEnum)
                 .filter((s) => s !== PropertyStatusEnum.expired)
@@ -537,7 +549,7 @@ export default function EditPropertyPage({
           </EditSection>
 
           {/* Location */}
-          <EditSection icon="📍" title="Property Location">
+          <EditSection icon="📍" title={t("edt_location")}>
             <div
               className="flex items-center gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
                          rounded-xl px-3.5 py-3 mb-3 transition-all"
@@ -547,7 +559,7 @@ export default function EditPropertyPage({
               <span className="text-[#9ca3af] flex-shrink-0">🗺️</span>
               <input
                 type="text"
-                placeholder="Street address, area, city…"
+                placeholder={t("edt_location_ph")}
                 value={formData.address ?? ""}
                 onChange={(e) => updateForm("address", e.target.value)}
                 className="w-full outline-none bg-transparent text-sm text-[#111827]
@@ -558,12 +570,12 @@ export default function EditPropertyPage({
               address={formData.address ?? ""}
               coordinates={propCoordinates}
               onChangeLocation={openLocationPicker}
-              hint="📌 Update the pin if your property's map location has changed — buyers search by proximity."
+              hint={t("edt_map_hint")}
             />
           </EditSection>
 
           {/* Description */}
-          <EditSection icon="📝" title="Description">
+          <EditSection icon="📝" title={t("edt_description")}>
             <div
               className="flex items-start gap-2.5 bg-[#f9fafb] border-[1.5px] border-[#e5e7eb]
                          rounded-xl px-3.5 py-3 transition-all"
@@ -573,7 +585,7 @@ export default function EditPropertyPage({
               <span className="text-[#9ca3af] pt-0.5 flex-shrink-0">📝</span>
               <textarea
                 rows={4}
-                placeholder="Describe the property, its features and neighbourhood…"
+                placeholder={t("edt_description_ph")}
                 value={formData.description ?? ""}
                 onChange={(e) => updateForm("description", e.target.value)}
                 className="w-full outline-none bg-transparent text-sm text-[#111827]
@@ -655,15 +667,14 @@ export default function EditPropertyPage({
               No photo bytes ever travel through handleSave.
           */}
           {property._id && (
-            <EditSection icon="📸" title="Property Photos">
+            <EditSection icon="📸" title={t("edt_photos")}>
               <div
                 className="flex items-start gap-2 px-3 py-2.5 rounded-xl mb-3"
                 style={{ background: "#e0f0f5", border: "1px solid rgba(30,95,116,0.12)" }}
               >
                 <span className="text-sm flex-shrink-0">ℹ️</span>
                 <p className="text-[11px] text-[#1e5f74] font-medium leading-relaxed">
-                  Photos save instantly when added or removed — independent of the
-                  &ldquo;Save Changes&rdquo; button below. Each photo is auto-optimised before upload.
+                  {t("edt_photos_note")}
                 </p>
               </div>
               <ImageManager
@@ -689,7 +700,7 @@ export default function EditPropertyPage({
                 fontFamily: "'Raleway', sans-serif",
               }}
             >
-              {isSaving ? <><Spinner /> Saving…</> : "✓ Save Changes"}
+              {isSaving ? <><Spinner /> {t("edt_saving")}</> : t("edt_save")}
             </button>
           ) : (
             <button
@@ -699,7 +710,7 @@ export default function EditPropertyPage({
                          opacity-60 cursor-not-allowed"
               style={{ background: "#9ca3af", fontFamily: "'Raleway', sans-serif" }}
             >
-              🔒 Login on Pi Browser to Save
+              {t("edt_login_save")}
             </button>
           )}
 
@@ -709,7 +720,7 @@ export default function EditPropertyPage({
             style={{ background: "#fff5f5" }}
           >
             <p className="text-[12px] text-red-400 mb-3">
-              Permanently remove this listing and all its data. This cannot be undone.
+              {t("edt_danger_desc")}
             </p>
             <button
               type="button"
@@ -718,7 +729,7 @@ export default function EditPropertyPage({
                          border border-red-200 bg-white transition-all active:scale-95
                          hover:bg-red-500 hover:text-white hover:border-red-500"
             >
-              🗑️ Delete Listing
+              {t("edt_delete_btn")}
             </button>
           </div>
         </div>
@@ -738,15 +749,14 @@ export default function EditPropertyPage({
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="Delete this listing?"
+        title={t("edt_delete_title")}
         description={
-          <><strong className="text-[#111827]">{property.title}</strong> will be
-          permanently removed. This action cannot be undone.</>
+          <><strong className="text-[#111827]">{property.title}</strong> {t("edt_delete_desc")}</>
         }
-        confirmLabel="Yes, Delete Listing"
+        confirmLabel={t("edt_delete_confirm")}
         confirmColor="#ef4444"
         loading={isDeleting}
-        loadingLabel="Deleting…"
+        loadingLabel={t("edt_delete_loading")}
       />
     </>
   );

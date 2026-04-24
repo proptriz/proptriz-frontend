@@ -92,8 +92,8 @@ const EditProfile = () => {
       formData.whatsapp = normalizedWhatsapp ?? "";
       await addOrUpdateUserSettings(formData, photo);
       toast.success(t("ep_updated"));
-    } catch {
-      toast.error(t("ep_failed"));
+    } catch (error:any) {
+      toast.error(error.message || t("ep_failed"));
     } finally {
       setIsLoading(false);
     }

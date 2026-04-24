@@ -140,8 +140,8 @@ export interface PropertyFilterPayload {
 
 export type WizardStep = 1 | 2 | 3;
 
-// ─── African bounding box ─────────────────────────────────────────────────────
+// ─── African bounding box with padding ────────────────────────────────────────
 export const AFRICAN_BOUNDS: L.LatLngBoundsExpression = [
-  [-35, -20],
-  [38, 55],
+  [-40, -25], // SW
+  [43, 60],   // NE
 ];

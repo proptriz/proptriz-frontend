@@ -12,6 +12,7 @@ import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import type { LatLngExpression } from "leaflet";
 import logger from "../../logger.config.mjs";
+import { AFRICAN_BOUNDS } from "@/types/property";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Gold:#f0a500
@@ -39,12 +40,6 @@ const goldPinIcon = L.divIcon({
   iconAnchor:[15, 40],   // tip of pin touches the clicked point
   className: "",         // clear leaflet's default white-box class
 });
-
-// ─── Nigeria bounding box ─────────────────────────────────────────────────────
-const NIGERIA_BOUNDS: [[number, number], [number, number]] = [
-  [4.0, 2.5],
-  [13.9, 14.7],
-];
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface LocationPickerMapProps {
@@ -164,7 +159,8 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
   submittedQuery,
   setSearchLoading,
 }) => {
-  const [position, setPosition] = useState<LatLngExpression>(initialCenter);
+  const savedCenter = sessionStorage.getItem("prevMapCenter");
+  const [position, setPosition] = useState<LatLngExpression>(savedCenter ? JSON.parse(savedCenter) : initialCenter);
 
   return (
     <div className="w-full h-full" style={{ minHeight: 400 }}>
@@ -173,7 +169,7 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
         zoom={initialZoom}
         scrollWheelZoom
         zoomControl={false}
-        maxBounds={NIGERIA_BOUNDS}
+        maxBounds={AFRICAN_BOUNDS}
         className="w-full h-full"
         style={{ position: "relative", zIndex: 0 }}
       >

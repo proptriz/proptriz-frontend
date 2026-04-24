@@ -1,3 +1,4 @@
+import { Translations } from "@/i18n/translations";
 import { UserSettingsType } from "@/types";
 
 export enum CategoryEnum {
@@ -9,6 +10,20 @@ export enum CategoryEnum {
   shop = "shop",
   others = "others"
 }
+
+export const TRANS_CATEGORIES: {
+  labelKey: keyof Translations;
+  value:    CategoryEnum;
+  icon:     string;
+}[] = [
+  { labelKey: "cat_apartment", value: CategoryEnum.house,    icon: "🏠" },
+  { labelKey: "cat_land",      value: CategoryEnum.land,     icon: "🏘️" },
+  { labelKey: "cat_shortlet",  value: CategoryEnum.shortlet, icon: "🌙" },
+  { labelKey: "cat_hotel",     value: CategoryEnum.hotel,    icon: "🏨" },
+  { labelKey: "cat_shop",      value: CategoryEnum.shop,     icon: "🏪" },
+  { labelKey: "cat_office",    value: CategoryEnum.office,   icon: "🏢" },
+  { labelKey: "cat_others",    value: CategoryEnum.others,   icon: "•••" },
+];
 
 export enum ListForEnum {
   rent = "rent",
@@ -39,6 +54,13 @@ export enum RenewalEnum {
   daily = "daily",
   weekly = "weekly"
 }
+
+export const RENEWAL_ENUM_TRANSLATIONS: Record<RenewalEnum, string> = {
+  [RenewalEnum.monthly]: "Monthly",
+  [RenewalEnum.yearly]: "Yearly",
+  [RenewalEnum.daily]: "Daily",
+  [RenewalEnum.weekly]: "Weekly"
+};
 
 export enum PropertyStatusEnum {
   available = "available",
@@ -117,3 +139,9 @@ export interface PropertyFilterPayload {
 
 
 export type WizardStep = 1 | 2 | 3;
+
+// ─── African bounding box ─────────────────────────────────────────────────────
+export const AFRICAN_BOUNDS: L.LatLngBoundsExpression = [
+  [-35, -20],
+  [38, 55],
+];

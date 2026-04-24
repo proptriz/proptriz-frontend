@@ -13,6 +13,7 @@ import * as L from "leaflet";
 import type { LatLngExpression } from "leaflet";
 import logger from "logger.config.mjs";
 import { type LandmarkCategory, LANDMARK_CATEGORIES } from "./PropertyLocationModal";
+import { AFRICAN_BOUNDS } from "@/types/property";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EXPORTED TYPE — matches LandmarkResponse from the backend + landmark.api.ts
@@ -143,12 +144,6 @@ function makePendingPinIcon(): L.DivIcon {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// NIGERIA BOUNDS
-// ─────────────────────────────────────────────────────────────────────────────
-
-const NIGERIA_BOUNDS: [[number, number], [number, number]] = [[4.0, 2.5], [13.9, 14.7]];
-
-// ─────────────────────────────────────────────────────────────────────────────
 // INNER MAP COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -241,7 +236,7 @@ const LandmarksPickerMap: React.FC<LandmarksPickerMapProps> = ({
         zoom={14}
         scrollWheelZoom
         zoomControl={false}
-        maxBounds={NIGERIA_BOUNDS}
+        maxBounds={AFRICAN_BOUNDS}
         className="w-full h-full"
         style={{ position: "relative", zIndex: 0 }}
       >

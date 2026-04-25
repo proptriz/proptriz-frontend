@@ -6,7 +6,7 @@ import { VerticalCard } from "@/components/shared/VerticalCard";
 import Link from "next/link";
 import { AppContext } from "../../context/AppContextProvider";
 import { CursorResponse, ReviewType, UserSettingsType } from "@/types";
-import { PropertyType } from "@/types/property";
+import { CategoryEnum, ListForEnum, PropertyType, RenewalEnum } from "@/types/property";
 import { deleteUserProperty, getUserListedProp } from "@/services/propertyApi";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -314,12 +314,12 @@ export default function ProfilePage() {
                       name={item.title}
                       price={item.price}
                       currency={item.currency}
-                      category={item.category ?? ""}
+                      category={item.category ?? CategoryEnum.house}
                       address={item.address}
                       image={item.banner}
-                      period={item.period ?? ""}
-                      listed_for={item.listed_for ?? ""}
-                      rating={item.average_rating ?? 4.9}
+                      period={item.period ?? RenewalEnum.yearly}
+                      listed_for={item.listed_for ?? ListForEnum.rent}
+                      rating={item.average_rating ?? 4.9} 
                       expired={new Date(item.expired_by ?? "1970-01-01") < new Date()}
                     />
 

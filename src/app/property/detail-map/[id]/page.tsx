@@ -11,7 +11,7 @@ import {
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { getPropertyById }                   from "@/services/propertyApi";
 import { getNearLandmarks, verifyLandmark }  from "@/services/landmarkApi";
-import { PropertyType }                       from "@/types/property";
+import { PropertyType, RenewalEnum }                       from "@/types/property";
 import logger                                 from "logger.config.mjs";
 import Price                                  from "@/components/shared/Price";
 import { LANDMARK_CATEGORIES }               from "@/components/PropertyLocationModal";
@@ -256,7 +256,7 @@ export default function PropertyMap({
                   <Price price={property.price} currency={property.currency} />
                 </span>
                 {listedFor === "rent"     && <span className="text-[11px] text-[#9ca3af] font-medium">/yr</span>}
-                {listedFor === "shortlet" && <span className="text-[11px] text-[#9ca3af] font-medium">/night</span>}
+                {property.period === RenewalEnum.daily && <span className="text-[11px] text-[#9ca3af] font-medium">/night</span>}
               </div>
               <span className={`inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full
                               text-[10px] font-bold uppercase tracking-wide

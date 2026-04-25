@@ -23,7 +23,7 @@ const Header: React.FC = () => {
   const MENU_ITEMS = [
     { icon: "✏️", labelKey: "menu_edit_profile"  as const, link: "/profile/edit",         action: undefined          },
     { icon: "🏠", labelKey: "menu_list_property" as const, link: "/property/add",          action: undefined          },
-    { icon: "🤝", labelKey: "menu_become_agent"  as const, link: "/profile/become-agent",  action: undefined          },
+    { icon: "🤝", labelKey: "menu_become_agent"  as const, link: "#",  action: undefined          },
     { icon: "🔒", labelKey: "menu_privacy"       as const, link: "/privacy-policy",        action: undefined          },
     { icon: "📋", labelKey: "menu_terms"         as const, link: "/terms-of-service",      action: undefined          },
     { icon: "❓", labelKey: "menu_faq"           as const, link: "/profile/faq",           action: undefined          },
@@ -51,8 +51,7 @@ const Header: React.FC = () => {
               type="button"
               onClick={openPicker}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full
-                         bg-white/15 border border-white/25 transition-all
-                         hover:bg-white/25 active:scale-95"
+                         transition-all hover:bg-white/25 active:scale-95"
               aria-label={t("menu_language")}
             >
               <span className="text-[16px] leading-none">{localeMeta.flag}</span>

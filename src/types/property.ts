@@ -1,3 +1,4 @@
+import { Translations } from "@/i18n/translations";
 import { UserSettingsType } from "@/types";
 
 export enum CategoryEnum {
@@ -9,6 +10,20 @@ export enum CategoryEnum {
   shop = "shop",
   others = "others"
 }
+
+export const TRANS_CATEGORIES: {
+  labelKey: keyof Translations;
+  value:    CategoryEnum;
+  icon:     string;
+}[] = [
+  { labelKey: "cat_apartment", value: CategoryEnum.house,    icon: "🏠" },
+  { labelKey: "cat_land",      value: CategoryEnum.land,     icon: "🏘️" },
+  { labelKey: "cat_shortlet",  value: CategoryEnum.shortlet, icon: "🌙" },
+  { labelKey: "cat_hotel",     value: CategoryEnum.hotel,    icon: "🏨" },
+  { labelKey: "cat_shop",      value: CategoryEnum.shop,     icon: "🏪" },
+  { labelKey: "cat_office",    value: CategoryEnum.office,   icon: "🏢" },
+  { labelKey: "cat_others",    value: CategoryEnum.others,   icon: "•••" },
+];
 
 export enum ListForEnum {
   rent = "rent",
@@ -39,6 +54,13 @@ export enum RenewalEnum {
   daily = "daily",
   weekly = "weekly"
 }
+
+export const RENEWAL_ENUM_TRANSLATIONS: Record<RenewalEnum, string> = {
+  [RenewalEnum.monthly]: "Monthly",
+  [RenewalEnum.yearly]: "Yearly",
+  [RenewalEnum.daily]: "Daily",
+  [RenewalEnum.weekly]: "Weekly"
+};
 
 export enum PropertyStatusEnum {
   available = "available",
@@ -117,3 +139,21 @@ export interface PropertyFilterPayload {
 
 
 export type WizardStep = 1 | 2 | 3;
+
+// ─── African bounding box with padding ────────────────────────────────────────
+export const AFRICAN_BOUNDS: L.LatLngBoundsExpression = [
+  [-40, -25], // SW
+  [43, 60],   // NE
+];
+
+// All 54 African countries (ISO 3166-1 alpha-2).
+// Passed to Nominatim's countrycodes param to restrict results to the continent.
+
+export const AFRICA_COUNTRY_CODES =
+  "dz,ao,bj,bw,bf,bi,cm,cv,cf,td,km,cd,cg,ci,dj,eg,gq,er,sz,et," +
+  "ga,gm,gh,gn,gw,ke,ls,lr,ly,mg,mw,ml,mr,mu,yt,ma,mz,na,ne,ng," +
+  "rw,re,sh,st,sn,sl,so,za,ss,sd,tz,tg,tn,ug,eh,zm,zw";
+
+// Africa bounding box for Nominatim viewbox (west, north, east, south).
+// Keeps bounded=1 so results never escape the continent.
+export const AFRICA_VIEWBOX = "-17.5,37.5,51.5,-35.0";

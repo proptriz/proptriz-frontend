@@ -738,7 +738,10 @@ export default function EditPropertyPage({
       {/* ── Location modal ────────────────────────────────────────────────── */}
       <PropertyLocationModal
         isOpen={openLocPicker}
-        onClose={() => setOpenLocPicker(false)}
+        onClose={() => {
+          handleSave(); 
+          setOpenLocPicker(false)
+        }}
         userCoordinates={propCoordinates}
         fallbackCoordinates={userCoordinates}
         onLocationSelect={handleLocationSelect}

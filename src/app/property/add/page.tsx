@@ -180,6 +180,7 @@ export default function AddPropertyPage() {
   // ── Submit ────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!authUser) { toast.error(t("add_val_login")); return; }
+    // if (requiresOnboarding) return router.push("/profile/edit");
 
     setUploadStage("creating");
 
@@ -255,6 +256,10 @@ export default function AddPropertyPage() {
     : t("add_cta_publish");
 
   if (!authUser) return <Splash showFooter />;
+
+  // if (requiresOnboarding) {
+  //   return router.push("/profile/edit");
+  // }
 
   // ─────────────────────────────────────────────────────────────────────────
   return (

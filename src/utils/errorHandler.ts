@@ -29,20 +29,24 @@ export class ApiErrorHandler {
       // Handle general error message
       const errorMessage = data?.message || error.message || defaultMessage;
       logger.error("API Error:", error);
-      toast.error(errorMessage);
-      return;
+      // toast.error(errorMessage);
+      return errorMessage;
     }
 
     logger.error("Unexpected error:", error);
-    toast.error(defaultMessage);
+    // toast.error(defaultMessage);
+    return defaultMessage;
   }
 
   private static handleValidationErrors(errors: ValidationError[]) {
     if (errors.length === 1) {
-      toast.error(errors[0].msg);
+      // toast.error(errors[0].msg);
+      logger.error(errors[0].msg);
+      return errors[0].msg;
     } else {
       const errorList = errors.map(e => `${e.path}: ${e.msg}`).join("\n");
-      toast.error(`Please fix the following errors:\n${errorList}`);
+      logger.error(`Please fix the following errors:\n${errorList}`);
+      return `Please fix the following errors:\n${errorList}`;
     }
   }
 

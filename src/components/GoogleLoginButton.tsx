@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function GoogleLoginButton() {
-  const { setAuthUser, googleReady } = useContext(AppContext);
+  const { setAuthUser, googleReady, setRequiresOnboarding } = useContext(AppContext);
   const router  = useRouter();
   const btnRef  = useRef<HTMLDivElement>(null);
 
@@ -32,6 +32,7 @@ export default function GoogleLoginButton() {
           setAuthToken(data.token);
 
           if (data.requiresOnboarding) {
+            setRequiresOnboarding(true);
             router.push("/profile/edit");
           }
         } catch (error) {

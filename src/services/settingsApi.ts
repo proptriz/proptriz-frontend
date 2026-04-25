@@ -20,14 +20,14 @@ export const addOrUpdateUserSettings = async (settings: Partial<UserSettingsType
       headers: { "Content-Type": "multipart/form-data" },
     });
     if (res.status===200){
-      toast.success(res.data.message || "Settings updated successfully");
+      // toast.success(res.data.message || "Settings updated successfully");
       logger.info("User settings updated:", res.data);
       return res.data;
     }
-    return null;
+    throw new Error(res.data.message || "Failed to update settings");
   } catch (error) {
     handleApiError(error, "Failed to update settings");
-    return null;
+    throw error;
   }
 }
 

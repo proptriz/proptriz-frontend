@@ -400,6 +400,59 @@ export interface Translations {
   detail_review_single: string;
   detail_review_plural: string;
 
+
+  // ── Currency names ──────────────────────────────────────────────────────────
+  cur_ngn:              string;   // "Nigerian Naira (₦)"
+  cur_usd:              string;   // "US Dollar ($)"
+  cur_kes:              string;   // "Kenyan Shilling (KSh)"
+  cur_cfa:              string;   // "CFA Franc (FCFA)"
+  cur_cda:              string;   // "CDA"
+  cur_pi:               string;   // "Pi Network (Pi)"
+
+  // ── ListFor standalone (maps, popups, cards) ─────────────────────────────────
+  list_for_rent:        string;   // "For Rent"
+  list_for_sale:        string;   // "For Sale"
+
+  // ── Property status standalone ───────────────────────────────────────────────
+  status_available:     string;
+  status_sold:          string;
+  status_rented:        string;
+  status_unavailable:   string;
+  status_expired:       string;
+
+  // ── Negotiable standalone ────────────────────────────────────────────────────
+  neg_negotiable:       string;   // "Negotiable"
+  neg_fixed:            string;   // "Fixed Price"
+
+  // ── Map marker popup ─────────────────────────────────────────────────────────
+  map_view:             string;   // "View" CTA button in popup
+  map_negotiable:       string;   // "Negotiable" tag on price
+
+  // ── Sticky agent bar ─────────────────────────────────────────────────────────
+  agent_owner:          string;   // "Property Owner"
+  agent_agent:          string;   // "Property Agent"
+  agent_company:        string;   // "Real Estate Company"
+  agent_call:           string;   // aria-label "Call"
+  agent_email:          string;   // aria-label "Email"
+  agent_whatsapp:       string;   // aria-label "WhatsApp"
+  agent_chat:           string;   // "Chat" button label
+
+  // ── Step 3 Listing Summary (simplified preview) ──────────────────────────────
+  s3_sum_header:        string;   // "Listing Summary"
+  s3_sum_title:         string;   // "Title"
+  s3_sum_category:      string;   // "Category"
+  s3_sum_price:         string;   // "Price"
+  s3_sum_listed_for:    string;   // "Listed For"
+  s3_sum_period:        string;   // "Period"
+  s3_sum_status:        string;   // "Status"
+  s3_sum_duration:      string;   // "Duration"
+  s3_sum_weeks:         string;   // "{n} weeks"
+  s3_sum_negotiable:    string;   // "Negotiable"
+  s3_sum_yes:           string;   // "✅ Yes"
+  s3_sum_no:            string;   // "🔒 No"
+  s3_sum_features:      string;   // "Features"
+  s3_sum_description:   string;   // "Description"
+  s3_location:          string;   // "Location" (section title in summary Step3)
   // ── Common ──────────────────────────────────────────────────────────────────
   common_save:          string;
   common_cancel:        string;
@@ -663,6 +716,36 @@ const en: Translations = {
   detail_nearby: "Nearby Properties", detail_wishlist: "Save to wishlist",
   detail_review_single: "review", detail_review_plural: "reviews",
 
+
+  cur_ngn: "Nigerian Naira (₦)", cur_usd: "US Dollar ($)",
+  cur_kes: "Kenyan Shilling (KSh)", cur_cfa: "CFA Franc (FCFA)",
+  cur_cda: "CDA", cur_pi: "Pi Network (Pi)",
+
+  list_for_rent: "For Rent", list_for_sale: "For Sale",
+
+  status_available: "Available", status_sold: "Sold",
+  status_rented: "Rented", status_unavailable: "Unavailable",
+  status_expired: "Expired",
+
+  neg_negotiable: "Negotiable", neg_fixed: "Fixed Price",
+
+  map_view: "View", map_negotiable: "Negotiable",
+
+  agent_owner: "Property Owner", agent_agent: "Property Agent",
+  agent_company: "Real Estate Company",
+  agent_call: "Call", agent_email: "Email",
+  agent_whatsapp: "WhatsApp", agent_chat: "Chat",
+
+  s3_sum_header: "Listing Summary",
+  s3_sum_title: "Title", s3_sum_category: "Category",
+  s3_sum_price: "Price", s3_sum_listed_for: "Listed For",
+  s3_sum_period: "Period", s3_sum_status: "Status",
+  s3_sum_duration: "Duration", s3_sum_weeks: "{n} weeks",
+  s3_sum_negotiable: "Negotiable",
+  s3_sum_yes: "✅ Yes", s3_sum_no: "🔒 No",
+  s3_sum_features: "Features", s3_sum_description: "Description",
+  s3_location: "Location",
+
   common_save: "Save", common_cancel: "Cancel", common_close: "Close",
   common_loading: "Loading…", common_error: "Something went wrong",
   common_retry: "Try Again", common_per_year: "/yr",
@@ -730,7 +813,7 @@ const fr: Translations = {
   add_banner_uploading_sub: "Photos optimisées et envoyées une par une",
   add_val_title: "Veuillez saisir un titre.",
   add_val_price: "Veuillez saisir un prix valide.",
-  add_val_photos: "Ajoutez au moins une photo.",
+  add_val_photos: "Ajoutez au moins une photo.", 
   add_val_address: "Veuillez saisir l'adresse.",
   add_val_login: "Veuillez vous connecter pour lister un bien.",
   add_toast_pinned: "Emplacement épinglé",
@@ -830,7 +913,7 @@ const fr: Translations = {
   ep_photo_large: "Fichier trop volumineux. Taille maximale : 2 Mo.",
   ep_photo_selected: "Photo sélectionnée — enregistrez pour appliquer.",
   ep_updated: "Profil mis à jour avec succès !",
-  ep_failed: "Échec de la mise à jour du profil.",
+  ep_failed: "Échec de la mise à jour du profil.", 
   ep_type_individual: "Particulier", ep_type_agent: "Agent", ep_type_company: "Société",
   ep_type_individual_desc: "Propriétaire particulier",
   ep_type_agent_desc: "Agent immobilier agréé",
@@ -929,6 +1012,36 @@ const fr: Translations = {
   detail_nearby: "Biens à proximité", detail_wishlist: "Sauvegarder",
   detail_review_single: "avis", detail_review_plural: "avis",
 
+
+  cur_ngn: "Naira nigérian (₦)", cur_usd: "Dollar américain ($)",
+  cur_kes: "Shilling kényan (KSh)", cur_cfa: "Franc CFA (FCFA)",
+  cur_cda: "CDA", cur_pi: "Pi Network (Pi)",
+
+  list_for_rent: "À louer", list_for_sale: "À vendre",
+
+  status_available: "Disponible", status_sold: "Vendu",
+  status_rented: "Loué", status_unavailable: "Indisponible",
+  status_expired: "Expiré",
+
+  neg_negotiable: "Négociable", neg_fixed: "Prix fixe",
+
+  map_view: "Voir", map_negotiable: "Négociable",
+
+  agent_owner: "Propriétaire", agent_agent: "Agent immobilier",
+  agent_company: "Agence immobilière",
+  agent_call: "Appeler", agent_email: "E-mail",
+  agent_whatsapp: "WhatsApp", agent_chat: "Chat",
+
+  s3_sum_header: "Résumé de l'annonce",
+  s3_sum_title: "Titre", s3_sum_category: "Catégorie",
+  s3_sum_price: "Prix", s3_sum_listed_for: "Proposé pour",
+  s3_sum_period: "Période", s3_sum_status: "Statut",
+  s3_sum_duration: "Durée", s3_sum_weeks: "{n} semaines",
+  s3_sum_negotiable: "Négociable",
+  s3_sum_yes: "✅ Oui", s3_sum_no: "🔒 Non",
+  s3_sum_features: "Caractéristiques", s3_sum_description: "Description",
+  s3_location: "Localisation",
+
   common_save: "Enregistrer", common_cancel: "Annuler", common_close: "Fermer",
   common_loading: "Chargement…", common_error: "Une erreur est survenue",
   common_retry: "Réessayer", common_per_year: "/an",
@@ -952,8 +1065,8 @@ const sw: Translations = {
 
   home_greeting: "Pata nafasi yako bora", home_search_hint: "Tafuta kwa eneo, aina…",
   home_nearby: "Mali za karibu", home_see_all: "Tazama Zote",
-  home_show_less: "Onyesha Chini",
-  home_no_results: "Hakuna mali iliyopatikana",
+  home_show_less: "Onyesha Chini", 
+  home_no_results: "Hakuna mali iliyopatikana", 
   home_for_rent: "Kukodi", home_for_sale: "Kuuza",
   home_featured: "Mali Zilizoangaziwa", home_top_agents: "Mawakala Bora",
   home_seen_all: "Umesoma mali zote", home_view_all: "Tazama zote →",
@@ -1199,6 +1312,36 @@ const sw: Translations = {
   detail_add_review_hd: "Ongeza maoni", detail_all_reviews: "Tazama maoni yote {n} →",
   detail_nearby: "Mali za karibu", detail_wishlist: "Hifadhi",
   detail_review_single: "maoni", detail_review_plural: "maoni",
+
+
+  cur_ngn: "Naira ya Nigeria (₦)", cur_usd: "Dola ya Marekani ($)",
+  cur_kes: "Shilingi ya Kenya (KSh)", cur_cfa: "Faranga ya CFA (FCFA)",
+  cur_cda: "CDA", cur_pi: "Pi Network (Pi)",
+
+  list_for_rent: "Kukodi", list_for_sale: "Kuuza",
+
+  status_available: "Inapatikana", status_sold: "Imeuzwa",
+  status_rented: "Imekodishwa", status_unavailable: "Haipatikani",
+  status_expired: "Imeisha Muda",
+
+  neg_negotiable: "Inaweza Kujadiliwa", neg_fixed: "Bei ya Mwisho",
+
+  map_view: "Tazama", map_negotiable: "Inaweza Kujadiliwa",
+
+  agent_owner: "Mmiliki wa Mali", agent_agent: "Wakala wa Mali",
+  agent_company: "Kampuni ya Mali",
+  agent_call: "Piga Simu", agent_email: "Barua pepe",
+  agent_whatsapp: "WhatsApp", agent_chat: "Zungumza",
+
+  s3_sum_header: "Muhtasari wa Orodha",
+  s3_sum_title: "Kichwa", s3_sum_category: "Jamii",
+  s3_sum_price: "Bei", s3_sum_listed_for: "Imeorodheshwa kwa",
+  s3_sum_period: "Kipindi", s3_sum_status: "Hali",
+  s3_sum_duration: "Muda", s3_sum_weeks: "wiki {n}",
+  s3_sum_negotiable: "Inaweza Kujadiliwa",
+  s3_sum_yes: "✅ Ndiyo", s3_sum_no: "🔒 Hapana",
+  s3_sum_features: "Vipengele", s3_sum_description: "Maelezo",
+  s3_location: "Mahali",
 
   common_save: "Hifadhi", common_cancel: "Ghairi", common_close: "Funga",
   common_loading: "Inapakia…", common_error: "Kitu kilienda vibaya",

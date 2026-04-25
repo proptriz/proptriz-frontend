@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import type { LatLngExpression } from "leaflet";
-import { ListForEnum, PropertyType } from "@/types/property";
+import { AFRICAN_BOUNDS, ListForEnum, PropertyType } from "@/types/property";
 import debounce from "lodash.debounce";
 import MapMarkerPopup from "./MapMarkerPopup";
 import { createPriceIcon } from "./PriceMarkerIcon";
@@ -104,12 +104,6 @@ const Map: React.FC<MapProps> = ({
 }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  /** Nigeria/West-Africa bounding box prevents panning off continent */
-  const africaBounds: L.LatLngBoundsExpression = [
-    [-35, -20],
-    [38, 55],
-  ];
-
   const handleMarkerClick = (property: PropertyType) => {
     setSelectedId(property._id);
     onMarkerClick(property); // notify parent (e.g. show peek card in ExplorePage)
@@ -128,7 +122,7 @@ const Map: React.FC<MapProps> = ({
         center={mapCenter ?? [9.082, 8.6753]}
         zoom={initialZoom}
         zoomControl={false}
-        maxBounds={africaBounds}
+        maxBounds={AFRICAN_BOUNDS}
         maxBoundsViscosity={1.0}
         className="w-full h-full"
       >

@@ -145,3 +145,15 @@ export const AFRICAN_BOUNDS: L.LatLngBoundsExpression = [
   [-40, -25], // SW
   [43, 60],   // NE
 ];
+
+// All 54 African countries (ISO 3166-1 alpha-2).
+// Passed to Nominatim's countrycodes param to restrict results to the continent.
+
+export const AFRICA_COUNTRY_CODES =
+  "dz,ao,bj,bw,bf,bi,cm,cv,cf,td,km,cd,cg,ci,dj,eg,gq,er,sz,et," +
+  "ga,gm,gh,gn,gw,ke,ls,lr,ly,mg,mw,ml,mr,mu,yt,ma,mz,na,ne,ng," +
+  "rw,re,sh,st,sn,sl,so,za,ss,sd,tz,tg,tn,ug,eh,zm,zw";
+
+// Africa bounding box for Nominatim viewbox (west, north, east, south).
+// Keeps bounded=1 so results never escape the continent.
+export const AFRICA_VIEWBOX = "-17.5,37.5,51.5,-35.0";

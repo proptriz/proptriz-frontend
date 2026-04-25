@@ -12,7 +12,7 @@ import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import type { LatLngExpression } from "leaflet";
 import logger from "../../logger.config.mjs";
-import { AFRICAN_BOUNDS } from "@/types/property";
+import { AFRICA_COUNTRY_CODES, AFRICA_VIEWBOX, AFRICAN_BOUNDS } from "@/types/property";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Gold:#f0a500
@@ -97,10 +97,11 @@ const LocationMarker: React.FC<{
 };
 
 // ─── Forward geocoding controller ─────────────────────────────────────────────
+
 const MapSearchController: React.FC<{
-  query:     string;
-  setLoading:(v: boolean) => void;
-  onResult:  (lat: number, lng: number) => void;
+  query:      string;
+  setLoading: (v: boolean) => void;
+  onResult:   (lat: number, lng: number) => void;
 }> = ({ query, setLoading, onResult }) => {
   const map = useMap();
 
@@ -114,16 +115,16 @@ const MapSearchController: React.FC<{
         const res = await fetch(
           "https://nominatim.openstreetmap.org/search?" +
             new URLSearchParams({
-              q:           query,
-              format:      "json",
-              countrycodes:"ng",
-              bounded:     "1",
-              viewbox:     "2.5,13.9,14.7,4.0",
-              limit:       "1",
+              q:            query,
+              format:       "json",
+              countrycodes: AFRICA_COUNTRY_CODES,
+              bounded:      "1",
+              viewbox:      AFRICA_VIEWBOX,
+              limit:        "1",
             }),
           {
             signal:  controller.signal,
-            headers: { "Accept-Language": "en" },
+            headers: { "Accept-Language": "en,fr,sw" },
           }
         );
 

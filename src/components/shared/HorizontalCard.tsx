@@ -3,7 +3,9 @@ import { FaStar } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import Image from "next/image";
 import formatPrice from "@/utils/formatPrice";
-import { CategoryEnum, CURRENCY_SYMBOL, CurrencyEnum } from "@/types/property";
+import { CategoryEnum, CURRENCY_SYMBOL, CurrencyEnum, ListForEnum, RenewalEnum } from "@/types/property";
+import { translateCategoryOptions, translateListedForOptions, translateRenewalOptions } from "@/utils/translate";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export interface HorizontalCardProps {
   id: string,
@@ -14,8 +16,8 @@ export interface HorizontalCardProps {
   price: number; // Price per month
   currency: CurrencyEnum;
   category: CategoryEnum; // Property type (e.g., "Apartment")
-  period: string;
-  listed_for: string;
+  period: RenewalEnum;
+  listed_for: ListForEnum;
   distance?: string;
   expired?: boolean
 }
@@ -33,6 +35,7 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
   listed_for,
   expired
 }) => {
+    const { t } = useLanguage();
   return (
     <div
       key={id}
@@ -54,14 +57,14 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
         {/* Listed for badge */}
         {listed_for && (
           <span className="absolute top-2 left-2 bg-white text-primary text-[10px] font-semibold px-2 py-[2px] rounded-md">
-            For {listed_for}
+            {translateListedForOptions(listed_for, t)}
           </span>
         )}
 
         {/* Category */}
         {category && (
           <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-[2px] rounded-md">
-            {category}
+            {translateCategoryOptions(category, t)}
           </span>
         )}
       </div>
@@ -94,13 +97,13 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
 
           {period && (
             <span className="text-xs text-gray-500 ml-1">
-              /{period}
+              / {translateRenewalOptions(period, t)}
             </span>
           )}
 
           {expired && (
             <span className="ml-auto bg-red-600 text-white text-[10px] px-2 py-[2px] rounded-md">
-              Expired
+              {t("status_expired")}
             </span>
           )}
         </div>

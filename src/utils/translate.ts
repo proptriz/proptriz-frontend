@@ -1,6 +1,7 @@
+import { Translations } from "@/i18n/translations";
 import { CategoryEnum, ListForEnum, NegotiableEnum, PropertyStatusEnum, RenewalEnum } from "@/types/property";
 
-export const getPropertyCategoryOptions = (t: (key: string) => string) => [
+export const getPropertyCategoryOptions = (t: (key: keyof Translations) => string) => [
   {
     value: CategoryEnum.house,
     name: t(
@@ -46,18 +47,18 @@ export const getPropertyCategoryOptions = (t: (key: string) => string) => [
   
 ];
 
-export const translateListedForOptions = (option: ListForEnum, t: (key: string) => string): string => {
+export const translateListedForOptions = (option: ListForEnum, t: (key: keyof Translations) => string): string => {
   switch (option) {
     case ListForEnum.rent:
-      return t('home_for_rent');
+      return t('list_for_rent');
     case ListForEnum.sale:
-      return t('home_for_sale');
+      return t('list_for_sale');
     default:
       return '';
   }
 };
 
-export const translateCategoryOptions = (option: CategoryEnum, t: (key: string) => string): string => {
+export const translateCategoryOptions = (option: CategoryEnum, t: (key: keyof Translations) => string): string => {
   switch (option) {
     case CategoryEnum.house:
       return t('cat_apartment');
@@ -78,22 +79,22 @@ export const translateCategoryOptions = (option: CategoryEnum, t: (key: string) 
   }
 };
 
-export const translateRenewalOptions = (option: RenewalEnum, t: (key: string) => string): string => {
+export const translateRenewalOptions = (option: RenewalEnum, t: (key: keyof Translations) => string): string => {
   switch (option) {
     case RenewalEnum.daily:
-      return t('renewal_daily');
+      return t('s1_period_daily');
     case RenewalEnum.weekly:
-      return t('renewal_weekly');
+      return t('s1_period_weekly');
     case RenewalEnum.monthly:
-      return t('renewal_monthly');
+      return t('s1_period_monthly');
     case RenewalEnum.yearly:
-      return t('renewal_yearly');
+      return t('s1_period_yearly');
     default:
       return '';
   }
 };
 
-export const translatePropertyStatusOptions = (option: PropertyStatusEnum, t: (key: string) => string): string => {
+export const translatePropertyStatusOptions = (option: PropertyStatusEnum, t: (key: keyof Translations) => string): string => {
   switch (option) {
     case PropertyStatusEnum.available:
       return t('status_available');
@@ -110,7 +111,7 @@ export const translatePropertyStatusOptions = (option: PropertyStatusEnum, t: (k
   }
 };
 
-export const translateNegotiableOptions = (option: NegotiableEnum, t: (key: string) => string): string => {
+export const translateNegotiableOptions = (option: NegotiableEnum, t: (key: keyof Translations) => string): string => {
   switch (option) {
     case NegotiableEnum.Negotiable:
       return t('neg_negotiable');

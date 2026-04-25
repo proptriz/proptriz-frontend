@@ -104,7 +104,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             aria-label="Open filters"
           >
             <LuSlidersHorizontal size={13} />
-            Filter
+            {t("filter_pill")}
             {activeFilterCount > 0 && (
               <span
                 className="min-w-[16px] h-4 rounded-full bg-[#f0a500] text-[#111]
@@ -165,7 +165,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* ── Filter popup ─────────────────────────────────────────────────── */}
       <Popup
-        header="Filter Properties"
+        header={t("filter_header")}
         toggle={togglePopup}
         setToggle={setTogglePopup}
         useMask

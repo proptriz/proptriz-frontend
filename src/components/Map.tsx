@@ -156,6 +156,7 @@ const Map: React.FC<MapProps> = ({
             position={[property.latitude, property.longitude] as LatLngExpression}
             icon={createPriceIcon({
               price: property.price,
+              currency: property.currency,
               listedFor: property.listed_for as ListForEnum,
               isSelected: selectedId === property._id,
             })}

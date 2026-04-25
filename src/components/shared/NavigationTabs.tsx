@@ -1,25 +1,6 @@
-import { CategoryEnum } from "@/types/property";
+import { CategoryEnum, TRANS_CATEGORIES } from "@/types/property";
 import React, { SetStateAction } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import type { Translations } from "@/i18n/translations";
-
-// ─── Tab definitions ──────────────────────────────────────────────────────────
-// labelKey ties each category to the translation table.
-// Icon emojis are language-neutral — only the text label changes.
-
-const CATEGORIES: {
-  labelKey: keyof Translations;
-  value:    CategoryEnum;
-  icon:     string;
-}[] = [
-  { labelKey: "cat_apartment", value: CategoryEnum.house,    icon: "🏠" },
-  { labelKey: "cat_land",      value: CategoryEnum.land,     icon: "🏘️" },
-  { labelKey: "cat_shortlet",  value: CategoryEnum.shortlet, icon: "🌙" },
-  { labelKey: "cat_hotel",     value: CategoryEnum.hotel,    icon: "🏨" },
-  { labelKey: "cat_shop",      value: CategoryEnum.shop,     icon: "🏪" },
-  { labelKey: "cat_office",    value: CategoryEnum.office,   icon: "🏢" },
-  { labelKey: "cat_others",    value: CategoryEnum.others,   icon: "•••" },
-];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -39,7 +20,7 @@ const NavigationTabs: React.FC<NavigationTabsProps> = ({ value, onChange }) => {
       style={{ msOverflowStyle: "none", scrollbarWidth: "none" } as React.CSSProperties}
       aria-label="Property categories"
     >
-      {CATEGORIES.map((tab) => {
+      {TRANS_CATEGORIES.map((tab) => {
         const isActive = value === tab.value;
         return (
           <button

@@ -1,38 +1,7 @@
 import Link from "next/link";
-import { CURRENCY_SYMBOL, CurrencyEnum, PropertyType } from "@/types/property";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { CURRENCY_SYMBOL, CurrencyEnum, PropertyType, TRANS_CATEGORIES } from "@/types/property";
 import formatPrice from "@/utils/formatPrice";
-
-// ─── category data ─────────────────────────────────────────────────
-
-const CATEGORY_ICON: Record<string, string> = {
-  house:    "🏠",
-  shortlet: "🛎️",
-  hotel:    "🏨",
-  office:   "🏢",
-  land:     "🏘️",
-  shop:     "🏪",
-  others:   "🏗️",
-};
-
-// ─── Listed-for color system  (matches createPriceIcon tokens) ────────────────
-//   Rent → teal   Sale → gold/amber
-
-const LISTED_FOR_CONFIG = {
-  rent: {
-    bg:   "#e0f0f5",
-    text: "#1e5f74",
-    dot:  "#1e5f74",
-    label:"For Rent",
-    icon: "🔑",
-  },
-  sale: {
-    bg:   "#fef3c7",
-    text: "#92400e",
-    dot:  "#f0a500",
-    label:"For Sale",
-    icon: "🏷️",
-  },
-} as const;
 
 // ─── Star renderer (compact inline SVG) ──────────────────────────────────────
 
@@ -55,12 +24,19 @@ function StarRating({ value }: { value: number }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
+  const { t } = useLanguage();
+
+  // Listed-for config — labels use t() so they switch with locale
+  const LISTED_FOR_CONFIG = {
+    rent: { bg: "#e0f0f5", text: "#1e5f74", dot: "#1e5f74", label: t("list_for_rent"), icon: "🔑" },
+    sale: { bg: "#fef3c7", text: "#92400e", dot: "#f0a500", label: t("list_for_sale"), icon: "🏷️" },
+  } as const;
   const imageUrl =
     property.banner?.trim() ? property.banner : "/logo.png";
 
   const symbol     = CURRENCY_SYMBOL[property.currency] ?? "₦";
   const rating     = property.average_rating ?? 5.0;
-  const catIcon    = CATEGORY_ICON[property.category] ?? "🏠";
+  const catIcon    = TRANS_CATEGORIES.find((cat) => cat.value === property.category)?.icon ?? "🏠";
   const lf         = (property.listed_for === "rent" ? "rent" : "sale") as "rent" | "sale";
   const lfConfig   = LISTED_FOR_CONFIG[lf];
   const isRent     = lf === "rent";
@@ -223,7 +199,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
                   textTransform:"uppercase",
                 }}
               >
-                Negotiable
+                {t("map_negotiable")}
               </span>
             )}
           </div>
@@ -332,7 +308,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
               b.style.transform  = "translateY(0)";
             }}
           >
-            View
+            {t("map_view")}
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
               <path
                 d="M2 5.5h7M6.5 2.5l3 3-3 3"

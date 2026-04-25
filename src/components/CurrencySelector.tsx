@@ -13,7 +13,7 @@ const CURRENCY_OPTIONS = [
   { value: CurrencyEnum.usd, label: "Dollar ($)" },
   { value: CurrencyEnum.kes,   label: "Kenyan Shillings (KSh)"   },
   { value: CurrencyEnum.cfa,  label: "CFA Franc (FCFA)"  },
-  { value: CurrencyEnum.cda,  label: "Congolese Franc (CDA)"  },
+  { value: CurrencyEnum.cdf,  label: "Congolese Franc (CDF)"  },
   { value: CurrencyEnum.pi,  label: "Pi Coin"  },
 ];
 

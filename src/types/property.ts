@@ -35,7 +35,7 @@ export enum CurrencyEnum {
   usd ="USD",
   kes = "KES",
   cfa = "CFA",
-  cda = "CDA",
+  cdf = "CDF",
   pi = "Pi"
 }
 
@@ -44,7 +44,7 @@ export const CURRENCY_SYMBOL: Record<CurrencyEnum, string> = {
   [CurrencyEnum.usd]: "$",
   [CurrencyEnum.kes]: "KSh",
   [CurrencyEnum.cfa]: "FCFA",
-  [CurrencyEnum.cda]: "CDA",
+  [CurrencyEnum.cdf]: "CDF",
   [CurrencyEnum.pi]: "Pi"
 };
 

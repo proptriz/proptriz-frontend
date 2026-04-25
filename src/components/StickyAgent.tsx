@@ -1,18 +1,16 @@
-import { UserSettingsType, UserTypeEnum } from "@/types";
 import { PropertyType } from "@/types/property";
+import {  UserSettingsType, UserTypeEnum } from "@/types";
 import { generateWhatsAppLink } from "@/utils/generateWhatsappLink";
 import { Call3DIcon, GmailMinimalIcon, WhatsAppMinimalIcon } from "./Icons";
 import { normalizePhone } from "@/utils/normalizePhone";
 import Image from "next/image";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
 // ─────────────────────────────────────────────────────────────────────────────
 
-const USER_TYPE_LABEL: Record<string, string> = {
-  [UserTypeEnum.Individual]: "Property Owner",
-  [UserTypeEnum.Agent]:      "Property Agent",
-};
+
 
 const StickyAgentInfo = ({
   user,
@@ -21,6 +19,13 @@ const StickyAgentInfo = ({
   user: UserSettingsType;
   property: PropertyType;
 }) => {
+  const { t } = useLanguage();
+
+  const USER_TYPE_LABEL: Record<string, string> = {
+    [UserTypeEnum.Individual]: t("agent_owner"),
+    [UserTypeEnum.Agent]:      t("agent_agent"),
+  };
+
   const link = generateWhatsAppLink({
     phoneNumber: user.whatsapp || user.phone || "",
     messageTop: `Hello, I'm interested in this property: ${property.title}`,
@@ -29,7 +34,7 @@ const StickyAgentInfo = ({
   });
 
   const userLabel =
-    USER_TYPE_LABEL[user.user_type ?? ""] ?? "Real Estate Company";
+    USER_TYPE_LABEL[user.user_type ?? ""] ?? t("agent_company");
 
   return (
     <div className="fixed bottom-0 left-0 w-full z-50">
@@ -87,7 +92,7 @@ const StickyAgentInfo = ({
           {user.phone && (
             <a
               href={`tel:${normalizePhone(user.phone)}`}
-              aria-label="Call"
+              aria-label={t("agent_call")}
               className="w-10 h-10 rounded-xl flex items-center justify-center
                          transition-all duration-200 active:scale-95"
               style={{ background: "#e0f0f5", color: "#1e5f74" }}
@@ -108,7 +113,7 @@ const StickyAgentInfo = ({
           {user.email && (
             <a
               href={`mailto:${user.email}`}
-              aria-label="Email"
+              aria-label={t("agent_email")}
               className="w-10 h-10 rounded-xl flex items-center justify-center
                          transition-all duration-200 active:scale-95"
               style={{ background: "#e0f0f5", color: "#1e5f74" }}
@@ -129,7 +134,7 @@ const StickyAgentInfo = ({
           {user.whatsapp && (
             <a
               href={link}
-              aria-label="WhatsApp"
+              aria-label={t("agent_whatsapp")}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 rounded-xl
@@ -141,7 +146,7 @@ const StickyAgentInfo = ({
               }}
             >
               <WhatsAppMinimalIcon className="text-[18px]" />
-              Chat
+              {t("agent_chat")}
             </a>
           )}
         </div>

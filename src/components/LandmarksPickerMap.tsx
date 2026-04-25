@@ -13,6 +13,7 @@ import * as L from "leaflet";
 import type { LatLngExpression } from "leaflet";
 import logger from "logger.config.mjs";
 import { type LandmarkCategory, LANDMARK_CATEGORIES } from "./PropertyLocationModal";
+import { AFRICA_COUNTRY_CODES, AFRICA_VIEWBOX, AFRICAN_BOUNDS } from "@/types/property";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EXPORTED TYPE — matches LandmarkResponse from the backend + landmark.api.ts
@@ -143,12 +144,6 @@ function makePendingPinIcon(): L.DivIcon {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// NIGERIA BOUNDS
-// ─────────────────────────────────────────────────────────────────────────────
-
-const NIGERIA_BOUNDS: [[number, number], [number, number]] = [[4.0, 2.5], [13.9, 14.7]];
-
-// ─────────────────────────────────────────────────────────────────────────────
 // INNER MAP COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -170,8 +165,8 @@ const MapSearchController: React.FC<{
         setLoading(true);
         const res = await fetch(
           "https://nominatim.openstreetmap.org/search?" +
-          new URLSearchParams({ q: query, format: "json", countrycodes: "ng", bounded: "1", viewbox: "2.5,13.9,14.7,4.0", limit: "1" }),
-          { signal: ctrl.signal, headers: { "Accept-Language": "en" } }
+          new URLSearchParams({ q: query, format: "json", countrycodes: AFRICA_COUNTRY_CODES, bounded: "1", viewbox: AFRICA_VIEWBOX, limit: "1" }),
+          { signal: ctrl.signal, headers: { "Accept-Language": "en,fr,sw" } }
         );
         const data = await res.json();
         if (data?.length) map.setView([Number(data[0].lat), Number(data[0].lon)], 15, { animate: true });
@@ -241,7 +236,7 @@ const LandmarksPickerMap: React.FC<LandmarksPickerMapProps> = ({
         zoom={14}
         scrollWheelZoom
         zoomControl={false}
-        maxBounds={NIGERIA_BOUNDS}
+        maxBounds={AFRICAN_BOUNDS}
         className="w-full h-full"
         style={{ position: "relative", zIndex: 0 }}
       >

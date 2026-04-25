@@ -234,8 +234,8 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                             : "bg-amber-50 text-amber-600 border-amber-200"
                           }`}
             >
-              {property.status === PropertyStatusEnum.available ? "✅ " + t("detail_available")
-               : property.status === PropertyStatusEnum.unavailable    ? "❌ " + t("detail_unavailable")
+              {property.status === PropertyStatusEnum.available ? t("detail_available")
+               : property.status === PropertyStatusEnum.unavailable    ? t("detail_unavailable")
                :                                  "⏳ " + property.status.charAt(0).toUpperCase() + property.status.slice(1)}
             </span>
           </div>
@@ -429,7 +429,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
       </div>
 
       {/* ── Sticky agent bar ────────────────────────────────────────────── */}
-      <StickyAgentInfo user={property.user} property={property} />
+      {property.user && <StickyAgentInfo user={property.user} property={property} />}
 
       {/* ── Gallery modal ────────────────────────────────────────────────── */}
       <GalleryModal

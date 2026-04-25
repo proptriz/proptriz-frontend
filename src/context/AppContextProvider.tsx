@@ -39,6 +39,8 @@ interface IAppContextProps {
   loginStage: PiLoginStage;
   googleReady: boolean;
   setGoogleReady: (value: boolean) => void;
+  requiresOnboarding: boolean;
+  setRequiresOnboarding: (value: boolean) => void;
 }
 
 const sleep = (ms: number) =>
@@ -80,7 +82,9 @@ const initialState: IAppContextProps = {
   setReload: () => {},
   loginStage: "",
   googleReady: false,
-  setGoogleReady: () => {}
+  setGoogleReady: () => {},
+  requiresOnboarding: false,
+  setRequiresOnboarding: () => {}
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -97,6 +101,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [loginStage, setLoginStage] = useState<PiLoginStage>("");
   const [googleReady, setGoogleReady] = useState(false);
+  const [requiresOnboarding, setRequiresOnboarding] = useState(false);
 
   const piSdkLoaded = useRef(false);
   const router = useRouter()
@@ -187,6 +192,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
       setLoginStage("authenticated");
 
       if (res.data.requiresOnboarding) {
+        setRequiresOnboarding(true);
         router.push("/profile/edit");
       } 
 
@@ -246,7 +252,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   };
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady, setRequiresOnboarding, requiresOnboarding }}>
       {children}
     </AppContext.Provider>
   );

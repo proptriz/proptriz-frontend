@@ -11,11 +11,13 @@ import {
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { getPropertyById }                   from "@/services/propertyApi";
 import { getNearLandmarks, verifyLandmark }  from "@/services/landmarkApi";
-import { PropertyType, RenewalEnum }                       from "@/types/property";
+import { CategoryEnum, ListForEnum, PropertyType, RenewalEnum }                       from "@/types/property";
 import logger                                 from "logger.config.mjs";
 import Price                                  from "@/components/shared/Price";
 import { LANDMARK_CATEGORIES }               from "@/components/PropertyLocationModal";
 import type { LandmarkWithDistance }          from "@/components/PropertyDetailMap";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { translateListedForOptions } from "@/utils/translate";
 
 // ─── Lazy map (Leaflet is SSR-incompatible) ───────────────────────────────────
 const PropertyDetailMap = dynamic(
@@ -55,6 +57,7 @@ export default function PropertyMap({
   params: Promise<{ id: string }>;
 }) {
   const router         = useRouter();
+  const { t }          = useLanguage();
   const { id: propId } = use(params);
 
   const [property,       setProperty]       = useState<PropertyType | null>(null);
@@ -65,7 +68,6 @@ export default function PropertyMap({
   const [saved,          setSaved]          = useState(false);
   const [snap,           setSnap]           = useState<SheetSnap>("peek");
   const [activeTab,      setActiveTab]      = useState<"facilities" | "details">("facilities");
-  /** id of a landmark being verified — shows a spinner on that row */
   const [verifyingId,    setVerifyingId]    = useState<string | null>(null);
 
   // ── 1. Fetch property ────────────────────────────────────────────────────
@@ -74,18 +76,18 @@ export default function PropertyMap({
     setLoading(true);
     getPropertyById(propId)
       .then((p) => {
-        if (!p?._id) { setError("Property not found."); return; }
+        if (!p?._id) { setError(t("detail_error")); return; }
         setProperty(p);
         logger.info("PropertyMap: loaded property", p._id);
       })
       .catch((e) => {
         logger.error("PropertyMap: property fetch error", e);
-        setError("Failed to load property.");
+        setError(t("detail_error"));
       })
       .finally(() => setLoading(false));
   }, [propId]);
 
-  // ── 2. Fetch landmarks from API once property coords are known ───────────
+  // ── 2. Fetch landmarks ───────────────────────────────────────────────────
   useEffect(() => {
     if (!property) return;
     const ctrl = new AbortController();
@@ -97,7 +99,6 @@ export default function PropertyMap({
     )
       .then((data) => {
         if (!data) return;
-        // Cast to LandmarkWithDistance — backend always returns distanceM on /near
         setLandmarks(data as LandmarkWithDistance[]);
         logger.info(`PropertyMap: ${data.length} landmarks loaded`);
       })
@@ -109,9 +110,9 @@ export default function PropertyMap({
     return () => ctrl.abort();
   }, [property]);
 
-  // ── Verify handler — any user can confirm a landmark ─────────────────────
+  // ── Verify handler ────────────────────────────────────────────────────────
   const handleVerify = useCallback(async (lmId: string) => {
-    if (verifyingId) return;          // prevent double-tap
+    if (verifyingId) return;
     setVerifyingId(lmId);
     try {
       const updated = await verifyLandmark(lmId);
@@ -135,21 +136,27 @@ export default function PropertyMap({
     setSnap(prev => prev === "peek" ? "half" : prev === "half" ? "full" : "peek");
   }, []);
 
+  // ── Snap label ────────────────────────────────────────────────────────────
+  const snapLabel =
+    snap === "peek" ? t("map_snap_expand") :
+    snap === "half" ? t("map_snap_more")   :
+                      t("map_snap_collapse");
+
   // ── Loading / error ────────────────────────────────────────────────────────
   if (loading) return (
     <div className="flex flex-col h-screen-safe items-center justify-center gap-3 bg-[#f5f7f9]">
       <div className="w-10 h-10 border-4 border-[#1e5f74] border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm text-[#4b5563] font-medium">Loading map…</p>
+      <p className="text-sm text-[#4b5563] font-medium">{t("detail_loading")}</p>
     </div>
   );
 
   if (error || !property) return (
     <div className="flex flex-col h-screen-safe items-center justify-center gap-4 bg-[#f5f7f9] px-6">
       <span className="text-5xl">📍</span>
-      <p className="text-base font-bold text-[#111827]">{error ?? "Property not found"}</p>
+      <p className="text-base font-bold text-[#111827]">{error ?? t("detail_error")}</p>
       <button onClick={() => router.back()}
         className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1e5f74] text-white text-sm font-bold">
-        <FiArrowLeft size={14} /> Go Back
+        <FiArrowLeft size={14} /> {t("detail_go_back")}
       </button>
     </div>
   );
@@ -187,6 +194,7 @@ export default function PropertyMap({
         </div>
 
         <button onClick={() => setSaved(s => !s)}
+          aria-label={t("detail_wishlist")}
           className="w-9 h-9 flex items-center justify-center rounded-xl
                      bg-white shadow-md border border-[#e5e7eb] active:scale-95 transition-all">
           {saved
@@ -203,15 +211,14 @@ export default function PropertyMap({
       </div>
 
       {/* ════ FEATURE PILLS ════ */}
-      {property.features &&property.features?.length > 0 && (
+      {property.features && property.features?.length > 0 && (
         <div className="relative z-20 flex gap-2 px-4 overflow-x-auto scrollbar-none pb-1 -mt-1">
           {property.features.map((feat, i) => (
             <div key={i}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
                          bg-white shadow-sm border border-[#e5e7eb] shrink-0">
               <span className="text-sm leading-none">{getFeatureEmoji(feat)}</span>
-              <span className="text-xs font-semibold text-[#374151] whitespace-nowrap">{feat}
-              </span>
+              <span className="text-xs font-semibold text-[#374151] whitespace-nowrap">{feat}</span>
             </div>
           ))}
         </div>
@@ -223,7 +230,7 @@ export default function PropertyMap({
                    rounded-xl bg-white shadow-lg border border-[#e5e7eb]
                    text-[#1e5f74] active:scale-95 transition-all"
         style={{ bottom: `calc(${SNAP_H[snap]} + 16px)` }}
-        title="Centre on property">
+        title={t("map_centre_btn")}>
         <FiNavigation size={17} />
       </button>
 
@@ -240,10 +247,10 @@ export default function PropertyMap({
         {/* Handle */}
         <button onClick={cycleSnap}
           className="flex flex-col items-center pt-2 pb-1 w-full shrink-0 focus:outline-none"
-          aria-label="Resize panel">
+          aria-label={t("map_resize_panel")}>
           <div className="w-10 h-[5px] rounded-full bg-[#e5e7eb]" />
           <span className="mt-1 text-[10px] text-[#9ca3af] font-medium select-none">
-            {snap === "peek" ? "Expand ↑" : snap === "half" ? "Show more ↑" : "Collapse ↓"}
+            {snapLabel}
           </span>
         </button>
 
@@ -255,20 +262,20 @@ export default function PropertyMap({
                 <span className="font-[Raleway] font-black text-[22px] text-[#1e5f74] tracking-tight leading-none">
                   <Price price={property.price} currency={property.currency} />
                 </span>
-                {listedFor === "rent"     && <span className="text-[11px] text-[#9ca3af] font-medium">/yr</span>}
-                {property.period === RenewalEnum.daily && <span className="text-[11px] text-[#9ca3af] font-medium">/night</span>}
+                {listedFor === ListForEnum.rent      && <span className="text-[11px] text-[#9ca3af] font-medium">{t("common_per_year")}</span>}
+                {property.period === RenewalEnum.daily && <span className="text-[11px] text-[#9ca3af] font-medium">{t("common_per_night")}</span>}
               </div>
               <span className={`inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full
                               text-[10px] font-bold uppercase tracking-wide
-                              ${listedFor === "sale" ? "bg-[#fef3c7] text-[#c88400]" : "bg-[#e0f0f5] text-[#1e5f74]"}`}>
-                {listedFor === "rent" ? "For Rent" : listedFor === "sale" ? "For Sale" : "Shortlet"}
+                              ${listedFor === ListForEnum.sale ? "bg-[#fef3c7] text-[#c88400]" : "bg-[#e0f0f5] text-[#1e5f74]"}`}>
+                {translateListedForOptions(listedFor as ListForEnum, t) || t("cat_shortlet")}
               </span>
             </div>
             <Link href={`/property/details/${propId}`}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl shrink-0
                          bg-[#1e5f74] text-white text-xs font-bold
                          hover:bg-[#143d4d] active:scale-95 transition-all shadow-sm">
-              View Details <FiExternalLink size={11} />
+              {t("map_view")} <FiExternalLink size={11} />
             </Link>
           </div>
           <div className="flex items-center gap-1.5">
@@ -283,10 +290,9 @@ export default function PropertyMap({
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`flex-1 py-2.5 text-xs font-bold transition-colors relative
                           ${activeTab === tab ? "text-[#1e5f74]" : "text-[#9ca3af] hover:text-[#374151]"}`}>
-              {tab === "facilities" ? "📍 Nearby Facilities" : "🏠 Property Details"}
+              {tab === "facilities" ? `📍 ${t("map_tab_facilities")}` : `🏠 ${t("map_tab_details")}`}
               {activeTab === tab && (
-                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5
-                                  bg-[#f0a500] rounded-full" />
+                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-[#f0a500] rounded-full" />
               )}
             </button>
           ))}
@@ -302,7 +308,7 @@ export default function PropertyMap({
               {/* Loading skeleton */}
               {lmLoading && (
                 <div className="space-y-2">
-                  {[1,2,3].map(i => (
+                  {[1, 2, 3].map(i => (
                     <div key={i} className="h-14 rounded-xl bg-[#f3f4f6] animate-pulse" />
                   ))}
                 </div>
@@ -312,17 +318,15 @@ export default function PropertyMap({
               {!lmLoading && landmarks.length === 0 && (
                 <div className="flex flex-col items-center py-8 gap-2 opacity-60">
                   <span className="text-4xl">🗺️</span>
-                  <p className="text-sm font-semibold text-[#6b7280]">No facilities nearby</p>
-                  <p className="text-xs text-[#9ca3af] text-center">
-                    No facilities have been added within 2 km of this property yet.
-                  </p>
+                  <p className="text-sm font-semibold text-[#6b7280]">{t("map_no_facilities")}</p>
+                  <p className="text-xs text-[#9ca3af] text-center">{t("map_no_facilities_sub")}</p>
                 </div>
               )}
 
-              {/* Landmark rows — sorted by distanceM (backend already sorts, preserve order) */}
+              {/* Landmark rows */}
               {!lmLoading && landmarks.map((lm, i) => {
-                const cat     = LANDMARK_CATEGORIES.find(c => c.value === lm.category);
-                const isClose = lm.distanceM < 500;
+                const cat            = LANDMARK_CATEGORIES.find(c => c.value === lm.category);
+                const isClose        = lm.distanceM < 500;
                 const isHighVerified = lm.verifiedCount >= 5;
                 const isVerifying    = verifyingId === lm.id;
 
@@ -346,8 +350,7 @@ export default function PropertyMap({
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-[#111827] truncate">{lm.name}</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <p className="text-[10px] text-[#9ca3af]">{cat?.label ?? "Landmark"}</p>
-                        {/* verifiedCount badge */}
+                        <p className="text-[10px] text-[#9ca3af]">{cat?.label ?? t("map_landmark_fallback")}</p>
                         <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full
                                           ${isHighVerified
                                             ? "bg-[#e0f0f5] text-[#1e5f74]"
@@ -359,7 +362,6 @@ export default function PropertyMap({
 
                     {/* Right column: distance + verify */}
                     <div className="shrink-0 flex flex-col items-end gap-1">
-                      {/* Distance from backend distanceM */}
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full
                                         ${isClose
                                           ? "bg-[#e0f0f5] text-[#1e5f74]"
@@ -367,14 +369,16 @@ export default function PropertyMap({
                         {fmtDist(lm.distanceM)}
                       </span>
                       {isClose && (
-                        <span className="text-[9px] text-[#1e5f74] font-semibold">nearby</span>
+                        <span className="text-[9px] text-[#1e5f74] font-semibold">
+                          {t("map_nearby_label")}
+                        </span>
                       )}
 
                       {/* Verify button */}
                       <button
                         onClick={() => handleVerify(lm.id)}
                         disabled={!!verifyingId}
-                        title={isHighVerified ? "Location verified by community" : "Confirm this landmark"}
+                        title={isHighVerified ? t("map_verified_title") : t("map_confirm_title")}
                         className={`flex items-center gap-1 text-[10px] font-semibold
                                     px-2 py-0.5 rounded-full transition-all active:scale-95
                                     ${isHighVerified
@@ -384,7 +388,7 @@ export default function PropertyMap({
                         {isVerifying
                           ? <FiRefreshCw size={9} className="animate-spin" />
                           : <FiCheckCircle size={9} />}
-                        {isHighVerified ? "Verified" : "Confirm"}
+                        {isHighVerified ? t("map_verified_btn") : t("map_confirm_btn")}
                       </button>
                     </div>
                   </div>
@@ -395,7 +399,7 @@ export default function PropertyMap({
               {!lmLoading && property.features && property.features?.length > 0 && (
                 <div className="mt-2 pt-3 border-t border-[#e5e7eb]">
                   <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider mb-2">
-                    Road Access & Environment
+                    {t("map_road_access")}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {property.features.map((ft: string, i: number) => (
@@ -418,7 +422,7 @@ export default function PropertyMap({
               {property.features && property.features?.length > 0 && (
                 <div>
                   <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider mb-2">
-                    Property Features
+                    {t("map_prop_features")}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     {property.features.map((feat, i) => (
@@ -439,7 +443,7 @@ export default function PropertyMap({
                 <FiMapPin size={14} className="text-[#1e5f74] shrink-0 mt-0.5" />
                 <div>
                   <p className="text-[10px] text-[#9ca3af] font-semibold uppercase tracking-wide mb-0.5">
-                    Full Address
+                    {t("map_full_address")}
                   </p>
                   <p className="text-sm font-semibold text-[#374151]">{property.address}</p>
                 </div>
@@ -449,7 +453,7 @@ export default function PropertyMap({
                 <FiNavigation size={14} className="text-[#1e5f74] shrink-0 mt-0.5" />
                 <div>
                   <p className="text-[10px] text-[#9ca3af] font-semibold uppercase tracking-wide mb-0.5">
-                    GPS Coordinates
+                    {t("map_gps")}
                   </p>
                   <p className="text-xs font-mono text-[#374151]">
                     {property.latitude.toFixed(6)}, {property.longitude.toFixed(6)}
@@ -463,7 +467,7 @@ export default function PropertyMap({
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-xl
                            border border-[#1e5f74] text-[#1e5f74] text-sm font-bold
                            hover:bg-[#e0f0f5] active:scale-95 transition-all">
-                Open in Google Maps <FiExternalLink size={13} />
+                {t("map_open_google")} <FiExternalLink size={13} />
               </a>
             </div>
           )}

@@ -463,6 +463,80 @@ export interface Translations {
   common_per_year:      string;
   common_per_month:     string;
   common_per_night:     string;
+
+  // ── Property Map page ────────────────────────────────────────────────────────
+  map_snap_expand:      string;  // "Expand ↑"
+  map_snap_more:        string;  // "Show more ↑"
+  map_snap_collapse:    string;  // "Collapse ↓"
+  map_centre_btn:       string;  // "Centre on property"
+  map_resize_panel:     string;  // "Resize panel"
+  map_tab_facilities:   string;  // "Nearby Facilities"
+  map_tab_details:      string;  // "Property Details"
+  map_no_facilities:    string;  // "No facilities nearby"
+  map_no_facilities_sub: string; // "No facilities have been added within 2 km…"
+  map_landmark_fallback: string; // "Landmark"
+  map_nearby_label:     string;  // "nearby"
+  map_verified_title:   string;  // "Location verified by community"
+  map_confirm_title:    string;  // "Confirm this landmark"
+  map_verified_btn:     string;  // "Verified"
+  map_confirm_btn:      string;  // "Confirm"
+  map_road_access:      string;  // "Road Access & Environment"
+  map_prop_features:    string;  // "Property Features"
+  map_full_address:     string;  // "Full Address"
+  map_gps:              string;  // "GPS Coordinates"
+  map_open_google:      string;  // "Open in Google Maps"
+
+  // ── Image Manager ────────────────────────────────────────────────────────────
+  img_upload_title:     string;  // "Upload Property Images"
+  img_add_photo:        string;  // "Add Photo"
+  img_removed:          string;  // "Image removed"
+  img_remove_failed:    string;  // "Failed to remove image"
+  img_upload_success:   string;  // "Image uploaded successfully"
+  img_upload_failed:    string;  // "Failed to upload image"
+
+  // ── Property Location Modal (landmark picker) ────────────────────────────────
+  lm_step_location:       string;  // Step 1 label "Location"
+  lm_step_facilities:     string;  // Step 2 label "Facilities"
+  lm_new_pin:             string;  // Fallback chip label "New Pin"
+  lm_pinned_location:     string;  // Chip subtitle "Pinned location"
+  lm_already_tagged:      string;  // Search results header "Already tagged nearby"
+  lm_duplicate_hint:      string;  // "💡 Check the list before adding…"
+  lm_name_label:          string;  // Form field label "Landmark name"
+  lm_name_ph:             string;  // Field placeholder
+  lm_category_label:      string;  // "Category"
+  lm_saving:              string;  // Submit button busy state "Saving…"
+  lm_add_btn:             string;  // "Add Nearby Facilities"
+  lm_save_changes:        string;  // "Save Changes"
+  lm_other:               string;  // Fallback category label "Other"
+  lm_delete_desc:         string;  // "This landmark will be removed…"
+  lm_keep_btn:            string;  // "Keep It"
+  lm_remove_btn:          string;  // "Remove"
+  lm_edit_aria:           string;  // aria-label for edit icon button
+  lm_delete_aria:         string;  // aria-label for delete icon button
+  lm_empty_title:         string;  // "No facilities added yet"
+  lm_empty_sub:           string;  // "Tap the map to pin…"
+  lm_go_to_map:           string;  // "Go to Map"
+  lm_search_address_ph:   string;  // "Search address or area…"
+  lm_search_area_ph:      string;  // "Search area…"
+  lm_next_step:           string;  // "Next: Add Nearby Facilities"
+  lm_panel_title:         string;  // Desktop panel heading "Nearby Facilities"
+  lm_optional:            string;  // "Optional" badge
+  lm_panel_desc:          string;  // Desktop panel subtitle
+  lm_back_btn:            string;  // "Back"
+  lm_skip_btn:            string;  // "Skip"
+  lm_save_btn:            string;  // "Save" (prefix before count)
+  lm_done_btn:            string;  // "Done"
+  lm_mobile_list_title:   string;  // Mobile list heading "Nearby Landmarks"
+  lm_added_count:         string;  // "{n} added" badge
+  lm_mobile_list_hint:    string;  // "Use ✏️ to edit or 🗑 to remove…"
+  lm_toggle_list:         string;  // "List ({n})" toggle button
+  lm_toggle_map:          string;  // "Map" toggle button
+  lm_popup_add_title:     string;  // Popup header "Add Nearby Facilities"
+  lm_popup_edit_title:    string;  // Popup header "Edit Landmark"
+  lm_popup_delete_title:  string;  // Popup header "Remove Landmark"
+  lm_err_name_required:   string;  // "Please enter a name for this landmark."
+  lm_err_save_failed:     string;  // "Failed to save landmark. Please try again."
+  lm_err_update_failed:   string;  // "Failed to update landmark. Please try again."
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -750,6 +824,79 @@ const en: Translations = {
   common_loading: "Loading…", common_error: "Something went wrong",
   common_retry: "Try Again", common_per_year: "/yr",
   common_per_month: "/mo", common_per_night: "/night",
+
+  // Map page
+map_snap_expand: "Expand ↑",
+map_snap_more: "Show more ↑",
+map_snap_collapse: "Collapse ↓",
+map_centre_btn: "Centre on property",
+map_resize_panel: "Resize panel",
+map_tab_facilities: "Nearby Facilities",
+map_tab_details: "Property Details",
+map_no_facilities: "No facilities nearby",
+map_no_facilities_sub: "No facilities have been added within 2 km of this property yet.",
+map_landmark_fallback: "Landmark",
+map_nearby_label: "nearby",
+map_verified_title: "Location verified by community",
+map_confirm_title: "Confirm this landmark",
+map_verified_btn: "Verified",
+map_confirm_btn: "Confirm",
+map_road_access: "Road Access & Environment",
+map_prop_features: "Property Features",
+map_full_address: "Full Address",
+map_gps: "GPS Coordinates",
+map_open_google: "Open in Google Maps",
+// Image Manager
+img_upload_title: "Upload Property Images",
+img_add_photo: "Add Photo",
+img_removed: "Image removed",
+img_remove_failed: "Failed to remove image",
+img_upload_success: "Image uploaded successfully",
+img_upload_failed: "Failed to upload image",
+
+// Landmark modal
+  lm_step_location:      "Location",
+  lm_step_facilities:    "Facilities",
+  lm_new_pin:            "New Pin",
+  lm_pinned_location:    "Pinned location",
+  lm_already_tagged:     "Already tagged nearby",
+  lm_duplicate_hint:     "💡 Check the list before adding — you may be tagging the same place.",
+  lm_name_label:         "Landmark name",
+  lm_name_ph:            "e.g. Ikeja City Mall, General Hospital…",
+  lm_category_label:     "Category",
+  lm_saving:             "Saving…",
+  lm_add_btn:            "Add Nearby Facilities",
+  lm_save_changes:       "Save Changes",
+  lm_other:              "Other",
+  lm_delete_desc:        "This landmark will be removed from your list. This cannot be undone.",
+  lm_keep_btn:           "Keep It",
+  lm_remove_btn:         "Remove",
+  lm_edit_aria:          "Edit landmark",
+  lm_delete_aria:        "Delete landmark",
+  lm_empty_title:        "No facilities added yet",
+  lm_empty_sub:          "Tap the map to pin nearby schools, hospitals, transport stops, and more.",
+  lm_go_to_map:          "Go to Map",
+  lm_search_address_ph:  "Search address or area…",
+  lm_search_area_ph:     "Search area…",
+  lm_next_step:          "Next: Add Nearby Facilities",
+  lm_panel_title:        "Nearby Facilities",
+  lm_optional:           "Optional",
+  lm_panel_desc:         "Click the map to pin a landmark. Each pin is saved globally — anyone can discover it.",
+  lm_back_btn:           "Back",
+  lm_skip_btn:           "Skip",
+  lm_save_btn:           "Save",
+  lm_done_btn:           "Done",
+  lm_mobile_list_title:  "Nearby Landmarks",
+  lm_added_count:        "{n} added",
+  lm_mobile_list_hint:   "Use ✏️ to edit or 🗑 to remove. Switch to Map to add more.",
+  lm_toggle_list:        "List ({n})",
+  lm_toggle_map:         "Map",
+  lm_popup_add_title:    "Add Nearby Facilities",
+  lm_popup_edit_title:   "Edit Landmark",
+  lm_popup_delete_title: "Remove Landmark",
+  lm_err_name_required:  "Please enter a name for this landmark.",
+  lm_err_save_failed:    "Failed to save landmark. Please try again.",
+  lm_err_update_failed:  "Failed to update landmark. Please try again.",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1046,6 +1193,77 @@ const fr: Translations = {
   common_loading: "Chargement…", common_error: "Une erreur est survenue",
   common_retry: "Réessayer", common_per_year: "/an",
   common_per_month: "/mois", common_per_night: "/nuit",
+
+  map_snap_expand: "Agrandir ↑",
+  map_snap_more: "Voir plus ↑",
+  map_snap_collapse: "Réduire ↓",
+  map_centre_btn: "Centrer sur le bien",
+  map_resize_panel: "Redimensionner",
+  map_tab_facilities: "Équipements proches",
+  map_tab_details: "Détails du bien",
+  map_no_facilities: "Aucun équipement à proximité",
+  map_no_facilities_sub: "Aucun équipement n'a été ajouté dans un rayon de 2 km.",
+  map_landmark_fallback: "Point d'intérêt",
+  map_nearby_label: "proche",
+  map_verified_title: "Lieu vérifié par la communauté",
+  map_confirm_title: "Confirmer ce point d'intérêt",
+  map_verified_btn: "Vérifié",
+  map_confirm_btn: "Confirmer",
+  map_road_access: "Accès routier & environnement",
+  map_prop_features: "Caractéristiques du bien",
+  map_full_address: "Adresse complète",
+  map_gps: "Coordonnées GPS",
+  map_open_google: "Ouvrir dans Google Maps",
+  img_upload_title: "Télécharger des photos du bien",
+  img_add_photo: "Ajouter une photo",
+  img_removed: "Photo supprimée",
+  img_remove_failed: "Impossible de supprimer la photo",
+  img_upload_success: "Photo téléchargée avec succès",
+  img_upload_failed: "Échec du téléchargement",
+
+  // Landmark modal
+  lm_step_location:      "Localisation",
+  lm_step_facilities:    "Équipements",
+  lm_new_pin:            "Nouvelle épingle",
+  lm_pinned_location:    "Emplacement épinglé",
+  lm_already_tagged:     "Déjà référencé à proximité",
+  lm_duplicate_hint:     "💡 Vérifiez la liste avant d'ajouter — vous taggez peut-être le même endroit.",
+  lm_name_label:         "Nom du point d'intérêt",
+  lm_name_ph:            "ex. Ikeja City Mall, Hôpital général…",
+  lm_category_label:     "Catégorie",
+  lm_saving:             "Enregistrement…",
+  lm_add_btn:            "Ajouter des équipements",
+  lm_save_changes:       "Enregistrer",
+  lm_other:              "Autre",
+  lm_delete_desc:        "Ce point d'intérêt sera supprimé de votre liste. Cette action est irréversible.",
+  lm_keep_btn:           "Conserver",
+  lm_remove_btn:         "Supprimer",
+  lm_edit_aria:          "Modifier le point d'intérêt",
+  lm_delete_aria:        "Supprimer le point d'intérêt",
+  lm_empty_title:        "Aucun équipement ajouté",
+  lm_empty_sub:          "Appuyez sur la carte pour épingler des écoles, hôpitaux, arrêts de transport, etc.",
+  lm_go_to_map:          "Aller à la carte",
+  lm_search_address_ph:  "Rechercher une adresse ou un quartier…",
+  lm_search_area_ph:     "Rechercher une zone…",
+  lm_next_step:          "Suivant : Ajouter des équipements",
+  lm_panel_title:        "Équipements proches",
+  lm_optional:           "Optionnel",
+  lm_panel_desc:         "Cliquez sur la carte pour épingler un point d'intérêt. Chaque épingle est partagée globalement.",
+  lm_back_btn:           "Retour",
+  lm_skip_btn:           "Passer",
+  lm_save_btn:           "Sauvegarder",
+  lm_done_btn:           "Terminer",
+  lm_mobile_list_title:  "Points d'intérêt proches",
+  lm_added_count:        "{n} ajouté(s)",
+  lm_mobile_list_hint:   "Utilisez ✏️ pour modifier ou 🗑 pour supprimer. Revenez à la carte pour en ajouter.",
+  lm_toggle_list:        "Liste ({n})",
+  lm_toggle_map:         "Carte",
+  lm_popup_add_title:    "Ajouter des équipements",
+  lm_popup_edit_title:   "Modifier le point d'intérêt",
+  lm_popup_delete_title: "Supprimer le point d'intérêt",
+  lm_err_name_required:  "Veuillez saisir un nom pour ce point d'intérêt.",
+  lm_err_save_failed:    "Échec de l'enregistrement. Veuillez réessayer.",
+  lm_err_update_failed:  "Échec de la mise à jour. Veuillez réessayer.",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1347,6 +1565,76 @@ const sw: Translations = {
   common_loading: "Inapakia…", common_error: "Kitu kilienda vibaya",
   common_retry: "Jaribu Tena", common_per_year: "/mwaka",
   common_per_month: "/mwezi", common_per_night: "/usiku",
+  map_snap_expand: "Panua ↑",
+  map_snap_more: "Onyesha zaidi ↑",
+  map_snap_collapse: "Punguza ↓",
+  map_centre_btn: "Rejea kwenye mali",
+  map_resize_panel: "Badilisha ukubwa",
+  map_tab_facilities: "Vituo vya Karibu",
+  map_tab_details: "Maelezo ya Mali",
+  map_no_facilities: "Hakuna vituo karibu",
+  map_no_facilities_sub: "Hakuna vituo vilivyoongezwa ndani ya km 2 ya mali hii.",
+  map_landmark_fallback: "Alama ya eneo",
+  map_nearby_label: "karibu",
+  map_verified_title: "Mahali imethibitishwa na jamii",
+  map_confirm_title: "Thibitisha alama hii",
+  map_verified_btn: "Imethibitishwa",
+  map_confirm_btn: "Thibitisha",
+  map_road_access: "Ufikiaji wa Barabara & Mazingira",
+  map_prop_features: "Vipengele vya Mali",
+  map_full_address: "Anwani Kamili",
+  map_gps: "Kuratibu za GPS",
+  map_open_google: "Fungua katika Google Maps",
+  img_upload_title: "Pakia Picha za Mali",
+  img_add_photo: "Ongeza Picha",
+  img_removed: "Picha imeondolewa",
+  img_remove_failed: "Imeshindwa kuondoa picha",
+  img_upload_success: "Picha imepakiwa",
+  img_upload_failed: "Kupakia picha kumeshindwa",
+
+  // Landmark modal
+  lm_step_location:      "Localisation",
+  lm_step_facilities:    "Équipements",
+  lm_new_pin:            "Nouvelle épingle",
+  lm_pinned_location:    "Emplacement épinglé",
+  lm_already_tagged:     "Déjà référencé à proximité",
+  lm_duplicate_hint:     "💡 Vérifiez la liste avant d'ajouter — vous taggez peut-être le même endroit.",
+  lm_name_label:         "Nom du point d'intérêt",
+  lm_name_ph:            "ex. Ikeja City Mall, Hôpital général…",
+  lm_category_label:     "Catégorie",
+  lm_saving:             "Enregistrement…",
+  lm_add_btn:            "Ajouter des équipements",
+  lm_save_changes:       "Enregistrer",
+  lm_other:              "Autre",
+  lm_delete_desc:        "Ce point d'intérêt sera supprimé de votre liste. Cette action est irréversible.",
+  lm_keep_btn:           "Conserver",
+  lm_remove_btn:         "Supprimer",
+  lm_edit_aria:          "Modifier le point d'intérêt",
+  lm_delete_aria:        "Supprimer le point d'intérêt",
+  lm_empty_title:        "Aucun équipement ajouté",
+  lm_empty_sub:          "Appuyez sur la carte pour épingler des écoles, hôpitaux, arrêts de transport, etc.",
+  lm_go_to_map:          "Aller à la carte",
+  lm_search_address_ph:  "Rechercher une adresse ou un quartier…",
+  lm_search_area_ph:     "Rechercher une zone…",
+  lm_next_step:          "Suivant : Ajouter des équipements",
+  lm_panel_title:        "Équipements proches",
+  lm_optional:           "Optionnel",
+  lm_panel_desc:         "Cliquez sur la carte pour épingler un point d'intérêt. Chaque épingle est partagée globalement.",
+  lm_back_btn:           "Retour",
+  lm_skip_btn:           "Passer",
+  lm_save_btn:           "Sauvegarder",
+  lm_done_btn:           "Terminer",
+  lm_mobile_list_title:  "Points d'intérêt proches",
+  lm_added_count:        "{n} ajouté(s)",
+  lm_mobile_list_hint:   "Utilisez ✏️ pour modifier ou 🗑 pour supprimer. Revenez à la carte pour en ajouter.",
+  lm_toggle_list:        "Liste ({n})",
+  lm_toggle_map:         "Carte",
+  lm_popup_add_title:    "Ajouter des équipements",
+  lm_popup_edit_title:   "Modifier le point d'intérêt",
+  lm_popup_delete_title: "Supprimer le point d'intérêt",
+  lm_err_name_required:  "Veuillez saisir un nom pour ce point d'intérêt.",
+  lm_err_save_failed:    "Échec de l'enregistrement. Veuillez réessayer.",
+  lm_err_update_failed:  "Échec de la mise à jour. Veuillez réessayer.",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

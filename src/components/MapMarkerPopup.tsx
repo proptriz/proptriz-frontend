@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { CURRENCY_SYMBOL, CurrencyEnum, PropertyType, TRANS_CATEGORIES } from "@/types/property";
 import formatPrice from "@/utils/formatPrice";
+import { translateCategoryOptions, translateNegotiableOptions, translateRenewalOptions } from "@/utils/translate";
 
 // ─── Star renderer (compact inline SVG) ──────────────────────────────────────
 
@@ -177,7 +178,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
               </span>
               {property.period && (
                 <span style={{ fontSize: 9, color: "#9ca3af", fontWeight: 500, flexShrink: 0 }}>
-                  /{property.period}
+                  / {translateRenewalOptions(property.period, t)}
                 </span>
               )}
             </div>
@@ -199,7 +200,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
                   textTransform:"uppercase",
                 }}
               >
-                {t("map_negotiable")}
+                {property.negotiable ? t("map_negotiable") : t("neg_fixed")}
               </span>
             )}
           </div>
@@ -273,7 +274,7 @@ const MapMarkerPopup = ({ property }: { property: PropertyType }) => {
             gap:         4,
           }}
         >
-          {catIcon} {property.category}
+          {catIcon} {translateCategoryOptions(property.category, t)}
         </span>
 
         {/* View Details CTA */}

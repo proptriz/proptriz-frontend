@@ -1,5 +1,7 @@
-import { CategoryEnum, CURRENCY_SYMBOL, CurrencyEnum } from "@/types/property";
+import { CategoryEnum, CURRENCY_SYMBOL, CurrencyEnum, ListForEnum, RenewalEnum } from "@/types/property";
 import formatPrice from "@/utils/formatPrice";
+import { translateCategoryOptions, translateListedForOptions, translateRenewalOptions } from "@/utils/translate";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -25,8 +27,8 @@ interface VerticalCardProps {
   price: number; // Price per month
   currency: CurrencyEnum;
   category: CategoryEnum; // Property type (e.g., "Apartment")
-  period: string;
-  listed_for: string;
+  period: RenewalEnum;
+  listed_for: ListForEnum;
   distance?: string;
   expired?: boolean
 }
@@ -47,6 +49,8 @@ export const VerticalCard = ({
   distance,
   expired,
 }: VerticalCardProps) => {
+  const { t } = useLanguage();
+
   const symbol    = CURRENCY_SYMBOL[currency as CurrencyEnum] ?? "";
   const distLabel = formatDistance(distance);
   const badgeStyle =
@@ -73,7 +77,7 @@ export const VerticalCard = ({
             className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1
                         rounded-[6px] border-[1.5px] leading-none ${badgeStyle}`}
           >
-            For {listed_for}
+            {translateListedForOptions(listed_for, t)}
           </span>
         )}
 
@@ -81,7 +85,7 @@ export const VerticalCard = ({
         {expired && (
           <span className="absolute top-2 right-2 bg-red-500 text-white text-[9px]
                            font-bold px-1.5 py-0.5 rounded-md leading-none">
-            Expired
+            {t("status_expired")}
           </span>
         )}
 
@@ -90,7 +94,7 @@ export const VerticalCard = ({
                         bg-black/55 backdrop-blur-[2px] text-white
                         text-[10px] font-medium px-2 py-1 rounded-md leading-none">
           <span className="text-[#f0a500]">★</span>
-          {rating} · {category}
+          {rating} · {translateCategoryOptions(category, t)}
         </div>
 
         {/* Bottom-right: distance */}
@@ -115,7 +119,7 @@ export const VerticalCard = ({
           </span>
           {period && (
             <span className="text-[10px] text-[#9ca3af] font-normal">
-              /{period}
+              / {translateRenewalOptions(period , t)}
             </span>
           )}
         </div>

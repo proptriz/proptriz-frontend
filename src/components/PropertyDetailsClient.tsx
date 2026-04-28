@@ -6,7 +6,7 @@ import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft, FaRegHeart, FaStar } from "react-icons/fa";
-import { PropertyStatusEnum, PropertyType } from "@/types/property";
+import { PropertyStatusEnum, PropertyType, RenewalEnum } from "@/types/property";
 import { ReviewType } from "@/types";
 import Link from "next/link";
 import { getCollocatedProperties } from "@/services/propertyApi";
@@ -415,7 +415,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                       listed_for={item.listed_for}
                       address={item.address}
                       image={item.banner}
-                      period={item.period ?? ""}
+                      period={item.period ?? RenewalEnum.yearly}
                       distance={item.distance ?? undefined}
                       rating={item.average_rating ?? 4.9}
                     />

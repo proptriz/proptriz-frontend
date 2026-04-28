@@ -6,7 +6,7 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import { getNearestProperties } from "@/services/propertyApi";
-import { CategoryEnum, PropertyFilterPayload, PropertyType} from "@/types/property";
+import { CategoryEnum, ListForEnum, PropertyFilterPayload, PropertyType, RenewalEnum} from "@/types/property";
 import Header from "@/components/shared/Header";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import Link from "next/link";
@@ -138,12 +138,12 @@ export default function Page() {
         className="px-5 pt-14 pb-5"
         style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 100%)" }}
       >
-        <p className="text-white/75 text-xs mb-1">Good day 👋</p>
+        <p className="text-white/75 text-xs mb-1">{t("home_good_day")}</p>
         <h2
           className="text-white text-[22px] font-extrabold leading-tight mb-4"
           style={{ fontFamily: "'Raleway', sans-serif" }}
         >
-          {t("home_greeting")}<br />perfect home
+          {t("home_subtitle")}
         </h2>
         <SearchBar
           value={draftQuery}
@@ -152,7 +152,7 @@ export default function Page() {
           onFilter={onFilter}
         />
       </div>
-
+    
       {/* ── Category tabs ───────────────────────────────────────────────── */}
       <div className="bg-white border-b border-[#e5e7eb] sticky top-0 z-30">
         <NavigationTabs onChange={setCategory} value={category} />
@@ -196,8 +196,8 @@ export default function Page() {
                           category={property.category}
                           address={property.address}
                           image={property.banner}
-                          period={property.period ?? ""}
-                          listed_for={property.listed_for ?? ""}
+                          period={property.period ?? RenewalEnum.yearly}
+                          listed_for={property.listed_for ?? ListForEnum.rent}
                           rating={property.average_rating ?? 4.9}
                           distance={property.distance ?? undefined}
                         />
@@ -213,7 +213,7 @@ export default function Page() {
 
             {showAll && !hasMore && !loading && (
               <p className="col-span-2 text-center text-sm text-[#9ca3af] py-4">
-                You've seen all properties
+                {t("home_seen_all")}
               </p>
             )}
           </div>
@@ -235,10 +235,10 @@ export default function Page() {
                     price={property.price}
                     currency={property.currency}
                     category={property.category}
-                    listed_for={property.listed_for}
+                    listed_for={property.listed_for ?? ListForEnum.rent}
                     address={property.address}
                     image={property.banner}
-                    period={property.period ?? ""}
+                    period={property.period ?? RenewalEnum.yearly}
                     rating={property.average_rating ?? 5.0}
                   />
                 </div>

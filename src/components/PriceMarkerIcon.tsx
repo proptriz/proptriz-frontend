@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL, CurrencyEnum } from "@/types/property";
 import L from "leaflet";
 
 // ─── Brand color system ───────────────────────────────────────────────────────
@@ -8,7 +9,7 @@ import L from "leaflet";
 
 type PriceMarkerOptions = {
   price:      number;
-  currency?:  string;      // e.g. "₦" "$" "£" "€"
+  currency?:  CurrencyEnum;      // e.g. "₦" "$" "£" "€"
   listedFor:  "rent" | "sale";
   isSelected?: boolean;
 };
@@ -48,12 +49,12 @@ function formatPrice(price: number): string {
 
 export function createPriceIcon({
   price,
-  currency   = "₦",
+  currency   = CurrencyEnum.ngn,
   listedFor,
   isSelected = false,
 }: PriceMarkerOptions): L.DivIcon {
   const c             = COLORS[listedFor];
-  const label         = currency + formatPrice(price);
+  const label         = CURRENCY_SYMBOL[currency] + formatPrice(price);
   const charCount     = label.length;
 
   // Dynamically size the pill so long labels never truncate

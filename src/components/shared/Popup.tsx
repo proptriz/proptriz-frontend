@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, ReactNode, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -45,6 +46,7 @@ export default function Popup({
   resetLabel = "Reset",
   children,
 }: PopupProps) {
+  const { t } = useLanguage();
   // Portal mount guard — createPortal needs the DOM to exist (SSR safe)
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -187,7 +189,7 @@ export default function Popup({
                     "
                   >
                     <span className="text-sm leading-none">↺</span>
-                    {resetLabel}
+                    {t("filter_reset")}
                   </button>
                 )}
 

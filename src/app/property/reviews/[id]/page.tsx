@@ -3,7 +3,7 @@
 import React, { use, useEffect, useState } from "react";
 import { ReviewCard } from "@/components/shared/Cards";
 import HorizontalCard from "@/components/shared/HorizontalCard";
-import { PropertyType } from "@/types/property";
+import { PropertyType, RenewalEnum } from "@/types/property";
 import { ReviewType } from "@/types";
 import Popup from "@/components/shared/Popup";
 import ReplyReview from "@/components/ReplyReview";
@@ -155,7 +155,7 @@ const PropertyReviews = ({
                     listed_for={property.listed_for}
                     address={property.address}
                     image={property.banner}
-                    period={property.period ?? "monthly"}
+                    period={property.period ?? RenewalEnum.yearly}
                     rating={property.average_rating ?? 4.5}
                   />
                 </div>

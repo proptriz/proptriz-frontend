@@ -59,8 +59,8 @@ export interface Translations {
   map_my_location:      string;
 
   // ── Search bar ──────────────────────────────────────────────────────────────
-  search_bar_filter:    string;   // "Filter" pill in search bar
-  search_filter_header: string;   // "Filter Properties" popup header
+  search_bar_filter:    string;
+  search_filter_header: string;
 
   // ── Filter panel ────────────────────────────────────────────────────────────
   filter_location:      string;
@@ -81,51 +81,51 @@ export interface Translations {
   filter_keywords_hint: string;
   filter_reset:         string;
   filter_apply:         string;
-  filter_show_results:  string;   // "{n} results"
-  filter_pill:          string;   // same as search_bar_filter, kept for backwards compat
-  filter_header:        string;   // same as search_filter_header
+  filter_show_results:  string;
+  filter_pill:          string;
+  filter_header:        string;
   filter_all:           string;
   filter_rent:          string;
   filter_sale:          string;
 
   // ── Add Property wizard ─────────────────────────────────────────────────────
-  add_title:              string;   // "Add Property"
-  add_subtitle:           string;   // "Hi {name}, let's list your space"
-  add_ai_title:           string;   // "List with AI"
-  add_ai_subtitle:        string;   // "Describe your property — AI fills the form"
-  add_ai_entry:           string;   // pill button label
-  add_ai_filled:          string;   // "✨ AI filled your listing"
-  add_ai_filled_sub:      string;   // "Review the details below…"
-  add_step_basics:        string;   // "Basics"
-  add_step_details:       string;   // "Details"
-  add_step_preview:       string;   // "Preview"
-  add_step_ai:            string;   // "AI" (step progress label)
-  add_cta_next:           string;   // "Add Photos & Details →"
-  add_cta_preview:        string;   // "Preview Listing →"
-  add_cta_publish:        string;   // "Publish Property 🎉"
-  add_cta_creating:       string;   // "Creating listing…"
-  add_cta_uploading:      string;   // "Uploading photo {cur} of {total}…"
-  add_cta_published:      string;   // "Published! ✨"
-  add_banner_creating:    string;   // "Creating your listing…"
-  add_banner_creating_sub: string;  // "Saving title, price & location — this is fast"
-  add_banner_uploading:   string;   // "Uploading photo {cur} of {total}"
-  add_banner_uploading_sub: string; // "Photos compressed & sent one by one…"
-  add_val_title:          string;   // validation: no title
-  add_val_price:          string;   // validation: no price
-  add_val_address:        string;   // validation: no address
-  add_val_photos:         string;   // validation: no photos
-  add_val_login:          string;   // "Please login to list a property."
-  add_toast_pinned:       string;   // "Location pinned: (…)"
-  add_toast_listed:       string;   // "Property successfully listed! 🎉"
-  add_toast_listed_photos: string;  // "Property listed with all photos! 🎉"
-  add_toast_photos_warn:  string;   // "{s} uploaded. {f} failed…"
-  add_toast_failed:       string;   // "Failed to create property."
+  add_title:              string;
+  add_subtitle:           string;
+  add_ai_title:           string;
+  add_ai_subtitle:        string;
+  add_ai_entry:           string;
+  add_ai_filled:          string;
+  add_ai_filled_sub:      string;
+  add_step_basics:        string;
+  add_step_details:       string;
+  add_step_preview:       string;
+  add_step_ai:            string;
+  add_cta_next:           string;
+  add_cta_preview:        string;
+  add_cta_publish:        string;
+  add_cta_creating:       string;
+  add_cta_uploading:      string;
+  add_cta_published:      string;
+  add_banner_creating:    string;
+  add_banner_creating_sub: string;
+  add_banner_uploading:   string;
+  add_banner_uploading_sub: string;
+  add_val_title:          string;
+  add_val_price:          string;
+  add_val_address:        string;
+  add_val_photos:         string;
+  add_val_login:          string;
+  add_toast_pinned:       string;
+  add_toast_listed:       string;
+  add_toast_listed_photos: string;
+  add_toast_photos_warn:  string;
+  add_toast_failed:       string;
 
   // ── Add Property — Step 1 ───────────────────────────────────────────────────
-  s1_prop_type:         string;   // section title
-  s1_prop_title:        string;   // section title
-  s1_prop_title_ph:     string;   // placeholder
-  s1_pricing:           string;   // section title
+  s1_prop_type:         string;
+  s1_prop_title:        string;
+  s1_prop_title_ph:     string;
+  s1_pricing:           string;
   s1_listed_for:        string;
   s1_for_rent:          string;
   s1_for_sale:          string;
@@ -136,30 +136,30 @@ export interface Translations {
   s1_period_weekly:     string;
   s1_period_monthly:    string;
   s1_period_yearly:     string;
-  s1_negotiable:        string;   // "✅ Negotiable"
-  s1_fixed_price:       string;   // "🔒 Fixed Price"
-  s1_negotiable_sub:    string;   // "Buyers can propose…"
-  s1_fixed_sub:         string;   // "The listed price is final"
-  s1_duration:          string;   // section title
-  s1_duration_label:    string;   // "Duration"
-  s1_duration_suffix:   string;   // "weeks"
-  s1_location:          string;   // section title
-  s1_location_ph:       string;   // "Street address, area, city…"
+  s1_negotiable:        string;
+  s1_fixed_price:       string;
+  s1_negotiable_sub:    string;
+  s1_fixed_sub:         string;
+  s1_duration:          string;
+  s1_duration_label:    string;
+  s1_duration_suffix:   string;
+  s1_location:          string;
+  s1_location_ph:       string;
 
   // ── Add Property — Step 2 ───────────────────────────────────────────────────
-  s2_photos:            string;   // "Property Photos"
+  s2_photos:            string;
   s2_photos_sub:        string;
-  s2_photos_tip:        string;   // "Properties with photos get 3× more views"
-  s2_status:            string;   // "Listing Status"
+  s2_photos_tip:        string;
+  s2_status:            string;
   s2_status_available:  string;
   s2_status_rented:     string;
   s2_status_unavail:    string;
   s2_description:       string;
   s2_description_ph:    string;
-  s2_features:          string;   // "Features & Facilities"
+  s2_features:          string;
   s2_features_sub:      string;
-  s2_custom_ph:         string;   // "Custom feature or facility…"
-  s2_add_custom:        string;   // "Add Custom Feature"
+  s2_custom_ph:         string;
+  s2_add_custom:        string;
 
   // ── Add Property — Step 3 (Preview) ─────────────────────────────────────────
   s3_photos:            string;
@@ -170,58 +170,58 @@ export interface Translations {
   s3_description:       string;
   s3_description_ph:    string;
   s3_features:          string;
-  s3_features_sub:      string;   // "Tap × to remove…"
+  s3_features_sub:      string;
   s3_duration:          string;
   s3_duration_sub:      string;
   s3_status:            string;
   s3_negotiable:        string;
 
-  // ── AI Extraction (ListWithAI + ExtractionModal) ─────────────────────────────
-  ai_describe:          string;   // section title
+  // ── AI Extraction ────────────────────────────────────────────────────────────
+  ai_describe:          string;
   ai_describe_sub:      string;
-  ai_describe_ph:       string;   // textarea placeholder
-  ai_chars:             string;   // "{n} chars"
-  ai_chars_good:        string;   // "· ✓ good"
-  ai_photos:            string;   // "Property Photos (Optional)"
+  ai_describe_ph:       string;
+  ai_chars:             string;
+  ai_chars_good:        string;
+  ai_photos:            string;
   ai_photos_sub:        string;
-  ai_location:          string;   // "Property Location (Optional)"
+  ai_location:          string;
   ai_location_sub:      string;
-  ai_location_ph:       string;   // address input placeholder
-  ai_tips_title:        string;   // "Tips for best results"
+  ai_location_ph:       string;
+  ai_tips_title:        string;
   ai_tip_1:             string;
   ai_tip_2:             string;
   ai_tip_3:             string;
   ai_tip_4:             string;
-  ai_extract_btn:       string;   // "✨ Extract Information"
-  ai_extracting:        string;   // "Extracting…"
-  ai_how_describe:      string;   // step label
+  ai_extract_btn:       string;
+  ai_extracting:        string;
+  ai_how_describe:      string;
   ai_how_photos:        string;
   ai_how_location:      string;
   ai_how_extract:       string;
-  ai_progress:          string;   // "Extracting property details…"
-  ai_powered_by:        string;   // "Powered by Llama 3 · usually 15–30 seconds"
-  ai_err_empty:         string;   // "Please describe the property…"
+  ai_progress:          string;
+  ai_powered_by:        string;
+  ai_err_empty:         string;
 
   // ── ExtractionModal ──────────────────────────────────────────────────────────
-  extr_title:           string;   // "Analysing Your Property"
-  extr_subtitle:        string;   // "Hang tight — AI is filling your listing form…"
-  extr_done_title:      string;   // "Details Extracted! ✨"
-  extr_done_sub:        string;   // "Review and edit the details before publishing."
-  extr_err_title:       string;   // "Extraction Failed"
-  extr_geocoding:       string;   // step label
+  extr_title:           string;
+  extr_subtitle:        string;
+  extr_done_title:      string;
+  extr_done_sub:        string;
+  extr_err_title:       string;
+  extr_geocoding:       string;
   extr_geocoding_sub:   string;
-  extr_extracting:      string;   // step label
+  extr_extracting:      string;
   extr_extracting_sub:  string;
-  extr_done:            string;   // step label "Done!"
+  extr_done:            string;
   extr_done_step_sub:   string;
-  extr_complete:        string;   // "Complete" — completed step sub-label
-  extr_cancel:          string;   // "Cancel extraction"
-  extr_retry:           string;   // "↺ Try Again"
-  extr_cancel_btn:      string;   // "Cancel" (error state)
+  extr_complete:        string;
+  extr_cancel:          string;
+  extr_retry:           string;
+  extr_cancel_btn:      string;
 
   // ── PublishSuccessModal ──────────────────────────────────────────────────────
-  pub_title:            string;   // "Property Published! 🎉"
-  pub_subtitle:         string;   // "Your property is now live…"
+  pub_title:            string;
+  pub_subtitle:         string;
   pub_list_another:     string;
   pub_list_another_sub: string;
   pub_view_listing:     string;
@@ -230,23 +230,23 @@ export interface Translations {
   pub_go_profile_sub:   string;
   pub_go_home:          string;
   pub_go_home_sub:      string;
-  pub_listed_on:        string;   // "Listed on"
+  pub_listed_on:        string;
 
   // ── Edit Profile ─────────────────────────────────────────────────────────────
-  ep_title:             string;   // "Edit Profile"
-  ep_identity:          string;   // section label
-  ep_full_name:         string;   // field label
+  ep_title:             string;
+  ep_identity:          string;
+  ep_full_name:         string;
   ep_full_name_ph:      string;
   ep_account_type:      string;
-  ep_contact:           string;   // section label "Contact Details"
+  ep_contact:           string;
   ep_email:             string;
   ep_email_ph:          string;
   ep_phone:             string;
   ep_whatsapp:          string;
   ep_whatsapp_ph:       string;
-  ep_save:              string;   // "✓ Save Changes"
-  ep_saving:            string;   // "Updating…"
-  ep_privacy:           string;   // footnote
+  ep_save:              string;
+  ep_saving:            string;
+  ep_privacy:           string;
   ep_photo_invalid:     string;
   ep_photo_large:       string;
   ep_photo_selected:    string;
@@ -260,7 +260,7 @@ export interface Translations {
   ep_type_company_desc: string;
 
   // ── Edit Property ────────────────────────────────────────────────────────────
-  edt_title:            string;   // "Edit Property"
+  edt_title:            string;
   edt_loading:          string;
   edt_error:            string;
   edt_go_back:          string;
@@ -297,7 +297,7 @@ export interface Translations {
   edt_danger_desc:      string;
   edt_delete_btn:       string;
   edt_delete_title:     string;
-  edt_delete_desc:      string;   // "{title} will be permanently removed…"
+  edt_delete_desc:      string;
   edt_delete_confirm:   string;
   edt_delete_loading:   string;
   edt_updated:          string;
@@ -327,7 +327,7 @@ export interface Translations {
   rev_reply_error:      string;
   rev_replies_header:   string;
   rev_write_header:     string;
-  rev_owner:            string;   // fallback sender name
+  rev_owner:            string;
 
   // ── Splash / Login ───────────────────────────────────────────────────────────
   splash_checking:      string;
@@ -400,18 +400,17 @@ export interface Translations {
   detail_review_single: string;
   detail_review_plural: string;
 
-
   // ── Currency names ──────────────────────────────────────────────────────────
-  cur_ngn:              string;   // "Nigerian Naira (₦)"
-  cur_usd:              string;   // "US Dollar ($)"
-  cur_kes:              string;   // "Kenyan Shilling (KSh)"
-  cur_cfa:              string;   // "CFA Franc (FCFA)"
-  cur_cda:              string;   // "CDA"
-  cur_pi:               string;   // "Pi Network (Pi)"
+  cur_ngn:              string;
+  cur_usd:              string;
+  cur_kes:              string;
+  cur_cfa:              string;
+  cur_cda:              string;
+  cur_pi:               string;
 
-  // ── ListFor standalone (maps, popups, cards) ─────────────────────────────────
-  list_for_rent:        string;   // "For Rent"
-  list_for_sale:        string;   // "For Sale"
+  // ── ListFor standalone ────────────────────────────────────────────────────────
+  list_for_rent:        string;
+  list_for_sale:        string;
 
   // ── Property status standalone ───────────────────────────────────────────────
   status_available:     string;
@@ -421,38 +420,39 @@ export interface Translations {
   status_expired:       string;
 
   // ── Negotiable standalone ────────────────────────────────────────────────────
-  neg_negotiable:       string;   // "Negotiable"
-  neg_fixed:            string;   // "Fixed Price"
+  neg_negotiable:       string;
+  neg_fixed:            string;
 
   // ── Map marker popup ─────────────────────────────────────────────────────────
-  map_view:             string;   // "View" CTA button in popup
-  map_negotiable:       string;   // "Negotiable" tag on price
+  map_view:             string;
+  map_negotiable:       string;
 
   // ── Sticky agent bar ─────────────────────────────────────────────────────────
-  agent_owner:          string;   // "Property Owner"
-  agent_agent:          string;   // "Property Agent"
-  agent_company:        string;   // "Real Estate Company"
-  agent_call:           string;   // aria-label "Call"
-  agent_email:          string;   // aria-label "Email"
-  agent_whatsapp:       string;   // aria-label "WhatsApp"
-  agent_chat:           string;   // "Chat" button label
+  agent_owner:          string;
+  agent_agent:          string;
+  agent_company:        string;
+  agent_call:           string;
+  agent_email:          string;
+  agent_whatsapp:       string;
+  agent_chat:           string;
 
-  // ── Step 3 Listing Summary (simplified preview) ──────────────────────────────
-  s3_sum_header:        string;   // "Listing Summary"
-  s3_sum_title:         string;   // "Title"
-  s3_sum_category:      string;   // "Category"
-  s3_sum_price:         string;   // "Price"
-  s3_sum_listed_for:    string;   // "Listed For"
-  s3_sum_period:        string;   // "Period"
-  s3_sum_status:        string;   // "Status"
-  s3_sum_duration:      string;   // "Duration"
-  s3_sum_weeks:         string;   // "{n} weeks"
-  s3_sum_negotiable:    string;   // "Negotiable"
-  s3_sum_yes:           string;   // "✅ Yes"
-  s3_sum_no:            string;   // "🔒 No"
-  s3_sum_features:      string;   // "Features"
-  s3_sum_description:   string;   // "Description"
-  s3_location:          string;   // "Location" (section title in summary Step3)
+  // ── Step 3 Listing Summary ────────────────────────────────────────────────────
+  s3_sum_header:        string;
+  s3_sum_title:         string;
+  s3_sum_category:      string;
+  s3_sum_price:         string;
+  s3_sum_listed_for:    string;
+  s3_sum_period:        string;
+  s3_sum_status:        string;
+  s3_sum_duration:      string;
+  s3_sum_weeks:         string;
+  s3_sum_negotiable:    string;
+  s3_sum_yes:           string;
+  s3_sum_no:            string;
+  s3_sum_features:      string;
+  s3_sum_description:   string;
+  s3_location:          string;
+
   // ── Common ──────────────────────────────────────────────────────────────────
   common_save:          string;
   common_cancel:        string;
@@ -465,78 +465,186 @@ export interface Translations {
   common_per_night:     string;
 
   // ── Property Map page ────────────────────────────────────────────────────────
-  map_snap_expand:      string;  // "Expand ↑"
-  map_snap_more:        string;  // "Show more ↑"
-  map_snap_collapse:    string;  // "Collapse ↓"
-  map_centre_btn:       string;  // "Centre on property"
-  map_resize_panel:     string;  // "Resize panel"
-  map_tab_facilities:   string;  // "Nearby Facilities"
-  map_tab_details:      string;  // "Property Details"
-  map_no_facilities:    string;  // "No facilities nearby"
-  map_no_facilities_sub: string; // "No facilities have been added within 2 km…"
-  map_landmark_fallback: string; // "Landmark"
-  map_nearby_label:     string;  // "nearby"
-  map_verified_title:   string;  // "Location verified by community"
-  map_confirm_title:    string;  // "Confirm this landmark"
-  map_verified_btn:     string;  // "Verified"
-  map_confirm_btn:      string;  // "Confirm"
-  map_road_access:      string;  // "Road Access & Environment"
-  map_prop_features:    string;  // "Property Features"
-  map_full_address:     string;  // "Full Address"
-  map_gps:              string;  // "GPS Coordinates"
-  map_open_google:      string;  // "Open in Google Maps"
+  map_snap_expand:       string;
+  map_snap_more:         string;
+  map_snap_collapse:     string;
+  map_centre_btn:        string;
+  map_resize_panel:      string;
+  map_tab_facilities:    string;
+  map_tab_details:       string;
+  map_no_facilities:     string;
+  map_no_facilities_sub: string;
+  map_landmark_fallback: string;
+  map_nearby_label:      string;
+  map_verified_title:    string;
+  map_confirm_title:     string;
+  map_verified_btn:      string;
+  map_confirm_btn:       string;
+  map_road_access:       string;
+  map_prop_features:     string;
+  map_full_address:      string;
+  map_gps:               string;
+  map_open_google:       string;
 
   // ── Image Manager ────────────────────────────────────────────────────────────
-  img_upload_title:     string;  // "Upload Property Images"
-  img_add_photo:        string;  // "Add Photo"
-  img_removed:          string;  // "Image removed"
-  img_remove_failed:    string;  // "Failed to remove image"
-  img_upload_success:   string;  // "Image uploaded successfully"
-  img_upload_failed:    string;  // "Failed to upload image"
+  img_upload_title:     string;
+  img_add_photo:        string;
+  img_removed:          string;
+  img_remove_failed:    string;
+  img_upload_success:   string;
+  img_upload_failed:    string;
 
   // ── Property Location Modal (landmark picker) ────────────────────────────────
-  lm_step_location:       string;  // Step 1 label "Location"
-  lm_step_facilities:     string;  // Step 2 label "Facilities"
-  lm_new_pin:             string;  // Fallback chip label "New Pin"
-  lm_pinned_location:     string;  // Chip subtitle "Pinned location"
-  lm_already_tagged:      string;  // Search results header "Already tagged nearby"
-  lm_duplicate_hint:      string;  // "💡 Check the list before adding…"
-  lm_name_label:          string;  // Form field label "Landmark name"
-  lm_name_ph:             string;  // Field placeholder
-  lm_category_label:      string;  // "Category"
-  lm_saving:              string;  // Submit button busy state "Saving…"
-  lm_add_btn:             string;  // "Add Nearby Facilities"
-  lm_save_changes:        string;  // "Save Changes"
-  lm_other:               string;  // Fallback category label "Other"
-  lm_delete_desc:         string;  // "This landmark will be removed…"
-  lm_keep_btn:            string;  // "Keep It"
-  lm_remove_btn:          string;  // "Remove"
-  lm_edit_aria:           string;  // aria-label for edit icon button
-  lm_delete_aria:         string;  // aria-label for delete icon button
-  lm_empty_title:         string;  // "No facilities added yet"
-  lm_empty_sub:           string;  // "Tap the map to pin…"
-  lm_go_to_map:           string;  // "Go to Map"
-  lm_search_address_ph:   string;  // "Search address or area…"
-  lm_search_area_ph:      string;  // "Search area…"
-  lm_next_step:           string;  // "Next: Add Nearby Facilities"
-  lm_panel_title:         string;  // Desktop panel heading "Nearby Facilities"
-  lm_optional:            string;  // "Optional" badge
-  lm_panel_desc:          string;  // Desktop panel subtitle
-  lm_back_btn:            string;  // "Back"
-  lm_skip_btn:            string;  // "Skip"
-  lm_save_btn:            string;  // "Save" (prefix before count)
-  lm_done_btn:            string;  // "Done"
-  lm_mobile_list_title:   string;  // Mobile list heading "Nearby Landmarks"
-  lm_added_count:         string;  // "{n} added" badge
-  lm_mobile_list_hint:    string;  // "Use ✏️ to edit or 🗑 to remove…"
-  lm_toggle_list:         string;  // "List ({n})" toggle button
-  lm_toggle_map:          string;  // "Map" toggle button
-  lm_popup_add_title:     string;  // Popup header "Add Nearby Facilities"
-  lm_popup_edit_title:    string;  // Popup header "Edit Landmark"
-  lm_popup_delete_title:  string;  // Popup header "Remove Landmark"
-  lm_err_name_required:   string;  // "Please enter a name for this landmark."
-  lm_err_save_failed:     string;  // "Failed to save landmark. Please try again."
-  lm_err_update_failed:   string;  // "Failed to update landmark. Please try again."
+  lm_step_location:      string;
+  lm_step_facilities:    string;
+  lm_new_pin:            string;
+  lm_pinned_location:    string;
+  lm_already_tagged:     string;
+  lm_duplicate_hint:     string;
+  lm_name_label:         string;
+  lm_name_ph:            string;
+  lm_category_label:     string;
+  lm_saving:             string;
+  lm_add_btn:            string;
+  lm_save_changes:       string;
+  lm_other:              string;
+  lm_delete_desc:        string;
+  lm_keep_btn:           string;
+  lm_remove_btn:         string;
+  lm_edit_aria:          string;
+  lm_delete_aria:        string;
+  lm_empty_title:        string;
+  lm_empty_sub:          string;
+  lm_go_to_map:          string;
+  lm_search_address_ph:  string;
+  lm_search_area_ph:     string;
+  lm_next_step:          string;
+  lm_panel_title:        string;
+  lm_optional:           string;
+  lm_panel_desc:         string;
+  lm_back_btn:           string;
+  lm_skip_btn:           string;
+  lm_save_btn:           string;
+  lm_done_btn:           string;
+  lm_mobile_list_title:  string;
+  lm_added_count:        string;
+  lm_mobile_list_hint:   string;
+  lm_toggle_list:        string;
+  lm_toggle_map:         string;
+  lm_popup_add_title:    string;
+  lm_popup_edit_title:   string;
+  lm_popup_delete_title: string;
+  lm_err_name_required:  string;
+  lm_err_save_failed:    string;
+  lm_err_update_failed:  string;
+
+  // ── Map Preview widget ────────────────────────────────────────────────────────
+  map_preview_tap_hint:  string;  // "Tap to pick your property location"
+  map_preview_change:    string;  // "Change"
+  map_preview_pick:      string;  // "Pick Location"
+  map_preview_no_address: string; // "No address typed yet"
+  map_preview_no_coords: string;  // "Coordinates not set"
+  map_preview_open:      string;  // "Open Map →"
+
+  // ── FAQ & Support ────────────────────────────────────────────────────────────
+  faq_title_bold:        string;  // "FAQ"
+  faq_title_light:       string;  // "& Support"
+  faq_subtitle:          string;  // "Find answer to your problem using this app."
+  faq_visit_website:     string;  // "Visit our website"
+  faq_email_us:          string;  // "Email us"
+  faq_privacy:           string;  // "Privacy policy"
+  faq_terms:             string;  // "Terms of service"
+  faq_tab_buyer:         string;  // "Buyer"
+  faq_tab_agent:         string;  // "Estate Agent"
+  // Buyer FAQ
+  faq_b_q1:             string;
+  faq_b_a1:             string;
+  faq_b_q2:             string;
+  faq_b_a2:             string;
+  // Agent FAQ
+  faq_a_q1:             string;
+  faq_a_a1:             string;
+  faq_a_q2:             string;
+  faq_a_a2:             string;
+
+  // ── Terms of Service page ────────────────────────────────────────────────────
+  terms_screen_title:    string;  // ScreenName title
+  terms_main_title:      string;  // h1
+  terms_last_updated:    string;  // "Last Updated: 16/02/2026"
+  terms_email_label:     string;  // "Email Address" / "Email"
+  terms_s1_title:        string;
+  terms_s1_body:         string;
+  terms_s2_title:        string;
+  terms_s2_body:         string;
+  terms_s3_title:        string;
+  terms_s3_body:         string;
+  terms_s4_title:        string;
+  terms_s4_li1:          string;
+  terms_s4_li2:          string;
+  terms_s4_li3:          string;
+  terms_s4_li4:          string;
+  terms_s5_title:        string;
+  terms_s5_body:         string;
+  terms_s6_title:        string;
+  terms_s6_body:         string;
+  terms_s7_title:        string;
+  terms_s7_body:         string;
+  terms_s8_title:        string;
+  terms_s8_body:         string;
+  terms_s9_title:        string;
+  terms_s9_body:         string;
+  terms_s10_title:       string;
+  terms_s10_body:        string;
+  terms_s11_title:       string;
+
+  // ── Privacy Policy page ──────────────────────────────────────────────────────
+  privacy_screen_title:       string;
+  privacy_main_title:         string;
+  privacy_s1_title:           string;
+  privacy_s1_body1:           string;
+  privacy_s1_body2:           string;
+  privacy_s2_title:           string;
+  privacy_s2_li1:             string;
+  privacy_s2_li2:             string;
+  privacy_s2_li3:             string;
+  privacy_s2_li4:             string;
+  privacy_s3_title:           string;
+  privacy_s3_h_account:       string;
+  privacy_s3_account_li1:     string;
+  privacy_s3_account_li2:     string;
+  privacy_s3_account_li3:     string;
+  privacy_s3_account_li4:     string;
+  privacy_s3_h_listing:       string;
+  privacy_s3_listing_li1:     string;
+  privacy_s3_listing_li2:     string;
+  privacy_s3_listing_li3:     string;
+  privacy_s3_h_tech:          string;
+  privacy_s3_tech_li1:        string;
+  privacy_s3_tech_li2:        string;
+  privacy_s3_tech_li3:        string;
+  privacy_s4_title:           string;
+  privacy_s4_li1:             string;
+  privacy_s4_li2:             string;
+  privacy_s4_li3:             string;
+  privacy_s4_li4:             string;
+  privacy_s4_li5:             string;
+  privacy_s5_title:           string;
+  privacy_s5_intro:           string;
+  privacy_s5_li1:             string;
+  privacy_s5_li2:             string;
+  privacy_s5_li3:             string;
+  privacy_s5_li4:             string;
+  privacy_s6_title:           string;
+  privacy_s6_body:            string;
+  privacy_s7_title:           string;
+  privacy_s7_li1:             string;
+  privacy_s7_li2:             string;
+  privacy_s7_li3:             string;
+  privacy_s7_li4:             string;
+  privacy_s7_li5:             string;
+  privacy_s8_title:           string;
+  privacy_s8_body:            string;
+  privacy_s9_title:           string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -790,7 +898,6 @@ const en: Translations = {
   detail_nearby: "Nearby Properties", detail_wishlist: "Save to wishlist",
   detail_review_single: "review", detail_review_plural: "reviews",
 
-
   cur_ngn: "Nigerian Naira (₦)", cur_usd: "US Dollar ($)",
   cur_kes: "Kenyan Shilling (KSh)", cur_cfa: "CFA Franc (FCFA)",
   cur_cda: "CDA", cur_pi: "Pi Network (Pi)",
@@ -825,78 +932,143 @@ const en: Translations = {
   common_retry: "Try Again", common_per_year: "/yr",
   common_per_month: "/mo", common_per_night: "/night",
 
-  // Map page
-map_snap_expand: "Expand ↑",
-map_snap_more: "Show more ↑",
-map_snap_collapse: "Collapse ↓",
-map_centre_btn: "Centre on property",
-map_resize_panel: "Resize panel",
-map_tab_facilities: "Nearby Facilities",
-map_tab_details: "Property Details",
-map_no_facilities: "No facilities nearby",
-map_no_facilities_sub: "No facilities have been added within 2 km of this property yet.",
-map_landmark_fallback: "Landmark",
-map_nearby_label: "nearby",
-map_verified_title: "Location verified by community",
-map_confirm_title: "Confirm this landmark",
-map_verified_btn: "Verified",
-map_confirm_btn: "Confirm",
-map_road_access: "Road Access & Environment",
-map_prop_features: "Property Features",
-map_full_address: "Full Address",
-map_gps: "GPS Coordinates",
-map_open_google: "Open in Google Maps",
-// Image Manager
-img_upload_title: "Upload Property Images",
-img_add_photo: "Add Photo",
-img_removed: "Image removed",
-img_remove_failed: "Failed to remove image",
-img_upload_success: "Image uploaded successfully",
-img_upload_failed: "Failed to upload image",
+  map_snap_expand: "Expand ↑", map_snap_more: "Show more ↑", map_snap_collapse: "Collapse ↓",
+  map_centre_btn: "Centre on property", map_resize_panel: "Resize panel",
+  map_tab_facilities: "Nearby Facilities", map_tab_details: "Property Details",
+  map_no_facilities: "No facilities nearby",
+  map_no_facilities_sub: "No facilities have been added within 2 km of this property yet.",
+  map_landmark_fallback: "Landmark", map_nearby_label: "nearby",
+  map_verified_title: "Location verified by community", map_confirm_title: "Confirm this landmark",
+  map_verified_btn: "Verified", map_confirm_btn: "Confirm",
+  map_road_access: "Road Access & Environment", map_prop_features: "Property Features",
+  map_full_address: "Full Address", map_gps: "GPS Coordinates",
+  map_open_google: "Open in Google Maps",
 
-// Landmark modal
-  lm_step_location:      "Location",
-  lm_step_facilities:    "Facilities",
-  lm_new_pin:            "New Pin",
-  lm_pinned_location:    "Pinned location",
-  lm_already_tagged:     "Already tagged nearby",
-  lm_duplicate_hint:     "💡 Check the list before adding — you may be tagging the same place.",
-  lm_name_label:         "Landmark name",
-  lm_name_ph:            "e.g. Ikeja City Mall, General Hospital…",
-  lm_category_label:     "Category",
-  lm_saving:             "Saving…",
-  lm_add_btn:            "Add Nearby Facilities",
-  lm_save_changes:       "Save Changes",
-  lm_other:              "Other",
-  lm_delete_desc:        "This landmark will be removed from your list. This cannot be undone.",
-  lm_keep_btn:           "Keep It",
-  lm_remove_btn:         "Remove",
-  lm_edit_aria:          "Edit landmark",
-  lm_delete_aria:        "Delete landmark",
-  lm_empty_title:        "No facilities added yet",
-  lm_empty_sub:          "Tap the map to pin nearby schools, hospitals, transport stops, and more.",
-  lm_go_to_map:          "Go to Map",
-  lm_search_address_ph:  "Search address or area…",
-  lm_search_area_ph:     "Search area…",
-  lm_next_step:          "Next: Add Nearby Facilities",
-  lm_panel_title:        "Nearby Facilities",
-  lm_optional:           "Optional",
-  lm_panel_desc:         "Click the map to pin a landmark. Each pin is saved globally — anyone can discover it.",
-  lm_back_btn:           "Back",
-  lm_skip_btn:           "Skip",
-  lm_save_btn:           "Save",
-  lm_done_btn:           "Done",
-  lm_mobile_list_title:  "Nearby Landmarks",
-  lm_added_count:        "{n} added",
-  lm_mobile_list_hint:   "Use ✏️ to edit or 🗑 to remove. Switch to Map to add more.",
-  lm_toggle_list:        "List ({n})",
-  lm_toggle_map:         "Map",
-  lm_popup_add_title:    "Add Nearby Facilities",
-  lm_popup_edit_title:   "Edit Landmark",
+  img_upload_title: "Upload Property Images", img_add_photo: "Add Photo",
+  img_removed: "Image removed", img_remove_failed: "Failed to remove image",
+  img_upload_success: "Image uploaded successfully", img_upload_failed: "Failed to upload image",
+
+  lm_step_location: "Location", lm_step_facilities: "Facilities",
+  lm_new_pin: "New Pin", lm_pinned_location: "Pinned location",
+  lm_already_tagged: "Already tagged nearby",
+  lm_duplicate_hint: "💡 Check the list before adding — you may be tagging the same place.",
+  lm_name_label: "Landmark name", lm_name_ph: "e.g. Ikeja City Mall, General Hospital…",
+  lm_category_label: "Category", lm_saving: "Saving…",
+  lm_add_btn: "Add Nearby Facilities", lm_save_changes: "Save Changes",
+  lm_other: "Other",
+  lm_delete_desc: "This landmark will be removed from your list. This cannot be undone.",
+  lm_keep_btn: "Keep It", lm_remove_btn: "Remove",
+  lm_edit_aria: "Edit landmark", lm_delete_aria: "Delete landmark",
+  lm_empty_title: "No facilities added yet",
+  lm_empty_sub: "Tap the map to pin nearby schools, hospitals, transport stops, and more.",
+  lm_go_to_map: "Go to Map",
+  lm_search_address_ph: "Search address or area…", lm_search_area_ph: "Search area…",
+  lm_next_step: "Next: Add Nearby Facilities",
+  lm_panel_title: "Nearby Facilities", lm_optional: "Optional",
+  lm_panel_desc: "Click the map to pin a landmark. Each pin is saved globally — anyone can discover it.",
+  lm_back_btn: "Back", lm_skip_btn: "Skip", lm_save_btn: "Save", lm_done_btn: "Done",
+  lm_mobile_list_title: "Nearby Landmarks", lm_added_count: "{n} added",
+  lm_mobile_list_hint: "Use ✏️ to edit or 🗑 to remove. Switch to Map to add more.",
+  lm_toggle_list: "List ({n})", lm_toggle_map: "Map",
+  lm_popup_add_title: "Add Nearby Facilities", lm_popup_edit_title: "Edit Landmark",
   lm_popup_delete_title: "Remove Landmark",
-  lm_err_name_required:  "Please enter a name for this landmark.",
-  lm_err_save_failed:    "Failed to save landmark. Please try again.",
-  lm_err_update_failed:  "Failed to update landmark. Please try again.",
+  lm_err_name_required: "Please enter a name for this landmark.",
+  lm_err_save_failed: "Failed to save landmark. Please try again.",
+  lm_err_update_failed: "Failed to update landmark. Please try again.",
+
+  map_preview_tap_hint: "Tap to pick your property location",
+  map_preview_change: "Change", map_preview_pick: "Pick Location",
+  map_preview_no_address: "No address typed yet", map_preview_no_coords: "Coordinates not set",
+  map_preview_open: "Open Map →",
+
+  faq_title_bold: "FAQ", faq_title_light: "& Support",
+  faq_subtitle: "Find answers to your questions about this app.",
+  faq_visit_website: "Visit our website", faq_email_us: "Email us",
+  faq_privacy: "Privacy policy", faq_terms: "Terms of service",
+  faq_tab_buyer: "Buyer", faq_tab_agent: "Estate Agent",
+  faq_b_q1: "What is Proptriz?",
+  faq_b_a1: "Proptriz is a property listing and discovery platform that connects buyers, renters, and sellers across Africa.",
+  faq_b_q2: "How do I search for properties?",
+  faq_b_a2: "Use the Explore tab to browse listings by location, category, and price. You can also use the Map view to find properties near you.",
+  faq_a_q1: "How do I list a property?",
+  faq_a_a1: "Tap '+ List Property' from the home screen or your profile. Fill in the details or use our AI-powered form filler to get started quickly.",
+  faq_a_q2: "How long does a listing stay active?",
+  faq_a_a2: "Listings stay active for the duration you select (in weeks) when creating or editing them. You can extend the duration at any time from Edit Property.",
+
+  terms_screen_title: "Terms of Service",
+  terms_main_title: "Proptriz - Terms of Service",
+  terms_last_updated: "Last Updated: 16/02/2026",
+  terms_email_label: "Email",
+  terms_s1_title: "1. Acceptance of Terms",
+  terms_s1_body: "By accessing or using Proptriz, you agree to be bound by these Terms. If you do not agree, you must discontinue use immediately.",
+  terms_s2_title: "2. Eligibility",
+  terms_s2_body: "You must be at least 18 years old and legally capable of entering into binding agreements.",
+  terms_s3_title: "3. Platform Nature",
+  terms_s3_body: "Proptriz is a property listing and discovery marketplace. We do not own or manage listed properties and do not guarantee transaction outcomes.",
+  terms_s4_title: "4. User Responsibilities",
+  terms_s4_li1: "Provide accurate information",
+  terms_s4_li2: "Only list properties you are authorized to list",
+  terms_s4_li3: "Do not post fraudulent or misleading content",
+  terms_s4_li4: "Do not harass or abuse other users",
+  terms_s5_title: "5. Content License",
+  terms_s5_body: "By posting content, you grant Proptriz a non-exclusive, royalty-free, worldwide license to use, display, and promote such content for operating the platform.",
+  terms_s6_title: "6. Fees and Payments",
+  terms_s6_body: "If paid features are introduced, fees will be disclosed clearly. Payments may be processed via approved third-party providers.",
+  terms_s7_title: "7. Disclaimers",
+  terms_s7_body: "The platform is provided \"as is\" without warranties of any kind. Proptriz is not responsible for user disputes or transaction outcomes.",
+  terms_s8_title: "8. Limitation of Liability",
+  terms_s8_body: "To the fullest extent permitted by law, Proptriz shall not be liable for indirect or consequential damages arising from use of the platform.",
+  terms_s9_title: "9. Termination",
+  terms_s9_body: "We may suspend or terminate accounts that violate these Terms. You may delete your account at any time.",
+  terms_s10_title: "10. Governing Law",
+  terms_s10_body: "These Terms are governed by the laws of the Federal Republic of Nigeria.",
+  terms_s11_title: "11. Contact",
+
+  privacy_screen_title: "Privacy Policy",
+  privacy_main_title: "Privacy Policy",
+  privacy_s1_title: "1. Introduction",
+  privacy_s1_body1: "Proptriz Hub (\"Proptriz,\" \"we,\" \"our,\" or \"us\") is committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application, website, and related services.",
+  privacy_s1_body2: "This Policy complies with the Nigeria Data Protection Regulation (NDPR) and international data protection standards.",
+  privacy_s2_title: "2. Lawful Basis for Processing",
+  privacy_s2_li1: "Consent provided by you",
+  privacy_s2_li2: "Performance of a contract",
+  privacy_s2_li3: "Compliance with legal obligations",
+  privacy_s2_li4: "Legitimate business interests",
+  privacy_s3_title: "3. Information We Collect",
+  privacy_s3_h_account: "Account Information",
+  privacy_s3_account_li1: "Full name", privacy_s3_account_li2: "Email address",
+  privacy_s3_account_li3: "Username", privacy_s3_account_li4: "Phone/WhatsApp number",
+  privacy_s3_h_listing: "Property Listing Information",
+  privacy_s3_listing_li1: "Property title, category, location",
+  privacy_s3_listing_li2: "Price and description",
+  privacy_s3_listing_li3: "Images and media uploads",
+  privacy_s3_h_tech: "Technical Information",
+  privacy_s3_tech_li1: "Device type and OS",
+  privacy_s3_tech_li2: "IP address",
+  privacy_s3_tech_li3: "App usage analytics",
+  privacy_s4_title: "4. How We Use Your Data",
+  privacy_s4_li1: "Provide and manage accounts",
+  privacy_s4_li2: "Enable property listings and searches",
+  privacy_s4_li3: "Facilitate communication between users",
+  privacy_s4_li4: "Improve platform performance",
+  privacy_s4_li5: "Prevent fraud and abuse",
+  privacy_s5_title: "5. Data Sharing",
+  privacy_s5_intro: "We do not sell your personal data. We may share information with:",
+  privacy_s5_li1: "Interested property seekers (contact details only)",
+  privacy_s5_li2: "Cloud hosting and analytics providers",
+  privacy_s5_li3: "Payment processors (if applicable)",
+  privacy_s5_li4: "Authorities where required by law",
+  privacy_s6_title: "6. Data Retention",
+  privacy_s6_body: "We retain personal data only as long as necessary to fulfill legitimate business or legal purposes. Data is securely deleted or anonymized when no longer required.",
+  privacy_s7_title: "7. Your Rights",
+  privacy_s7_li1: "Access your personal data",
+  privacy_s7_li2: "Request correction",
+  privacy_s7_li3: "Request deletion",
+  privacy_s7_li4: "Withdraw consent",
+  privacy_s7_li5: "Lodge complaints with relevant authorities",
+  privacy_s8_title: "8. Security",
+  privacy_s8_body: "We implement technical and organizational safeguards including encryption, secure hosting, and access controls. However, no system is completely secure.",
+  privacy_s9_title: "9. Contact Us",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -916,19 +1088,16 @@ const fr: Translations = {
 
   home_greeting: "Trouvez votre espace idéal", home_search_hint: "Rechercher par lieu, type…",
   home_nearby: "Propriétés à proximité", home_see_all: "Voir tout",
-  home_show_less: "Afficher moins",
-  home_no_results: "Aucune propriété trouvée",
+  home_show_less: "Afficher moins", home_no_results: "Aucune propriété trouvée",
   home_for_rent: "Location", home_for_sale: "Vente",
   home_featured: "Propriétés vedettes", home_top_agents: "Meilleurs agents",
   home_seen_all: "Vous avez tout vu", home_view_all: "Voir tout →",
   home_more: "Plus →", home_good_day: "Bonjour 👋",
   home_subtitle: "Trouvez votre prochaine maison idéale",
   home_loading: "Chargement des propriétés…",
-  home_top_locations: "Meilleurs emplacements",
-  home_all: "Tout",
+  home_top_locations: "Meilleurs emplacements", home_all: "Tout",
 
   map_list_property: "＋ Ajouter un bien", map_my_location: "Ma position",
-
   search_bar_filter: "Filtrer", search_filter_header: "Filtrer les biens",
 
   filter_location: "Localisation", filter_location_ph: "Rechercher une ville, un quartier…",
@@ -960,7 +1129,7 @@ const fr: Translations = {
   add_banner_uploading_sub: "Photos optimisées et envoyées une par une",
   add_val_title: "Veuillez saisir un titre.",
   add_val_price: "Veuillez saisir un prix valide.",
-  add_val_photos: "Ajoutez au moins une photo.", 
+  add_val_photos: "Ajoutez au moins une photo.",
   add_val_address: "Veuillez saisir l'adresse.",
   add_val_login: "Veuillez vous connecter pour lister un bien.",
   add_toast_pinned: "Emplacement épinglé",
@@ -993,8 +1162,7 @@ const fr: Translations = {
   s2_description_ph: "Décrivez le bien, ses caractéristiques et son quartier…",
   s2_features: "Caractéristiques & équipements",
   s2_features_sub: "Sélectionnez des équipements ou ajoutez les vôtres.",
-  s2_custom_ph: "Équipement personnalisé…",
-  s2_add_custom: "Ajouter un équipement",
+  s2_custom_ph: "Équipement personnalisé…", s2_add_custom: "Ajouter un équipement",
 
   s3_photos: "Photos", s3_photos_sub: "Image de couverture · tap pour changer",
   s3_prop_type: "Type de bien", s3_prop_title: "Titre du bien",
@@ -1007,7 +1175,7 @@ const fr: Translations = {
   s3_status: "Statut de disponibilité", s3_negotiable: "Négociable",
 
   ai_describe: "Décrivez votre bien",
-  ai_describe_sub: "Mentionnez le type, la taille, le prix, la localisation et les atouts. Plus c'est détaillé, meilleur est le résultat.",
+  ai_describe_sub: "Mentionnez le type, la taille, le prix, la localisation et les atouts.",
   ai_describe_ph: "ex. Duplex 3 chambres à Lekki Phase 1, Lagos. ₦4,5M/an en location…",
   ai_chars: "{n} car.", ai_chars_good: "· ✓ bon",
   ai_photos: "Photos du bien (optionnel)",
@@ -1060,7 +1228,7 @@ const fr: Translations = {
   ep_photo_large: "Fichier trop volumineux. Taille maximale : 2 Mo.",
   ep_photo_selected: "Photo sélectionnée — enregistrez pour appliquer.",
   ep_updated: "Profil mis à jour avec succès !",
-  ep_failed: "Échec de la mise à jour du profil.", 
+  ep_failed: "Échec de la mise à jour du profil.",
   ep_type_individual: "Particulier", ep_type_agent: "Agent", ep_type_company: "Société",
   ep_type_individual_desc: "Propriétaire particulier",
   ep_type_agent_desc: "Agent immobilier agréé",
@@ -1159,7 +1327,6 @@ const fr: Translations = {
   detail_nearby: "Biens à proximité", detail_wishlist: "Sauvegarder",
   detail_review_single: "avis", detail_review_plural: "avis",
 
-
   cur_ngn: "Naira nigérian (₦)", cur_usd: "Dollar américain ($)",
   cur_kes: "Shilling kényan (KSh)", cur_cfa: "Franc CFA (FCFA)",
   cur_cda: "CDA", cur_pi: "Pi Network (Pi)",
@@ -1171,7 +1338,6 @@ const fr: Translations = {
   status_expired: "Expiré",
 
   neg_negotiable: "Négociable", neg_fixed: "Prix fixe",
-
   map_view: "Voir", map_negotiable: "Négociable",
 
   agent_owner: "Propriétaire", agent_agent: "Agent immobilier",
@@ -1194,76 +1360,143 @@ const fr: Translations = {
   common_retry: "Réessayer", common_per_year: "/an",
   common_per_month: "/mois", common_per_night: "/nuit",
 
-  map_snap_expand: "Agrandir ↑",
-  map_snap_more: "Voir plus ↑",
-  map_snap_collapse: "Réduire ↓",
-  map_centre_btn: "Centrer sur le bien",
-  map_resize_panel: "Redimensionner",
-  map_tab_facilities: "Équipements proches",
-  map_tab_details: "Détails du bien",
+  map_snap_expand: "Agrandir ↑", map_snap_more: "Voir plus ↑", map_snap_collapse: "Réduire ↓",
+  map_centre_btn: "Centrer sur le bien", map_resize_panel: "Redimensionner",
+  map_tab_facilities: "Équipements proches", map_tab_details: "Détails du bien",
   map_no_facilities: "Aucun équipement à proximité",
   map_no_facilities_sub: "Aucun équipement n'a été ajouté dans un rayon de 2 km.",
-  map_landmark_fallback: "Point d'intérêt",
-  map_nearby_label: "proche",
-  map_verified_title: "Lieu vérifié par la communauté",
-  map_confirm_title: "Confirmer ce point d'intérêt",
-  map_verified_btn: "Vérifié",
-  map_confirm_btn: "Confirmer",
-  map_road_access: "Accès routier & environnement",
-  map_prop_features: "Caractéristiques du bien",
-  map_full_address: "Adresse complète",
-  map_gps: "Coordonnées GPS",
+  map_landmark_fallback: "Point d'intérêt", map_nearby_label: "proche",
+  map_verified_title: "Lieu vérifié par la communauté", map_confirm_title: "Confirmer ce point d'intérêt",
+  map_verified_btn: "Vérifié", map_confirm_btn: "Confirmer",
+  map_road_access: "Accès routier & environnement", map_prop_features: "Caractéristiques du bien",
+  map_full_address: "Adresse complète", map_gps: "Coordonnées GPS",
   map_open_google: "Ouvrir dans Google Maps",
-  img_upload_title: "Télécharger des photos du bien",
-  img_add_photo: "Ajouter une photo",
-  img_removed: "Photo supprimée",
-  img_remove_failed: "Impossible de supprimer la photo",
-  img_upload_success: "Photo téléchargée avec succès",
-  img_upload_failed: "Échec du téléchargement",
 
-  // Landmark modal
-  lm_step_location:      "Localisation",
-  lm_step_facilities:    "Équipements",
-  lm_new_pin:            "Nouvelle épingle",
-  lm_pinned_location:    "Emplacement épinglé",
-  lm_already_tagged:     "Déjà référencé à proximité",
-  lm_duplicate_hint:     "💡 Vérifiez la liste avant d'ajouter — vous taggez peut-être le même endroit.",
-  lm_name_label:         "Nom du point d'intérêt",
-  lm_name_ph:            "ex. Ikeja City Mall, Hôpital général…",
-  lm_category_label:     "Catégorie",
-  lm_saving:             "Enregistrement…",
-  lm_add_btn:            "Ajouter des équipements",
-  lm_save_changes:       "Enregistrer",
-  lm_other:              "Autre",
-  lm_delete_desc:        "Ce point d'intérêt sera supprimé de votre liste. Cette action est irréversible.",
-  lm_keep_btn:           "Conserver",
-  lm_remove_btn:         "Supprimer",
-  lm_edit_aria:          "Modifier le point d'intérêt",
-  lm_delete_aria:        "Supprimer le point d'intérêt",
-  lm_empty_title:        "Aucun équipement ajouté",
-  lm_empty_sub:          "Appuyez sur la carte pour épingler des écoles, hôpitaux, arrêts de transport, etc.",
-  lm_go_to_map:          "Aller à la carte",
-  lm_search_address_ph:  "Rechercher une adresse ou un quartier…",
-  lm_search_area_ph:     "Rechercher une zone…",
-  lm_next_step:          "Suivant : Ajouter des équipements",
-  lm_panel_title:        "Équipements proches",
-  lm_optional:           "Optionnel",
-  lm_panel_desc:         "Cliquez sur la carte pour épingler un point d'intérêt. Chaque épingle est partagée globalement.",
-  lm_back_btn:           "Retour",
-  lm_skip_btn:           "Passer",
-  lm_save_btn:           "Sauvegarder",
-  lm_done_btn:           "Terminer",
-  lm_mobile_list_title:  "Points d'intérêt proches",
-  lm_added_count:        "{n} ajouté(s)",
-  lm_mobile_list_hint:   "Utilisez ✏️ pour modifier ou 🗑 pour supprimer. Revenez à la carte pour en ajouter.",
-  lm_toggle_list:        "Liste ({n})",
-  lm_toggle_map:         "Carte",
-  lm_popup_add_title:    "Ajouter des équipements",
-  lm_popup_edit_title:   "Modifier le point d'intérêt",
+  img_upload_title: "Télécharger des photos du bien", img_add_photo: "Ajouter une photo",
+  img_removed: "Photo supprimée", img_remove_failed: "Impossible de supprimer la photo",
+  img_upload_success: "Photo téléchargée avec succès", img_upload_failed: "Échec du téléchargement",
+
+  lm_step_location: "Localisation", lm_step_facilities: "Équipements",
+  lm_new_pin: "Nouvelle épingle", lm_pinned_location: "Emplacement épinglé",
+  lm_already_tagged: "Déjà référencé à proximité",
+  lm_duplicate_hint: "💡 Vérifiez la liste avant d'ajouter — vous taggez peut-être le même endroit.",
+  lm_name_label: "Nom du point d'intérêt", lm_name_ph: "ex. Ikeja City Mall, Hôpital général…",
+  lm_category_label: "Catégorie", lm_saving: "Enregistrement…",
+  lm_add_btn: "Ajouter des équipements", lm_save_changes: "Enregistrer",
+  lm_other: "Autre",
+  lm_delete_desc: "Ce point d'intérêt sera supprimé de votre liste. Cette action est irréversible.",
+  lm_keep_btn: "Conserver", lm_remove_btn: "Supprimer",
+  lm_edit_aria: "Modifier le point d'intérêt", lm_delete_aria: "Supprimer le point d'intérêt",
+  lm_empty_title: "Aucun équipement ajouté",
+  lm_empty_sub: "Appuyez sur la carte pour épingler des écoles, hôpitaux, arrêts de transport, etc.",
+  lm_go_to_map: "Aller à la carte",
+  lm_search_address_ph: "Rechercher une adresse ou un quartier…", lm_search_area_ph: "Rechercher une zone…",
+  lm_next_step: "Suivant : Ajouter des équipements",
+  lm_panel_title: "Équipements proches", lm_optional: "Optionnel",
+  lm_panel_desc: "Cliquez sur la carte pour épingler un point d'intérêt. Chaque épingle est partagée globalement.",
+  lm_back_btn: "Retour", lm_skip_btn: "Passer", lm_save_btn: "Sauvegarder", lm_done_btn: "Terminer",
+  lm_mobile_list_title: "Points d'intérêt proches", lm_added_count: "{n} ajouté(s)",
+  lm_mobile_list_hint: "Utilisez ✏️ pour modifier ou 🗑 pour supprimer. Revenez à la carte pour en ajouter.",
+  lm_toggle_list: "Liste ({n})", lm_toggle_map: "Carte",
+  lm_popup_add_title: "Ajouter des équipements", lm_popup_edit_title: "Modifier le point d'intérêt",
   lm_popup_delete_title: "Supprimer le point d'intérêt",
-  lm_err_name_required:  "Veuillez saisir un nom pour ce point d'intérêt.",
-  lm_err_save_failed:    "Échec de l'enregistrement. Veuillez réessayer.",
-  lm_err_update_failed:  "Échec de la mise à jour. Veuillez réessayer.",
+  lm_err_name_required: "Veuillez saisir un nom pour ce point d'intérêt.",
+  lm_err_save_failed: "Échec de l'enregistrement. Veuillez réessayer.",
+  lm_err_update_failed: "Échec de la mise à jour. Veuillez réessayer.",
+
+  map_preview_tap_hint: "Appuyez pour choisir l'emplacement",
+  map_preview_change: "Modifier", map_preview_pick: "Choisir un emplacement",
+  map_preview_no_address: "Aucune adresse saisie", map_preview_no_coords: "Coordonnées non définies",
+  map_preview_open: "Ouvrir la carte →",
+
+  faq_title_bold: "FAQ", faq_title_light: "& Assistance",
+  faq_subtitle: "Trouvez des réponses à vos questions sur cette application.",
+  faq_visit_website: "Visiter notre site web", faq_email_us: "Nous envoyer un e-mail",
+  faq_privacy: "Politique de confidentialité", faq_terms: "Conditions d'utilisation",
+  faq_tab_buyer: "Acheteur", faq_tab_agent: "Agent immobilier",
+  faq_b_q1: "Qu'est-ce que Proptriz ?",
+  faq_b_a1: "Proptriz est une plateforme de référencement et de découverte de biens immobiliers qui met en relation acheteurs, locataires et vendeurs à travers l'Afrique.",
+  faq_b_q2: "Comment rechercher des biens ?",
+  faq_b_a2: "Utilisez l'onglet Explorer pour parcourir les annonces par lieu, catégorie et prix. Vous pouvez aussi utiliser la vue Carte pour trouver des biens près de vous.",
+  faq_a_q1: "Comment lister un bien ?",
+  faq_a_a1: "Appuyez sur '+ Lister un bien' depuis l'accueil ou votre profil. Remplissez les détails ou utilisez notre formulaire assisté par IA pour démarrer rapidement.",
+  faq_a_q2: "Combien de temps reste active une annonce ?",
+  faq_a_a2: "Les annonces restent actives pendant la durée choisie (en semaines) lors de leur création ou modification. Vous pouvez prolonger la durée à tout moment via Modifier le bien.",
+
+  terms_screen_title: "Conditions d'utilisation",
+  terms_main_title: "Proptriz - Conditions d'utilisation",
+  terms_last_updated: "Dernière mise à jour : 16/02/2026",
+  terms_email_label: "E-mail",
+  terms_s1_title: "1. Acceptation des conditions",
+  terms_s1_body: "En accédant ou en utilisant Proptriz, vous acceptez d'être lié par ces conditions. Si vous n'êtes pas d'accord, vous devez cesser immédiatement toute utilisation.",
+  terms_s2_title: "2. Éligibilité",
+  terms_s2_body: "Vous devez avoir au moins 18 ans et être légalement capable de conclure des accords contraignants.",
+  terms_s3_title: "3. Nature de la plateforme",
+  terms_s3_body: "Proptriz est une place de marché de référencement et de découverte de biens immobiliers. Nous ne possédons pas les biens listés et ne garantissons pas les résultats des transactions.",
+  terms_s4_title: "4. Responsabilités de l'utilisateur",
+  terms_s4_li1: "Fournir des informations exactes",
+  terms_s4_li2: "Lister uniquement les biens que vous êtes autorisé à lister",
+  terms_s4_li3: "Ne pas publier de contenu frauduleux ou trompeur",
+  terms_s4_li4: "Ne pas harceler ou abuser d'autres utilisateurs",
+  terms_s5_title: "5. Licence de contenu",
+  terms_s5_body: "En publiant du contenu, vous accordez à Proptriz une licence non exclusive, sans redevance, mondiale pour utiliser, afficher et promouvoir ce contenu dans le cadre de l'exploitation de la plateforme.",
+  terms_s6_title: "6. Frais et paiements",
+  terms_s6_body: "Si des fonctionnalités payantes sont introduites, les frais seront clairement communiqués. Les paiements peuvent être traités via des prestataires tiers approuvés.",
+  terms_s7_title: "7. Avertissements",
+  terms_s7_body: "La plateforme est fournie « telle quelle » sans garantie d'aucune sorte. Proptriz n'est pas responsable des litiges entre utilisateurs ni des résultats des transactions.",
+  terms_s8_title: "8. Limitation de responsabilité",
+  terms_s8_body: "Dans toute la mesure permise par la loi, Proptriz ne sera pas responsable des dommages indirects ou consécutifs découlant de l'utilisation de la plateforme.",
+  terms_s9_title: "9. Résiliation",
+  terms_s9_body: "Nous pouvons suspendre ou résilier les comptes qui violent ces conditions. Vous pouvez supprimer votre compte à tout moment.",
+  terms_s10_title: "10. Droit applicable",
+  terms_s10_body: "Ces conditions sont régies par les lois de la République fédérale du Nigeria.",
+  terms_s11_title: "11. Contact",
+
+  privacy_screen_title: "Politique de confidentialité",
+  privacy_main_title: "Politique de confidentialité",
+  privacy_s1_title: "1. Introduction",
+  privacy_s1_body1: "Proptriz Hub (« Proptriz », « nous », « notre » ou « nos ») s'engage à protéger vos données personnelles. Cette politique explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre application mobile, notre site web et nos services associés.",
+  privacy_s1_body2: "Cette politique est conforme au Règlement nigérian sur la protection des données (NDPR) et aux normes internationales de protection des données.",
+  privacy_s2_title: "2. Base légale du traitement",
+  privacy_s2_li1: "Consentement fourni par vous",
+  privacy_s2_li2: "Exécution d'un contrat",
+  privacy_s2_li3: "Respect des obligations légales",
+  privacy_s2_li4: "Intérêts commerciaux légitimes",
+  privacy_s3_title: "3. Informations que nous collectons",
+  privacy_s3_h_account: "Informations de compte",
+  privacy_s3_account_li1: "Nom complet", privacy_s3_account_li2: "Adresse e-mail",
+  privacy_s3_account_li3: "Nom d'utilisateur", privacy_s3_account_li4: "Numéro de téléphone/WhatsApp",
+  privacy_s3_h_listing: "Informations sur les annonces",
+  privacy_s3_listing_li1: "Titre, catégorie, localisation du bien",
+  privacy_s3_listing_li2: "Prix et description",
+  privacy_s3_listing_li3: "Images et fichiers multimédias",
+  privacy_s3_h_tech: "Informations techniques",
+  privacy_s3_tech_li1: "Type d'appareil et système d'exploitation",
+  privacy_s3_tech_li2: "Adresse IP",
+  privacy_s3_tech_li3: "Statistiques d'utilisation de l'application",
+  privacy_s4_title: "4. Utilisation de vos données",
+  privacy_s4_li1: "Fournir et gérer les comptes",
+  privacy_s4_li2: "Permettre les annonces et les recherches de biens",
+  privacy_s4_li3: "Faciliter la communication entre utilisateurs",
+  privacy_s4_li4: "Améliorer les performances de la plateforme",
+  privacy_s4_li5: "Prévenir la fraude et les abus",
+  privacy_s5_title: "5. Partage des données",
+  privacy_s5_intro: "Nous ne vendons pas vos données personnelles. Nous pouvons partager des informations avec :",
+  privacy_s5_li1: "Les chercheurs de biens intéressés (coordonnées uniquement)",
+  privacy_s5_li2: "Les prestataires d'hébergement cloud et d'analyse",
+  privacy_s5_li3: "Les processeurs de paiement (le cas échéant)",
+  privacy_s5_li4: "Les autorités lorsque la loi l'exige",
+  privacy_s6_title: "6. Conservation des données",
+  privacy_s6_body: "Nous conservons les données personnelles uniquement le temps nécessaire pour répondre à des fins commerciales ou légales légitimes. Les données sont supprimées de façon sécurisée ou anonymisées lorsqu'elles ne sont plus nécessaires.",
+  privacy_s7_title: "7. Vos droits",
+  privacy_s7_li1: "Accéder à vos données personnelles",
+  privacy_s7_li2: "Demander une correction",
+  privacy_s7_li3: "Demander la suppression",
+  privacy_s7_li4: "Retirer votre consentement",
+  privacy_s7_li5: "Déposer des plaintes auprès des autorités compétentes",
+  privacy_s8_title: "8. Sécurité",
+  privacy_s8_body: "Nous mettons en œuvre des mesures techniques et organisationnelles incluant le chiffrement, l'hébergement sécurisé et les contrôles d'accès. Cependant, aucun système n'est totalement sécurisé.",
+  privacy_s9_title: "9. Nous contacter",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1283,29 +1516,23 @@ const sw: Translations = {
 
   home_greeting: "Pata nafasi yako bora", home_search_hint: "Tafuta kwa eneo, aina…",
   home_nearby: "Mali za karibu", home_see_all: "Tazama Zote",
-  home_show_less: "Onyesha Chini", 
-  home_no_results: "Hakuna mali iliyopatikana", 
+  home_show_less: "Onyesha Chini", home_no_results: "Hakuna mali iliyopatikana",
   home_for_rent: "Kukodi", home_for_sale: "Kuuza",
   home_featured: "Mali Zilizoangaziwa", home_top_agents: "Mawakala Bora",
   home_seen_all: "Umesoma mali zote", home_view_all: "Tazama zote →",
   home_more: "Zaidi →", home_good_day: "Habari 👋",
   home_subtitle: "Tafuta nyumba yako bora",
-  home_loading: "Inapakia mali…",
-  home_top_locations: "Maeneo Bora",
-  home_all: "Zote",
+  home_loading: "Inapakia mali…", home_top_locations: "Maeneo Bora", home_all: "Zote",
 
   map_list_property: "＋ Ongeza Mali", map_my_location: "Mahali pangu",
-
   search_bar_filter: "Chuja", search_filter_header: "Chuja Mali",
 
   filter_location: "Mahali", filter_location_ph: "Tafuta mji, eneo…",
   filter_searching: "Inatafuta…", filter_prop_type: "Aina ya Mali",
   filter_listed_for: "Imeorodheshwa kwa", filter_price_budget: "Bajeti ya Bei",
   filter_per_year: "mwaka", filter_per_total: "jumla", filter_any: "Yote",
-  filter_no_limit: "Hakuna kikomo", filter_min_price: "Bei ya Chini",
-  filter_max_price: "Bei ya Juu",
-  filter_showing: "Inaonyesha:",
-  filter_keywords: "Maneno Muhimu",
+  filter_no_limit: "Hakuna kikomo", filter_min_price: "Bei ya Chini", filter_max_price: "Bei ya Juu",
+  filter_showing: "Inaonyesha:", filter_keywords: "Maneno Muhimu",
   filter_keywords_ph: "mf. na samani, imefungwa, maegesho…",
   filter_keywords_hint: "Tenganisha maneno kwa mkato bora",
   filter_reset: "Weka upya", filter_apply: "Tumia Vichujio",
@@ -1362,15 +1589,13 @@ const sw: Translations = {
   s2_description_ph: "Elezea mali, vipengele vyake na mtaa…",
   s2_features: "Vipengele & Vifaa",
   s2_features_sub: "Chagua vifaa vya kawaida au ongeza vyako.",
-  s2_custom_ph: "Kipengele au kifaa cha kipekee…",
-  s2_add_custom: "Ongeza Kipengele Kipekee",
+  s2_custom_ph: "Kipengele au kifaa cha kipekee…", s2_add_custom: "Ongeza Kipengele Kipekee",
 
   s3_photos: "Picha", s3_photos_sub: "Picha ya jalada · gusa kubadilisha",
   s3_prop_type: "Aina ya Mali", s3_prop_title: "Kichwa cha Mali",
   s3_pricing: "Bei", s3_description: "Maelezo",
   s3_description_ph: "Elezea mali, vipengele vyake na mtaa…",
-  s3_features: "Vipengele",
-  s3_features_sub: "Gusa × kuondoa kipengele kisichohusika.",
+  s3_features: "Vipengele", s3_features_sub: "Gusa × kuondoa kipengele kisichohusika.",
   s3_duration: "Muda wa Orodha",
   s3_duration_sub: "Wiki ngapi orodha hii ibaki hai kabla ya kuisha muda?",
   s3_status: "Hali ya Upatikanaji", s3_negotiable: "Inaweza Kujadiliwa",
@@ -1428,8 +1653,7 @@ const sw: Translations = {
   ep_photo_invalid: "Aina ya faili si sahihi. Chagua picha ya PNG au JPG.",
   ep_photo_large: "Faili kubwa sana. Ukubwa wa juu ni 2 MB.",
   ep_photo_selected: "Picha imechaguliwa — hifadhi ili kutumia.",
-  ep_updated: "Wasifu umesasishwa!",
-  ep_failed: "Kusasisha kumeshindwa.",
+  ep_updated: "Wasifu umesasishwa!", ep_failed: "Kusasisha kumeshindwa.",
   ep_type_individual: "Mtu Binafsi", ep_type_agent: "Wakala", ep_type_company: "Kampuni",
   ep_type_individual_desc: "Mmiliki wa mali binafsi",
   ep_type_agent_desc: "Wakala wa mali aliyeidhinishwa",
@@ -1531,7 +1755,6 @@ const sw: Translations = {
   detail_nearby: "Mali za karibu", detail_wishlist: "Hifadhi",
   detail_review_single: "maoni", detail_review_plural: "maoni",
 
-
   cur_ngn: "Naira ya Nigeria (₦)", cur_usd: "Dola ya Marekani ($)",
   cur_kes: "Shilingi ya Kenya (KSh)", cur_cfa: "Faranga ya CFA (FCFA)",
   cur_cda: "CDA", cur_pi: "Pi Network (Pi)",
@@ -1543,7 +1766,6 @@ const sw: Translations = {
   status_expired: "Imeisha Muda",
 
   neg_negotiable: "Inaweza Kujadiliwa", neg_fixed: "Bei ya Mwisho",
-
   map_view: "Tazama", map_negotiable: "Inaweza Kujadiliwa",
 
   agent_owner: "Mmiliki wa Mali", agent_agent: "Wakala wa Mali",
@@ -1565,76 +1787,144 @@ const sw: Translations = {
   common_loading: "Inapakia…", common_error: "Kitu kilienda vibaya",
   common_retry: "Jaribu Tena", common_per_year: "/mwaka",
   common_per_month: "/mwezi", common_per_night: "/usiku",
-  map_snap_expand: "Panua ↑",
-  map_snap_more: "Onyesha zaidi ↑",
-  map_snap_collapse: "Punguza ↓",
-  map_centre_btn: "Rejea kwenye mali",
-  map_resize_panel: "Badilisha ukubwa",
-  map_tab_facilities: "Vituo vya Karibu",
-  map_tab_details: "Maelezo ya Mali",
+
+  map_snap_expand: "Panua ↑", map_snap_more: "Onyesha zaidi ↑", map_snap_collapse: "Punguza ↓",
+  map_centre_btn: "Rejea kwenye mali", map_resize_panel: "Badilisha ukubwa",
+  map_tab_facilities: "Vituo vya Karibu", map_tab_details: "Maelezo ya Mali",
   map_no_facilities: "Hakuna vituo karibu",
   map_no_facilities_sub: "Hakuna vituo vilivyoongezwa ndani ya km 2 ya mali hii.",
-  map_landmark_fallback: "Alama ya eneo",
-  map_nearby_label: "karibu",
-  map_verified_title: "Mahali imethibitishwa na jamii",
-  map_confirm_title: "Thibitisha alama hii",
-  map_verified_btn: "Imethibitishwa",
-  map_confirm_btn: "Thibitisha",
-  map_road_access: "Ufikiaji wa Barabara & Mazingira",
-  map_prop_features: "Vipengele vya Mali",
-  map_full_address: "Anwani Kamili",
-  map_gps: "Kuratibu za GPS",
+  map_landmark_fallback: "Alama ya eneo", map_nearby_label: "karibu",
+  map_verified_title: "Mahali imethibitishwa na jamii", map_confirm_title: "Thibitisha alama hii",
+  map_verified_btn: "Imethibitishwa", map_confirm_btn: "Thibitisha",
+  map_road_access: "Ufikiaji wa Barabara & Mazingira", map_prop_features: "Vipengele vya Mali",
+  map_full_address: "Anwani Kamili", map_gps: "Kuratibu za GPS",
   map_open_google: "Fungua katika Google Maps",
-  img_upload_title: "Pakia Picha za Mali",
-  img_add_photo: "Ongeza Picha",
-  img_removed: "Picha imeondolewa",
-  img_remove_failed: "Imeshindwa kuondoa picha",
-  img_upload_success: "Picha imepakiwa",
-  img_upload_failed: "Kupakia picha kumeshindwa",
 
-  // Landmark modal
-  lm_step_location:      "Localisation",
-  lm_step_facilities:    "Équipements",
-  lm_new_pin:            "Nouvelle épingle",
-  lm_pinned_location:    "Emplacement épinglé",
-  lm_already_tagged:     "Déjà référencé à proximité",
-  lm_duplicate_hint:     "💡 Vérifiez la liste avant d'ajouter — vous taggez peut-être le même endroit.",
-  lm_name_label:         "Nom du point d'intérêt",
-  lm_name_ph:            "ex. Ikeja City Mall, Hôpital général…",
-  lm_category_label:     "Catégorie",
-  lm_saving:             "Enregistrement…",
-  lm_add_btn:            "Ajouter des équipements",
-  lm_save_changes:       "Enregistrer",
-  lm_other:              "Autre",
-  lm_delete_desc:        "Ce point d'intérêt sera supprimé de votre liste. Cette action est irréversible.",
-  lm_keep_btn:           "Conserver",
-  lm_remove_btn:         "Supprimer",
-  lm_edit_aria:          "Modifier le point d'intérêt",
-  lm_delete_aria:        "Supprimer le point d'intérêt",
-  lm_empty_title:        "Aucun équipement ajouté",
-  lm_empty_sub:          "Appuyez sur la carte pour épingler des écoles, hôpitaux, arrêts de transport, etc.",
-  lm_go_to_map:          "Aller à la carte",
-  lm_search_address_ph:  "Rechercher une adresse ou un quartier…",
-  lm_search_area_ph:     "Rechercher une zone…",
-  lm_next_step:          "Suivant : Ajouter des équipements",
-  lm_panel_title:        "Équipements proches",
-  lm_optional:           "Optionnel",
-  lm_panel_desc:         "Cliquez sur la carte pour épingler un point d'intérêt. Chaque épingle est partagée globalement.",
-  lm_back_btn:           "Retour",
-  lm_skip_btn:           "Passer",
-  lm_save_btn:           "Sauvegarder",
-  lm_done_btn:           "Terminer",
-  lm_mobile_list_title:  "Points d'intérêt proches",
-  lm_added_count:        "{n} ajouté(s)",
-  lm_mobile_list_hint:   "Utilisez ✏️ pour modifier ou 🗑 pour supprimer. Revenez à la carte pour en ajouter.",
-  lm_toggle_list:        "Liste ({n})",
-  lm_toggle_map:         "Carte",
-  lm_popup_add_title:    "Ajouter des équipements",
-  lm_popup_edit_title:   "Modifier le point d'intérêt",
-  lm_popup_delete_title: "Supprimer le point d'intérêt",
-  lm_err_name_required:  "Veuillez saisir un nom pour ce point d'intérêt.",
-  lm_err_save_failed:    "Échec de l'enregistrement. Veuillez réessayer.",
-  lm_err_update_failed:  "Échec de la mise à jour. Veuillez réessayer.",
+  img_upload_title: "Pakia Picha za Mali", img_add_photo: "Ongeza Picha",
+  img_removed: "Picha imeondolewa", img_remove_failed: "Imeshindwa kuondoa picha",
+  img_upload_success: "Picha imepakiwa", img_upload_failed: "Kupakia picha kumeshindwa",
+
+  lm_step_location: "Mahali", lm_step_facilities: "Vituo",
+  lm_new_pin: "Pini Mpya", lm_pinned_location: "Mahali Piliwa Pini",
+  lm_already_tagged: "Tayari imewekwa alama karibu",
+  lm_duplicate_hint: "💡 Angalia orodha kabla ya kuongeza — huenda unaweka alama sehemu ile ile.",
+  lm_name_label: "Jina la alama", lm_name_ph: "mf. Ikeja City Mall, Hospitali Kuu…",
+  lm_category_label: "Jamii", lm_saving: "Inahifadhi…",
+  lm_add_btn: "Ongeza Vituo vya Karibu", lm_save_changes: "Hifadhi Mabadiliko",
+  lm_other: "Nyingine",
+  lm_delete_desc: "Alama hii itaondolewa kwenye orodha yako. Kitendo hiki hakiwezi kutenduliwa.",
+  lm_keep_btn: "Ibaki", lm_remove_btn: "Ondoa",
+  lm_edit_aria: "Hariri alama", lm_delete_aria: "Futa alama",
+  lm_empty_title: "Hakuna vituo vilivyoongezwa",
+  lm_empty_sub: "Gusa ramani kuweka pini shule, hospitali, vituo vya usafiri, na zaidi.",
+  lm_go_to_map: "Nenda Ramani",
+  lm_search_address_ph: "Tafuta anwani au eneo…", lm_search_area_ph: "Tafuta eneo…",
+  lm_next_step: "Ifuatayo: Ongeza Vituo vya Karibu",
+  lm_panel_title: "Vituo vya Karibu", lm_optional: "Hiari",
+  lm_panel_desc: "Bonyeza ramani kuweka pini alama. Kila pini inahifadhiwa kimataifa — mtu yeyote anaweza kuipata.",
+  lm_back_btn: "Rudi", lm_skip_btn: "Ruka", lm_save_btn: "Hifadhi", lm_done_btn: "Imekamilika",
+  lm_mobile_list_title: "Alama za Karibu", lm_added_count: "{n} zimeongezwa",
+  lm_mobile_list_hint: "Tumia ✏️ kuhariri au 🗑 kuondoa. Rudi kwenye Ramani kuongeza zaidi.",
+  lm_toggle_list: "Orodha ({n})", lm_toggle_map: "Ramani",
+  lm_popup_add_title: "Ongeza Vituo vya Karibu", lm_popup_edit_title: "Hariri Alama",
+  lm_popup_delete_title: "Ondoa Alama",
+  lm_err_name_required: "Tafadhali ingiza jina la alama hii.",
+  lm_err_save_failed: "Kuhifadhi kumeshindwa. Tafadhali jaribu tena.",
+  lm_err_update_failed: "Kusasisha kumeshindwa. Tafadhali jaribu tena.",
+
+  map_preview_tap_hint: "Gusa kuchagua mahali pa mali",
+  map_preview_change: "Badilisha", map_preview_pick: "Chagua Mahali",
+  map_preview_no_address: "Hakuna anwani iliyoandikwa", map_preview_no_coords: "Kuratibu hazijawekwa",
+  map_preview_open: "Fungua Ramani →",
+
+  faq_title_bold: "Maswali", faq_title_light: "& Msaada",
+  faq_subtitle: "Pata majibu ya maswali yako kuhusu programu hii.",
+  faq_visit_website: "Tembelea tovuti yetu", faq_email_us: "Tutumie barua pepe",
+  faq_privacy: "Sera ya faragha", faq_terms: "Masharti ya huduma",
+  faq_tab_buyer: "Mnunuzi", faq_tab_agent: "Wakala wa Mali",
+  faq_b_q1: "Proptriz ni nini?",
+  faq_b_a1: "Proptriz ni jukwaa la kuorodhesha na kugundua mali ambalo linaunganisha wanunuzi, wapangaji na wauzaji kote Afrika.",
+  faq_b_q2: "Jinsi ya kutafuta mali?",
+  faq_b_a2: "Tumia kichupo cha Gundua kuvinjari orodha kwa eneo, jamii na bei. Unaweza pia kutumia mtazamo wa Ramani kupata mali karibu nawe.",
+  faq_a_q1: "Jinsi ya kuorodhesha mali?",
+  faq_a_a1: "Gusa '+ Orodhesha Mali' kutoka skrini ya nyumbani au wasifu wako. Jaza maelezo au tumia fomu yetu inayosaidiwa na AI kuanza haraka.",
+  faq_a_q2: "Orodha inabaki hai kwa muda gani?",
+  faq_a_a2: "Orodha zinabaki hai kwa muda uliochagua (kwa wiki) unapoziunda au kuzihariri. Unaweza kupanua muda wakati wowote kupitia Hariri Mali.",
+
+  terms_screen_title: "Masharti ya Huduma",
+  terms_main_title: "Proptriz - Masharti ya Huduma",
+  terms_last_updated: "Ilisasishwa Mwisho: 16/02/2026",
+  terms_email_label: "Barua pepe",
+  terms_s1_title: "1. Kukubali Masharti",
+  terms_s1_body: "Kwa kufikia au kutumia Proptriz, unakubali kufungwa na Masharti haya. Ikiwa hukubaliani, lazima usimame kutumia mara moja.",
+  terms_s2_title: "2. Ustahili",
+  terms_s2_body: "Lazima uwe na umri wa miaka 18 au zaidi na uwe na uwezo wa kisheria kuingia katika makubaliano yanayofunga.",
+  terms_s3_title: "3. Asili ya Jukwaa",
+  terms_s3_body: "Proptriz ni soko la kuorodhesha na kugundua mali. Hatumiliki mali zilizoorodheshwa na hatuhakikishi matokeo ya miamala.",
+  terms_s4_title: "4. Majukumu ya Mtumiaji",
+  terms_s4_li1: "Toa taarifa sahihi",
+  terms_s4_li2: "Orodhesha tu mali unazoidhinishwa kuorodhesha",
+  terms_s4_li3: "Usichapishe maudhui ya udanganyifu au ya kupotosha",
+  terms_s4_li4: "Usimfuate au kumdhulumu mtumiaji mwingine",
+  terms_s5_title: "5. Leseni ya Maudhui",
+  terms_s5_body: "Kwa kuchapisha maudhui, unatoa Proptriz leseni isiyonikia, bila ada, ya kimataifa ya kutumia, kuonyesha na kukuza maudhui hayo kwa uendeshaji wa jukwaa.",
+  terms_s6_title: "6. Ada na Malipo",
+  terms_s6_body: "Ikiwa vipengele vya kulipa vitaanzishwa, ada zitaelezwa wazi. Malipo yanaweza kushughulikiwa kupitia watoa huduma wa tatu walioidhinishwa.",
+  terms_s7_title: "7. Kanusho",
+  terms_s7_body: "Jukwaa linatolewa \"kama lilivyo\" bila dhamana yoyote. Proptriz si wajibu wa migogoro ya watumiaji au matokeo ya miamala.",
+  terms_s8_title: "8. Ukomo wa Dhima",
+  terms_s8_body: "Kwa kiwango kinachohusika cha kisheria, Proptriz haitawajibika kwa uharibifu usio wa moja kwa moja unaotokana na matumizi ya jukwaa.",
+  terms_s9_title: "9. Kusimamishwa",
+  terms_s9_body: "Tunaweza kusimamisha au kumaliza akaunti zinazokiuka Masharti haya. Unaweza kufuta akaunti yako wakati wowote.",
+  terms_s10_title: "10. Sheria Inayotumika",
+  terms_s10_body: "Masharti haya yanafuata sheria za Jamhuri ya Shirikisho la Nigeria.",
+  terms_s11_title: "11. Mawasiliano",
+
+  privacy_screen_title: "Sera ya Faragha",
+  privacy_main_title: "Sera ya Faragha",
+  privacy_s1_title: "1. Utangulizi",
+  privacy_s1_body1: "Proptriz Hub (\"Proptriz,\" \"sisi,\" \"yetu,\" au \"zetu\") imejitolea kulinda data yako ya kibinafsi. Sera hii ya Faragha inaeleza jinsi tunavyokusanya, kutumia, kufichua na kulinda taarifa zako unapotumia programu yetu ya simu, tovuti na huduma zinazohusiana.",
+  privacy_s1_body2: "Sera hii inazingatia Kanuni ya Ulinzi wa Data ya Nigeria (NDPR) na viwango vya kimataifa vya ulinzi wa data.",
+  privacy_s2_title: "2. Msingi wa Kisheria wa Usindikaji",
+  privacy_s2_li1: "Idhini uliyotoa",
+  privacy_s2_li2: "Utekelezaji wa mkataba",
+  privacy_s2_li3: "Utiifu wa majukumu ya kisheria",
+  privacy_s2_li4: "Maslahi ya biashara halali",
+  privacy_s3_title: "3. Taarifa Tunazokusanya",
+  privacy_s3_h_account: "Taarifa za Akaunti",
+  privacy_s3_account_li1: "Jina kamili", privacy_s3_account_li2: "Anwani ya barua pepe",
+  privacy_s3_account_li3: "Jina la mtumiaji", privacy_s3_account_li4: "Nambari ya simu/WhatsApp",
+  privacy_s3_h_listing: "Taarifa za Orodha ya Mali",
+  privacy_s3_listing_li1: "Kichwa, jamii, eneo la mali",
+  privacy_s3_listing_li2: "Bei na maelezo",
+  privacy_s3_listing_li3: "Picha na maudhui ya media",
+  privacy_s3_h_tech: "Taarifa za Kiufundi",
+  privacy_s3_tech_li1: "Aina ya kifaa na mfumo wa uendeshaji",
+  privacy_s3_tech_li2: "Anwani ya IP",
+  privacy_s3_tech_li3: "Takwimu za matumizi ya programu",
+  privacy_s4_title: "4. Jinsi Tunavyotumia Data Yako",
+  privacy_s4_li1: "Kutoa na kusimamia akaunti",
+  privacy_s4_li2: "Kuwezesha orodha za mali na utafutaji",
+  privacy_s4_li3: "Kurahisisha mawasiliano kati ya watumiaji",
+  privacy_s4_li4: "Kuboresha utendaji wa jukwaa",
+  privacy_s4_li5: "Kuzuia udanganyifu na matumizi mabaya",
+  privacy_s5_title: "5. Kushiriki Data",
+  privacy_s5_intro: "Hatuuzi data yako ya kibinafsi. Tunaweza kushiriki taarifa na:",
+  privacy_s5_li1: "Watafutaji wa mali wanaovutiwa (mawasiliano tu)",
+  privacy_s5_li2: "Watoa huduma wa uhifadhi wa wingu na uchambuzi",
+  privacy_s5_li3: "Wasindikaji wa malipo (ikitumika)",
+  privacy_s5_li4: "Mamlaka inapohitajika kisheria",
+  privacy_s6_title: "6. Uhifadhi wa Data",
+  privacy_s6_body: "Tunashikilia data ya kibinafsi kwa muda unaohitajika tu kutimiza madhumuni ya biashara au kisheria halali. Data inafutwa kwa usalama au kutamkwa jina isipokuwa inapohitajika tena.",
+  privacy_s7_title: "7. Haki Zako",
+  privacy_s7_li1: "Pata data yako ya kibinafsi",
+  privacy_s7_li2: "Omba marekebisho",
+  privacy_s7_li3: "Omba kufutwa",
+  privacy_s7_li4: "Ondoa idhini",
+  privacy_s7_li5: "Leta malalamiko kwa mamlaka husika",
+  privacy_s8_title: "8. Usalama",
+  privacy_s8_body: "Tunatekeleza ulinzi wa kiufundi na wa shirika ikiwemo usimbuaji, uhifadhi salama na udhibiti wa ufikiaji. Hata hivyo, hakuna mfumo unaokuwa salama kabisa.",
+  privacy_s9_title: "9. Wasiliana Nasi",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

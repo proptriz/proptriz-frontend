@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface PropertyDescriptionProps {
   description?: string;
@@ -11,6 +12,7 @@ export default function PropertyDescription({
   description = "",
   wordLimit = 30,
 }: PropertyDescriptionProps) {
+  const { t } = useLanguage()
   const [expanded, setExpanded] = useState(false);
 
   const { previewText, hasMore } = useMemo(() => {
@@ -66,7 +68,7 @@ export default function PropertyDescription({
             px-1
           "
         >
-          {expanded ? "See less" : "See more"}
+          {expanded ? t("home_show_less") : t("home_see_all")}
         </button>
       )}
     </div>

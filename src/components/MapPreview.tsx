@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/i18n/LanguageContext";
+
 interface MapPreviewProps {
   address: string;
   coordinates: [number, number];
@@ -14,16 +16,16 @@ export default function MapPreview({
   onChangeLocation,
   hint,
 }: MapPreviewProps) {
+  const { t } = useLanguage();
   const [lat, lng] = coordinates;
-  const hasCoords  = lat !== 6.4281 || lng !== 3.4219; // not the default center
+  const hasCoords  = lat !== 6.4281 || lng !== 3.4219;
 
   return (
     <div className="flex flex-col gap-2">
       <div className="rounded-2xl overflow-hidden border border-[#e5e7eb]">
         {/* SVG map visual */}
         <div
-          className="h-28 relative flex items-center justify-center cursor-pointer
-                     select-none"
+          className="h-28 relative flex items-center justify-center cursor-pointer select-none"
           style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 60%,#2d8ba8 100%)" }}
           onClick={onChangeLocation}
         >
@@ -57,7 +59,7 @@ export default function MapPreview({
                             w-3 h-3 bg-white rounded-full" />
           </div>
 
-          {/* "No pin yet" overlay when using default coords */}
+          {/* "No pin yet" overlay */}
           {!hasCoords && (
             <div
               className="absolute inset-0 flex flex-col items-center justify-center gap-1.5"
@@ -65,12 +67,12 @@ export default function MapPreview({
             >
               <span className="text-2xl">📍</span>
               <p className="text-white text-[12px] font-bold text-center px-4">
-                Tap to pick your property location
+                {t("map_preview_tap_hint")}
               </p>
             </div>
           )}
 
-          {/* Change location button */}
+          {/* Change / Pick location button */}
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onChangeLocation(); }}
@@ -79,7 +81,7 @@ export default function MapPreview({
                        transition-all active:scale-95"
             style={{ background: "#f0a500", color: "#143d4d" }}
           >
-            📍 {hasCoords ? "Change" : "Pick Location"}
+            📍 {hasCoords ? t("map_preview_change") : t("map_preview_pick")}
           </button>
         </div>
 
@@ -87,12 +89,12 @@ export default function MapPreview({
         <div className="bg-white px-3.5 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-[#111827] truncate">
-              {address || "No address typed yet"}
+              {address || t("map_preview_no_address")}
             </p>
             <p className="text-[11px] text-[#9ca3af] mt-0.5 font-mono">
               {hasCoords
                 ? `${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E`
-                : "Coordinates not set"}
+                : t("map_preview_no_coords")}
             </p>
           </div>
           <button
@@ -101,7 +103,7 @@ export default function MapPreview({
             className="text-[11px] font-bold flex-shrink-0 transition-colors"
             style={{ color: "#1e5f74" }}
           >
-            Open Map →
+            {t("map_preview_open")}
           </button>
         </div>
       </div>

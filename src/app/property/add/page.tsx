@@ -391,10 +391,10 @@ export default function AddPropertyPage() {
             </svg>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-bold text-[#92400e] leading-tight">
-{t("add_ai_filled")}
+                {t("add_ai_filled")}
               </p>
               <p className="text-[11px] text-[#b45309] mt-0.5">
-{t("add_ai_filled_sub")}
+                {t("add_ai_filled_sub")}
               </p>
             </div>
             <button

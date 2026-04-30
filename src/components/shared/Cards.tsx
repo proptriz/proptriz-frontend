@@ -6,6 +6,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { ReviewType } from "@/types";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
@@ -32,6 +33,7 @@ export const ReviewCard: React.FC<{
   showReply?: (review: ReviewType) => void;
   showPropDetails?: boolean;
 }> = ({ review, showReply, showPropDetails = false }) => {
+  const { t } = useLanguage();
   const [relativeTimeString, setRelativeTimeString] = useState("");
 
   useEffect(() => {
@@ -151,7 +153,7 @@ export const ReviewCard: React.FC<{
                              active:scale-95"
                   style={{ background: "#e0f0f5", color: "#1e5f74" }}
                 >
-                  💬 Reply ({review.reply_count ?? 0})
+                  💬 {t("rev_reply")} ({review.reply_count ?? 0})
                 </button>
               )}
             </div>

@@ -7,23 +7,29 @@ import Popup from "./Popup";
 import { AppContext } from "@/context/AppContextProvider";
 import Image from "next/image";
 import { BrandLogo } from "@/components/shared/BrandLogo";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const MENU_ITEMS = [
-  { icon: "✏️", title: "Edit Profile",       link: "/profile/edit"         },
-  { icon: "🏠", title: "List New Property",  link: "/property/add"         },
-  { icon: "🤝", title: "Become an Agent",    link: "/profile/become-agent" },
-  { icon: "🔒", title: "Privacy Policy",     link: "/privacy-policy"       },
-  { icon: "📋", title: "Terms of Service",   link: "/terms-of-service"     },
-  { icon: "❓", title: "FAQ",                link: "/profile/faq"          },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
+import { LOCALE_META } from "@/i18n/translations";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { authUser }            = useContext(AppContext);
+  const { t, locale, openPicker } = useLanguage();
+
+  // Menu items — labels come from the translation table.
+  // The Language entry also shows the active locale flag + name for instant
+  // feedback without opening the picker.
+  const MENU_ITEMS = [
+    { icon: "✏️", labelKey: "menu_edit_profile"  as const, link: "/profile/edit",         action: undefined          },
+    { icon: "🏠", labelKey: "menu_list_property" as const, link: "/property/add",          action: undefined          },
+    { icon: "🤝", labelKey: "menu_become_agent"  as const, link: "#",  action: undefined          },
+    { icon: "🔒", labelKey: "menu_privacy"       as const, link: "/privacy-policy",        action: undefined          },
+    { icon: "📋", labelKey: "menu_terms"         as const, link: "/terms-of-service",      action: undefined          },
+    { icon: "❓", labelKey: "menu_faq"           as const, link: "/profile/faq",           action: undefined          },
+  ] as const;
+
+  const localeMeta = LOCALE_META[locale];
 
   return (
     <>
@@ -34,21 +40,39 @@ const Header: React.FC = () => {
       >
         <div className="h-14 px-4 flex items-center justify-between mx-auto">
 
-          {/* Logo — full variant (mark + wordmark), light theme for teal header) */}
+          {/* Logo */}
           <BrandLogo variant="full" theme="light" size={36} linkTo="/" />
 
-          {/* Menu button */}
-          <button
-            type="button"
-            onClick={() => setShowMenu(true)}
-            className="w-9 h-9 rounded-full flex items-center justify-center
-                       text-white text-lg transition-colors
-                       bg-white/15 border border-white/25
-                       hover:bg-white/25 active:scale-95"
-            aria-label="Open menu"
-          >
-            <SlMenu size={16} />
-          </button>
+          {/* Right-side: language badge + menu button */}
+          <div className="flex items-center gap-2">
+
+            {/* Language badge — tapping it opens the picker directly from header */}
+            <button
+              type="button"
+              onClick={openPicker}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full
+                         transition-all hover:bg-white/25 active:scale-95"
+              aria-label={t("menu_language")}
+            >
+              <span className="text-[16px] leading-none">{localeMeta.flag}</span>
+              <span className="text-white text-[11px] font-semibold hidden xs:inline">
+                {locale.toUpperCase()}
+              </span>
+            </button>
+
+            {/* Hamburger menu button */}
+            <button
+              type="button"
+              onClick={() => setShowMenu(true)}
+              className="w-9 h-9 rounded-full flex items-center justify-center
+                         text-white text-lg transition-colors
+                         bg-white/15 border border-white/25
+                         hover:bg-white/25 active:scale-95"
+              aria-label="Open menu"
+            >
+              <SlMenu size={16} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -90,7 +114,7 @@ const Header: React.FC = () => {
                          bg-[#fef3cd] text-[#c88400] px-2 py-0.5 rounded-full
                          border border-[rgba(240,165,0,0.3)]"
             >
-              🏆 Top Agent #1
+              🏆 {t("profile_top_agent")}
             </span>
           </div>
         </div>
@@ -112,10 +136,37 @@ const Header: React.FC = () => {
                 {item.icon}
               </div>
               <span className="text-[13px] font-semibold text-[#111827]">
-                {item.title}
+                {t(item.labelKey)}
               </span>
             </Link>
           ))}
+
+          {/* Language selector row — opens picker, shows active flag + name */}
+          <button
+            type="button"
+            onClick={() => { setShowMenu(false); openPicker(); }}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl
+                       hover:bg-[#e0f0f5] transition-colors w-full text-left"
+          >
+            <div
+              className="w-8 h-8 rounded-[10px] flex items-center justify-center
+                         text-[18px] flex-shrink-0 bg-[#e0f0f5]"
+            >
+              {localeMeta.flag}
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="text-[13px] font-semibold text-[#111827]">
+                {t("menu_language")}
+              </span>
+            </div>
+            {/* Current locale badge */}
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+              style={{ background: "#e0f0f5", color: "#1e5f74" }}
+            >
+              {localeMeta.nativeName}
+            </span>
+          </button>
         </nav>
 
         {/* Footer actions */}
@@ -126,7 +177,7 @@ const Header: React.FC = () => {
             className="flex-1 py-2.5 rounded-xl text-center text-[13px] font-bold
                        bg-[#e0f0f5] text-[#1e5f74]"
           >
-            ⚙️ Manage Account
+            ⚙️ {t("menu_edit_profile")}
           </Link>
           <button
             type="button"
@@ -134,7 +185,7 @@ const Header: React.FC = () => {
             className="flex-1 py-2.5 rounded-xl text-[13px] font-bold
                        bg-[#fee2e2] text-[#ef4444]"
           >
-            ✕ Close
+            ✕ {t("common_close")}
           </button>
         </div>
       </Popup>

@@ -12,21 +12,25 @@ import { EmailInput, SelectInput, TextInput } from '@/components/shared/Input';
 import { PhoneInput } from '@/components/shared/PhoneInput';
 import Splash from '@/components/shared/Splash';
 import { BackButton } from '@/components/shared/buttons';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
 // ─────────────────────────────────────────────────────────────────────────────
 
-const USER_TYPE_META: Record<string, { label: string; emoji: string; desc: string }> = {
-  [UserTypeEnum.Individual]: { label: "Individual",   emoji: "🏠", desc: "Personal property owner" },
-  [UserTypeEnum.Agent]:      { label: "Agent",        emoji: "🤝", desc: "Licensed property agent" },
-  company:                   { label: "Company",      emoji: "🏢", desc: "Real estate company" },
-};
+
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const EditProfile = () => {
   const { authUser } = useContext(AppContext);
+  const { t } = useLanguage();
+
+  const USER_TYPE_META: Record<string, { label: string; emoji: string; desc: string }> = {
+    [UserTypeEnum.Individual]: { label: t("ep_type_individual"), emoji: "🏠", desc: t("ep_type_individual_desc") },
+    [UserTypeEnum.Agent]:      { label: t("ep_type_agent"),      emoji: "🤝", desc: t("ep_type_agent_desc")      },
+    company:                   { label: t("ep_type_company"),    emoji: "🏢", desc: t("ep_type_company_desc")    },
+  };
 
   const [photo, setPhoto]                           = useState<File | undefined>();
   const [existingPhotoUrl, setExistingPhotoUrl]     = useState("/logo.png");
@@ -69,16 +73,16 @@ const EditProfile = () => {
 
     const validTypes = ["image/png", "image/jpeg", "image/jpg"];
     if (!validTypes.includes(file.type)) {
-      toast.error("Invalid file type. Please select a PNG or JPG image.");
+      toast.error(t("ep_photo_invalid"));
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("File is too large. Maximum size is 2 MB.");
+      toast.error(t("ep_photo_large"));
       return;
     }
     setPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
-    toast.success("Photo selected — save to apply.");
+    toast.success(t("ep_photo_selected"));
   };
 
   const handleSubmit = async () => {
@@ -87,9 +91,9 @@ const EditProfile = () => {
       formData.phone    = normalizedPhone ?? "";
       formData.whatsapp = normalizedWhatsapp ?? "";
       await addOrUpdateUserSettings(formData, photo);
-      toast.success("Profile updated successfully!");
-    } catch {
-      toast.error("Failed to update profile.");
+      toast.success(t("ep_updated"));
+    } catch (error:any) {
+      toast.error(error.message || t("ep_failed"));
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +102,7 @@ const EditProfile = () => {
   // ── Gate ─────────────────────────────────────────────────────────────────
   if (!authUser) return <Splash showFooter />;
 
-  const displayName  = formData.brand || authUser.display_name || "Your Name";
+  const displayName  = formData.brand || authUser.display_name || t("ep_full_name_ph");
   const displayEmail = formData.email || authUser.primary_email || "";
   const userTypeMeta = USER_TYPE_META[formData.user_type ?? UserTypeEnum.Individual];
 
@@ -138,7 +142,7 @@ const EditProfile = () => {
                        text-[13px] font-bold tracking-wide"
             style={{ fontFamily: "'Raleway', sans-serif" }}
           >
-            Edit Profile
+            {t("ep_title")}
           </p>
         </div>
 
@@ -230,20 +234,20 @@ const EditProfile = () => {
           <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]
                         flex items-center gap-1.5 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-            Identity
+            {t("ep_identity")}
           </p>
           <div className="space-y-3">
             <TextInput
-              label="Full Name / Brand"
+              label={t("ep_full_name")}
               icon={<FaUser className="text-[#1e5f74]" />}
               name="brand"
               id="brand"
               value={formData.brand ?? ""}
               onChange={onChange}
-              placeholder="Enter your full name or brand"
+              placeholder={t("ep_full_name_ph")}
             />
             <SelectInput
-              label="Account Type"
+              label={t("ep_account_type")}
               value={formData.user_type ?? UserTypeEnum.Individual}
               onChange={onChange}
               name="user_type"
@@ -263,31 +267,31 @@ const EditProfile = () => {
           className="bg-white rounded-2xl border border-[#e5e7eb] overflow-hidden"
           style={{ boxShadow: "0 2px 12px rgba(30,95,116,0.06)" }}
         >
-          <ToggleCollapse header="📞 Contact Details" open>
+          <ToggleCollapse header={`📞 ${t("ep_contact")}`} open>
             <div className="space-y-3 px-4 pb-4">
               <EmailInput
-                label="Email (optional)"
+                label={t("ep_email")}
                 icon={<FaEnvelope className="text-[#1e5f74]" />}
                 name="email"
                 id="email"
                 value={formData.email ?? ""}
                 onChange={onChange}
-                placeholder="Enter your email"
+                placeholder={t("ep_email_ph")}
               />
               <PhoneInput
-                label="Phone Number"
+                label={t("ep_phone")}
                 value={phone}
                 onChange={setPhone}
                 onNormalize={setNormalizedPhone}
               />
               <PhoneInput
-                label="WhatsApp (optional)"
+                label={t("ep_whatsapp")}
                 name="whatsapp"
                 id="whatsapp"
                 value={whatsapp}
                 onChange={setWhatsapp}
                 onNormalize={setNormalizedWhatsapp}
-                placeholder="+234 080 3288 9111"
+                placeholder={t("ep_whatsapp_ph")}
               />
             </div>
           </ToggleCollapse>
@@ -311,15 +315,15 @@ const EditProfile = () => {
           {isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin flex-shrink-0" />
-              Updating…
+              {t("ep_saving")}
             </>
           ) : (
-            <>✓ Save Changes</>
+  <>{t("ep_save")}</>
           )}
         </button>
 
         <p className="text-center text-[11px] text-[#9ca3af] pb-2">
-          Your information is only visible to parties you engage with.
+          {t("ep_privacy")}
         </p>
       </div>
     </div>

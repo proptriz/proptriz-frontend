@@ -9,10 +9,12 @@ interface CurrencySelectorProps {
 }
 
 const CURRENCY_OPTIONS = [
-  { value: CurrencyEnum.naira,  label: "Naira (₦)"  },
-  { value: CurrencyEnum.dollar, label: "Dollar ($)" },
-  { value: CurrencyEnum.euro,   label: "Euro (€)"   },
-  { value: CurrencyEnum.pound,  label: "Pound (£)"  },
+  { value: CurrencyEnum.ngn,  label: "Naira (₦)"  },
+  { value: CurrencyEnum.usd, label: "Dollar ($)" },
+  { value: CurrencyEnum.kes,   label: "Kenyan Shillings (KSh)"   },
+  { value: CurrencyEnum.cfa,  label: "CFA Franc (FCFA)"  },
+  { value: CurrencyEnum.cdf,  label: "Congolese Franc (CDF)"  },
+  { value: CurrencyEnum.pi,  label: "Pi Coin"  },
 ];
 
 export default function CurrencySelector({ value, onChange }: CurrencySelectorProps) {

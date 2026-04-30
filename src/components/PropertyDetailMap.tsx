@@ -7,8 +7,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
-import type { LatLngExpression } from "leaflet";
-import { PropertyType } from "@/types";
+import { AFRICAN_BOUNDS, PropertyType } from "@/types/property";
 import { LANDMARK_CATEGORIES } from "@/components/PropertyLocationModal";
 import type { ExternalLandmark } from "@/components/LandmarksPickerMap";
 import logger from "logger.config.mjs";
@@ -235,7 +234,6 @@ const PropertyDetailMap: React.FC<PropertyDetailMapProps> = ({
   const [routes,      setRoutes]      = useState<OsrmRoute[]>([]);
   const [activeRoute, setActiveRoute] = useState<string | null>(null);
 
-  const NIGERIA_BOUNDS: L.LatLngBoundsExpression = [[4.0, 2.5], [13.9, 14.7]];
   const handleRoutes = useCallback((r: OsrmRoute[]) => setRoutes(r), []);
 
   const lineColor   = (id: string) => activeRoute === id ? "#f0a500" : "#1e5f74";
@@ -249,7 +247,7 @@ const PropertyDetailMap: React.FC<PropertyDetailMapProps> = ({
         zoom={15}
         scrollWheelZoom
         zoomControl={false}
-        maxBounds={NIGERIA_BOUNDS}
+        maxBounds={AFRICAN_BOUNDS}
         className="w-full h-full"
         style={{ position: "relative", zIndex: 0 }}
       >

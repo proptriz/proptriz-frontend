@@ -6,19 +6,23 @@ import { AppContext } from "@/context/AppContextProvider";
 import Footer from "./Footer";
 import GoogleLoginButton from "../GoogleLoginButton";
 import { BrandLogo } from "@/components/shared/BrandLogo";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-const STAGE_LABELS: Record<string, string> = {
-  auto_login:             "Checking session…",
-  pi_sdk_loading:         "Loading Pi SDK…",
-  pi_authenticating:      "Authenticating with Pi…",
-  backend_authenticating: "Verifying identity…",
-  authenticated:          "Signed in! Redirecting…",
-  timeout:                "Connection timed out",
-  failed:                 "Login failed — please retry",
-};
+
 
 export default function Splash({ showFooter = false }: { showFooter?: boolean }) {
   const { isSigningInUser, authenticateUser, loginStage } = useContext(AppContext);
+  const { t } = useLanguage();
+
+  const STAGE_LABELS: Record<string, string> = {
+    auto_login:             t("splash_checking"),
+    pi_sdk_loading:         t("splash_sdk"),
+    pi_authenticating:      t("splash_pi_auth"),
+    backend_authenticating: t("splash_verifying"),
+    authenticated:          t("splash_signed_in"),
+    timeout:                t("splash_timeout"),
+    failed:                 t("splash_failed"),
+  };
 
   const stageLabel = loginStage
     ? (STAGE_LABELS[loginStage] ?? loginStage.replace(/_/g, " "))
@@ -115,7 +119,7 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
                   color: "#9ca3af", textTransform: "uppercase",
                   letterSpacing: "0.2em",
                 }}>
-                  or
+                  {t("splash_or")}
                 </span>
                 <div className="flex-grow border-t border-[#f0f0f0]" />
               </div>
@@ -154,14 +158,11 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
                         style={{ background: "#1e5f74" }}
                       />
                     </span>
-                    Required: Pi Browser
+                    {t("splash_pi_required")}
                   </div>
 
                   <p style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.6 }}>
-                    To use your Pi Wallet and Identity, you{" "}
-                    <strong style={{ color: "#111827" }}>must</strong> be browsing
-                    within the{" "}
-                    <strong style={{ color: "#111827" }}>Pi Browser</strong> app.
+                    {t("splash_pi_desc")} app.
                   </p>
 
                   <button
@@ -185,19 +186,16 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
                       height={20}
                       className="opacity-90 flex-shrink-0"
                     />
-                    {isSigningInUser ? "Connecting to Pi…" : "Continue with Pi Network"}
+                    {isSigningInUser ? t("splash_pi_connecting") : t("splash_pi_btn")}
                   </button>
                 </div>
               </div>
             </div>
 
             <p className="mt-7 text-center" style={{ fontSize: 12, color: "#9ca3af" }}>
-              Trouble signing in?{" "}
-              <span
-                className="font-semibold cursor-pointer hover:underline"
-                style={{ color: "#1e5f74" }}
-              >
-                Get Help
+              {t("splash_trouble")}{" "}
+              <span className="font-semibold cursor-pointer hover:underline" style={{ color: "#1e5f74" }}>
+                {t("splash_help")}
               </span>
             </p>
           </div>

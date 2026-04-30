@@ -5,14 +5,17 @@ import Link from "next/link";
 import SearchBar from "@/components/shared/SearchBar";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import propertyService from "@/services/propertyApi";
-import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
+import { CategoryEnum, ListForEnum, PropertyFilterPayload, PropertyType, RenewalEnum } from "@/types/property";
 import logger from "../../../../logger.config.mjs"
 import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import { VerticalCard } from "@/components/shared/VerticalCard";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function PropertyListPage() {
+    const { t } = useLanguage();
+
     const [properties, setProperties] = useState<PropertyType[]>([]);
     const [loadingProp, setLoadingProp] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -98,7 +101,7 @@ export default function PropertyListPage() {
 
       {/* Explore Nearby Property List */}
       <section className="px-4 my-6">
-        <h2 className="text-lg font-semibold">Properties</h2>
+        <h2 className="text-lg font-semibold">{t("profile_properties")}</h2>
 
         <div className="grid grid-cols-2 gap-4 mt-4">
           {properties.map((item, key) => (
@@ -109,11 +112,11 @@ export default function PropertyListPage() {
                 name={item.title}
                 price={item.price}
                 currency={item.currency}
-                category={item.category || ""}
+                category={item.category || CategoryEnum.house}
                 address={item.address}
                 image={item.banner}
-                period={item.period || ""}
-                listed_for={item.listed_for || ""}
+                period={item.period || RenewalEnum.yearly}
+                listed_for={item.listed_for || ListForEnum.rent}
                 rating={item.average_rating || 4.9}
               />
             </Link>

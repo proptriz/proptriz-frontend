@@ -16,6 +16,7 @@ import {
   updateLandmark,
 } from "@/services/landmarkApi";
 import type { LocalLandmark, ExternalLandmark } from "@/components/LandmarksPickerMap";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const LocationPickerMap = dynamic(
   () => import("@/components/LocationPickerMap"),
@@ -30,20 +31,12 @@ const LandmarksPickerMap = dynamic(
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * The Landmark type used in the parent (AddProperty / EditProperty) callbacks.
- * Mirrors LandmarkResponse for landmarks that were saved to the DB, and
- * LocalLandmark for ones that only exist in the session (before saving).
- *
- * We keep a simple union here so parent components don't need two types.
- */
 export interface Landmark {
-  id:       string;    // DB id after save, or crypto.randomUUID() before save
+  id:       string;
   name:     string;
   lat:      number;
   lng:      number;
   category: LandmarkCategory;
-  /** Present only after a successful POST /api/landmarks */
   dbId?:    string;
 }
 
@@ -85,31 +78,34 @@ interface PropertyLocationModalProps {
 // SUB-COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const StepIndicator: React.FC<{ step: 1 | 2 }> = ({ step }) => (
-  <div className="flex items-center gap-2 shrink-0">
-    <div className="flex items-center gap-1.5">
-      <div className={`w-6 h-6 rounded-full flex items-center justify-center
-                       text-[11px] font-bold transition-all duration-200
-                       ${step === 1 ? "bg-[#1e5f74] text-white shadow-sm" : "bg-[#e0f0f5] text-[#1e5f74]"}`}>
-        1
+const StepIndicator: React.FC<{ step: 1 | 2 }> = ({ step }) => {
+  const { t } = useLanguage();
+  return (
+    <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-1.5">
+        <div className={`w-6 h-6 rounded-full flex items-center justify-center
+                         text-[11px] font-bold transition-all duration-200
+                         ${step === 1 ? "bg-[#1e5f74] text-white shadow-sm" : "bg-[#e0f0f5] text-[#1e5f74]"}`}>
+          1
+        </div>
+        <span className={`text-xs font-semibold ${step === 1 ? "text-[#1e5f74]" : "text-[#9ca3af]"}`}>
+          {t("lm_step_location")}
+        </span>
       </div>
-      <span className={`text-xs font-semibold ${step === 1 ? "text-[#1e5f74]" : "text-[#9ca3af]"}`}>
-        Location
-      </span>
-    </div>
-    <FiChevronRight size={12} className="text-[#d1d5db]" />
-    <div className="flex items-center gap-1.5">
-      <div className={`w-6 h-6 rounded-full flex items-center justify-center
-                       text-[11px] font-bold transition-all duration-200
-                       ${step === 2 ? "bg-[#1e5f74] text-white shadow-sm" : "bg-[#e0f0f5] text-[#1e5f74]"}`}>
-        2
+      <FiChevronRight size={12} className="text-[#d1d5db]" />
+      <div className="flex items-center gap-1.5">
+        <div className={`w-6 h-6 rounded-full flex items-center justify-center
+                         text-[11px] font-bold transition-all duration-200
+                         ${step === 2 ? "bg-[#1e5f74] text-white shadow-sm" : "bg-[#e0f0f5] text-[#1e5f74]"}`}>
+          2
+        </div>
+        <span className={`text-xs font-semibold ${step === 2 ? "text-[#1e5f74]" : "text-[#9ca3af]"}`}>
+          {t("lm_step_facilities")}
+        </span>
       </div>
-      <span className={`text-xs font-semibold ${step === 2 ? "text-[#1e5f74]" : "text-[#9ca3af]"}`}>
-        Facilities
-      </span>
     </div>
-  </div>
-);
+  );
+};
 
 const CategoryPills: React.FC<{
   selected: LandmarkCategory;
@@ -141,166 +137,169 @@ const LandmarkFormBody: React.FC<{
   name:           string;
   category:       LandmarkCategory;
   error:          string;
-  /** true while the API call is in flight */
   saving:         boolean;
   onNameChange:   (v: string) => void;
   onCatChange:    (v: LandmarkCategory) => void;
   onSubmit:       () => void;
-  /** Search results from GET /api/landmarks/search — add mode only */
   searchResults:  ExternalLandmark[];
   searchLoading:  boolean;
 }> = ({
   mode, lat, lng, name, category, error, saving,
   onNameChange, onCatChange, onSubmit,
   searchResults, searchLoading,
-}) => (
-  <div className="space-y-4">
+}) => {
+  const { t } = useLanguage();
+  return (
+    <div className="space-y-4">
 
-    {/* Selected pin chip (add mode) */}
-    {mode === "add" && (
-      <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
-                      bg-[#e0f0f5] border border-[#1e5f74]/30">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1e5f74] shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#a8d8e8]" />
-          <span className="text-[11px] font-bold text-white leading-none">
-            {name.trim() ? name.trim().slice(0, 14) : "New Pin"}
-          </span>
+      {/* Selected pin chip (add mode) */}
+      {mode === "add" && (
+        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                        bg-[#e0f0f5] border border-[#1e5f74]/30">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1e5f74] shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#a8d8e8]" />
+            <span className="text-[11px] font-bold text-white leading-none">
+              {name.trim() ? name.trim().slice(0, 14) : t("lm_new_pin")}
+            </span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-[#1e5f74] font-semibold uppercase tracking-wide mb-0.5">
+              {t("lm_pinned_location")}
+            </p>
+            <p className="text-xs font-mono text-[#374151]">
+              {lat.toFixed(5)},&nbsp;{lng.toFixed(5)}
+            </p>
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-[#1e5f74] font-semibold uppercase tracking-wide mb-0.5">
-            Pinned location
-          </p>
-          <p className="text-xs font-mono text-[#374151]">
-            {lat.toFixed(5)},&nbsp;{lng.toFixed(5)}
-          </p>
-        </div>
-      </div>
-    )}
-
-    {/* Coordinates (edit mode) */}
-    {mode === "edit" && (
-      <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
-                      bg-[#f5f7f9] border border-[#e5e7eb]">
-        <FiMapPin size={13} className="text-[#1e5f74] shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-[#9ca3af] font-semibold uppercase tracking-wide mb-0.5">
-            Coordinates
-          </p>
-          <p className="text-xs font-mono text-[#374151]">
-            {lat.toFixed(6)},&nbsp;{lng.toFixed(6)}
-          </p>
-        </div>
-      </div>
-    )}
-
-    {/* ── Live search results — "Already in DB nearby" (add mode) ── */}
-    {mode === "add" && (searchLoading || searchResults.length > 0) && (
-      <div className="rounded-xl border border-[#e5e7eb] overflow-hidden">
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#f9fafb] border-b border-[#e5e7eb]">
-          <span className="text-sm">📌</span>
-          <p className="text-[11px] font-bold text-[#374151] uppercase tracking-wide">
-            Already tagged nearby
-          </p>
-          {searchLoading
-            ? <FiRefreshCw size={10} className="ml-auto text-[#9ca3af] animate-spin" />
-            : <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5
-                               rounded-full bg-[#e5e7eb] text-[#6b7280]">
-                {searchResults.length}
-              </span>
-          }
-        </div>
-
-        {!searchLoading && (
-          <ul className="divide-y divide-[#f3f4f6] max-h-[148px] overflow-y-auto">
-            {searchResults.map((lm) => {
-              const cat = LANDMARK_CATEGORIES.find(c => c.value === lm.category);
-              const dist = lm.distanceM != null
-                ? lm.distanceM < 1000
-                  ? `${Math.round(lm.distanceM)} m`
-                  : `${(lm.distanceM / 1000).toFixed(1)} km`
-                : null;
-              return (
-                <li key={lm.id}
-                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#f9fafb] transition-colors">
-                  <span className="text-base leading-none shrink-0">{cat?.emoji ?? "📍"}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#111827] truncate">{lm.name}</p>
-                    <p className="text-[10px] text-[#9ca3af]">{cat?.label ?? "Other"}</p>
-                  </div>
-                  <div className="shrink-0 flex flex-col items-end gap-0.5">
-                    {dist && (
-                      <span className="text-[10px] font-semibold text-[#1e5f74]
-                                       bg-[#e0f0f5] px-1.5 py-0.5 rounded-full">
-                        {dist}
-                      </span>
-                    )}
-                    <span className="text-[9px] text-[#9ca3af]">
-                      ✓{lm.verifiedCount}
-                    </span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-
-        <div className="px-3 py-2 bg-[#fffbeb] border-t border-[#fde68a]">
-          <p className="text-[10px] text-[#92400e] leading-relaxed">
-            💡 Check the list before adding — you may be tagging the same place.
-          </p>
-        </div>
-      </div>
-    )}
-
-    {/* Name field */}
-    <div>
-      <label className="block text-xs font-semibold text-[#374151] mb-1.5">
-        Landmark name <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        placeholder="e.g. Ikeja City Mall, General Hospital…"
-        value={name}
-        onChange={(e) => onNameChange(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onSubmit(); } }}
-        autoFocus
-        disabled={saving}
-        className={`w-full text-sm px-3 py-2.5 rounded-xl border outline-none
-                    bg-white text-[#111827] placeholder:text-[#9ca3af] transition-colors
-                    disabled:opacity-50
-                    ${error
-                      ? "border-red-400 ring-1 ring-red-200"
-                      : "border-[#d1d5db] focus:border-[#1e5f74] focus:ring-1 focus:ring-[#e0f0f5]"}`}
-      />
-      {error && (
-        <p className="mt-1.5 text-[11px] text-red-500 flex items-center gap-1">
-          <FiAlertCircle size={10} /> {error}
-        </p>
       )}
-    </div>
 
-    {/* Category picker */}
-    <div>
-      <label className="block text-xs font-semibold text-[#374151] mb-2">Category</label>
-      <CategoryPills selected={category} onChange={onCatChange} />
-    </div>
+      {/* Coordinates (edit mode) */}
+      {mode === "edit" && (
+        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                        bg-[#f5f7f9] border border-[#e5e7eb]">
+          <FiMapPin size={13} className="text-[#1e5f74] shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-[#9ca3af] font-semibold uppercase tracking-wide mb-0.5">
+              {t("map_gps")}
+            </p>
+            <p className="text-xs font-mono text-[#374151]">
+              {lat.toFixed(6)},&nbsp;{lng.toFixed(6)}
+            </p>
+          </div>
+        </div>
+      )}
 
-    {/* Submit */}
-    <button
-      type="button"
-      onClick={onSubmit}
-      disabled={saving}
-      className="w-full py-3 rounded-xl bg-[#1e5f74] hover:bg-[#143d4d]
-                 text-white text-sm font-bold flex items-center justify-center
-                 gap-2 shadow-sm active:scale-95 transition-all disabled:opacity-60">
-      {saving
-        ? <><FiRefreshCw size={14} className="animate-spin" /> Saving…</>
-        : mode === "add"
-          ? <><FiPlus size={14} /> Add Nearby Facilities</>
-          : <><FiCheck size={14} /> Save Changes</>}
-    </button>
-  </div>
-);
+      {/* Live search results — "Already in DB nearby" (add mode) */}
+      {mode === "add" && (searchLoading || searchResults.length > 0) && (
+        <div className="rounded-xl border border-[#e5e7eb] overflow-hidden">
+          <div className="flex items-center gap-2 px-3 py-2 bg-[#f9fafb] border-b border-[#e5e7eb]">
+            <span className="text-sm">📌</span>
+            <p className="text-[11px] font-bold text-[#374151] uppercase tracking-wide">
+              {t("lm_already_tagged")}
+            </p>
+            {searchLoading
+              ? <FiRefreshCw size={10} className="ml-auto text-[#9ca3af] animate-spin" />
+              : <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5
+                                 rounded-full bg-[#e5e7eb] text-[#6b7280]">
+                  {searchResults.length}
+                </span>
+            }
+          </div>
+
+          {!searchLoading && (
+            <ul className="divide-y divide-[#f3f4f6] max-h-[148px] overflow-y-auto">
+              {searchResults.map((lm) => {
+                const cat = LANDMARK_CATEGORIES.find(c => c.value === lm.category);
+                const dist = lm.distanceM != null
+                  ? lm.distanceM < 1000
+                    ? `${Math.round(lm.distanceM)} m`
+                    : `${(lm.distanceM / 1000).toFixed(1)} km`
+                  : null;
+                return (
+                  <li key={lm.id}
+                    className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-[#f9fafb] transition-colors">
+                    <span className="text-base leading-none shrink-0">{cat?.emoji ?? "📍"}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[#111827] truncate">{lm.name}</p>
+                      <p className="text-[10px] text-[#9ca3af]">{cat?.label ?? t("lm_other")}</p>
+                    </div>
+                    <div className="shrink-0 flex flex-col items-end gap-0.5">
+                      {dist && (
+                        <span className="text-[10px] font-semibold text-[#1e5f74]
+                                         bg-[#e0f0f5] px-1.5 py-0.5 rounded-full">
+                          {dist}
+                        </span>
+                      )}
+                      <span className="text-[9px] text-[#9ca3af]">
+                        ✓{lm.verifiedCount}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <div className="px-3 py-2 bg-[#fffbeb] border-t border-[#fde68a]">
+            <p className="text-[10px] text-[#92400e] leading-relaxed">
+              {t("lm_duplicate_hint")}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Name field */}
+      <div>
+        <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+          {t("lm_name_label")} <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          placeholder={t("lm_name_ph")}
+          value={name}
+          onChange={(e) => onNameChange(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onSubmit(); } }}
+          autoFocus
+          disabled={saving}
+          className={`w-full text-sm px-3 py-2.5 rounded-xl border outline-none
+                      bg-white text-[#111827] placeholder:text-[#9ca3af] transition-colors
+                      disabled:opacity-50
+                      ${error
+                        ? "border-red-400 ring-1 ring-red-200"
+                        : "border-[#d1d5db] focus:border-[#1e5f74] focus:ring-1 focus:ring-[#e0f0f5]"}`}
+        />
+        {error && (
+          <p className="mt-1.5 text-[11px] text-red-500 flex items-center gap-1">
+            <FiAlertCircle size={10} /> {error}
+          </p>
+        )}
+      </div>
+
+      {/* Category picker */}
+      <div>
+        <label className="block text-xs font-semibold text-[#374151] mb-2">
+          {t("lm_category_label")}
+        </label>
+        <CategoryPills selected={category} onChange={onCatChange} />
+      </div>
+
+      {/* Submit */}
+      <button
+        type="button"
+        onClick={onSubmit}
+        disabled={saving}
+        className="w-full py-3 rounded-xl bg-[#1e5f74] hover:bg-[#143d4d]
+                   text-white text-sm font-bold flex items-center justify-center
+                   gap-2 shadow-sm active:scale-95 transition-all disabled:opacity-60">
+        {saving
+          ? <><FiRefreshCw size={14} className="animate-spin" /> {t("lm_saving")}</>
+          : mode === "add"
+            ? <><FiPlus size={14} /> {t("lm_add_btn")}</>
+            : <><FiCheck size={14} /> {t("lm_save_changes")}</>}
+      </button>
+    </div>
+  );
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DELETE CONFIRM BODY
@@ -311,6 +310,7 @@ const DeleteConfirmBody: React.FC<{
   onConfirm: () => void;
   onCancel:  () => void;
 }> = ({ landmark, onConfirm, onCancel }) => {
+  const { t } = useLanguage();
   const cat = LANDMARK_CATEGORIES.find(c => c.value === landmark.category);
   return (
     <div className="space-y-5">
@@ -320,26 +320,26 @@ const DeleteConfirmBody: React.FC<{
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-[#111827] truncate">{landmark.name}</p>
           <p className="text-xs text-[#9ca3af] mt-0.5">
-            {cat?.label ?? "Other"} ·{" "}
+            {cat?.label ?? t("lm_other")} ·{" "}
             <span className="font-mono">{landmark.lat.toFixed(4)}, {landmark.lng.toFixed(4)}</span>
           </p>
         </div>
       </div>
       <p className="text-sm text-[#4b5563] leading-relaxed text-center">
-        This landmark will be removed from your list. This cannot be undone.
+        {t("lm_delete_desc")}
       </p>
       <div className="flex gap-3">
         <button type="button" onClick={onCancel}
           className="flex-1 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb]
                      text-sm font-semibold text-[#6b7280]
                      hover:border-[#9ca3af] active:scale-95 transition-all">
-          Keep It
+          {t("lm_keep_btn")}
         </button>
         <button type="button" onClick={onConfirm}
           className="flex-[2] py-3 rounded-xl bg-red-500 hover:bg-red-600
                      text-white text-sm font-bold flex items-center justify-center
                      gap-2 shadow-sm active:scale-95 transition-all">
-          <FiTrash2 size={14} /> Remove
+          <FiTrash2 size={14} /> {t("lm_remove_btn")}
         </button>
       </div>
     </div>
@@ -356,6 +356,7 @@ const LandmarkChip: React.FC<{
   onEdit:   (id: string) => void;
   onDelete: (id: string) => void;
 }> = ({ landmark, index, onEdit, onDelete }) => {
+  const { t } = useLanguage();
   const cat = LANDMARK_CATEGORIES.find(c => c.value === landmark.category);
   return (
     <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl
@@ -367,15 +368,17 @@ const LandmarkChip: React.FC<{
       <span className="text-base leading-none shrink-0">{cat?.emoji ?? "📍"}</span>
       <div className="flex-1 min-w-0">
         <p className="text-xs font-bold text-[#111827] truncate">{landmark.name}</p>
-        <p className="text-[10px] text-[#9ca3af]">{cat?.label ?? "Other"}</p>
+        <p className="text-[10px] text-[#9ca3af]">{cat?.label ?? t("lm_other")}</p>
       </div>
       <button onClick={() => onEdit(landmark.id)}
+        aria-label={t("lm_edit_aria")}
         className="w-7 h-7 flex items-center justify-center rounded-lg
                    text-[#6b7280] hover:text-[#1e5f74] hover:bg-[#e0f0f5]
                    active:scale-95 transition-all shrink-0">
         <FiEdit2 size={12} />
       </button>
       <button onClick={() => onDelete(landmark.id)}
+        aria-label={t("lm_delete_aria")}
         className="w-7 h-7 flex items-center justify-center rounded-lg
                    text-[#6b7280] hover:text-red-500 hover:bg-red-50
                    active:scale-95 transition-all shrink-0">
@@ -391,19 +394,18 @@ const LandmarkList: React.FC<{
   onDelete:  (id: string) => void;
   onGoToMap?: () => void;
 }> = ({ landmarks, onEdit, onDelete, onGoToMap }) => {
+  const { t } = useLanguage();
   if (landmarks.length === 0) {
     return (
       <div className="flex flex-col items-center py-8 gap-2 opacity-60">
         <span className="text-4xl">📍</span>
-        <p className="text-sm font-semibold text-[#6b7280]">No facilities added yet</p>
-        <p className="text-xs text-[#9ca3af] text-center">
-          Tap the map to pin nearby schools, hospitals, transport stops, and more.
-        </p>
+        <p className="text-sm font-semibold text-[#6b7280]">{t("lm_empty_title")}</p>
+        <p className="text-xs text-[#9ca3af] text-center">{t("lm_empty_sub")}</p>
         {onGoToMap && (
           <button onClick={onGoToMap}
             className="mt-2 flex items-center gap-1.5 px-3 py-2 rounded-xl
                        bg-[#1e5f74] text-white text-xs font-bold active:scale-95 transition-all">
-            <FiMap size={12} /> Go to Map
+            <FiMap size={12} /> {t("lm_go_to_map")}
           </button>
         )}
       </div>
@@ -431,6 +433,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
   onLandmarksSelect,
   initialLandmarks = [],
 }) => {
+  const { t } = useLanguage();
 
   // ── Step 1 ──────────────────────────────────────────────────────────────────
   const [step, setStep]                     = useState<1 | 2>(1);
@@ -450,10 +453,9 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
   const [mobileView, setMobileView]             = useState<"map" | "list">("map");
   const [selectedId, setSelectedId]             = useState<string | null>(null);
 
-  // ── DB search results — populates "Already tagged nearby" in Add popup ──────
+  // ── DB search results ─────────────────────────────────────────────────────
   const [dbSearchResults, setDbSearchResults]     = useState<ExternalLandmark[]>([]);
   const [dbSearchLoading, setDbSearchLoading]     = useState(false);
-  /** Global DB landmarks shown as grey pills on the map */
   const [externalLandmarks, setExternalLandmarks] = useState<ExternalLandmark[]>([]);
 
   // ── ADD popup state ──────────────────────────────────────────────────────────
@@ -488,7 +490,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Fetch global DB landmarks when step 2 opens (grey map pills) ─────────────
+  // Fetch global DB landmarks when step 2 opens
   useEffect(() => {
     if (!isOpen || step !== 2) return;
     const centre = (userCoordinates as [number, number]) ?? fallbackCoordinates;
@@ -500,16 +502,15 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
         if (!results) return;
         setExternalLandmarks(results as ExternalLandmark[]);
       })
-      .catch(() => {}); // cancelled on cleanup
+      .catch(() => {});
 
     return () => ctrl.abort();
   }, [isOpen, step]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Live search as user types in Add popup ────────────────────────────────────
+  // Live search as user types in Add popup
   useEffect(() => {
     if (!pendingPin) { setDbSearchResults([]); return; }
 
-    // Debounce 500ms
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(async () => {
       if (searchCtrlRef.current) searchCtrlRef.current.abort();
@@ -568,13 +569,9 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
     setDbSearchLoading(false);
   }, []);
 
-  /**
-   * POST /api/landmarks to create the landmark in the global DB,
-   * then add it to the local session list.
-   */
   const confirmAdd = useCallback(async () => {
     if (!pendingPin) return;
-    if (!addName.trim()) { setAddError("Please enter a name for this landmark."); return; }
+    if (!addName.trim()) { setAddError(t("lm_err_name_required")); return; }
 
     setAddSaving(true);
     setAddError("");
@@ -589,7 +586,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
       setLandmarks(prev => [
         ...prev,
         {
-          id:       saved.id,       // use the DB id directly
+          id:       saved.id,
           name:     saved.name,
           lat:      saved.lat,
           lng:      saved.lng,
@@ -599,13 +596,12 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
       closeAddPopup();
       setMobileView("list");
     } catch (err: any) {
-      // 409 = duplicate from the server deduplication check
-      const msg = err?.response?.data?.message ?? "Failed to save landmark. Please try again.";
+      const msg = err?.response?.data?.message ?? t("lm_err_save_failed");
       setAddError(msg);
     } finally {
       setAddSaving(false);
     }
-  }, [pendingPin, addName, addCategory, closeAddPopup]);
+  }, [pendingPin, addName, addCategory, closeAddPopup, t]);
 
   // ── EDIT handlers ────────────────────────────────────────────────────────────
 
@@ -632,15 +628,9 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
     setSelectedId(null);
   }, []);
 
-  /**
-   * PATCH /api/landmarks/:id to update name/category in the DB,
-   * then update the local session list.
-   * Note: we do NOT allow moving the pin coordinates from the edit popup
-   * (the marker position is fixed at creation time in this flow).
-   */
   const confirmEdit = useCallback(async () => {
     if (!editTarget) return;
-    if (!editName.trim()) { setEditError("Please enter a name for this landmark."); return; }
+    if (!editName.trim()) { setEditError(t("lm_err_name_required")); return; }
 
     setEditSaving(true);
     setEditError("");
@@ -659,12 +649,12 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
       );
       closeEditPopup();
     } catch (err: any) {
-      const msg = err?.response?.data?.message ?? "Failed to update landmark. Please try again.";
+      const msg = err?.response?.data?.message ?? t("lm_err_update_failed");
       setEditError(msg);
     } finally {
       setEditSaving(false);
     }
-  }, [editTarget, editName, editCategory, closeEditPopup]);
+  }, [editTarget, editName, editCategory, closeEditPopup, t]);
 
   // ── DELETE handlers ──────────────────────────────────────────────────────────
 
@@ -678,7 +668,6 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
 
   const closeDeletePopup = useCallback(() => setDeleteTarget(null), []);
 
-  /** Remove from local session list only (no DELETE API call — admin restriction) */
   const confirmDelete = useCallback(() => {
     if (!deleteTarget) return;
     setLandmarks(prev => prev.filter(l => l.id !== deleteTarget.id));
@@ -705,6 +694,11 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
 
   const mapCenter: LatLngExpression = userCoordinates ?? fallbackCoordinates;
 
+  // ── Save button label — computed once, reused in 3 footers ──────────────────
+  const saveLabel = landmarks.length > 0
+    ? `${t("lm_save_btn")} (${landmarks.length})`
+    : t("lm_done_btn");
+
   return (
     <>
       {/* ════════════════════════════════════════════════════════════
@@ -719,6 +713,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                         border-b border-[#e5e7eb] bg-white">
           <StepIndicator step={step} />
           <button onClick={onClose}
+            aria-label={t("common_close")}
             className="w-8 h-8 flex items-center justify-center rounded-xl
                        text-[#9ca3af] hover:text-[#374151] hover:bg-[#f9fafb]
                        active:scale-95 transition-all">
@@ -740,7 +735,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                     <FiSearch size={13} className="text-[#9ca3af] shrink-0" />
                     <input
                       type="text"
-                      placeholder="Search address or area…"
+                      placeholder={t("lm_search_address_ph")}
                       value={searchValue}
                       onChange={(e) => setSearchValue(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && triggerSearch()}
@@ -748,7 +743,9 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                                  placeholder:text-[#9ca3af] bg-transparent"
                     />
                     {searchValue && (
-                      <button onClick={() => { setSearchValue(""); setSubmittedQuery(""); }}
+                      <button
+                        onClick={() => { setSearchValue(""); setSubmittedQuery(""); }}
+                        aria-label={t("common_close")}
                         className="text-[#9ca3af] hover:text-[#374151]">
                         <FiX size={12} />
                       </button>
@@ -783,13 +780,13 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                                text-sm font-semibold text-[#6b7280]
                                border border-[#e5e7eb] bg-[#f9fafb]
                                hover:border-[#9ca3af] active:scale-95 transition-all">
-                    Cancel
+                    {t("common_cancel")}
                   </button>
                   <button onClick={() => setStep(2)}
                     className="flex-1 py-3 rounded-xl bg-[#1e5f74] hover:bg-[#143d4d]
                                text-white text-sm font-bold flex items-center
                                justify-center gap-2 shadow-md active:scale-95 transition-all">
-                    Next: Add Nearby Facilities <FiChevronRight size={15} />
+                    {t("lm_next_step")} <FiChevronRight size={15} />
                   </button>
                 </div>
               </div>
@@ -806,14 +803,14 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                 <div className="px-4 pt-4 pb-3 border-b border-[#e5e7eb] bg-white shrink-0">
                   <div className="flex items-center gap-2 mb-1">
                     <FiNavigation size={14} className="text-[#1e5f74]" />
-                    <h3 className="text-sm font-bold text-[#111827]">Nearby Facilities</h3>
+                    <h3 className="text-sm font-bold text-[#111827]">{t("lm_panel_title")}</h3>
                     <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full
                                      bg-[#e0f0f5] text-[#1e5f74] ml-auto">
-                      Optional
+                      {t("lm_optional")}
                     </span>
                   </div>
                   <p className="text-xs text-[#6b7280] leading-relaxed">
-                    Click the map to pin a landmark. Each pin is saved globally — anyone can discover it.
+                    {t("lm_panel_desc")}
                   </p>
                 </div>
                 <div className="flex-1 px-3 py-3 overflow-y-auto">
@@ -826,20 +823,20 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                                  text-xs font-semibold text-[#6b7280]
                                  border border-[#e5e7eb] bg-[#f9fafb]
                                  hover:border-[#9ca3af] active:scale-95 transition-all">
-                      <FiChevronLeft size={13} /> Back
+                      <FiChevronLeft size={13} /> {t("lm_back_btn")}
                     </button>
                     <button onClick={handleSkipLandmarks}
                       className="flex-1 py-2.5 rounded-xl text-xs font-semibold
                                  text-[#6b7280] border border-[#e5e7eb] bg-[#f9fafb]
                                  hover:border-[#9ca3af] active:scale-95 transition-all">
-                      Skip
+                      {t("lm_skip_btn")}
                     </button>
                     <button onClick={handleConfirm}
                       className="flex-[2] py-2.5 rounded-xl bg-[#1e5f74] hover:bg-[#143d4d]
                                  text-white text-sm font-bold flex items-center
                                  justify-center gap-2 shadow-sm active:scale-95 transition-all">
                       <FiCheck size={14} />
-                      {landmarks.length > 0 ? `Save (${landmarks.length})` : "Done"}
+                      {saveLabel}
                     </button>
                   </div>
                 </div>
@@ -855,7 +852,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                       <FiSearch size={13} className="text-[#9ca3af] shrink-0" />
                       <input
                         type="text"
-                        placeholder="Search area…"
+                        placeholder={t("lm_search_area_ph")}
                         value={lmSearchValue}
                         onChange={(e) => setLmSearchValue(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && triggerLmSearch()}
@@ -863,7 +860,9 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                                    placeholder:text-[#9ca3af] bg-transparent"
                       />
                       {lmSearchValue && (
-                        <button onClick={() => { setLmSearchValue(""); setLmSubmittedQuery(""); }}
+                        <button
+                          onClick={() => { setLmSearchValue(""); setLmSubmittedQuery(""); }}
+                          aria-label={t("common_close")}
                           className="text-[#9ca3af] hover:text-[#374151]">
                           <FiX size={12} />
                         </button>
@@ -903,20 +902,20 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                                  text-xs font-semibold text-[#6b7280]
                                  border border-[#e5e7eb] bg-[#f9fafb]
                                  hover:border-[#9ca3af] active:scale-95 transition-all">
-                      <FiChevronLeft size={14} /> Back
+                      <FiChevronLeft size={14} /> {t("lm_back_btn")}
                     </button>
                     <button onClick={handleSkipLandmarks}
                       className="flex-1 py-2.5 rounded-xl text-xs font-semibold
                                  text-[#6b7280] border border-[#e5e7eb] bg-[#f9fafb]
                                  hover:border-[#9ca3af] active:scale-95 transition-all">
-                      Skip
+                      {t("lm_skip_btn")}
                     </button>
                     <button onClick={handleConfirm}
                       className="flex-[2] py-2.5 rounded-xl bg-[#1e5f74] hover:bg-[#143d4d]
                                  text-white text-sm font-bold flex items-center
                                  justify-center gap-2 shadow-sm active:scale-95 transition-all">
                       <FiCheck size={14} />
-                      {landmarks.length > 0 ? `Save (${landmarks.length})` : "Done"}
+                      {saveLabel}
                     </button>
                   </div>
                 </div>
@@ -929,17 +928,15 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                   <div className="px-4 pt-4 pb-3 bg-white border-b border-[#e5e7eb] shrink-0">
                     <div className="flex items-center gap-2">
                       <FiNavigation size={14} className="text-[#1e5f74]" />
-                      <h3 className="text-sm font-bold text-[#111827]">Nearby Landmarks</h3>
+                      <h3 className="text-sm font-bold text-[#111827]">{t("lm_mobile_list_title")}</h3>
                       {landmarks.length > 0 && (
                         <span className="ml-auto text-[10px] font-bold px-2 py-0.5
                                          rounded-full bg-[#e0f0f5] text-[#1e5f74]">
-                          {landmarks.length} added
+                          {t("lm_added_count").replace("{n}", String(landmarks.length))}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-[#6b7280] mt-1">
-                      Use ✏️ to edit or 🗑 to remove. Switch to Map to add more.
-                    </p>
+                    <p className="text-xs text-[#6b7280] mt-1">{t("lm_mobile_list_hint")}</p>
                   </div>
                   <div className="flex-1 overflow-y-auto px-4 py-3">
                     <LandmarkList
@@ -957,20 +954,20 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                                    text-xs font-semibold text-[#6b7280]
                                    border border-[#e5e7eb] bg-[#f9fafb]
                                    hover:border-[#9ca3af] active:scale-95 transition-all">
-                        <FiChevronLeft size={13} /> Back
+                        <FiChevronLeft size={13} /> {t("lm_back_btn")}
                       </button>
                       <button onClick={handleSkipLandmarks}
                         className="flex-1 py-3 rounded-xl text-xs font-semibold
                                    text-[#6b7280] border border-[#e5e7eb] bg-[#f9fafb]
                                    hover:border-[#9ca3af] active:scale-95 transition-all">
-                        Skip
+                        {t("lm_skip_btn")}
                       </button>
                       <button onClick={handleConfirm}
                         className="flex-[2] py-3 rounded-xl bg-[#1e5f74] hover:bg-[#143d4d]
                                    text-white text-sm font-bold flex items-center
                                    justify-center gap-2 shadow-md active:scale-95 transition-all">
                         <FiCheck size={15} />
-                        {landmarks.length > 0 ? `Save (${landmarks.length})` : "Done"}
+                        {saveLabel}
                       </button>
                     </div>
                   </div>
@@ -985,8 +982,8 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
                              bg-white shadow-lg border border-[#e5e7eb]
                              text-xs font-bold text-[#1e5f74] active:scale-95 transition-all">
                   {mobileView === "map"
-                    ? <><FiList size={13} /> List ({landmarks.length})</>
-                    : <><FiMap size={13} /> Map</>}
+                    ? <><FiList size={13} /> {t("lm_toggle_list").replace("{n}", String(landmarks.length))}</>
+                    : <><FiMap size={13} /> {t("lm_toggle_map")}</>}
                 </button>
               </div>
             </div>
@@ -996,7 +993,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
 
       {/* ════ ADD POPUP ════ */}
       <Popup
-        header="Add Nearby Facilities"
+        header={t("lm_popup_add_title")}
         toggle={!!pendingPin}
         setToggle={(v) => { if (!v) closeAddPopup(); }}
         onClose={closeAddPopup}
@@ -1023,7 +1020,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
 
       {/* ════ EDIT POPUP ════ */}
       <Popup
-        header="Edit Landmark"
+        header={t("lm_popup_edit_title")}
         toggle={!!editTarget}
         setToggle={(v) => { if (!v) closeEditPopup(); }}
         onClose={closeEditPopup}
@@ -1050,7 +1047,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
 
       {/* ════ DELETE POPUP ════ */}
       <Popup
-        header="Remove Landmark"
+        header={t("lm_popup_delete_title")}
         toggle={!!deleteTarget}
         setToggle={(v) => { if (!v) closeDeletePopup(); }}
         onClose={closeDeletePopup}

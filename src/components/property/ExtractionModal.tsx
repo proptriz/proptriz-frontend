@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { createPortal }        from "react-dom";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -28,31 +29,6 @@ interface ExtractionModalProps {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STEP DEFINITIONS
-// ─────────────────────────────────────────────────────────────────────────────
-
-const STEPS: { phase: ExtractionPhase; icon: string; label: string; sub: string }[] = [
-  {
-    phase: "geocoding",
-    icon:  "📍",
-    label: "Resolving location",
-    sub:   "Looking up coordinates from your address",
-  },
-  {
-    phase: "extracting",
-    icon:  "✨",
-    label: "Extracting property details",
-    sub:   "AI is reading your description — usually 15–30 s",
-  },
-  {
-    phase: "done",
-    icon:  "✅",
-    label: "Done!",
-    sub:   "Your listing details are ready to review",
-  },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
 // COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -64,7 +40,15 @@ export default function ExtractionModal({
   onRetry,
   onCancel,
 }: ExtractionModalProps) {
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
+
+  const STEPS: { phase: ExtractionPhase; icon: string; label: string; sub: string }[] = [
+    { phase: "geocoding",  icon: "📍", label: t("extr_geocoding"),  sub: t("extr_geocoding_sub")  },
+    { phase: "extracting", icon: "✨", label: t("extr_extracting"), sub: t("extr_extracting_sub") },
+    { phase: "done",       icon: "✅", label: t("extr_done"),       sub: t("extr_done_step_sub")  },
+  ];
+
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
@@ -103,7 +87,7 @@ export default function ExtractionModal({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Extracting property details"
+        aria-label={t("extr_title")}
         className={`fixed inset-0 z-[9999]
           flex items-end sm:items-center justify-center px-4 pb-6 sm:pb-0
           transition-all duration-300
@@ -138,30 +122,6 @@ export default function ExtractionModal({
                 : "linear-gradient(180deg,#e0f0f5 0%,white 100%)",
             }}
           >
-
-            {/* ── Sparkle animation for ref ──────────────────────────────────── */}
-            {/* <div
-                className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-                style={{
-                    background: "linear-gradient(135deg,#143d4d,#1e5f74)",
-                    boxShadow:  "0 4px 16px rgba(30,95,116,0.28)",
-                }}
-                >
-                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 relative">
-                    <div
-                    className="absolute inset-0 rounded-full border-[2.5px] animate-spin"
-                    style={{ borderColor: "transparent", borderTopColor: "#f0a500" }}
-                    />
-                    <Sparkle size={13} />
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="text-white text-[13px] font-bold leading-tight">{progress}</p>
-                    <p className="text-white/55 text-[11px] mt-0.5">
-                    Powered by Llama 3 · usually 15–30 seconds
-                    </p>
-                </div>
-            </div> */}
-
             {/* Animated icon circle */}
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center relative mb-4"
@@ -204,17 +164,11 @@ export default function ExtractionModal({
                 color: isError ? "#ef4444" : "#111827",
               }}
             >
-              {isError ? "Extraction Failed"
-               : isDone  ? "Details Extracted! ✨"
-               : "Analysing Your Property"}
+              {isError ? t("extr_err_title") : isDone ? t("extr_done_title") : t("extr_title")}
             </h2>
             <p className="text-[12px] text-center leading-relaxed"
               style={{ color: isError ? "#ef4444" : "#6b7280", maxWidth: 280 }}>
-              {isError
-                ? (error ?? "Something went wrong. Please try again.")
-                : isDone
-                ? "Review and edit the details before publishing."
-                : "Hang tight — AI is filling your listing form…"}
+              {isError ? (error ?? t("common_error")) : isDone ? t("extr_done_sub") : t("extr_subtitle")}
             </p>
           </div>
 
@@ -292,7 +246,7 @@ export default function ExtractionModal({
                         )}
                         {isComplete && (
                           <p className="text-[10px] mt-0.5" style={{ color: "#9ca3af" }}>
-                            Complete
+                            {t("extr_complete")}
                           </p>
                         )}
                       </div>
@@ -327,7 +281,7 @@ export default function ExtractionModal({
                     fontFamily: "'Raleway', sans-serif",
                   }}
                 >
-                  ↺ Try Again
+                  {t("extr_retry")}
                 </button>
 
                 {/* Cancel */}
@@ -342,7 +296,7 @@ export default function ExtractionModal({
                     color:      "#6b7280",
                   }}
                 >
-                  Cancel
+                  {t("extr_cancel_btn")}
                 </button>
               </>
             )}
@@ -360,7 +314,7 @@ export default function ExtractionModal({
                   color:      "#dc2626",
                 }}
               >
-                Cancel extraction
+                {t("extr_cancel")}
               </button>
             )}
           </div>

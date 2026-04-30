@@ -10,6 +10,7 @@ import { addReplyReviewApi, getPropertyReviewReplyApi } from "@/services/reviewA
 import Splash from "./shared/Splash";
 import { AppContext } from "@/context/AppContextProvider";
 import { ReplyCardSkeleton } from "./skeletons/ReplyCardSkeleton";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
@@ -17,6 +18,7 @@ import { ReplyCardSkeleton } from "./skeletons/ReplyCardSkeleton";
 
 const ReplyReview = ({ review }: { review: ReviewType }) => {
   const { authUser } = useContext(AppContext);
+  const { t } = useLanguage();
 
   const [replies, setReplies]         = useState<any[]>([]);
   const [cursor, setCursor]           = useState<string | null>(null);
@@ -74,13 +76,13 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
     setIsSubmitting(true);
     try {
       const newReply = await addReplyReviewApi(review._id, comment.trim());
-      if (!newReply) { toast.error("Failed to submit reply."); return; }
-      toast.success("Reply sent!");
+      if (!newReply) { toast.error(t("rev_reply_failed")); return; }
+      toast.success(t("rev_reply_success"));
       setReplies(prev => [{ ...newReply, __optimistic: true }, ...prev]);
       setComment("");
     } catch (err) {
       logger.error("Reply error:", err);
-      toast.error("Something went wrong.");
+      toast.error(t("rev_reply_error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -96,7 +98,7 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]
                       flex items-center gap-1.5 mb-2.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#f0a500] inline-block" />
-          Review
+          {t("detail_reviews")}
         </p>
         <ReviewCard review={review} />
       </div>
@@ -112,13 +114,13 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]
                       flex items-center gap-1.5 mb-3">
           <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-          Replies {replies.length > 0 && `(${replies.length})`}
+{t("rev_replies_header")} {replies.length > 0 && `(${replies.length})`}
         </p>
 
         {!loading && replies.length === 0 && (
           <div className="flex flex-col items-center py-8 text-center">
             <span className="text-3xl mb-2">💬</span>
-            <p className="text-[13px] text-[#9ca3af]">No replies yet. Be the first!</p>
+<p className="text-[13px] text-[#9ca3af]">{t("rev_reply_placeholder")}</p>
           </div>
         )}
 
@@ -130,7 +132,7 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
             >
               <ReplyCard
                 id={reply._id}
-                sender={reply.reply_from?.username || "Owner"}
+                sender={reply.reply_from?.username || t("rev_owner")}
                 comment={reply.comment}
                 senderAvatar={reply.reply_from?.image || "/logo.png"}
                 reviewDate={reply.createdAt}
@@ -148,7 +150,7 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
         {hasMore && <div ref={observerRef} />}
 
         {!hasMore && replies.length > 0 && (
-          <p className="text-center text-[11px] text-[#9ca3af] py-4">All replies loaded</p>
+          <p className="text-center text-[11px] text-[#9ca3af] py-4">{t("profile_no_more")}</p>
         )}
       </div>
 
@@ -164,7 +166,7 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]
                       flex items-center gap-1.5 mb-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-          Write a reply
+          {t("rev_reply_placeholder").replace("…", "")}
         </p>
 
         <div className="flex items-center gap-2">
@@ -174,7 +176,7 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendReply()}
-            placeholder="Write your reply…"
+            placeholder={t("rev_reply_placeholder")}
             className="flex-1 text-[13px] rounded-xl px-3.5 py-2.5
                        transition-all duration-200 disabled:opacity-50 outline-none"
             style={{

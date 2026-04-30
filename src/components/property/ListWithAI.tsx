@@ -10,6 +10,7 @@ import PhotoUploadSection                  from "@/components/PhotoUploadSection
 import ExtractionModal, { ExtractionPhase } from "@/components/property/ExtractionModal";
 import { extractPropertyApi }              from "@/services/extractPropertyApi";
 import logger                              from "../../../logger.config.mjs";
+import { useLanguage }                     from "@/i18n/LanguageContext";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PROPS
@@ -82,6 +83,15 @@ export default function ListWithAI({
   onOpenLocationPicker,
   pinnedCoordinates,
 }: ListWithAIProps) {
+  const { t } = useLanguage();
+
+  const HOW_STEPS = [
+    { n: "1", label: t("ai_how_describe")  },
+    { n: "2", label: t("ai_how_photos")    },
+    { n: "3", label: t("ai_how_location")  },
+    { n: "4", label: t("ai_how_extract")   },
+  ];
+
   const [description, setDescription] = useState("");
   const [photos,      setPhotos]      = useState<File[]>([]);
   const [address,     setAddress]     = useState("");
@@ -127,7 +137,7 @@ export default function ListWithAI({
 
   const handleExtract = useCallback(async () => {
     if (!description.trim()) {
-      toast.warn("Please describe the property so AI has something to work with.");
+      toast.warn(t("ai_err_empty"));
       return;
     }
 
@@ -261,10 +271,9 @@ export default function ListWithAI({
         </div>
 
         {/* ① Description ──────────────────────────────────────────────────── */}
-        <SectionCard icon="✍️" title="Describe Your Property">
+        <SectionCard icon="✍️" title={t("ai_describe")}>
           <p className="text-[11px] text-[#9ca3af] mb-2.5 leading-relaxed">
-            Mention type, size, price, location, and standout features.
-            The more detail, the better the result.
+            {t("ai_describe_sub")}
           </p>
 
           {/* Textarea wrapper */}
@@ -278,11 +287,7 @@ export default function ListWithAI({
               <span className="text-[#9ca3af] text-base pt-0.5 flex-shrink-0">📝</span>
               <textarea
                 rows={6}
-                placeholder={
-                  "e.g. 3 bedroom duplex in Lekki Phase 1, Lagos. ₦4.5M/year for rent. " +
-                  "Has 2 bathrooms, boys quarter, spacious compound, 24hr electricity and water. " +
-                  "Gated estate, close to Chevron roundabout."
-                }
+                placeholder={t("ai_describe_ph")}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full outline-none bg-transparent text-sm
@@ -294,9 +299,9 @@ export default function ListWithAI({
             <div className="flex items-center justify-between mt-2 pt-2
                             border-t border-[#e5e7eb]">
               <span className="text-[10px] text-[#9ca3af]">
-                {description.length} chars
+                {t("ai_chars").replace("{n}", String(description.length))}
                 {description.length >= 80 && (
-                  <span style={{ color: "#1e5f74" }}> · ✓ good</span>
+                  <span style={{ color: "#1e5f74" }}> {t("ai_chars_good")}</span>
                 )}
               </span>
               <button
@@ -336,10 +341,9 @@ export default function ListWithAI({
         </SectionCard>
 
         {/* ② Photos ───────────────────────────────────────────────────────── */}
-        <SectionCard icon="📸" title="Property Photos (Optional)">
+        <SectionCard icon="📸" title={t("ai_photos")}>
           <p className="text-[11px] text-[#9ca3af] mb-2.5 leading-relaxed">
-            Photos carry over to your listing automatically.
-            Upload the exterior first — it becomes the cover image.
+            {t("ai_photos_sub")}
           </p>
           <PhotoUploadSection
             photos={photos}
@@ -350,10 +354,9 @@ export default function ListWithAI({
         </SectionCard>
 
         {/* ③ Location ─────────────────────────────────────────────────────── */}
-        <SectionCard icon="📍" title="Property Location (Optional)">
+        <SectionCard icon="📍" title={t("ai_location")}>
           <p className="text-[11px] text-[#9ca3af] mb-2.5 leading-relaxed">
-            Type the address or pin it on the map. AI will geocode it to set
-            accurate coordinates on your listing.
+            {t("ai_location_sub")}
           </p>
 
           {/* Address field */}
@@ -366,7 +369,7 @@ export default function ListWithAI({
             <span className="text-[#9ca3af] text-base flex-shrink-0">🏘️</span>
             <input
               type="text"
-              placeholder="Type address or area (optional)…"
+              placeholder={t("ai_location_ph")}
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="flex-1 outline-none bg-transparent text-sm
@@ -392,12 +395,12 @@ export default function ListWithAI({
         >
           <span className="text-xl flex-shrink-0">💡</span>
           <div>
-            <p className="text-[12px] font-bold text-[#92400e] mb-1">Tips for best results</p>
+            <p className="text-[12px] font-bold text-[#92400e] mb-1">{t("ai_tips_title")}</p>
             <ul className="text-[11px] text-[#92400e] space-y-0.5 leading-relaxed list-none">
-              <li>• Mention price, property type, and number of rooms</li>
-              <li>• Include the neighbourhood or nearest landmark</li>
-              <li>• Typing an address gives the most accurate map pin</li>
-              <li>• You can edit all extracted details before publishing</li>
+              <li>{t("ai_tip_1")}</li>
+              <li>{t("ai_tip_2")}</li>
+              <li>{t("ai_tip_3")}</li>
+              <li>{t("ai_tip_4")}</li>
             </ul>
           </div>
         </div>
@@ -431,7 +434,7 @@ export default function ListWithAI({
             <path d="M19 16L19.9 18.9L22 20L19.9 21.1L19 24L18.1 21.1L16 20L18.1 18.9L19 16Z"
               fill="#143d4d" opacity="0.6" />
           </svg>
-          ✨ Extract Information
+          {t("ai_extract_btn")}
         </button>
       </div>
 
@@ -448,11 +451,3 @@ export default function ListWithAI({
   );
 }
 
-// ─── constants ───────────────────────────────────────────────────────────────
-
-const HOW_STEPS = [
-  { n: "1", label: "Describe it"  },
-  { n: "2", label: "Add photos"   },
-  { n: "3", label: "Pin location" },
-  { n: "4", label: "Extract ✨"   },
-];

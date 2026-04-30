@@ -6,7 +6,8 @@ import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft, FaRegHeart, FaStar } from "react-icons/fa";
-import { PropertyType, ReviewType } from "@/types";
+import { PropertyStatusEnum, PropertyType, RenewalEnum } from "@/types/property";
+import { ReviewType } from "@/types";
 import Link from "next/link";
 import { getCollocatedProperties } from "@/services/propertyApi";
 import Price from "@/components/shared/Price";
@@ -17,33 +18,46 @@ import ShareButton from "./ShareButton";
 import { getPropertyReviewsApi } from "@/services/reviewApi";
 import Popup from "./shared/Popup";
 import { AddReview } from "./AddReview";
-import { PropertyStatusEnum } from "@/types/property";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { interpolate } from "@/i18n/translations";
+import { translateCategoryOptions, translateListedForOptions, translateRenewalOptions } from "@/utils/translate";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Map known feature names to an emoji for richer display */
-const FEATURE_EMOJI: Record<string, string> = {
-  bedroom:      "🛏️",
-  bedrooms:     "🛏️",
-  bathroom:     "🚿",
-  bathrooms:    "🚿",
-  toilet:       "🚿",
-  toilets:      "🚿",
-  garage:       "🚗",
-  parking:      "🚗",
-  pool:         "🏊",
-  "swimming pool": "🏊",
-  gym:          "🏋️",
-  garden:       "🌿",
-  balcony:      "🪟",
-  floor:        "🏢",
-  floors:       "🏢",
-  kitchen:      "🍳",
-  store:        "📦",
-};
+// Features are now plain strings like "3 Bedrooms", "Swimming Pool".
+// We use a substring scan so the emoji matches regardless of numeric prefix.
+const FEATURE_EMOJI: [string, string][] = [
+  ["bedroom",       "🛏️"],
+  ["bathroom",      "🚿"],
+  ["toilet",        "🚿"],
+  ["garage",        "🚗"],
+  ["parking",       "🚗"],
+  ["swimming pool", "🏊"],
+  ["pool",          "🏊"],
+  ["gym",           "🏋️"],
+  ["garden",        "🌿"],
+  ["balcony",       "🪟"],
+  ["floor",         "🏢"],
+  ["kitchen",       "🍳"],
+  ["electricity",   "⚡"],
+  ["generator",     "🔋"],
+  ["water",         "💧"],
+  ["security",      "🔒"],
+  ["cctv",          "📹"],
+  ["wifi",          "📶"],
+  ["internet",      "📶"],
+  ["bq",            "🏠"],
+  ["boys quarter",  "🏠"],
+  ["air condition", "❄️"],
+  ["ac",            "❄️"],
+];
 
-const getFeatureEmoji = (name: string) =>
-  FEATURE_EMOJI[name.toLowerCase()] ?? "🏠";
+const getFeatureEmoji = (label: string): string => {
+  const lower = label.toLowerCase();
+  const match = FEATURE_EMOJI.find(([kw]) => lower.includes(kw));
+  return match ? match[1] : "✨";
+};
 
 const formatDate = (iso?: string) =>
   iso
@@ -55,6 +69,7 @@ const formatDate = (iso?: string) =>
 const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
   const router     = useRouter();
   const propertyId = property._id;
+  const { t }      = useLanguage();
 
   const [nearbyProperties, setNearbyProperties] = useState<PropertyType[]>([]);
   const [reviews, setReviews]                   = useState<ReviewType[]>([]);
@@ -97,7 +112,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-[#e0f0f5] border-t-[#1e5f74]
                           rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[#4b5563]">Loading property…</p>
+          <p className="text-sm text-[#4b5563]">{t("detail_loading")}</p>
         </div>
       </div>
     );
@@ -107,13 +122,13 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-3 p-6">
         <p className="text-5xl">😕</p>
-        <p className="text-[#111827] font-bold text-lg">Couldn't load property</p>
+        <p className="text-[#111827] font-bold text-lg">{t("detail_error")}</p>
         <p className="text-sm text-[#9ca3af] text-center">{error}</p>
         <button
           onClick={() => router.back()}
           className="mt-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold" style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
         >
-          Go Back
+          {t("detail_go_back")}
         </button>
       </div>
     );
@@ -160,7 +175,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
             <button
               className="w-9 h-9 rounded-full bg-white flex items-center justify-center
                          shadow-[0_2px_10px_rgba(0,0,0,0.2)] hover:bg-red-50 transition-colors"
-              aria-label="Save to wishlist"
+              aria-label={t("detail_wishlist")}
             >
               <FaRegHeart className="text-[#4b5563] text-sm" />
             </button>
@@ -171,12 +186,12 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
             <div className="flex items-center gap-1.5 bg-black/55 backdrop-blur-[3px]
                             text-white text-xs font-semibold px-3 py-1.5 rounded-full">
               <FaStar className="text-[#f0a500]" />
-              {property.average_rating} · {property.category}
+              {property.average_rating} · {translateCategoryOptions(property.category, t)}
             </div>
             {property.listed_for && (
               <span className="bg-[#f0a500] text-[#111] text-[11px] font-extrabold
                                px-3 py-1.5 rounded-full capitalize">
-                For {property.listed_for}
+                {translateListedForOptions( property.listed_for, t )};
               </span>
             )}
           </div>
@@ -209,19 +224,19 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
           {/* Meta row: updated date + availability status */}
           <div className="flex items-center justify-between">
             <p className="text-[11px] text-[#9ca3af]">
-              Updated {formatDate(property.updatedAt?.toString())}
+              {t("detail_updated")} {formatDate(property.updatedAt?.toString())}
             </p>
             <span
               className={`text-[11px] font-bold px-3 py-1 rounded-full border-[1.5px]
                           ${property.status === "available"
                             ? "bg-[#e0f0f5] text-[#1e5f74] border-[rgba(30,95,116,0.25)]"
-                            : property.status === PropertyStatusEnum.unavailable
+                            : property.status === "unavailable"
                             ? "bg-red-50 text-red-500 border-red-200"
                             : "bg-amber-50 text-amber-600 border-amber-200"
                           }`}
             >
-              {property.status === "available" ? "✅ Available"
-               : property.status === PropertyStatusEnum.unavailable ? "❌ Unavailable"
+              {property.status === PropertyStatusEnum.available ? t("detail_available")
+               : property.status === PropertyStatusEnum.unavailable    ? t("detail_unavailable")
                :                                  "⏳ " + property.status.charAt(0).toUpperCase() + property.status.slice(1)}
             </span>
           </div>
@@ -244,7 +259,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
               <Price
                 price={property.price}
                 currency={property.currency}
-                tenancyPeriod={property.period}
+                tenancyPeriod={property.period? translateRenewalOptions(property.period, t) : ""}
               />
             </div>
           </div>
@@ -252,14 +267,15 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
           {/* Feature chips */}
           {property.features && property.features.length > 0 && (
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {property.features.map((feat, i) => (
+              {(property.features as string[]).map((feat, i) => (
                 <div
                   key={i}
                   className="flex items-center gap-1.5 flex-shrink-0
                              bg-[#e0f0f5] text-[#1e5f74] border border-[rgba(30,95,116,0.2)]
                              px-3 py-1.5 rounded-full text-[12px] font-semibold"
                 >
-                  <span>{getFeatureEmoji(feat)}</span>{feat}
+                  <span>{getFeatureEmoji(feat)}</span>
+                  {feat}
                 </div>
               ))}
             </div>
@@ -270,7 +286,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
             <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-2
                           flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-              Description
+              {t("detail_description")}
             </p>
             <PropertyDescription description={property.description} />
           </div>
@@ -302,7 +318,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
               </div>
               <div className="bg-white px-4 py-3 flex items-center justify-between">
                 <div>
-                  <p className="text-[13px] font-semibold text-[#111827]">View full map</p>
+                  <p className="text-[13px] font-semibold text-[#111827]">{t("detail_view_map")}</p>
                   {property.latitude && property.longitude && (
                     <p className="text-[10px] text-[#9ca3af] font-mono">
                       {Number(property.latitude).toFixed(4)}° N,{" "}
@@ -320,7 +336,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
             <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
                           flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-              Reviews
+              {t("detail_reviews")}
             </p>
 
             {/* Summary card */}
@@ -344,7 +360,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                   ))}
                 </div>
                 <p className="text-[10px] text-white/70 mt-0.5">
-                  {reviews.length} review{reviews.length !== 1 ? "s" : ""}
+                  {reviews.length} {reviews.length !== 1 ? t("detail_review_plural") : t("detail_review_single")}
                 </p>
               </div>
               <div className="flex-1" />
@@ -354,7 +370,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                            bg-white/20 backdrop-blur-sm text-white
                            text-[12px] font-bold hover:bg-white/30 transition-colors"
               >
-                + Add Review
+                {t("detail_add_review")}
               </button>
             </div>
 
@@ -374,7 +390,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                   href={`/property/reviews/${propertyId}`}
                   className="text-[12px] font-bold text-[#1e5f74] block text-right mt-2"
                 >
-                  View all {reviews.length} reviews →
+                  {interpolate(t("detail_all_reviews"), { n: reviews.length })}
                 </Link>
               </>
             )}
@@ -386,7 +402,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
               <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
                             flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-                Nearby Properties
+                {t("detail_nearby")}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {nearbyProperties.slice(0, 4).map((item) => (
@@ -400,7 +416,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
                       listed_for={item.listed_for}
                       address={item.address}
                       image={item.banner}
-                      period={item.period ?? ""}
+                      period={item.period ?? RenewalEnum.yearly}
                       distance={item.distance ?? undefined}
                       rating={item.average_rating ?? 4.9}
                     />
@@ -414,7 +430,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
       </div>
 
       {/* ── Sticky agent bar ────────────────────────────────────────────── */}
-      <StickyAgentInfo user={property.user} property={property} />
+      {property.user && <StickyAgentInfo user={property.user} property={property} />}
 
       {/* ── Gallery modal ────────────────────────────────────────────────── */}
       <GalleryModal
@@ -426,7 +442,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
 
       {/* ── Add review popup ─────────────────────────────────────────────── */}
       <Popup
-        header="Add a review"
+        header={t("detail_add_review_hd")}
         toggle={togglePopup}
         setToggle={setTogglePopup}
         useMask

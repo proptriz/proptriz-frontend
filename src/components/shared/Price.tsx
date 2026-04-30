@@ -1,12 +1,12 @@
 import formatPrice from "@/utils/formatPrice"
-import { CurrencyEnum } from "@/types"
+import { CURRENCY_SYMBOL, CurrencyEnum } from "@/types/property"
 
 const Price = ({price, currency, tenancyPeriod="", }: {price: number, currency?: CurrencyEnum, tenancyPeriod?: string,}) => {
   return (
     <div className="" >                  
       <p className="text-2xl text-right font-semibold text-primary flex items-center">
         <span className="">
-          {currency===CurrencyEnum.naira ? "₦" : currency===CurrencyEnum.dollar ? "$" : currency===CurrencyEnum.pound ? "£" : currency===CurrencyEnum.euro ? "€" : ""}
+          {CURRENCY_SYMBOL[currency as CurrencyEnum] ?? ""}
         </span>
         { formatPrice(price) }
       </p>

@@ -1,3 +1,4 @@
+// /app/explore/page.tsx
 'use client';
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from "react";
@@ -5,7 +6,7 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import { getNearestProperties } from "@/services/propertyApi";
-import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types";
+import { CategoryEnum, ListForEnum, PropertyFilterPayload, PropertyType, RenewalEnum} from "@/types/property";
 import Header from "@/components/shared/Header";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import Link from "next/link";
@@ -14,6 +15,7 @@ import HorizontalCard from "@/components/shared/HorizontalCard";
 import { topLocation } from "@/constant";
 import Image from "next/image";
 import getUserPosition from "@/utils/getUserPosition";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -21,7 +23,9 @@ const PREVIEW_COUNT = 4; // 2 rows × 2 cols
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default function HomePage() {
+export default function Page() {
+  const { t } = useLanguage();
+
   const [draftQuery, setDraftQuery]           = useState("");
   const [searchQuery, setSearchQuery]         = useState("");
   const [category, setCategory]               = useState<CategoryEnum>(CategoryEnum.house);
@@ -126,7 +130,7 @@ export default function HomePage() {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f8fa]">
+    <div className="flex flex-col min-h-screen bg-[#f7f8fa] mb-14">
       <Header />
 
       {/* ── Hero header ─────────────────────────────────────────────────── */}
@@ -134,12 +138,12 @@ export default function HomePage() {
         className="px-5 pt-14 pb-5"
         style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 100%)" }}
       >
-        <p className="text-white/75 text-xs mb-1">Good day 👋</p>
+        <p className="text-white/75 text-xs mb-1">{t("home_good_day")}</p>
         <h2
           className="text-white text-[22px] font-extrabold leading-tight mb-4"
           style={{ fontFamily: "'Raleway', sans-serif" }}
         >
-          Find your next<br />perfect home
+          {t("home_subtitle")}
         </h2>
         <SearchBar
           value={draftQuery}
@@ -148,7 +152,7 @@ export default function HomePage() {
           onFilter={onFilter}
         />
       </div>
-
+    
       {/* ── Category tabs ───────────────────────────────────────────────── */}
       <div className="bg-white border-b border-[#e5e7eb] sticky top-0 z-30">
         <NavigationTabs onChange={setCategory} value={category} />
@@ -159,20 +163,20 @@ export default function HomePage() {
         {/* ── Nearby Properties ─────────────────────────────────────────── */}
         <section className="px-4 pt-5 mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">Nearby Properties</h2>
+            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_nearby")}</h2>
             {!showAll && listedProperties.length > PREVIEW_COUNT && (
               <button
                 onClick={() => setShowAll(true)}
                 className="text-[13px] font-semibold text-[#1e5f74]"
               >
-                View all →
+                {t("home_see_all")} →
               </button>
             )}
           </div>
 
           <div
             className={`grid grid-cols-2 gap-3 ${
-              showAll ? "max-h-[72vh] overflow-y-auto pr-1" : ""
+              showAll ? "max-h-[72vh] overflow-y-auto pr-1 pb-4" : ""
             }`}
           >
             {loading && !listedProperties.length
@@ -192,8 +196,8 @@ export default function HomePage() {
                           category={property.category}
                           address={property.address}
                           image={property.banner}
-                          period={property.period ?? ""}
-                          listed_for={property.listed_for ?? ""}
+                          period={property.period ?? RenewalEnum.yearly}
+                          listed_for={property.listed_for ?? ListForEnum.rent}
                           rating={property.average_rating ?? 4.9}
                           distance={property.distance ?? undefined}
                         />
@@ -209,7 +213,7 @@ export default function HomePage() {
 
             {showAll && !hasMore && !loading && (
               <p className="col-span-2 text-center text-sm text-[#9ca3af] py-4">
-                You've seen all properties
+                {t("home_seen_all")}
               </p>
             )}
           </div>
@@ -219,8 +223,8 @@ export default function HomePage() {
         {listedProperties.length > 0 && (
           <section className="mb-8">
             <div className="flex items-center justify-between px-4 mb-3">
-              <h2 className="text-[15px] font-bold text-[#111827]">Featured Properties</h2>
-              <span className="text-[13px] font-semibold text-[#1e5f74]">See all →</span>
+              <h2 className="text-[15px] font-bold text-[#111827]">{t("home_featured")}</h2>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_see_all")} →</span>
             </div>
             <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
               {listedProperties.slice(0, 5).map((property) => (
@@ -231,10 +235,10 @@ export default function HomePage() {
                     price={property.price}
                     currency={property.currency}
                     category={property.category}
-                    listed_for={property.listed_for}
+                    listed_for={property.listed_for ?? ListForEnum.rent}
                     address={property.address}
                     image={property.banner}
-                    period={property.period ?? ""}
+                    period={property.period ?? RenewalEnum.yearly}
                     rating={property.average_rating ?? 5.0}
                   />
                 </div>
@@ -251,32 +255,32 @@ export default function HomePage() {
               style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
             >
               <div className="text-white text-xs font-bold leading-snug">
-                🎃 End of Year<br />
-                <span className="opacity-75 font-normal">Up to 66% off</span>
+                🎃 {t("home_Announce")}<br />
+                <span className="opacity-75 font-normal">{t("home_discover")}</span>
               </div>
               <span className="absolute top-2 right-2 bg-[#f0a500] text-[#143d4d] text-[9px]
-                               font-extrabold px-2 py-0.5 rounded-md">SALE</span>
+                               font-extrabold px-2 py-0.5 rounded-md">{t("home_sale")}</span>
             </div>
             <div
               className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
               style={{ background: "linear-gradient(135deg,#a06500,#f0a500)" }}
             >
               <div className="text-white text-xs font-bold leading-snug">
-                ☀️ Summer Deals<br />
-                <span className="opacity-80 font-normal">Discounts await</span>
+                ☀️ {t("home_Announce")}<br />
+                <span className="opacity-80 font-normal">{t("home_discover")}</span>
               </div>
               <span className="absolute top-2 right-2 bg-white text-[#143d4d] text-[9px]
-                               font-extrabold px-2 py-0.5 rounded-md">NEW</span>
+                               font-extrabold px-2 py-0.5 rounded-md">{t("home_new")}</span>
             </div>
           </div>
         </section>
 
         {/* ── Top Locations ─────────────────────────────────────────────── */}
-        <section className="mb-8">
+        {/* <section className="mb-8">
           <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">Top Locations</h2>
+            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_locations")}</h2>
             <Link href="/location/list">
-              <span className="text-[13px] font-semibold text-[#1e5f74]">More →</span>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_more")}</span>
             </Link>
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
@@ -302,14 +306,14 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* ── Top Agents ────────────────────────────────────────────────── */}
-        <section className="mb-8">
+        {/* <section className="mb-8">
           <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">Top Agents</h2>
+            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_agents")}</h2>
             <Link href="/agent/list">
-              <span className="text-[13px] font-semibold text-[#1e5f74]">View all →</span>
+              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_view_all")}</span>
             </Link>
           </div>
           <div className="flex gap-5 px-4 overflow-x-auto pb-1 scrollbar-hide">
@@ -337,7 +341,7 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
       </div>
 

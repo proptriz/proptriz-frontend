@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Gold:#f0a500
@@ -42,6 +43,7 @@ export function BrandLogo({
   linkTo,
   className = "",
 }: BrandLogoProps) {
+  const { t } = useLanguage()
   const wordmarkColor  = theme === "light" ? "white"    : "#143d4d";
   const accentColor    = "#f0a500";                // gold — always the same
   const taglineColor   = theme === "light" ? "rgba(255,255,255,0.65)" : "#9ca3af";
@@ -121,7 +123,7 @@ export function BrandLogo({
               lineHeight: 1,
             }}
           >
-            Discover trusted properties
+            {t("brand_caption")}
           </span>
         </div>
       </div>

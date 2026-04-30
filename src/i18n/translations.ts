@@ -53,6 +53,10 @@ export interface Translations {
   home_more:            string;
   home_good_day:        string;
   home_subtitle:        string;
+  home_sale:             string;
+  home_new:             string;
+  home_Announce:        string;
+  home_discover:        string;
 
   // ── Map page ────────────────────────────────────────────────────────────────
   map_list_property:    string;
@@ -328,6 +332,10 @@ export interface Translations {
   rev_replies_header:   string;
   rev_write_header:     string;
   rev_owner:            string;
+  rev_reply:            string;
+
+  // ── Brand Logo ───────────────────────────────────────────────────────────
+  brand_caption:      string;
 
   // ── Splash / Login ───────────────────────────────────────────────────────────
   splash_checking:      string;
@@ -669,6 +677,8 @@ const en: Translations = {
   home_all: "All", home_featured: "Featured Properties", home_top_agents: "Top Agents",
   home_seen_all: "You've seen all properties", home_view_all: "View all →",
   home_more: "More →", home_good_day: "Good day 👋", home_subtitle: "Find your next perfect home",
+  home_Announce: "Announcements", home_discover: "Discover properties & area", home_new: "NEW",
+  home_sale: "SALE",
 
   map_list_property: "＋ List Property", map_my_location: "My location",
 
@@ -856,7 +866,9 @@ const en: Translations = {
   rev_reply_send: "Send", rev_reply_failed: "Failed to submit reply.",
   rev_reply_success: "Reply sent!", rev_reply_error: "Something went wrong.",
   rev_replies_header: "Replies", rev_write_header: "Write a Review",
-  rev_owner: "Owner",
+  rev_owner: "Owner", rev_reply: "Reply",
+
+  brand_caption: "Discover trusted properties",
 
   splash_checking: "Checking session…", splash_sdk: "Loading Pi SDK…",
   splash_pi_auth: "Authenticating with Pi…", splash_verifying: "Verifying identity…",
@@ -1096,6 +1108,8 @@ const fr: Translations = {
   home_subtitle: "Trouvez votre prochaine maison idéale",
   home_loading: "Chargement des propriétés…",
   home_top_locations: "Meilleurs emplacements", home_all: "Tout",
+  home_Announce: "Annonce", home_discover: "Découvrez des propriétés fiables", home_new: "Nouveau",
+  home_sale: "Soldes",
 
   map_list_property: "＋ Ajouter un bien", map_my_location: "Ma position",
   search_bar_filter: "Filtrer", search_filter_header: "Filtrer les biens",
@@ -1219,8 +1233,8 @@ const fr: Translations = {
   ep_title: "Modifier le profil", ep_identity: "Identité",
   ep_full_name: "Nom complet / Marque", ep_full_name_ph: "Saisissez votre nom ou marque",
   ep_account_type: "Type de compte", ep_contact: "Coordonnées",
-  ep_email: "Email (optionnel)", ep_email_ph: "Saisissez votre email",
-  ep_phone: "Numéro de téléphone", ep_whatsapp: "WhatsApp (optionnel)",
+  ep_email: "Email (facultatif)", ep_email_ph: "Saisissez votre email",
+  ep_phone: "Numéro de téléphone", ep_whatsapp: "WhatsApp (facultatif)",
   ep_whatsapp_ph: "+234 080 3288 9111",
   ep_save: "✓ Enregistrer", ep_saving: "Mise à jour…",
   ep_privacy: "Vos informations ne sont visibles que par les parties avec lesquelles vous interagissez.",
@@ -1285,7 +1299,9 @@ const fr: Translations = {
   rev_reply_send: "Envoyer", rev_reply_failed: "Échec de l'envoi.",
   rev_reply_success: "Réponse envoyée !", rev_reply_error: "Une erreur est survenue.",
   rev_replies_header: "Réponses", rev_write_header: "Écrire un avis",
-  rev_owner: "Propriétaire",
+  rev_owner: "Propriétaire", rev_reply: "Répondre",
+
+  brand_caption: "Découvrez des propriétés fiables",
 
   splash_checking: "Vérification de la session…", splash_sdk: "Chargement du SDK Pi…",
   splash_pi_auth: "Authentification avec Pi…", splash_verifying: "Vérification de l'identité…",
@@ -1523,6 +1539,8 @@ const sw: Translations = {
   home_more: "Zaidi →", home_good_day: "Habari 👋",
   home_subtitle: "Tafuta nyumba yako bora",
   home_loading: "Inapakia mali…", home_top_locations: "Maeneo Bora", home_all: "Zote",
+  home_Announce: "Tangazo", home_discover: "Gundua mali zinazoaminika", home_new: "Mpya",
+  home_sale: "Punguzo",
 
   map_list_property: "＋ Ongeza Mali", map_my_location: "Mahali pangu",
   search_bar_filter: "Chuja", search_filter_header: "Chuja Mali",
@@ -1710,8 +1728,10 @@ const sw: Translations = {
   rev_reply_send: "Tuma", rev_reply_failed: "Kutuma jibu kumeshindwa.",
   rev_reply_success: "Jibu limetumwa!", rev_reply_error: "Kitu kilienda vibaya.",
   rev_replies_header: "Majibu", rev_write_header: "Andika Maoni",
-  rev_owner: "Mmiliki",
+  rev_owner: "Mmiliki", rev_reply: "Jibu",
 
+  brand_caption: "Gundua mali zinazoaminika",
+  
   splash_checking: "Inakagua kipindi…", splash_sdk: "Inapakia Pi SDK…",
   splash_pi_auth: "Inathibitisha na Pi…", splash_verifying: "Inathibitisha utambulisho…",
   splash_signed_in: "Umeingia! Inaelekeza…", splash_timeout: "Muda wa muunganisho umeisha",

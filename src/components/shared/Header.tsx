@@ -114,7 +114,7 @@ const Header: React.FC = () => {
                          bg-[#fef3cd] text-[#c88400] px-2 py-0.5 rounded-full
                          border border-[rgba(240,165,0,0.3)]"
             >
-              🏆 Top Agent #1
+              🏆 {t("profile_top_agent")}
             </span>
           </div>
         </div>

@@ -98,7 +98,7 @@ const ReplyReview = ({ review }: { review: ReviewType }) => {
         <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]
                       flex items-center gap-1.5 mb-2.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#f0a500] inline-block" />
-          Review
+          {t("detail_reviews")}
         </p>
         <ReviewCard review={review} />
       </div>

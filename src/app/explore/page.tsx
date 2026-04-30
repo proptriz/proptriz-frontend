@@ -130,7 +130,7 @@ export default function Page() {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f8fa]">
+    <div className="flex flex-col min-h-screen bg-[#f7f8fa] mb-14">
       <Header />
 
       {/* ── Hero header ─────────────────────────────────────────────────── */}
@@ -176,7 +176,7 @@ export default function Page() {
 
           <div
             className={`grid grid-cols-2 gap-3 ${
-              showAll ? "max-h-[72vh] overflow-y-auto pr-1" : ""
+              showAll ? "max-h-[72vh] overflow-y-auto pr-1 pb-4" : ""
             }`}
           >
             {loading && !listedProperties.length
@@ -255,28 +255,28 @@ export default function Page() {
               style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
             >
               <div className="text-white text-xs font-bold leading-snug">
-                🎃 End of Year<br />
-                <span className="opacity-75 font-normal">Up to 66% off</span>
+                🎃 {t("home_Announce")}<br />
+                <span className="opacity-75 font-normal">{t("home_discover")}</span>
               </div>
               <span className="absolute top-2 right-2 bg-[#f0a500] text-[#143d4d] text-[9px]
-                               font-extrabold px-2 py-0.5 rounded-md">SALE</span>
+                               font-extrabold px-2 py-0.5 rounded-md">{t("home_sale")}</span>
             </div>
             <div
               className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
               style={{ background: "linear-gradient(135deg,#a06500,#f0a500)" }}
             >
               <div className="text-white text-xs font-bold leading-snug">
-                ☀️ Summer Deals<br />
-                <span className="opacity-80 font-normal">Discounts await</span>
+                ☀️ {t("home_Announce")}<br />
+                <span className="opacity-80 font-normal">{t("home_discover")}</span>
               </div>
               <span className="absolute top-2 right-2 bg-white text-[#143d4d] text-[9px]
-                               font-extrabold px-2 py-0.5 rounded-md">NEW</span>
+                               font-extrabold px-2 py-0.5 rounded-md">{t("home_new")}</span>
             </div>
           </div>
         </section>
 
         {/* ── Top Locations ─────────────────────────────────────────────── */}
-        <section className="mb-8">
+        {/* <section className="mb-8">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_locations")}</h2>
             <Link href="/location/list">
@@ -306,10 +306,10 @@ export default function Page() {
               </Link>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* ── Top Agents ────────────────────────────────────────────────── */}
-        <section className="mb-8">
+        {/* <section className="mb-8">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_agents")}</h2>
             <Link href="/agent/list">
@@ -341,7 +341,7 @@ export default function Page() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
       </div>
 

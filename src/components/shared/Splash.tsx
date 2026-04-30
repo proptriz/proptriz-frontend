@@ -162,10 +162,7 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
                   </div>
 
                   <p style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.6 }}>
-                    To use your Pi Wallet and Identity, you{" "}
-                    <strong style={{ color: "#111827" }}>must</strong> be browsing
-                    within the{" "}
-                    <strong style={{ color: "#111827" }}>Pi Browser</strong> app.
+                    {t("splash_pi_desc")} app.
                   </p>
 
                   <button
@@ -196,7 +193,7 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
             </div>
 
             <p className="mt-7 text-center" style={{ fontSize: 12, color: "#9ca3af" }}>
-{t("splash_trouble")}{" "}
+              {t("splash_trouble")}{" "}
               <span className="font-semibold cursor-pointer hover:underline" style={{ color: "#1e5f74" }}>
                 {t("splash_help")}
               </span>

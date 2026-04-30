@@ -234,7 +234,7 @@ const EditProfile = () => {
           <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px]
                         flex items-center gap-1.5 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-            Identity
+            {t("ep_identity")}
           </p>
           <div className="space-y-3">
             <TextInput

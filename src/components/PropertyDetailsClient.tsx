@@ -20,6 +20,7 @@ import Popup from "./shared/Popup";
 import { AddReview } from "./AddReview";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { interpolate } from "@/i18n/translations";
+import { translateCategoryOptions, translateListedForOptions, translateRenewalOptions } from "@/utils/translate";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -185,12 +186,12 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
             <div className="flex items-center gap-1.5 bg-black/55 backdrop-blur-[3px]
                             text-white text-xs font-semibold px-3 py-1.5 rounded-full">
               <FaStar className="text-[#f0a500]" />
-              {property.average_rating} · {property.category}
+              {property.average_rating} · {translateCategoryOptions(property.category, t)}
             </div>
             {property.listed_for && (
               <span className="bg-[#f0a500] text-[#111] text-[11px] font-extrabold
                                px-3 py-1.5 rounded-full capitalize">
-                For {property.listed_for}
+                {translateListedForOptions( property.listed_for, t )};
               </span>
             )}
           </div>
@@ -258,7 +259,7 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
               <Price
                 price={property.price}
                 currency={property.currency}
-                tenancyPeriod={property.period}
+                tenancyPeriod={property.period? translateRenewalOptions(property.period, t) : ""}
               />
             </div>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext, useCallback } from "react";
+import { useState, useContext, useCallback, useEffect } from "react";
 import { useRouter }      from "next/navigation";
 import { toast }          from "react-toastify";
 
@@ -40,6 +40,7 @@ type UploadStage = "idle" | "creating" | "uploading" | "done";
 // ─────────────────────────────────────────────────────────────────────────────
 // DEFAULT FORM STATE
 // ─────────────────────────────────────────────────────────────────────────────
+const DEFAULT_POSITION = [9.0820, 8.6753] as [number, number]
 
 const DEFAULT_FORM: PropertyFormData = {
   title:       "",
@@ -54,7 +55,7 @@ const DEFAULT_FORM: PropertyFormData = {
   negotiable:  NegotiableEnum.Negotiable,
   duration:    4,
   features:    [],
-  coordinates: [9.0820, 8.6753],
+  coordinates: DEFAULT_POSITION,
   photos:      [],
 };
 
@@ -90,7 +91,7 @@ export default function AddPropertyPage() {
 
   // ── Shared location picker ────────────────────────────────────────────────
   const [openLocPicker,   setOpenLocPicker]   = useState(false);
-  const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [userCoordinates, setUserCoordinates] = useState<[number, number]>(DEFAULT_POSITION);
   const [landmarks,       setLandmarks]       = useState<Landmark[]>([]);
 
   // ── Upload ────────────────────────────────────────────────────────────────
@@ -104,6 +105,17 @@ export default function AddPropertyPage() {
 
   const isSubmitting = uploadStage !== "idle" && uploadStage !== "done";
 
+  // ── Location ───────────────────────────────────────────────────────────
+  const fetchLocation = useCallback(async () => {
+    const [lat, lng] = await getUserPosition();
+    setUserCoordinates([lat, lng]);
+    setFormData({...DEFAULT_FORM, coordinates: [lat, lng]})
+  }, []);
+
+  useEffect(() => {
+    fetchLocation();
+  }, [authUser, fetchLocation]);
+  
   // ── Form update ───────────────────────────────────────────────────────────
   const update = useCallback((partial: Partial<PropertyFormData>) => {
     setFormData((prev) => ({ ...prev, ...partial }));

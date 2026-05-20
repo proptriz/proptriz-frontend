@@ -246,7 +246,7 @@ export default function AddPropertyPage() {
     const doneTitle = formData.title;
 
     // Full wizard reset — wizard is clean when modal closes
-    setFormData(DEFAULT_FORM);
+    setFormData({...DEFAULT_FORM, coordinates: userCoordinates});
     setView(1);
     setAiBanner(false);
     setUploadStage("idle");

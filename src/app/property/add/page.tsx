@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext, useCallback } from "react";
+import { useState, useContext, useCallback, useEffect } from "react";
 import { useRouter }      from "next/navigation";
 import { toast }          from "react-toastify";
 
@@ -40,6 +40,7 @@ type UploadStage = "idle" | "creating" | "uploading" | "done";
 // ─────────────────────────────────────────────────────────────────────────────
 // DEFAULT FORM STATE
 // ─────────────────────────────────────────────────────────────────────────────
+const DEFAULT_POSITION = [9.0820, 8.6753] as [number, number]
 
 const DEFAULT_FORM: PropertyFormData = {
   title:       "",
@@ -54,7 +55,7 @@ const DEFAULT_FORM: PropertyFormData = {
   negotiable:  NegotiableEnum.Negotiable,
   duration:    4,
   features:    [],
-  coordinates: [9.0820, 8.6753],
+  coordinates: DEFAULT_POSITION,
   photos:      [],
 };
 
@@ -86,11 +87,12 @@ export default function AddPropertyPage() {
   // ── Wizard state ─────────────────────────────────────────────────────────
   const [view,      setView]      = useState<WizardView>(1);
   const [formData,  setFormData]  = useState<PropertyFormData>(DEFAULT_FORM);
+  const [defaultForm,  setDefaultForm]  = useState<PropertyFormData>(DEFAULT_FORM);
   const [aiBanner,  setAiBanner]  = useState(false);
 
   // ── Shared location picker ────────────────────────────────────────────────
   const [openLocPicker,   setOpenLocPicker]   = useState(false);
-  const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [userCoordinates, setUserCoordinates] = useState<[number, number]>(DEFAULT_POSITION);
   const [landmarks,       setLandmarks]       = useState<Landmark[]>([]);
 
   // ── Upload ────────────────────────────────────────────────────────────────
@@ -104,6 +106,18 @@ export default function AddPropertyPage() {
 
   const isSubmitting = uploadStage !== "idle" && uploadStage !== "done";
 
+  // ── Location ───────────────────────────────────────────────────────────
+  const fetchLocation = useCallback(async () => {
+    const [lat, lng] = await getUserPosition();
+    setUserCoordinates([lat, lng]);
+    setFormData({...DEFAULT_FORM, coordinates: [lat, lng]});
+    setDefaultForm({...DEFAULT_FORM, coordinates: [lat, lng]});
+  }, []);
+
+  useEffect(() => {
+    fetchLocation();
+  }, [authUser, fetchLocation]);
+  
   // ── Form update ───────────────────────────────────────────────────────────
   const update = useCallback((partial: Partial<PropertyFormData>) => {
     setFormData((prev) => ({ ...prev, ...partial }));
@@ -149,11 +163,11 @@ export default function AddPropertyPage() {
   // No sessionStorage, no window.__aiPhotos, no cross-page state.
   const handleExtracted = useCallback(
     (data: Omit<PropertyFormData, "photos">, photos: File[]) => {
-      setFormData({ ...DEFAULT_FORM, ...data, photos });
+      setFormData({ ...defaultForm, ...data, photos });
       setAiBanner(true);
       setView(3);
     },
-    [],
+    [defaultForm],
   );
 
   // ── Photo upload helper ───────────────────────────────────────────────────
@@ -234,7 +248,7 @@ export default function AddPropertyPage() {
     const doneTitle = formData.title;
 
     // Full wizard reset — wizard is clean when modal closes
-    setFormData(DEFAULT_FORM);
+    setFormData({...defaultForm, coordinates: userCoordinates});
     setView(1);
     setAiBanner(false);
     setUploadStage("idle");

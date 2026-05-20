@@ -22,19 +22,19 @@ const getRawBudgetPresets = (listedFor: string, priceMax: number) => {
   if (listedFor === "rent") {
     return [
       { label: "any",          min: 0,          max: priceMax  },
-      { label: "Under ₦100k",  min: 0,          max: 100_000   },
-      { label: "Under ₦500k",  min: 100_000,    max: 500_000   },
-      { label: "₦500k–₦2M",   min: 500_000,    max: 2_000_000 },
-      { label: "₦2M–₦5M",     min: 2_000_000,  max: 5_000_000 },
-      { label: "₦5M+",         min: 5_000_000,  max: priceMax  },
+      { label: "Under 100k",  min: 0,          max: 100_000   },
+      { label: "Under 500k",  min: 100_000,    max: 500_000   },
+      { label: "500k–2M",   min: 500_000,    max: 2_000_000 },
+      { label: "2M–5M",     min: 2_000_000,  max: 5_000_000 },
+      { label: "5M+",         min: 5_000_000,  max: priceMax  },
     ];
   }
   return [
     { label: "any",          min: 0,            max: priceMax      },
-    { label: "Under ₦5M",   min: 0,            max: 5_000_000     },
-    { label: "₦5M–₦20M",   min: 5_000_000,    max: 20_000_000    },
-    { label: "₦20M–₦100M", min: 20_000_000,   max: 100_000_000   },
-    { label: "₦100M+",      min: 100_000_000,  max: priceMax      },
+    { label: "Under 5M",   min: 0,            max: 5_000_000     },
+    { label: "5M–20M",   min: 5_000_000,    max: 20_000_000    },
+    { label: "20M–100M", min: 20_000_000,   max: 100_000_000   },
+    { label: "100M+",      min: 100_000_000,  max: priceMax      },
   ];
 };
 
@@ -232,7 +232,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
   const isDefaultPrice = filters.price[0] === 0 && filters.price[1] >= PRICE_MAX;
   if (!isDefaultPrice) {
     activeTags.push({
-      label: `₦${formatNum(filters.price[0])} – ${filters.price[1] >= PRICE_MAX ? t("filter_no_limit") : `₦${formatNum(filters.price[1])}`}`,
+      label: `${formatNum(filters.price[0])} – ${filters.price[1] >= PRICE_MAX ? t("filter_no_limit") : `${formatNum(filters.price[1])}`}`,
       onRemove: () => setFilters((f) => ({ ...f, price: [0, PRICE_MAX] })),
     });
   }
@@ -410,7 +410,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
             💰 {t("filter_price_budget")}
           </p>
           <span className="text-[10px] text-[#9ca3af]">
-            ₦ / {filters.listedFor === "rent" ? t("filter_per_year") : t("filter_per_total")}
+            0 / {filters.listedFor === "rent" ? t("filter_per_year") : t("filter_per_total")}
           </span>
         </div>
 
@@ -444,7 +444,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
               labelKey: "filter_min_price" as const,
               value:    filters.price[0] || "",
               handler:  handleMinChange,
-              ph:       "₦ 0",
+              ph:       " 0",
             },
             {
               labelKey: "filter_max_price" as const,
@@ -479,8 +479,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
         <div className="mt-2.5 bg-[#f9fafb] rounded-lg px-3 py-2 flex items-center gap-1.5 text-[11px] text-[#4b5563]">
           🎯 {t("filter_showing")}{" "}
           <span className="font-bold text-[#1e5f74]">
-            ₦{formatNum(filters.price[0])} —{" "}
-            {filters.price[1] >= PRICE_MAX ? t("filter_no_limit") : `₦${formatNum(filters.price[1])}`}
+            {formatNum(filters.price[0])} —{" "}
+            {filters.price[1] >= PRICE_MAX ? t("filter_no_limit") : `${formatNum(filters.price[1])}`}
           </span>
         </div>
       </div>

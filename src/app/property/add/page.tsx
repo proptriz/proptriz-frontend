@@ -87,6 +87,7 @@ export default function AddPropertyPage() {
   // ── Wizard state ─────────────────────────────────────────────────────────
   const [view,      setView]      = useState<WizardView>(1);
   const [formData,  setFormData]  = useState<PropertyFormData>(DEFAULT_FORM);
+  const [defaultForm,  setDefaultForm]  = useState<PropertyFormData>(DEFAULT_FORM);
   const [aiBanner,  setAiBanner]  = useState(false);
 
   // ── Shared location picker ────────────────────────────────────────────────
@@ -109,7 +110,8 @@ export default function AddPropertyPage() {
   const fetchLocation = useCallback(async () => {
     const [lat, lng] = await getUserPosition();
     setUserCoordinates([lat, lng]);
-    setFormData({...DEFAULT_FORM, coordinates: [lat, lng]})
+    setFormData({...DEFAULT_FORM, coordinates: [lat, lng]});
+    setDefaultForm({...DEFAULT_FORM, coordinates: [lat, lng]});
   }, []);
 
   useEffect(() => {
@@ -161,11 +163,11 @@ export default function AddPropertyPage() {
   // No sessionStorage, no window.__aiPhotos, no cross-page state.
   const handleExtracted = useCallback(
     (data: Omit<PropertyFormData, "photos">, photos: File[]) => {
-      setFormData({ ...DEFAULT_FORM, ...data, photos });
+      setFormData({ ...defaultForm, ...data, photos });
       setAiBanner(true);
       setView(3);
     },
-    [],
+    [defaultForm],
   );
 
   // ── Photo upload helper ───────────────────────────────────────────────────
@@ -246,7 +248,7 @@ export default function AddPropertyPage() {
     const doneTitle = formData.title;
 
     // Full wizard reset — wizard is clean when modal closes
-    setFormData({...DEFAULT_FORM, coordinates: userCoordinates});
+    setFormData({...defaultForm, coordinates: userCoordinates});
     setView(1);
     setAiBanner(false);
     setUploadStage("idle");

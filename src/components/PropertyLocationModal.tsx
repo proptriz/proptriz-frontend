@@ -497,7 +497,7 @@ const PropertyLocationModal: React.FC<PropertyLocationModalProps> = ({
     const [lat, lng] = Array.isArray(centre) ? centre : [centre as any, 0];
 
     const ctrl = new AbortController();
-    searchLandmarks({ lat, lng, radius: 2000, limit: 50 }, { signal: ctrl.signal })
+    searchLandmarks({ lat, lng, radius: 2000, limit: 20 }, { signal: ctrl.signal })
       .then((results) => {
         if (!results) return;
         setExternalLandmarks(results as ExternalLandmark[]);

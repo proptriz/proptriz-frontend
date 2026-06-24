@@ -1,25 +1,152 @@
 // /app/explore/page.tsx
 'use client';
 
-import React, { useState, useCallback, useRef, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import { getNearestProperties } from "@/services/propertyApi";
-import { CategoryEnum, ListForEnum, PropertyFilterPayload, PropertyType, RenewalEnum} from "@/types/property";
+import { CategoryEnum, ListForEnum, PropertyFilterPayload, PropertyType, RenewalEnum } from "@/types/property";
 import Header from "@/components/shared/Header";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import Link from "next/link";
 import { VerticalCard } from "@/components/shared/VerticalCard";
 import HorizontalCard from "@/components/shared/HorizontalCard";
-import { topLocation } from "@/constant";
-import Image from "next/image";
 import getUserPosition from "@/utils/getUserPosition";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useInfiniteCursorScroll } from "@/components/shared/useInfiniteCursorScroll";
+import { CursorResponse } from "@/types";
+import { Translations } from "@/i18n/translations";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PREVIEW_COUNT = 4; // 2 rows × 2 cols
+/**
+ * Cards 0–FEATURED_AFTER_INDEX render above the Featured strip.
+ * Cards FEATURED_AFTER_INDEX+1 onwards render below the Promo banners.
+ * i.e. first 4 cards (2 rows × 2 cols) sit above the injected sections.
+ */
+const FEATURED_AFTER_INDEX = 3; // 0-based
+const BANNERS_AFTER_INDEX   = 7;  // last 0-based index shown before Promo banners
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function FeaturedStrip({
+  properties,
+  loading,
+  t,
+}: {
+  properties: PropertyType[];
+  loading: boolean;
+  t: (key: keyof Translations) => string;
+}) {
+  return (
+    <section className="mb-10">
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-[15px] font-bold text-[#111827]">{t("home_featured")}</h2>
+        {properties.length > 0 && (
+          <span className="text-[13px] font-semibold text-[#1e5f74]">
+            {t("home_see_all")} →
+          </span>
+        )}
+      </div>
+      {/* Skeleton while first load */}
+      {loading && properties.length === 0 ? (
+        <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex-shrink-0 w-[180px] h-[120px] rounded-2xl bg-[#e5e7eb] animate-pulse"
+            />
+          ))}
+        </div>
+      ) : properties.length > 0 ? (
+        <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+          {properties.slice(0, 5).map((property) => (
+            <div key={property._id} className="flex-shrink-0 w-[180px]">
+              <HorizontalCard
+                id={property._id}
+                name={property.title}
+                price={property.price}
+                currency={property.currency}
+                category={property.category}
+                listed_for={property.listed_for ?? ListForEnum.rent}
+                address={property.address}
+                image={property.banner}
+                period={property.period ?? RenewalEnum.yearly}
+                rating={property.average_rating ?? 5.0}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* Empty: category has no results — show a quiet placeholder row */
+        <p className="text-[13px] text-[#9ca3af]">{'Empty Properties'}</p>
+      )}
+    </section>
+  );
+}
+
+function PromoBanners({
+  loading,
+  hasContent,
+  t,
+}: {
+  loading: boolean;
+  hasContent: boolean;
+  t: (key: keyof Translations) => string;
+}) {
+  return (
+    <section className="my-10">
+      {/* Skeleton while first batch hasn't arrived yet */}
+      {loading && !hasContent ? (
+        <div className="flex gap-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex-1 h-[90px] rounded-2xl bg-[#e5e7eb] animate-pulse"
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex gap-3">
+          <div
+            className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
+            style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
+          >
+            <div className="text-white text-xs font-bold leading-snug">
+              🎃 {t("home_Announce")}
+              <br />
+              <span className="opacity-75 font-normal">{t("home_discover")}</span>
+            </div>
+            <span
+              className="absolute top-2 right-2 bg-[#f0a500] text-[#143d4d] text-[9px]
+                         font-extrabold px-2 py-0.5 rounded-md"
+            >
+              {t("home_sale")}
+            </span>
+          </div>
+          <div
+            className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
+            style={{ background: "linear-gradient(135deg,#a06500,#f0a500)" }}
+          >
+            <div className="text-white text-xs font-bold leading-snug">
+              ☀️ {t("home_Announce")}
+              <br />
+              <span className="opacity-80 font-normal">{t("home_discover")}</span>
+            </div>
+            <span
+              className="absolute top-2 right-2 bg-white text-[#143d4d] text-[9px]
+                         font-extrabold px-2 py-0.5 rounded-md"
+            >
+              {t("home_new")}
+            </span>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -34,19 +161,7 @@ export default function Page() {
   const [maxPriceBudget, setMaxPriceBudget]   = useState<number>(900_000_000_000);
   const [centerLat, setCenterLat]             = useState<number | null>(null);
   const [centerLng, setCenterLng]             = useState<number | null>(null);
-  const [listedProperties, setListedProperties] = useState<PropertyType[]>([]);
-  const [cursor, setCursor]                   = useState<string | null>(null);
-  const [loading, setLoading]                 = useState(false);
-  const [hasMore, setHasMore]                 = useState(true);
-  const [showAll, setShowAll]                 = useState(false);
   const [isLocationReady, setIsLocationReady] = useState(false);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  const visibleProperties = showAll
-    ? listedProperties
-    : listedProperties.slice(0, PREVIEW_COUNT);
 
   // ── Location ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -58,15 +173,18 @@ export default function Page() {
   }, []);
 
   // ── Filter handler ───────────────────────────────────────────────────────
-  const onFilter = useCallback((filters: PropertyFilterPayload) => {
-    setListedFor(filters.listedFor);
-    setMinPriceBudget(filters.priceMin ?? 0);
-    setMaxPriceBudget(filters.priceMax ?? 900_000_000_000);
-    setCategory(filters.propertyType);
-    setSearchQuery(filters.description ?? searchQuery);
-    setCenterLat(filters.location?.lat ?? null);
-    setCenterLng(filters.location?.lng ?? null);
-  }, [searchQuery]);
+  const onFilter = useCallback(
+    (filters: PropertyFilterPayload) => {
+      setListedFor(filters.listedFor);
+      setMinPriceBudget(filters.priceMin ?? 0);
+      setMaxPriceBudget(filters.priceMax ?? 900_000_000_000);
+      setCategory(filters.propertyType);
+      setSearchQuery(filters.description ?? searchQuery);
+      setCenterLat(filters.location?.lat ?? null);
+      setCenterLng(filters.location?.lng ?? null);
+    },
+    [searchQuery]
+  );
 
   // ── Query string ─────────────────────────────────────────────────────────
   const queryString = useMemo(() => {
@@ -84,55 +202,39 @@ export default function Page() {
     return new URLSearchParams(params).toString();
   }, [searchQuery, category, listedFor, minPriceBudget, maxPriceBudget, centerLat, centerLng]);
 
-  // ── Fetch ────────────────────────────────────────────────────────────────
-  const fetchProperties = useCallback(
-    async (reset = false) => {
-      if (loading || (!hasMore && !reset)) return;
-      setLoading(true);
-      try {
-        const res = await getNearestProperties(
-          `${queryString}&cursor=${reset ? "" : (cursor ?? "")}`
-        );
-        if (!res) { setHasMore(false); return; }
-        setListedProperties((prev) => reset ? res.properties : [...prev, ...res.properties]);
-        setCursor(res.nextCursor);
-        setHasMore(Boolean(res.nextCursor));
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+  // ── Infinite scroll ───────────────────────────────────────────────────────
+  const {
+    items: listedProperties,
+    loading,
+    hasMore,
+    setObserverTarget,
+  } = useInfiniteCursorScroll<PropertyType>({
+    fetcher: async (cursor, signal): Promise<CursorResponse<PropertyType[]>> => {
+      const res = await getNearestProperties(
+        `${queryString}&cursor=${cursor ?? ""}`,
+        { signal }
+      );
+      if (!res) return { items: [], nextCursor: null };
+      return { items: res.properties, nextCursor: res.nextCursor };
     },
-    [queryString, cursor, loading, hasMore]
-  );
-
-  // Reset + refetch when deps change
-  useEffect(() => {
-    if (!isLocationReady) return;
-    setListedProperties([]);
-    setCursor(null);
-    setHasMore(true);
-    fetchProperties(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLocationReady, searchQuery, category, listedFor, minPriceBudget, maxPriceBudget, centerLat, centerLng]);
-
-  // Infinite scroll observer
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-    observerRef.current?.disconnect();
-    observerRef.current = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) fetchProperties(); },
-      { rootMargin: "200px" }
-    );
-    observerRef.current.observe(loadMoreRef.current);
-    return () => observerRef.current?.disconnect();
-  }, [fetchProperties]);
+    enabled: isLocationReady,
+    deps: [
+      isLocationReady,
+      searchQuery,
+      category,
+      listedFor,
+      minPriceBudget,
+      maxPriceBudget,
+      centerLat,
+      centerLng,
+    ],
+  });
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col min-h-screen bg-[#f7f8fa] mb-14">
       <Header />
-
+ 
       {/* ── Hero header ─────────────────────────────────────────────────── */}
       <div
         className="px-5 pt-14 pb-5"
@@ -152,41 +254,51 @@ export default function Page() {
           onFilter={onFilter}
         />
       </div>
-    
+ 
       {/* ── Category tabs ───────────────────────────────────────────────── */}
       <div className="bg-white border-b border-[#e5e7eb] sticky top-0 z-30">
         <NavigationTabs onChange={setCategory} value={category} />
       </div>
-
-      <div className="flex-1">
-
-        {/* ── Nearby Properties ─────────────────────────────────────────── */}
-        <section className="px-4 pt-5 mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_nearby")}</h2>
-            {!showAll && listedProperties.length > PREVIEW_COUNT && (
-              <button
-                onClick={() => setShowAll(true)}
-                className="text-[13px] font-semibold text-[#1e5f74]"
-              >
-                {t("home_see_all")} →
-              </button>
-            )}
-          </div>
-
-          <div
-            className={`grid grid-cols-2 gap-3 ${
-              showAll ? "max-h-[72vh] overflow-y-auto pr-1 pb-4" : ""
-            }`}
-          >
-            {loading && !listedProperties.length
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <VerticalPropertyCardSkeleton key={i} />
-                ))
-              : visibleProperties.map((property, index) => {
-                  const isLast = showAll && index === visibleProperties.length - 1;
-                  return (
-                    <div key={property._id} ref={isLast ? loadMoreRef : undefined}>
+ 
+      {/* ── Feed ────────────────────────────────────────────────────────── */}
+      <div className="flex-1 px-4 pt-5 pb-8">
+ 
+        {/*
+         * Five-zone feed layout
+         *
+         *  Zone 1  — cards [0–3]      Nearby grid          (2-col, 2 rows)
+         *  Zone 2  — Featured strip   Always rendered       (skeleton → cards → empty)
+         *  Zone 3a — cards [4–7]      Mid grid             (2-col, 2 rows)
+         *  Zone 4  — Promo banners    Always rendered       (skeleton → banners)
+         *  Zone 3b — cards [8+]       Infinite remainder   (2-col, load-more)
+         *
+         * Both interstitial sections (Zone 2 + Zone 4) live outside the grids
+         * so they always mount regardless of list length.
+         *
+         * Observer rule: setObserverTarget attaches to whichever card is the
+         * true last item in listedProperties across all three grid zones.
+         */}
+ 
+        {(() => {
+          // Helper so each zone's map stays clean
+          const isLastCard = (globalIndex: number) =>
+            globalIndex === listedProperties.length - 1;
+ 
+          return (
+            <>
+              {/* ── Zone 1: Nearby — cards 0–3 ─────────────────────────── */}
+              <section className="mb-8">
+                <h2 className="text-[15px] font-bold text-[#111827] mb-3">
+                  {t("home_nearby")}
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {loading && listedProperties.length === 0 &&
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <VerticalPropertyCardSkeleton key={`sk-init-${i}`} />
+                    ))
+                  }
+                  {listedProperties.slice(0, FEATURED_AFTER_INDEX + 1).map((property, i) => (
+                    <div key={property._id} ref={isLastCard(i) ? setObserverTarget : undefined}>
                       <Link href={`/property/details/${property._id}?slug=${property.slug}`}>
                         <VerticalCard
                           id={property._id}
@@ -203,148 +315,121 @@ export default function Page() {
                         />
                       </Link>
                     </div>
-                  );
-                })
-            }
-
-            {showAll && loading && Array.from({ length: 4 }).map((_, i) => (
-              <VerticalPropertyCardSkeleton key={`sk-${i}`} />
-            ))}
-
-            {showAll && !hasMore && !loading && (
-              <p className="col-span-2 text-center text-sm text-[#9ca3af] py-4">
-                {t("home_seen_all")}
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* ── Featured Properties ───────────────────────────────────────── */}
-        {listedProperties.length > 0 && (
-          <section className="mb-8">
-            <div className="flex items-center justify-between px-4 mb-3">
-              <h2 className="text-[15px] font-bold text-[#111827]">{t("home_featured")}</h2>
-              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_see_all")} →</span>
-            </div>
-            <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
-              {listedProperties.slice(0, 5).map((property) => (
-                <div key={property._id} className="flex-shrink-0 w-[180px]">
-                  <HorizontalCard
-                    id={property._id}
-                    name={property.title}
-                    price={property.price}
-                    currency={property.currency}
-                    category={property.category}
-                    listed_for={property.listed_for ?? ListForEnum.rent}
-                    address={property.address}
-                    image={property.banner}
-                    period={property.period ?? RenewalEnum.yearly}
-                    rating={property.average_rating ?? 5.0}
-                  />
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Promotional Banners ───────────────────────────────────────── */}
-        <section className="px-4 mb-8">
-          <div className="flex gap-3">
-            <div
-              className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
-              style={{ background: "linear-gradient(135deg,#143d4d,#1e5f74)" }}
-            >
-              <div className="text-white text-xs font-bold leading-snug">
-                🎃 {t("home_Announce")}<br />
-                <span className="opacity-75 font-normal">{t("home_discover")}</span>
-              </div>
-              <span className="absolute top-2 right-2 bg-[#f0a500] text-[#143d4d] text-[9px]
-                               font-extrabold px-2 py-0.5 rounded-md">{t("home_sale")}</span>
-            </div>
-            <div
-              className="flex-1 h-[90px] rounded-2xl relative overflow-hidden flex items-end p-3"
-              style={{ background: "linear-gradient(135deg,#a06500,#f0a500)" }}
-            >
-              <div className="text-white text-xs font-bold leading-snug">
-                ☀️ {t("home_Announce")}<br />
-                <span className="opacity-80 font-normal">{t("home_discover")}</span>
-              </div>
-              <span className="absolute top-2 right-2 bg-white text-[#143d4d] text-[9px]
-                               font-extrabold px-2 py-0.5 rounded-md">{t("home_new")}</span>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Top Locations ─────────────────────────────────────────────── */}
-        {/* <section className="mb-8">
-          <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_locations")}</h2>
-            <Link href="/location/list">
-              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_more")}</span>
-            </Link>
-          </div>
-          <div className="flex gap-3 px-4 overflow-x-auto pb-1 scrollbar-hide">
-            {topLocation.map((location, key) => (
-              <Link href="#" key={key}>
-                <div className="flex items-center gap-2 bg-white rounded-full
-                                px-3 py-2 shadow-[0_1px_6px_rgba(0,0,0,0.08)]
-                                flex-shrink-0 cursor-pointer
-                                hover:shadow-md transition-shadow">
-                  <div className="w-8 h-8 rounded-full bg-[#e0f0f5] overflow-hidden flex-shrink-0">
-                    <Image
-                      src={location.image}
-                      width={32}
-                      height={32}
-                      alt={location.name}
-                      className="w-full h-full object-cover rounded-full"
-                    />
+              </section>
+ 
+              {/* ── Zone 2: Featured strip — always visible ─────────────── */}
+              <FeaturedStrip properties={listedProperties} loading={loading} t={t} />
+ 
+              {/* ── Zone 3a: Mid cards — cards 4–7 ─────────────────────── */}
+              {listedProperties.length > FEATURED_AFTER_INDEX + 1 && (
+                <section className="mb-0">
+                  <div className="grid grid-cols-2 gap-3">
+                    {listedProperties
+                      .slice(FEATURED_AFTER_INDEX + 1, BANNERS_AFTER_INDEX + 1)
+                      .map((property, i) => {
+                        const globalIndex = FEATURED_AFTER_INDEX + 1 + i;
+                        return (
+                          <div
+                            key={property._id}
+                            ref={isLastCard(globalIndex) ? setObserverTarget : undefined}
+                          >
+                            <Link href={`/property/details/${property._id}?slug=${property.slug}`}>
+                              <VerticalCard
+                                id={property._id}
+                                name={property.title}
+                                price={property.price}
+                                currency={property.currency}
+                                category={property.category}
+                                address={property.address}
+                                image={property.banner}
+                                period={property.period ?? RenewalEnum.yearly}
+                                listed_for={property.listed_for ?? ListForEnum.rent}
+                                rating={property.average_rating ?? 4.9}
+                                distance={property.distance ?? undefined}
+                              />
+                            </Link>
+                          </div>
+                        );
+                      })}
+                    {/* Skeleton shown here while Zone 3a is still filling */}
+                    {loading &&
+                      listedProperties.length > FEATURED_AFTER_INDEX &&
+                      listedProperties.length <= BANNERS_AFTER_INDEX + 1 &&
+                      Array.from({ length: 2 }).map((_, i) => (
+                        <VerticalPropertyCardSkeleton key={`sk-mid-${i}`} />
+                      ))
+                    }
                   </div>
-                  <p className="text-[12px] font-semibold text-[#111827] whitespace-nowrap">
-                    {location.name}
-                  </p>
+                </section>
+              )}
+ 
+              {/* ── Zone 4: Promo banners — always visible ──────────────── */}
+              <PromoBanners
+                loading={loading}
+                hasContent={listedProperties.length > FEATURED_AFTER_INDEX + 1}
+                t={t}
+              />
+ 
+              {/* ── Zone 3b: Infinite remainder — cards 8+ ──────────────── */}
+              {listedProperties.length > BANNERS_AFTER_INDEX + 1 && (
+                <section>
+                  <div className="grid grid-cols-2 gap-3">
+                    {listedProperties.slice(BANNERS_AFTER_INDEX + 1).map((property, i) => {
+                      const globalIndex = BANNERS_AFTER_INDEX + 1 + i;
+                      return (
+                        <div
+                          key={property._id}
+                          ref={isLastCard(globalIndex) ? setObserverTarget : undefined}
+                        >
+                          <Link href={`/property/details/${property._id}?slug=${property.slug}`}>
+                            <VerticalCard
+                              id={property._id}
+                              name={property.title}
+                              price={property.price}
+                              currency={property.currency}
+                              category={property.category}
+                              address={property.address}
+                              image={property.banner}
+                              period={property.period ?? RenewalEnum.yearly}
+                              listed_for={property.listed_for ?? ListForEnum.rent}
+                              rating={property.average_rating ?? 4.9}
+                              distance={property.distance ?? undefined}
+                            />
+                          </Link>
+                        </div>
+                      );
+                    })}
+                    {/* Load-more skeleton at the bottom of Zone 3b */}
+                    {loading && listedProperties.length > BANNERS_AFTER_INDEX + 1 &&
+                      Array.from({ length: 2 }).map((_, i) => (
+                        <VerticalPropertyCardSkeleton key={`sk-more-${i}`} />
+                      ))
+                    }
+                  </div>
+                </section>
+              )}
+ 
+              {/* ── End-of-feed ─────────────────────────────────────────── */}
+              {!hasMore && !loading && listedProperties.length > 0 && (
+                <p className="text-center text-sm text-[#9ca3af] py-4">
+                  {t("home_seen_all")}
+                </p>
+              )}
+ 
+              {/* ── Empty state ──────────────────────────────────────────── */}
+              {!loading && listedProperties.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-10 gap-2">
+                  <p className="text-[#9ca3af] text-sm">{t("home_no_results")}</p>
                 </div>
-              </Link>
-            ))}
-          </div>
-        </section> */}
-
-        {/* ── Top Agents ────────────────────────────────────────────────── */}
-        {/* <section className="mb-8">
-          <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="text-[15px] font-bold text-[#111827]">{t("home_top_agents")}</h2>
-            <Link href="/agent/list">
-              <span className="text-[13px] font-semibold text-[#1e5f74]">{t("home_view_all")}</span>
-            </Link>
-          </div>
-          <div className="flex gap-5 px-4 overflow-x-auto pb-1 scrollbar-hide">
-            {[
-              { name: "Mr. Yusuf",      rating: 4.9 },
-              { name: "Mrs. Oladosu",   rating: 4.8 },
-              { name: "Engr. Kola",     rating: 4.7 },
-              { name: "Arc. Bisi",      rating: 5.0 },
-            ].map((agent) => (
-              <div key={agent.name} className="text-center flex-shrink-0">
-                <div
-                  className="w-14 h-14 rounded-full bg-white mx-auto mb-1
-                             border-2 border-[#e0f0f5]
-                             shadow-[0_2px_10px_rgba(0,0,0,0.1)] overflow-hidden
-                             flex items-center justify-center"
-                >
-                  <img
-                    src="https://placehold.co/56"
-                    alt={agent.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <p className="text-[11px] font-semibold text-[#111827]">{agent.name}</p>
-                <p className="text-[10px] text-[#9ca3af]">⭐ {agent.rating}</p>
-              </div>
-            ))}
-          </div>
-        </section> */}
-
+              )}
+            </>
+          );
+        })()}
+ 
       </div>
-
+ 
       <Footer />
     </div>
   );

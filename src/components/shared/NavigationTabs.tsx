@@ -1,5 +1,7 @@
+'use client';
+
 import { CategoryEnum, TRANS_CATEGORIES } from "@/types/property";
-import React, { SetStateAction } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,6 +16,16 @@ interface NavigationTabsProps {
 const NavigationTabs: React.FC<NavigationTabsProps> = ({ value, onChange }) => {
   const { t } = useLanguage();
 
+  useEffect(() => {
+    const savedCategory = sessionStorage.getItem("prevCategory") as CategoryEnum;
+    onChange(savedCategory || CategoryEnum.house);
+  }, []);
+
+  const handleCatChange = (category: CategoryEnum) => {
+    sessionStorage.setItem("prevCategory", category);
+    onChange(category)
+  }
+
   return (
     <nav
       className="flex gap-2 overflow-x-auto w-full py-0.5"
@@ -26,7 +38,7 @@ const NavigationTabs: React.FC<NavigationTabsProps> = ({ value, onChange }) => {
           <button
             key={tab.value}
             type="button"
-            onClick={() => onChange(tab.value)}
+            onClick={() => handleCatChange(tab.value)}
             aria-pressed={isActive}
             className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl border-[1.5px]
                         flex-shrink-0 text-[11px] font-medium transition-all duration-200

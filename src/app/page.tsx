@@ -20,7 +20,7 @@ const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default function ExplorePage() {
+export default function HomePage() {
   const { authUser, isSigningInUser } = useContext(AppContext);
   const { t } = useLanguage();
 

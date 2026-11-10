@@ -141,6 +141,18 @@ const Header: React.FC = () => {
             </Link>
           ))}
 
+          <Link
+              href={"/profile/notifications"}
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl
+                         hover:bg-[#e0f0f5] transition-colors"
+            >
+              
+              <span className="text-[13px] font-semibold text-[#111827]">
+                "notification settings"
+              </span>
+            </Link>
+
           {/* Language selector row — opens picker, shows active flag + name */}
           <button
             type="button"
@@ -188,7 +200,7 @@ const Header: React.FC = () => {
             ✕ {t("common_close")}
           </button>
         </div>
-      </Popup>
+      </Popup>      
     </>
   );
 };

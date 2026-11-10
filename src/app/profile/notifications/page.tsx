@@ -21,7 +21,7 @@ export default function NotificationPage() {
 
   const deleteFcmToken = async () => {
     try {
-      const res = await notificationsApi.unregisterPushNotifications("cgLyBe-DktneuOgCM4iMtz:APA91bHlCRYUhLx_XIj78Qhx3thJ85dPX8Efott6mCWUzo65XN7zQqWFYS7_zCtLLZDJx0vW5W8cu1rvnzO3EDaDXOYsdLSuJncLeOVGyeLJ7FHX2Sk7CXc");
+      const res = await notificationsApi.unregisterPushNotifications("test-fcm-token");
       console.log('FCM token deleted:', res.data);
     } catch (err) {
       console.error('Error deleting FCM token:', err);

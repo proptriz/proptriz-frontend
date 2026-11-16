@@ -1,6 +1,26 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useLanguage } from "@/i18n/LanguageContext";
+
+// Leaflet needs `window`, so the map is loaded on the client only.
+// The teal block is what shows while it loads (and what used to be the placeholder).
+const MiniMap = dynamic(() => import("./MiniMap"), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="h-full w-full animate-pulse"
+      style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 60%,#2d8ba8 100%)" }}
+    />
+  ),
+});
+
+// Positions the form starts with before the user picks anything.
+const PLACEHOLDER_POSITIONS: [number, number][] = [
+  [6.4281, 3.4219],
+  [9.082, 8.6753],
+  [0, 0],
+];
 
 interface MapPreviewProps {
   address: string;
@@ -18,52 +38,36 @@ export default function MapPreview({
 }: MapPreviewProps) {
   const { t } = useLanguage();
   const [lat, lng] = coordinates;
-  const hasCoords  = lat !== 6.4281 || lng !== 3.4219;
+  const validCoords = Number.isFinite(lat) && Number.isFinite(lng);
+  const hasCoords   = validCoords && !PLACEHOLDER_POSITIONS.some(([pLat, pLng]) => pLat === lat && pLng === lng);
 
   return (
     <div className="flex flex-col gap-2">
       <div className="rounded-2xl overflow-hidden border border-[#e5e7eb]">
-        {/* SVG map visual */}
+        {/* Live map centred on the pin. The whole tile is the button that opens the picker. */}
         <div
-          className="h-28 relative flex items-center justify-center cursor-pointer select-none"
-          style={{ background: "linear-gradient(160deg,#143d4d 0%,#1e5f74 60%,#2d8ba8 100%)" }}
+          role="button"
+          tabIndex={0}
+          aria-label={hasCoords ? t("map_preview_change") : t("map_preview_pick")}
+          className="h-32 relative cursor-pointer select-none outline-none
+                     focus-visible:ring-2 focus-visible:ring-[#f0a500] focus-visible:ring-inset"
           onClick={onChangeLocation}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onChangeLocation(); }
+          }}
         >
-          {/* Grid overlay */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-[0.15]"
-            viewBox="0 0 390 112" preserveAspectRatio="none"
-          >
-            <line x1="0"   y1="37"  x2="390" y2="37"  stroke="white" strokeWidth="1"/>
-            <line x1="0"   y1="74"  x2="390" y2="74"  stroke="white" strokeWidth="1"/>
-            <line x1="78"  y1="0"   x2="78"  y2="112" stroke="white" strokeWidth="1"/>
-            <line x1="156" y1="0"   x2="156" y2="112" stroke="white" strokeWidth="1"/>
-            <line x1="234" y1="0"   x2="234" y2="112" stroke="white" strokeWidth="1"/>
-            <line x1="312" y1="0"   x2="312" y2="112" stroke="white" strokeWidth="1"/>
-            {/* Gold roads */}
-            <path d="M0 58 Q100 44 200 62 Q300 76 390 52" stroke="#f0a500" strokeWidth="3.5" fill="none" opacity="0.6"/>
-            <path d="M130 0 Q140 56 128 112" stroke="#f0a500" strokeWidth="3" fill="none" opacity="0.5"/>
-            <path d="M260 0 Q250 56 265 112" stroke="#f0a500" strokeWidth="2" fill="none" opacity="0.3"/>
-          </svg>
-
-          {/* Gold pin */}
-          <div
-            className="w-8 h-8 rounded-tl-full rounded-tr-full rounded-br-none rounded-bl-full
-                       rotate-[-45deg] relative z-10 shadow-[0_4px_14px_rgba(240,165,0,0.55)]"
-            style={{
-              background: hasCoords ? "#f0a500" : "rgba(240,165,0,0.5)",
-              transition: "background 0.3s",
-            }}
-          >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                            w-3 h-3 bg-white rounded-full" />
-          </div>
+          <MiniMap
+            lat={validCoords ? lat : 9.082}
+            lng={validCoords ? lng : 8.6753}
+            zoom={hasCoords ? 16 : 5}
+            showPin={hasCoords}
+          />
 
           {/* "No pin yet" overlay */}
           {!hasCoords && (
             <div
-              className="absolute inset-0 flex flex-col items-center justify-center gap-1.5"
-              style={{ background: "rgba(20,61,77,0.5)" }}
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5"
+              style={{ background: "rgba(20,61,77,0.55)" }}
             >
               <span className="text-2xl">📍</span>
               <p className="text-white text-[12px] font-bold text-center px-4">
@@ -93,7 +97,7 @@ export default function MapPreview({
             </p>
             <p className="text-[11px] text-[#9ca3af] mt-0.5 font-mono">
               {hasCoords
-                ? `${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E`
+                ? `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}, ${Math.abs(lng).toFixed(4)}° ${lng >= 0 ? "E" : "W"}`
                 : t("map_preview_no_coords")}
             </p>
           </div>

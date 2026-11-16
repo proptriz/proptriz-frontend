@@ -2,17 +2,26 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { ReviewCard } from "@/components/shared/Cards";
-import { VerticalCard } from "@/components/shared/VerticalCard";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft, FaRegHeart, FaStar } from "react-icons/fa";
-import { PropertyStatusEnum, PropertyType, RenewalEnum } from "@/types/property";
+import { PropertyStatusEnum, PropertyType } from "@/types/property";
 import { ReviewType } from "@/types";
 import Link from "next/link";
-import { getCollocatedProperties } from "@/services/propertyApi";
 import Price from "@/components/shared/Price";
 import GalleryModal from "@/components/shared/GalleryModal";
 import StickyAgentInfo from "@/components/StickyAgent";
+import PostcodeReveal from "@/components/PostcodeReveal";
+import NearbyProperties from "@/components/NearbyProperties";
+import dynamic from "next/dynamic";
+
+// Small live map for the location card (Leaflet needs `window`, so client only)
+const MiniMap = dynamic(() => import("@/components/MiniMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full animate-pulse" style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }} />
+  ),
+});
 import PropertyDescription from "@/components/shared/Description";
 import ShareButton from "./ShareButton";
 import { getPropertyReviewsApi } from "@/services/reviewApi";
@@ -71,7 +80,6 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
   const propertyId = property._id;
   const { t }      = useLanguage();
 
-  const [nearbyProperties, setNearbyProperties] = useState<PropertyType[]>([]);
   const [reviews, setReviews]                   = useState<ReviewType[]>([]);
   const [nextCursor, setNextCursor]             = useState<string | undefined>();
   const [refreshReviews, setRefreshReviews]     = useState(false);
@@ -79,14 +87,6 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
   const [togglePopup, setTogglePopup]           = useState(false);
   const [loading, setLoading]                   = useState(false);
   const [error, setError]                       = useState<string | null>(null);
-
-  // ── Fetch nearby ────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!propertyId || nearbyProperties.length > 0) return;
-    getCollocatedProperties(propertyId)
-      .then((props) => { if (props?.length) setNearbyProperties(props); })
-      .catch(() => {/* silent */});
-  }, [propertyId, nearbyProperties.length]);
 
   // ── Fetch reviews ────────────────────────────────────────────────────────
   const fetchReviews = useCallback(async () => {
@@ -295,26 +295,19 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
           <Link href={`/property/detail-map/${propertyId}`}>
             <div className="rounded-2xl overflow-hidden border border-[#e5e7eb] cursor-pointer
                             hover:shadow-md transition-shadow">
-              {/* SVG map visual — no /map-image.png dependency */}
-              <div
-                className="h-[110px] relative flex items-center justify-center"
-                style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}
-              >
-                <svg
-                  className="absolute inset-0 w-full h-full opacity-15"
-                  viewBox="0 0 360 110"
-                  preserveAspectRatio="none"
-                >
-                  <line x1="0" y1="37" x2="360" y2="37" stroke="white" strokeWidth=".8"/>
-                  <line x1="0" y1="73" x2="360" y2="73" stroke="white" strokeWidth=".8"/>
-                  <line x1="72" y1="0" x2="72" y2="110" stroke="white" strokeWidth=".8"/>
-                  <line x1="144" y1="0" x2="144" y2="110" stroke="white" strokeWidth=".8"/>
-                  <line x1="216" y1="0" x2="216" y2="110" stroke="white" strokeWidth=".8"/>
-                  <line x1="288" y1="0" x2="288" y2="110" stroke="white" strokeWidth=".8"/>
-                  <path d="M0 55 Q90 42 180 58 Q270 72 360 50" stroke="#f0a500" strokeWidth="4" fill="none" opacity=".5"/>
-                  <path d="M144 0 Q158 55 146 110" stroke="#f0a500" strokeWidth="3" fill="none" opacity=".4"/>
-                </svg>
-                <span className="text-3xl relative z-10 drop-shadow-lg">📍</span>
+              {/* Live map centred on the listing's pin; the whole card opens the full map */}
+              <div className="h-[130px] relative">
+                {Number.isFinite(Number(property.latitude)) && Number.isFinite(Number(property.longitude)) &&
+                 (Number(property.latitude) !== 0 || Number(property.longitude) !== 0) ? (
+                  <MiniMap lat={Number(property.latitude)} lng={Number(property.longitude)} />
+                ) : (
+                  <div
+                    className="h-full w-full flex items-center justify-center"
+                    style={{ background: "linear-gradient(160deg,#143d4d,#1e5f74)" }}
+                  >
+                    <span className="text-3xl drop-shadow-lg">📍</span>
+                  </div>
+                )}
               </div>
               <div className="bg-white px-4 py-3 flex items-center justify-between">
                 <div>
@@ -330,6 +323,9 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
               </div>
             </div>
           </Link>
+
+          {/* Postcode + State / LGA (Nigeria) or area + region (elsewhere) */}
+          <PostcodeReveal property={property} />
 
           {/* Reviews */}
           <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
@@ -396,35 +392,8 @@ const PropertyDetailsClient = ({ property }: { property: PropertyType }) => {
             )}
           </div>
 
-          {/* Nearby Properties */}
-          {nearbyProperties.length > 0 && (
-            <div className="bg-white rounded-2xl border border-[#e5e7eb] p-4">
-              <p className="text-[11px] font-bold text-[#4b5563] uppercase tracking-[0.7px] mb-3
-                            flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1e5f74] inline-block" />
-                {t("detail_nearby")}
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {nearbyProperties.slice(0, 4).map((item) => (
-                  <Link key={item._id} href={`/property/details/${item._id}`}>
-                    <VerticalCard
-                      id={item._id}
-                      name={item.title}
-                      currency={item.currency}
-                      price={item.price}
-                      category={item.category}
-                      listed_for={item.listed_for}
-                      address={item.address}
-                      image={item.banner}
-                      period={item.period ?? RenewalEnum.yearly}
-                      distance={item.distance ?? undefined}
-                      rating={item.average_rating ?? 4.9}
-                    />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Nearby Properties: Same area / Same LGA / Nearest */}
+          <NearbyProperties property={property} />
 
         </div>
       </div>

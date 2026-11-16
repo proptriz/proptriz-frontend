@@ -10,6 +10,7 @@ import TogglePills from "./TogglePills";
 import Counter from "./Counter";
 import PriceInput from "./PriceInput";
 import MapPreview from "./MapPreview";
+import PostcodeField from "./PostcodeField";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 // ─── Focus helpers ────────────────────────────────────────────────────────────
@@ -232,6 +233,14 @@ export default function Step1Basics({ data, onUpdate, onOpenLocationPicker }: St
           coordinates={data.coordinates}
           onChangeLocation={onOpenLocationPicker}
           hint="📌 Tap the map to drop a pin on your property's exact location — buyers use the map to find properties near them."
+        />
+
+        {/* Where the pin is: postcode + State / LGA in Nigeria, area + region elsewhere */}
+        <PostcodeField
+          coordinates={data.coordinates}
+          address={data.address}
+          value={data.postcodeInput ?? ""}
+          onChange={(code) => onUpdate({ postcodeInput: code })}
         />
       </SectionCard>
     </div>

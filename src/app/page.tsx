@@ -7,7 +7,10 @@ import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
 import propertyService from "@/services/propertyApi";
-import { CategoryEnum, PropertyFilterPayload, PropertyType } from "@/types/property";
+import {
+  appliedPlaceParams, CategoryEnum, PlaceFilter, placeFilterParams, PropertyFilterPayload, PropertyType,
+} from "@/types/property";
+import PlaceNotice, { PlaceMatch } from "@/components/property/PlaceNotice";
 import getUserPosition from "@/utils/getUserPosition";
 import { AppContext } from "@/context/AppContextProvider";
 import Header from "@/components/shared/Header";
@@ -36,6 +39,14 @@ export default function HomePage() {
   const [zoomLevel, setZoomLevel]               = useState<number>(7);
   const [selectedProperty, setSelectedProperty] = useState<PropertyType | null>(null);
 
+  // Postcode prefix or named place chosen in the filter sheet. While set, results come from
+  // that place (not the visible map area) and the map moves to them.
+  const [place, setPlace]                       = useState<PlaceFilter | null>(null);
+  const [widen, setWiden]                       = useState(true);
+  const [placeMatch, setPlaceMatch]             = useState<PlaceMatch | null>(null);
+  const placeFetchKey                           = useRef<string | null>(null);
+  const placeAbort                              = useRef<AbortController | null>(null);
+
   const renderedMarkerIds = useRef<Set<string>>(new Set());
   const [nextCursor, setNextCursor]             = useState<string | undefined>(undefined);
 
@@ -61,6 +72,66 @@ export default function HomePage() {
   const fetchProperties = useCallback(
     async (signal: AbortSignal) => {
       if (!mapBounds) return;
+
+      // ── Chosen place: fetch its listings once (not on every map move) ──
+      if (place) {
+        const key = JSON.stringify([place, widen, appliedSearchQuery, category, listedFor, minPriceBudget, maxPriceBudget]);
+        if (placeFetchKey.current === key) return;
+        placeFetchKey.current = key;
+        // Moving the map cancels the viewport request, but must not cancel this one:
+        // it is tied to the chosen place, so it gets its own controller.
+        placeAbort.current?.abort();
+        const own = new AbortController();
+        placeAbort.current = own;
+        signal = own.signal;
+        try {
+          let location = placeFilterParams(place, widen);
+          let cursor = "";
+          let total = 0;
+          for (let page = 0; page < 5; page++) {
+            const params = new URLSearchParams({
+              query:      appliedSearchQuery ?? "",
+              category:   category ?? "",
+              listed_for: listedFor === "all" ? "" : listedFor,
+              min_price:  minPriceBudget.toString(),
+              max_price:  maxPriceBudget.toString(),
+              ...location,
+              cursor,
+            });
+            const result = await propertyService.getAllProperties(params.toString(), { signal });
+            if (signal.aborted) return; // a newer search replaced this one
+            if (!result.success) { placeFetchKey.current = null; break; }
+
+            const found: PropertyType[] = result.properties ?? [];
+            const fresh = found.filter((p) => !renderedMarkerIds.current.has(p._id));
+            fresh.forEach((p) => renderedMarkerIds.current.add(p._id));
+            if (fresh.length) setProperties((prev) => [...prev, ...fresh]);
+            total += found.length;
+
+            if (page === 0) {
+              // Later pages must ask for the level the server actually used
+              if (result.applied) location = appliedPlaceParams(result.applied);
+              setPlaceMatch({ tier: result.match_tier ?? place.tier, widened: !!result.widened, count: null });
+              const first = found.find((p) => typeof p.latitude === "number" && typeof p.longitude === "number");
+              if (first && fresh.length) {
+                sessionStorage.removeItem("prevMapCenter");
+                sessionStorage.removeItem("prevMapZoom");
+                setZoomLevel(13);
+                setMapCenter([first.latitude, first.longitude]);
+              }
+            }
+            if (!result.nextCursor) break;
+            cursor = result.nextCursor;
+          }
+          setPlaceMatch((m) => (m ? { ...m, count: total } : { tier: place.tier, widened: false, count: total }));
+        } catch (error: unknown) {
+          if (signal.aborted) return;
+          placeFetchKey.current = null;
+          console.error("Fetch properties by place failed:", (error as Error).message);
+        }
+        return;
+      }
+
       try {
         const ne = mapBounds.getNorthEast();
         const sw = mapBounds.getSouthWest();
@@ -99,11 +170,12 @@ export default function HomePage() {
         }
       }
     },
-    [mapBounds, appliedSearchQuery, category, listedFor, minPriceBudget, maxPriceBudget]
+    [mapBounds, appliedSearchQuery, category, listedFor, minPriceBudget, maxPriceBudget, place, widen]
   );
 
   // ── Search / filter handlers ──────────────────────────────────────────
   const onSearchClick = useCallback(() => {
+    placeFetchKey.current = null;
     renderedMarkerIds.current.clear();
     setProperties([]);
     setAppliedSearchQuery(searchInput);
@@ -114,6 +186,13 @@ export default function HomePage() {
       renderedMarkerIds.current.clear();
       setProperties([]);
       setSelectedProperty(null);
+
+      placeFetchKey.current = null;
+      placeAbort.current?.abort();
+      setNextCursor(undefined);
+      setPlace(filters.place ?? null);
+      setWiden(filters.widen ?? true);
+      setPlaceMatch(null);
 
       if (filters.location) {
         sessionStorage.removeItem("prevMapCenter");
@@ -141,10 +220,21 @@ export default function HomePage() {
   }, [fetchProperties, mapBounds]);
 
   useEffect(() => {
+    placeFetchKey.current = null;
     renderedMarkerIds.current.clear();
     setProperties([]);
     setAppliedSearchQuery(searchInput);
   }, [category, appliedSearchQuery]);
+
+  const clearPlace = useCallback(() => {
+    placeFetchKey.current = null;
+    placeAbort.current?.abort();
+    renderedMarkerIds.current.clear();
+    setProperties([]);
+    setNextCursor(undefined);
+    setPlace(null);
+    setPlaceMatch(null);
+  }, []);
 
   useEffect(() => {
     if (searchInput === "" && appliedSearchQuery) {
@@ -181,6 +271,18 @@ export default function HomePage() {
             <NavigationTabs onChange={setCategory} value={category} />
           </div>
         </div>
+
+        {/* Chosen postcode / place — below the tabs */}
+        {place && (
+          <div className="absolute top-[118px] left-0 right-0 z-[498] px-4">
+            <PlaceNotice
+              place={place}
+              match={placeMatch}
+              onClear={clearPlace}
+              className="mx-auto max-w-[480px] shadow-[0_2px_10px_rgba(0,0,0,0.1)]"
+            />
+          </div>
+        )}
 
         {/* Leaflet map */}
         <Map
@@ -227,4 +329,4 @@ export default function HomePage() {
       <Footer />
     </div>
   );
-}
+}

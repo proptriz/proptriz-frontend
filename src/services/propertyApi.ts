@@ -63,7 +63,10 @@ export const createProperty = async (formData: FormData): Promise<PropertyType> 
   return response.data.property;
 };
 
-export const updateProperty = async (id: string, data: Partial<PropertyType>): Promise<PropertyType | undefined> => {
+export const updateProperty = async (
+  id: string,
+  data: Partial<PropertyType> & { postcode_input?: string }
+): Promise<PropertyType | undefined> => {
   try {
     logger.info("📦 FormData contents: ", {data});
     const response = await axiosClient.put(
@@ -131,6 +134,29 @@ export const getCollocatedProperties = async (propertyId: string): Promise<Prope
   const response = await axiosClient.get(`/property/collocated-prop/${propertyId}`);
   logger.info(response.data);
   return response.data.properties;
+};
+
+export type CollocatedTier = "auto" | "area" | "district" | "subregion" | "region" | "distance";
+
+/**
+ * Listings near a property, with the tier they came from ("area" = same postcode area or
+ * neighbourhood, "subregion" = same LGA, ...) and the tiers this listing supports.
+ */
+export const getCollocatedByTier = async (
+  propertyId: string,
+  tier: CollocatedTier = "auto"
+): Promise<{ properties: PropertyType[]; match_tier: Exclude<CollocatedTier, "auto">; tiers: Exclude<CollocatedTier, "auto">[] }> => {
+  try {
+    const response = await axiosClient.get(`/property/collocated-prop/${propertyId}`, { params: { tier } });
+    return {
+      properties: response.data.properties ?? [],
+      match_tier: response.data.match_tier ?? "distance",
+      tiers: response.data.tiers ?? ["distance"],
+    };
+  } catch (error: any) {
+    logger.error("error loading nearby properties");
+    return { properties: [], match_tier: "distance", tiers: ["distance"] };
+  }
 };
 
 export const getAllProperties = async (

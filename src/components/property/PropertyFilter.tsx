@@ -2,9 +2,10 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FiSearch, FiMapPin, FiX } from "react-icons/fi";
-import { CategoryEnum, PropertyFilterPayload } from "@/types/property";
+import { AFRICA_COUNTRY_CODES, CategoryEnum, PlaceFilter, PropertyFilterPayload } from "@/types/property";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { interpolate } from "@/i18n/translations";
+import FilterPlacePicker, { placeTitle } from "./FilterPlacePicker";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -121,6 +122,9 @@ const PropertyFilter: React.FC<FilterProps> = ({
   const [locationQuery,   setLocationQuery]   = useState("");
   const [locationResult,  setLocationResult]  = useState<LocationResult | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
+  // Postcode prefix (Nigeria) or named place picked from the suggestions
+  const [place, setPlace] = useState<PlaceFilter | null>(null);
+  const [widen, setWiden] = useState(true);
 
   const [filters, setFilters] = useState<FilterState>({
     propertyType: CategoryEnum.house,
@@ -160,6 +164,9 @@ const PropertyFilter: React.FC<FilterProps> = ({
   // ── Forward geocoding ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!locationQuery || locationQuery.length < 3) return;
+    if (place) return; // a suggestion was chosen: no map lookup needed
+    // Postcode-like text ("LA 11 U34") is handled by the suggestions, not the map search
+    if (/^[A-Za-z]{2}[\s-]?\d/.test(locationQuery.trim())) return;
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -171,7 +178,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
           `https://nominatim.openstreetmap.org/search?` +
             new URLSearchParams({
               q: locationQuery, format: "json",
-              addressdetails: "1", countrycodes: "ng", limit: "1",
+              addressdetails: "1", countrycodes: AFRICA_COUNTRY_CODES, limit: "1",
             }),
           { signal: controller.signal, headers: { "Accept-Language": "en" } },
         );
@@ -194,7 +201,7 @@ const PropertyFilter: React.FC<FilterProps> = ({
     }, 500);
 
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [locationQuery]);
+  }, [locationQuery, place]);
 
   // ── Price helpers ────────────────────────────────────────────────────────────
   const handleMinChange = (raw: string) => {
@@ -215,6 +222,12 @@ const PropertyFilter: React.FC<FilterProps> = ({
     activeTags.push({
       label: `📍 ${locationResult.name}`,
       onRemove: () => { setLocationResult(null); setLocationQuery(""); },
+    });
+  }
+  if (place) {
+    activeTags.push({
+      label: `📮 ${placeTitle(place)}`,
+      onRemove: () => setPlace(null),
     });
   }
   if (filters.propertyType !== CategoryEnum.house) {
@@ -241,6 +254,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
   const handleReset = useCallback(() => {
     setLocationQuery("");
     setLocationResult(null);
+    setPlace(null);
+    setWiden(true);
     const resetState: FilterState = {
       propertyType: CategoryEnum.house,
       listedFor: "all",
@@ -255,6 +270,8 @@ const PropertyFilter: React.FC<FilterProps> = ({
       priceMin:     null,
       priceMax:     null,
       description:  undefined,
+      place:        undefined,
+      widen:        undefined,
     });
   }, [onFilter]);
 
@@ -262,12 +279,14 @@ const PropertyFilter: React.FC<FilterProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onFilter({
-      location:     locationResult ?? undefined,
+      location:     place ? undefined : locationResult ?? undefined,
       propertyType: filters.propertyType,
       listedFor:    filters.listedFor,
       priceMin:     filters.price[0],
       priceMax:     filters.price[1],
       description:  filters.description || undefined,
+      place:        place ?? undefined,
+      widen:        place ? widen : undefined,
     });
     setTogglePopup?.(false);
   };
@@ -347,6 +366,20 @@ const PropertyFilter: React.FC<FilterProps> = ({
             </button>
           </div>
         )}
+
+        {/* Postcode / place suggestions, chosen place and shortcuts */}
+        <FilterPlacePicker
+          query={locationQuery}
+          onClearQuery={() => { setLocationQuery(""); setLocationResult(null); }}
+          place={place}
+          onPlace={setPlace}
+          widen={widen}
+          onWiden={setWiden}
+          onNearMe={(lat, lng) => {
+            setLocationQuery("");
+            setLocationResult({ query: "", lat, lng, name: t("filter_near_me") });
+          }}
+        />
       </div>
 
       {/* ── Property Type ────────────────────────────────────────────────────── */}

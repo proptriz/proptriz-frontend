@@ -5,6 +5,8 @@ import { Call3DIcon, GmailMinimalIcon, WhatsAppMinimalIcon } from "./Icons";
 import { normalizePhone } from "@/utils/normalizePhone";
 import Image from "next/image";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { POSTCODE_REVEALED_EVENT, REQUEST_CONTACT_EVENT, recordPropertyContact } from "@/services/postcodeApi";
+import { useEffect } from "react";
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
 // Teal dark:#143d4d  Teal:#1e5f74  Teal-light:#e0f0f5  Gold:#f0a500
@@ -35,6 +37,39 @@ const StickyAgentInfo = ({
 
   const userLabel =
     USER_TYPE_LABEL[user.user_type ?? ""] ?? t("agent_company");
+
+  // Records the lead and unlocks the full postcode. Fire-and-forget: the tel:/mailto:/WhatsApp
+  // link opens immediately either way.
+  const trackContact = (channel: "call" | "email" | "chat") => {
+    if (!property.postcode?.public_code) return; // nothing to unlock without a postcode
+    recordPropertyContact(property._id, channel).then((postcode) => {
+      window.dispatchEvent(
+        new CustomEvent(POSTCODE_REVEALED_EVENT, { detail: { propertyId: property._id, postcode } })
+      );
+    });
+  };
+
+  // "Get exact address" on the location card: open the agent's main contact channel
+  // (WhatsApp, else phone, else email) exactly as if the visitor had tapped it here.
+  const phoneHref = user.phone ? `tel:${normalizePhone(user.phone)}` : "";
+  const emailHref = user.email ? `mailto:${user.email}` : "";
+  useEffect(() => {
+    const onRequest = (e: Event) => {
+      if ((e as CustomEvent<{ propertyId: string }>).detail?.propertyId !== property._id) return;
+      if (user.whatsapp) {
+        trackContact("chat");
+        window.open(link, "_blank", "noopener,noreferrer");
+      } else if (phoneHref) {
+        trackContact("call");
+        window.location.href = phoneHref;
+      } else if (emailHref) {
+        trackContact("email");
+        window.location.href = emailHref;
+      }
+    };
+    window.addEventListener(REQUEST_CONTACT_EVENT, onRequest);
+    return () => window.removeEventListener(REQUEST_CONTACT_EVENT, onRequest);
+  }, [property._id, user.whatsapp, phoneHref, emailHref, link]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="fixed bottom-0 left-0 w-full z-50">
@@ -92,6 +127,7 @@ const StickyAgentInfo = ({
           {user.phone && (
             <a
               href={`tel:${normalizePhone(user.phone)}`}
+              onClick={() => trackContact("call")}
               aria-label={t("agent_call")}
               className="w-10 h-10 rounded-xl flex items-center justify-center
                          transition-all duration-200 active:scale-95"
@@ -113,6 +149,7 @@ const StickyAgentInfo = ({
           {user.email && (
             <a
               href={`mailto:${user.email}`}
+              onClick={() => trackContact("email")}
               aria-label={t("agent_email")}
               className="w-10 h-10 rounded-xl flex items-center justify-center
                          transition-all duration-200 active:scale-95"
@@ -134,6 +171,7 @@ const StickyAgentInfo = ({
           {user.whatsapp && (
             <a
               href={link}
+              onClick={() => trackContact("chat")}
               aria-label={t("agent_whatsapp")}
               target="_blank"
               rel="noopener noreferrer"

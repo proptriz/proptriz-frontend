@@ -653,6 +653,67 @@ export interface Translations {
   privacy_s8_title:           string;
   privacy_s8_body:            string;
   privacy_s9_title:           string;
+
+  // ── Location, postcode and place search ──
+  loc_location_label: string;
+  loc_postcode_label: string;
+  loc_finding: string;
+  loc_no_postcode: string;
+  loc_no_postcode_note: string;
+  loc_verified: string;
+  loc_unverified: string;
+  loc_location_verified: string;
+  loc_location_unverified: string;
+  loc_m_from_pin: string;
+  loc_pin_matches: string;
+  loc_pin_mismatch_note: string;
+  loc_country: string;
+  loc_state: string;
+  loc_lga: string;
+  loc_county: string;
+  loc_subcounty: string;
+  loc_province: string;
+  loc_commune: string;
+  loc_region: string;
+  loc_district: string;
+  loc_area: string;
+  loc_neighbourhood: string;
+  loc_nearest: string;
+  loc_same_area: string;
+  loc_same_district: string;
+  loc_same_lga: string;
+  loc_same_state: string;
+  loc_same_neighbourhood: string;
+  loc_same_subcounty: string;
+  loc_same_county: string;
+  loc_same_commune: string;
+  loc_same_province: string;
+  loc_same_region: string;
+  loc_none_in_tier: string;
+  loc_type_instead: string;
+  loc_type_different: string;
+  loc_type_ph: string;
+  loc_type_hint: string;
+  loc_code_invalid: string;
+  loc_code_far: string;
+  loc_get_exact: string;
+  loc_full_shared: string;
+  loc_signin_reveal: string;
+  loc_exact_code: string;
+  loc_copy: string;
+  loc_copied: string;
+  filter_loc_listings: string;
+  filter_loc_listing_one: string;
+  filter_near_me: string;
+  filter_my_area: string;
+  filter_search_scope: string;
+  filter_widen_title: string;
+  filter_widen_hint: string;
+  filter_location_denied: string;
+  filter_my_area_fail: string;
+  place_showing_wider: string;
+  place_none: string;
+  place_clear: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1081,6 +1142,67 @@ const en: Translations = {
   privacy_s8_title: "8. Security",
   privacy_s8_body: "We implement technical and organizational safeguards including encryption, secure hosting, and access controls. However, no system is completely secure.",
   privacy_s9_title: "9. Contact Us",
+
+  // ── Location, postcode and place search ──
+  loc_location_label: "Location",
+  loc_postcode_label: "Nigeria postcode",
+  loc_finding: "Checking this pin…",
+  loc_no_postcode: "No postcode at this spot yet",
+  loc_no_postcode_note: "No postcode at this spot? Keep going. Your listing is published as “Unverified” and we check again later.",
+  loc_verified: "Verified",
+  loc_unverified: "Unverified",
+  loc_location_verified: "Location verified",
+  loc_location_unverified: "Location unverified",
+  loc_m_from_pin: "{n} m from pin",
+  loc_pin_matches: "Pin matches address",
+  loc_pin_mismatch_note: "The pin is in {place}, but the address doesn’t mention it. Add the area name or move the pin. You can still publish.",
+  loc_country: "Country",
+  loc_state: "State",
+  loc_lga: "LGA",
+  loc_county: "County",
+  loc_subcounty: "Sub-county",
+  loc_province: "Province",
+  loc_commune: "Commune",
+  loc_region: "Region",
+  loc_district: "District",
+  loc_area: "Area",
+  loc_neighbourhood: "Neighbourhood",
+  loc_nearest: "Nearest",
+  loc_same_area: "Same area",
+  loc_same_district: "Same district",
+  loc_same_lga: "Same LGA",
+  loc_same_state: "Same state",
+  loc_same_neighbourhood: "Same neighbourhood",
+  loc_same_subcounty: "Same sub-county",
+  loc_same_county: "Same county",
+  loc_same_commune: "Same commune",
+  loc_same_province: "Same province",
+  loc_same_region: "Same region",
+  loc_none_in_tier: "No other listings here yet.",
+  loc_type_instead: "Type the postcode instead",
+  loc_type_different: "Know a different postcode? Type it",
+  loc_type_ph: "e.g. LA 11 U34 ZR 63",
+  loc_type_hint: "Leave empty to use the postcode found from your pin.",
+  loc_code_invalid: "This postcode doesn’t exist. Check the code.",
+  loc_code_far: "Valid code, but not near your pin. Move the pin or check the code.",
+  loc_get_exact: "Get exact address",
+  loc_full_shared: "The full postcode is shared once you contact the agent.",
+  loc_signin_reveal: "Sign in, then contact the agent to see the full postcode.",
+  loc_exact_code: "Exact building code",
+  loc_copy: "Copy postcode",
+  loc_copied: "Copied",
+  filter_loc_listings: "{n} listings",
+  filter_loc_listing_one: "1 listing",
+  filter_near_me: "Near me",
+  filter_my_area: "My area",
+  filter_search_scope: "Search in",
+  filter_widen_title: "If nothing matches",
+  filter_widen_hint: "Show the next wider level instead",
+  filter_location_denied: "Allow location access to use this.",
+  filter_my_area_fail: "Couldn’t work out your area. Sign in and try again, or type a place.",
+  place_showing_wider: "Nothing in {place} yet. Showing: {tier}.",
+  place_none: "No listings in {place} yet.",
+  place_clear: "Clear location",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1513,6 +1635,67 @@ const fr: Translations = {
   privacy_s8_title: "8. Sécurité",
   privacy_s8_body: "Nous mettons en œuvre des mesures techniques et organisationnelles incluant le chiffrement, l'hébergement sécurisé et les contrôles d'accès. Cependant, aucun système n'est totalement sécurisé.",
   privacy_s9_title: "9. Nous contacter",
+
+  // ── Location, postcode and place search ──
+  loc_location_label: "Emplacement",
+  loc_postcode_label: "Code postal du Nigeria",
+  loc_finding: "Vérification du repère…",
+  loc_no_postcode: "Pas encore de code postal à cet endroit",
+  loc_no_postcode_note: "Pas de code postal ici ? Continuez. Votre annonce est publiée comme « Non vérifié » et nous revérifions plus tard.",
+  loc_verified: "Vérifié",
+  loc_unverified: "Non vérifié",
+  loc_location_verified: "Emplacement vérifié",
+  loc_location_unverified: "Emplacement non vérifié",
+  loc_m_from_pin: "à {n} m du repère",
+  loc_pin_matches: "Le repère correspond à l’adresse",
+  loc_pin_mismatch_note: "Le repère se trouve à {place}, mais l’adresse ne le mentionne pas. Ajoutez le nom du quartier ou déplacez le repère. Vous pouvez quand même publier.",
+  loc_country: "Pays",
+  loc_state: "État",
+  loc_lga: "LGA (collectivité locale)",
+  loc_county: "Comté",
+  loc_subcounty: "Sous-comté",
+  loc_province: "Province",
+  loc_commune: "Commune",
+  loc_region: "Région",
+  loc_district: "District",
+  loc_area: "Zone",
+  loc_neighbourhood: "Quartier",
+  loc_nearest: "Les plus proches",
+  loc_same_area: "Même zone",
+  loc_same_district: "Même district",
+  loc_same_lga: "Même LGA",
+  loc_same_state: "Même État",
+  loc_same_neighbourhood: "Même quartier",
+  loc_same_subcounty: "Même sous-comté",
+  loc_same_county: "Même comté",
+  loc_same_commune: "Même commune",
+  loc_same_province: "Même province",
+  loc_same_region: "Même région",
+  loc_none_in_tier: "Aucune autre annonce ici pour l’instant.",
+  loc_type_instead: "Saisir plutôt le code postal",
+  loc_type_different: "Vous connaissez un autre code postal ? Saisissez-le",
+  loc_type_ph: "ex. LA 11 U34 ZR 63",
+  loc_type_hint: "Laissez vide pour utiliser le code postal trouvé à partir du repère.",
+  loc_code_invalid: "Ce code postal n’existe pas. Vérifiez le code.",
+  loc_code_far: "Code valide, mais éloigné du repère. Déplacez le repère ou vérifiez le code.",
+  loc_get_exact: "Obtenir l’adresse exacte",
+  loc_full_shared: "Le code postal complet est partagé une fois l’agent contacté.",
+  loc_signin_reveal: "Connectez-vous, puis contactez l’agent pour voir le code postal complet.",
+  loc_exact_code: "Code exact du bâtiment",
+  loc_copy: "Copier le code postal",
+  loc_copied: "Copié",
+  filter_loc_listings: "{n} annonces",
+  filter_loc_listing_one: "1 annonce",
+  filter_near_me: "Près de moi",
+  filter_my_area: "Ma zone",
+  filter_search_scope: "Rechercher dans",
+  filter_widen_title: "Si rien ne correspond",
+  filter_widen_hint: "Afficher le niveau plus large suivant",
+  filter_location_denied: "Autorisez l’accès à la position pour utiliser cette option.",
+  filter_my_area_fail: "Impossible de déterminer votre zone. Connectez-vous et réessayez, ou saisissez un lieu.",
+  place_showing_wider: "Rien à {place} pour l’instant. Affichage : {tier}.",
+  place_none: "Aucune annonce à {place} pour l’instant.",
+  place_clear: "Effacer le lieu",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1945,6 +2128,67 @@ const sw: Translations = {
   privacy_s8_title: "8. Usalama",
   privacy_s8_body: "Tunatekeleza ulinzi wa kiufundi na wa shirika ikiwemo usimbuaji, uhifadhi salama na udhibiti wa ufikiaji. Hata hivyo, hakuna mfumo unaokuwa salama kabisa.",
   privacy_s9_title: "9. Wasiliana Nasi",
+
+  // ── Location, postcode and place search ──
+  loc_location_label: "Mahali",
+  loc_postcode_label: "Msimbo wa posta wa Nigeria",
+  loc_finding: "Inakagua alama…",
+  loc_no_postcode: "Bado hakuna msimbo wa posta mahali hapa",
+  loc_no_postcode_note: "Hakuna msimbo wa posta hapa? Endelea. Tangazo lako litachapishwa kama “Haijathibitishwa” na tutakagua tena baadaye.",
+  loc_verified: "Imethibitishwa",
+  loc_unverified: "Haijathibitishwa",
+  loc_location_verified: "Mahali pamethibitishwa",
+  loc_location_unverified: "Mahali hapajathibitishwa",
+  loc_m_from_pin: "mita {n} kutoka kwenye alama",
+  loc_pin_matches: "Alama inalingana na anwani",
+  loc_pin_mismatch_note: "Alama iko {place}, lakini anwani haitaji eneo hilo. Ongeza jina la eneo au sogeza alama. Bado unaweza kuchapisha.",
+  loc_country: "Nchi",
+  loc_state: "Jimbo",
+  loc_lga: "LGA (serikali ya mtaa)",
+  loc_county: "Kaunti",
+  loc_subcounty: "Kaunti ndogo",
+  loc_province: "Mkoa",
+  loc_commune: "Komuni",
+  loc_region: "Mkoa",
+  loc_district: "Wilaya",
+  loc_area: "Eneo",
+  loc_neighbourhood: "Mtaa",
+  loc_nearest: "Karibu zaidi",
+  loc_same_area: "Eneo hilohilo",
+  loc_same_district: "Wilaya hiyohiyo",
+  loc_same_lga: "LGA hiyohiyo",
+  loc_same_state: "Jimbo hilohilo",
+  loc_same_neighbourhood: "Mtaa huohuo",
+  loc_same_subcounty: "Kaunti ndogo hiyohiyo",
+  loc_same_county: "Kaunti hiyohiyo",
+  loc_same_commune: "Komuni hiyohiyo",
+  loc_same_province: "Mkoa huohuo",
+  loc_same_region: "Mkoa huohuo",
+  loc_none_in_tier: "Bado hakuna matangazo mengine hapa.",
+  loc_type_instead: "Andika msimbo wa posta badala yake",
+  loc_type_different: "Unajua msimbo mwingine wa posta? Uandike",
+  loc_type_ph: "mf. LA 11 U34 ZR 63",
+  loc_type_hint: "Acha wazi ili kutumia msimbo wa posta uliopatikana kutoka kwenye alama yako.",
+  loc_code_invalid: "Msimbo huu wa posta haupo. Kagua msimbo.",
+  loc_code_far: "Msimbo ni sahihi, lakini hauko karibu na alama yako. Sogeza alama au kagua msimbo.",
+  loc_get_exact: "Pata anwani kamili",
+  loc_full_shared: "Msimbo kamili wa posta hutolewa ukishawasiliana na wakala.",
+  loc_signin_reveal: "Ingia, kisha wasiliana na wakala ili kuona msimbo kamili wa posta.",
+  loc_exact_code: "Msimbo kamili wa jengo",
+  loc_copy: "Nakili msimbo wa posta",
+  loc_copied: "Imenakiliwa",
+  filter_loc_listings: "matangazo {n}",
+  filter_loc_listing_one: "tangazo 1",
+  filter_near_me: "Karibu nami",
+  filter_my_area: "Eneo langu",
+  filter_search_scope: "Tafuta katika",
+  filter_widen_title: "Kama hakuna kinacholingana",
+  filter_widen_hint: "Onyesha kiwango kipana kinachofuata",
+  filter_location_denied: "Ruhusu ufikiaji wa mahali ili kutumia hii.",
+  filter_my_area_fail: "Imeshindikana kutambua eneo lako. Ingia ujaribu tena, au andika mahali.",
+  place_showing_wider: "Bado hakuna kitu {place}. Inaonyesha: {tier}.",
+  place_none: "Bado hakuna matangazo {place}.",
+  place_clear: "Ondoa mahali",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1976,4 +2220,4 @@ export function interpolate(
     (acc, [key, val]) => acc.replace(new RegExp(`\\{${key}\\}`, "g"), String(val)),
     template,
   );
-}
+}

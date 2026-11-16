@@ -91,7 +91,7 @@ export function isPushConfigured(): boolean {
   );
 }
 
-export async function registerPushNotifications(): Promise<string | null> {
+export async function registerPushNotifications(language?: string): Promise<string | null> {
   const env = getEnvironmentInfo();
 
   if (!isPushConfigured()) {
@@ -131,7 +131,7 @@ export async function registerPushNotifications(): Promise<string | null> {
       return null;
     }
 
-    await notificationsApi.saveTokenToServer(token);
+    await notificationsApi.saveTokenToServer(token, language);
     logger.info('[Push] Registered ✓');
     return token;
 

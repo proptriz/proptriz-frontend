@@ -389,6 +389,7 @@ export interface Translations {
   menu_terms:           string;
   menu_faq:             string;
   menu_language:        string;
+  menu_notifications:   string;
 
   // ── Property details ────────────────────────────────────────────────────────
   detail_loading:       string;
@@ -900,6 +901,7 @@ const en: Translations = {
   menu_list_property: "List New Property", menu_become_agent: "Become an Agent",
   menu_privacy: "Privacy Policy", menu_terms: "Terms of Service",
   menu_faq: "FAQ", menu_language: "Language",
+  menu_notifications: "Notifications",
 
   detail_loading: "Loading property…", detail_error: "Couldn't load property",
   detail_go_back: "Go Back", detail_updated: "Updated",
@@ -1333,6 +1335,7 @@ const fr: Translations = {
   menu_list_property: "Ajouter un bien", menu_become_agent: "Devenir agent",
   menu_privacy: "Politique de confidentialité", menu_terms: "Conditions d'utilisation",
   menu_faq: "FAQ", menu_language: "Langue",
+  menu_notifications: "Notifications",
 
   detail_loading: "Chargement du bien…", detail_error: "Impossible de charger le bien",
   detail_go_back: "Retour", detail_updated: "Mis à jour",
@@ -1765,6 +1768,7 @@ const sw: Translations = {
   menu_list_property: "Ongeza Mali", menu_become_agent: "Kuwa Wakala",
   menu_privacy: "Sera ya Faragha", menu_terms: "Masharti ya Huduma",
   menu_faq: "Maswali", menu_language: "Lugha",
+  menu_notifications: "Arifa",
 
   detail_loading: "Inapakia mali…", detail_error: "Imeshindwa kupakia mali",
   detail_go_back: "Rudi", detail_updated: "Imesasishwa",

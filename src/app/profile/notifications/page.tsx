@@ -2,7 +2,6 @@
 
 import Header from "@/components/shared/Header";
 import { NotificationSettingsPage } from "@/components/NotificationSettings";
-import { notificationsApi } from "@/services/notificationApi";
 import Splash from "@/components/shared/Splash";
 import { useAuth } from "@/context/AppContextProvider";
 
@@ -10,24 +9,6 @@ import { useAuth } from "@/context/AppContextProvider";
 export default function NotificationPage() {
   const { authUser } = useAuth();
  
-  const sendCustomMessage = async () => {
-    try {
-      const res = await notificationsApi.customMessage();
-      console.log('Custom message sent:', res.data);
-    } catch (err) {
-      console.error('Error sending custom message:', err);
-    }
-  };
-
-  const deleteFcmToken = async () => {
-    try {
-      const res = await notificationsApi.unregisterPushNotifications("test-fcm-token");
-      console.log('FCM token deleted:', res.data);
-    } catch (err) {
-      console.error('Error deleting FCM token:', err);
-    }
-  };
-
   if (!authUser) return <Splash showFooter />;
 
   return (
@@ -38,19 +19,6 @@ export default function NotificationPage() {
       <Header />
 
       <NotificationSettingsPage />
-      <button 
-        className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark"
-        onClick={sendCustomMessage}                            
-      >
-        Send Custom Message
-      </button>
-
-      <button 
-        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-        onClick={deleteFcmToken}                            
-      >
-        Delete FCM Token
-      </button>
     </main>
   );
 }

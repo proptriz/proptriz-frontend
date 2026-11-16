@@ -266,7 +266,7 @@ export function NotificationSettingsPage() {
 
     setPushLoading(true);
     try {
-      const token = await registerPushNotifications(authUser._id);
+      const token = await registerPushNotifications();
       if (token) {
         setFcmToken(token);
         setChannels((c) => ({ ...c, push: true }));

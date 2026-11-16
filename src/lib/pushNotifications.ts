@@ -83,9 +83,21 @@ export function getEnvironmentInfo(): EnvironmentInfo {
 
 // ─── Register ─────────────────────────────────────────────────────────────────
 
-export async function registerPushNotifications(userId: string): Promise<string | null> {
+/** True when the Firebase web settings are present in this build. */
+export function isPushConfigured(): boolean {
+  return Boolean(
+    firebaseConfig.apiKey && firebaseConfig.projectId &&
+    firebaseConfig.messagingSenderId && firebaseConfig.appId && VAPID_KEY
+  );
+}
+
+export async function registerPushNotifications(): Promise<string | null> {
   const env = getEnvironmentInfo();
-  console.log('[Push] env:', JSON.stringify(env, null, 2));
+
+  if (!isPushConfigured()) {
+    logger.warn('[Push] Firebase settings are missing; push is disabled');
+    return null;
+  }
 
   if (env.support === 'ios-webview' || env.support === 'no-sw') {
     logger.warn('[Push] Not supported:', env.support);
@@ -119,7 +131,7 @@ export async function registerPushNotifications(userId: string): Promise<string 
       return null;
     }
 
-    await notificationsApi.saveTokenToServer(userId, token);
+    await notificationsApi.saveTokenToServer(token);
     logger.info('[Push] Registered ✓');
     return token;
 

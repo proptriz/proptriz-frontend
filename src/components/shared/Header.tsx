@@ -24,6 +24,7 @@ const Header: React.FC = () => {
     { icon: "✏️", labelKey: "menu_edit_profile"  as const, link: "/profile/edit",         action: undefined          },
     { icon: "🏠", labelKey: "menu_list_property" as const, link: "/property/add",          action: undefined          },
     { icon: "🤝", labelKey: "menu_become_agent"  as const, link: "#",  action: undefined          },
+    { icon: "🔔", labelKey: "menu_notifications" as const, link: "/profile/notifications", action: undefined      },
     { icon: "🔒", labelKey: "menu_privacy"       as const, link: "/privacy-policy",        action: undefined          },
     { icon: "📋", labelKey: "menu_terms"         as const, link: "/terms-of-service",      action: undefined          },
     { icon: "❓", labelKey: "menu_faq"           as const, link: "/profile/faq",           action: undefined          },
@@ -141,18 +142,6 @@ const Header: React.FC = () => {
             </Link>
           ))}
 
-          <Link
-              href={"/profile/notifications"}
-              onClick={() => setShowMenu(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl
-                         hover:bg-[#e0f0f5] transition-colors"
-            >
-              
-              <span className="text-[13px] font-semibold text-[#111827]">
-                "notification settings"
-              </span>
-            </Link>
-
           {/* Language selector row — opens picker, shows active flag + name */}
           <button
             type="button"
@@ -200,7 +189,7 @@ const Header: React.FC = () => {
             ✕ {t("common_close")}
           </button>
         </div>
-      </Popup>      
+      </Popup>
     </>
   );
 };

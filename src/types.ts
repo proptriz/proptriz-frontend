@@ -114,3 +114,11 @@ export interface ApiSuccess<T> {
   data:    T;
   count?:  number;
 }
+
+export interface INotificationSettings {
+  emailEnabled:    boolean,
+  email:           string | undefined,
+  whatsappEnabled: boolean,
+  whatsappNumber:        string | undefined,
+  pushEnabled:     boolean,
+}

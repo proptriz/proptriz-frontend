@@ -24,6 +24,7 @@ const Header: React.FC = () => {
     { icon: "✏️", labelKey: "menu_edit_profile"  as const, link: "/profile/edit",         action: undefined          },
     { icon: "🏠", labelKey: "menu_list_property" as const, link: "/property/add",          action: undefined          },
     { icon: "🤝", labelKey: "menu_become_agent"  as const, link: "#",  action: undefined          },
+    { icon: "🔔", labelKey: "menu_notifications" as const, link: "/profile/notifications", action: undefined      },
     { icon: "🔒", labelKey: "menu_privacy"       as const, link: "/privacy-policy",        action: undefined          },
     { icon: "📋", labelKey: "menu_terms"         as const, link: "/terms-of-service",      action: undefined          },
     { icon: "❓", labelKey: "menu_faq"           as const, link: "/profile/faq",           action: undefined          },

@@ -5,7 +5,8 @@ import {
   useState,
   SetStateAction,
   ReactNode,
-  useRef
+  useRef,
+  useContext
 } from 'react';
 import axiosClient, {setAuthToken} from '@/config/client';
 import { AuthUserType,  } from '../types';
@@ -41,6 +42,7 @@ interface IAppContextProps {
   setGoogleReady: (value: boolean) => void;
   requiresOnboarding: boolean;
   setRequiresOnboarding: (value: boolean) => void;
+  setIsNotificationConfigured: React.Dispatch<SetStateAction<boolean>>;
 }
 
 const sleep = (ms: number) =>
@@ -84,7 +86,8 @@ const initialState: IAppContextProps = {
   googleReady: false,
   setGoogleReady: () => {},
   requiresOnboarding: false,
-  setRequiresOnboarding: () => {}
+  setRequiresOnboarding: () => {},
+  setIsNotificationConfigured: () => {},
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -102,6 +105,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [loginStage, setLoginStage] = useState<PiLoginStage>("");
   const [googleReady, setGoogleReady] = useState(false);
   const [requiresOnboarding, setRequiresOnboarding] = useState(false);
+  const [isNotificationConfigured, setIsNotificationConfigured] = useState(false);
 
   const piSdkLoaded = useRef(false);
   const router = useRouter()
@@ -252,10 +256,18 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   };
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady, setRequiresOnboarding, requiresOnboarding }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady, setRequiresOnboarding, requiresOnboarding, setIsNotificationConfigured }}>
       {children}
     </AppContext.Provider>
   );
 };
 
 export default AppContextProvider;
+
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+export function useAuth() {
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error('useAuth must be used within <AuthProvider>');
+  return ctx;
+}

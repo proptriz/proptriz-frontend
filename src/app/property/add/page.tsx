@@ -163,7 +163,12 @@ export default function AddPropertyPage() {
   // No sessionStorage, no window.__aiPhotos, no cross-page state.
   const handleExtracted = useCallback(
     (data: Omit<PropertyFormData, "photos">, photos: File[]) => {
-      setFormData({ ...defaultForm, ...data, photos });
+      // A Nigerian postcode written in the description ("... postcode LA-11-U34-ZR-63") is carried
+      // into the location step, where it is checked against the pin.
+      const typedCode = `${data.description} ${data.address}`
+        .toUpperCase()
+        .match(/\b[A-Z]{2}[\s-]?\d{2}[\s-]?[A-Z]\d{2}[\s-]?[A-Z]{2}[\s-]?\d{2}\b/)?.[0];
+      setFormData({ ...defaultForm, ...data, photos, ...(typedCode ? { postcodeInput: typedCode } : {}) });
       setAiBanner(true);
       setView(3);
     },
@@ -212,6 +217,9 @@ export default function AddPropertyPage() {
     fd.append("latitude",    String(formData.coordinates[0]));
     fd.append("longitude",   String(formData.coordinates[1]));
     fd.append("features",    JSON.stringify(formData.features));
+    if (formData.postcodeInput?.trim()) {
+      fd.append("postcode_input", formData.postcodeInput.trim());
+    }
     if (formData.listedFor === ListForEnum.rent) {
       fd.append("period", formData.renewPeriod.toLowerCase());
     }

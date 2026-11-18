@@ -1,12 +1,15 @@
 // /app/explore/page.tsx
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import NavigationTabs from "@/components/shared/NavigationTabs";
 import Footer from "@/components/shared/Footer";
 import SearchBar from "@/components/shared/SearchBar";
-import { getNearestProperties } from "@/services/propertyApi";
-import { CategoryEnum, ListForEnum, PropertyFilterPayload, PropertyType, RenewalEnum } from "@/types/property";
+import propertyService, { getNearestProperties } from "@/services/propertyApi";
+import PlaceNotice, { PlaceMatch } from "@/components/property/PlaceNotice";
+import {
+  appliedPlaceParams, CategoryEnum, ListForEnum, PlaceFilter, placeFilterParams, PropertyFilterPayload, PropertyType, RenewalEnum,
+} from "@/types/property";
 import Header from "@/components/shared/Header";
 import { VerticalPropertyCardSkeleton } from "@/components/skeletons/VerticalPropertyCardSkeleton";
 import Link from "next/link";
@@ -162,6 +165,11 @@ export default function Page() {
   const [centerLat, setCenterLat]             = useState<number | null>(null);
   const [centerLng, setCenterLng]             = useState<number | null>(null);
   const [isLocationReady, setIsLocationReady] = useState(false);
+  // Postcode prefix or named place chosen in the filter sheet (replaces "nearest to me" while set)
+  const [place, setPlace]                     = useState<PlaceFilter | null>(null);
+  const [widen, setWiden]                     = useState(true);
+  const [placeMatch, setPlaceMatch]           = useState<PlaceMatch | null>(null);
+  const appliedPlace                          = useRef<Record<string, string> | null>(null);
 
   // ── Location ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -180,6 +188,11 @@ export default function Page() {
       setMaxPriceBudget(filters.priceMax ?? 900_000_000_000);
       setCategory(filters.propertyType);
       setSearchQuery(filters.description ?? searchQuery);
+      appliedPlace.current = null;
+      setPlaceMatch(null);
+      setPlace(filters.place ?? null);
+      setWiden(filters.widen ?? true);
+      if (filters.place) return; // keep the current centre so "nearest" still works once the place is cleared
       setCenterLat(filters.location?.lat ?? null);
       setCenterLng(filters.location?.lng ?? null);
     },
@@ -210,6 +223,29 @@ export default function Page() {
     setObserverTarget,
   } = useInfiniteCursorScroll<PropertyType>({
     fetcher: async (cursor, signal): Promise<CursorResponse<PropertyType[]>> => {
+      // Chosen place: listings in that postcode / area, newest first
+      if (place) {
+        const base = new URLSearchParams(queryString);
+        base.delete("lat");
+        base.delete("lng");
+        // After the first page, ask for the level the server actually used (it may have widened)
+        const location: Record<string, string> =
+          cursor && appliedPlace.current ? appliedPlace.current : placeFilterParams(place, widen);
+        Object.entries(location).forEach(([k, v]) => base.set(k, v));
+        base.set("cursor", cursor ?? "");
+        const res = await propertyService.getAllProperties(base.toString(), { signal });
+        if (!res?.success) return { items: [], nextCursor: null };
+        if (!cursor) {
+          appliedPlace.current = res.applied ? appliedPlaceParams(res.applied) : null;
+          setPlaceMatch({
+            tier: res.match_tier ?? place.tier,
+            widened: !!res.widened,
+            count: res.properties.length === 0 ? 0 : null,
+          });
+        }
+        return { items: res.properties, nextCursor: res.nextCursor ?? null };
+      }
+
       const res = await getNearestProperties(
         `${queryString}&cursor=${cursor ?? ""}`,
         { signal }
@@ -227,8 +263,16 @@ export default function Page() {
       maxPriceBudget,
       centerLat,
       centerLng,
+      place,
+      widen,
     ],
   });
+
+  const clearPlace = useCallback(() => {
+    appliedPlace.current = null;
+    setPlace(null);
+    setPlaceMatch(null);
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
@@ -258,6 +302,11 @@ export default function Page() {
       {/* ── Category tabs ───────────────────────────────────────────────── */}
       <div className="bg-white border-b border-[#e5e7eb] sticky top-0 z-30">
         <NavigationTabs onChange={setCategory} value={category} />
+        {place && (
+          <div className="px-4 pb-2">
+            <PlaceNotice place={place} match={placeMatch} onClear={clearPlace} />
+          </div>
+        )}
       </div>
  
       {/* ── Feed ────────────────────────────────────────────────────────── */}
@@ -433,4 +482,4 @@ export default function Page() {
       <Footer />
     </div>
   );
-}
+}

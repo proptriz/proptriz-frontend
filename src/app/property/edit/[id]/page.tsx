@@ -15,6 +15,7 @@ import TogglePills  from "@/components/TogglePills";
 import Counter      from "@/components/Counter";
 import PriceInput   from "@/components/PriceInput";
 import MapPreview   from "@/components/MapPreview";
+import PostcodeField from "@/components/PostcodeField";
 import ImageManager from "@/components/ImageManager";
 
 import { AppContext }           from "@/context/AppContextProvider";
@@ -137,6 +138,7 @@ export default function EditPropertyPage({
   const [negotiable,  setNegotiable]  = useState<NegotiableEnum>(NegotiableEnum.Negotiable);
   const [features,    setFeatures]    = useState<string[]>([]);
   const [propCoordinates, setPropCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
+  const [postcodeInput, setPostcodeInput] = useState(""); // Nigeria postcode typed by the agent (optional)
   const [userCoordinates, setUserCoordinates] = useState<[number, number]>([9.0820, 8.6753]);
 
   // ── UI flags ─────────────────────────────────────────────────────────────
@@ -231,6 +233,10 @@ export default function EditPropertyPage({
       period:         formData.listed_for === ListForEnum.rent ? formData.period : undefined,
       user:           undefined, // never overwrite ownership
       images:         undefined, // never overwrite images via this endpoint
+      postcode:       undefined, // server-owned: resolved from the pin
+      place:          undefined, // server-owned
+      country:        undefined, // server-owned
+      ...(postcodeInput.trim() ? { postcode_input: postcodeInput.trim() } : {}),
     };
 
     try {
@@ -246,6 +252,7 @@ export default function EditPropertyPage({
         setFeatures(updated.features       ?? []);
         if (typeof updated.latitude === "number" && typeof updated.longitude === "number")
           setPropCoordinates([updated.latitude, updated.longitude]);
+        setPostcodeInput("");
         logger.info("Property updated:", updated._id);
       }
     } catch (err: unknown) {
@@ -254,7 +261,7 @@ export default function EditPropertyPage({
     } finally {
       setIsSaving(false);
     }
-  }, [authUser, formData, currency, negotiable, propCoordinates, features, propertyId]);
+  }, [authUser, formData, currency, negotiable, propCoordinates, features, propertyId, postcodeInput]);
 
   // ── Delete ───────────────────────────────────────────────────────────────
   const handleDelete = useCallback(async () => {
@@ -571,6 +578,14 @@ export default function EditPropertyPage({
               coordinates={propCoordinates}
               onChangeLocation={openLocationPicker}
               hint={t("edt_map_hint")}
+            />
+
+            {/* Where the pin is: postcode + State / LGA in Nigeria, area + region elsewhere */}
+            <PostcodeField
+              coordinates={propCoordinates}
+              address={formData.address ?? ""}
+              value={postcodeInput}
+              onChange={setPostcodeInput}
             />
           </EditSection>
 

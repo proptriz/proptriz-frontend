@@ -5,7 +5,9 @@ import { registerPushNotifications, getEnvironmentInfo, PushSupport } from '@/li
 import logger from "../../logger.config.mjs";
 import { notificationsApi } from '@/services/notificationApi';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
-import { INotificationSettings } from '@/types';
+import { INotificationSettings, SwitchableAlertType } from '@/types';
+import { useLanguage } from '@/i18n/LanguageContext';
+import type { Locale } from '@/i18n/translations';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,6 +26,34 @@ const CHANNELS: ChannelMeta[] = [
   { id: 'push',     label: 'Push',     description: 'Instant alerts on this device',         icon: '🔔' },
   { id: 'whatsapp', label: 'WhatsApp', description: 'Get alerts sent to your WhatsApp',      icon: '💬' },
 ];
+
+const ALERT_TYPE_KEYS = [
+  'new_listing', 'listing_change', 'enquiry', 'expiring', 'review', 'agent_report', 'demand',
+] as const satisfies readonly SwitchableAlertType[];
+
+const DEFAULT_TYPES: Record<SwitchableAlertType, boolean> = {
+  new_listing: true, listing_change: true, enquiry: true, expiring: true,
+  review: true, agent_report: true, demand: true,
+};
+
+const FALLBACK_ZONES = ['Africa/Lagos', 'Africa/Nairobi', 'Africa/Accra', 'Africa/Johannesburg', 'Europe/London', 'Europe/Paris', 'America/New_York', 'Asia/Dubai', 'UTC'];
+
+function listTimeZones(current: string): string[] {
+  let zones: string[] = FALLBACK_ZONES;
+  try {
+    const fn = (Intl as any).supportedValuesOf;
+    if (typeof fn === 'function') zones = fn('timeZone');
+  } catch { /* use fallback */ }
+  return zones.includes(current) ? zones : [current, ...zones];
+}
+
+function browserTimeZone(): string {
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Lagos'; }
+  catch { return 'Africa/Lagos'; }
+}
+
+const HOURS = Array.from({ length: 24 }, (_, h) => h);
+const pad = (n: number) => String(n).padStart(2, '0');
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
 
@@ -190,6 +220,7 @@ function ChannelCard({
 
 export function NotificationSettingsPage() {
   const { authUser } = useAuth();
+  const { t, locale } = useLanguage();
   const { settings, setSettings } = useNotificationSettings();
 
   const [channels, setChannels] = useState<Record<ChannelId, boolean>>({
@@ -210,6 +241,16 @@ export function NotificationSettingsPage() {
   const [whatsappTouched, setWhatsappTouched] = useState(false);
 
   const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
+
+  const [timezone, setTimezone]   = useState<string>(() => browserTimeZone());
+  const [alertLang, setAlertLang] = useState<Locale>(locale);
+  const [quiet, setQuiet]         = useState({ enabled: true, start: '21:00', end: '07:00' });
+  const [digestHour, setDigestHour] = useState(8);
+  const [types, setTypes]         = useState<Record<SwitchableAlertType, boolean>>(DEFAULT_TYPES);
+
+  const [testing, setTesting]     = useState(false);
+  const [testMsg, setTestMsg]     = useState<string | null>(null);
 
   useEffect(() => {
     const env = getEnvironmentInfo();
@@ -233,6 +274,11 @@ export function NotificationSettingsPage() {
     }));
     setEmail(settings.email || '');
     setWhatsapp(settings.whatsappNumber || '');
+    if (settings.timezone) setTimezone(settings.timezone);
+    if (settings.language) setAlertLang(settings.language);
+    if (settings.quietHours) setQuiet(settings.quietHours);
+    if (typeof settings.digestHour === 'number') setDigestHour(settings.digestHour);
+    if (settings.types) setTypes({ ...DEFAULT_TYPES, ...settings.types });
   }, [settings]);
 
   const emailError    = useMemo(() => (channels.email    ? validateEmail(email)       : null), [channels.email, email]);
@@ -266,7 +312,7 @@ export function NotificationSettingsPage() {
 
     setPushLoading(true);
     try {
-      const token = await registerPushNotifications();
+      const token = await registerPushNotifications(alertLang);
       if (token) {
         setFcmToken(token);
         setChannels((c) => ({ ...c, push: true }));
@@ -280,11 +326,24 @@ export function NotificationSettingsPage() {
     } finally {
       setPushLoading(false);
     }
-  }, [channels.push, pushBlocked, pushUnsupported, fcmToken, authUser]);
+  }, [channels.push, pushBlocked, pushUnsupported, fcmToken, authUser, alertLang]);
 
   const canSave =
     (!channels.email    || !emailError) &&
     (!channels.whatsapp || !whatsappError);
+
+  const handleTest = async () => {
+    setTesting(true);
+    setTestMsg(null);
+    try {
+      await notificationsApi.sendTestAlert();
+      setTestMsg(t('alerts_test_done'));
+    } catch (err: any) {
+      setTestMsg(err?.response?.status === 429 ? t('alerts_test_limit') : t('alerts_test_failed'));
+    } finally {
+      setTesting(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!canSave) {
@@ -293,10 +352,8 @@ export function NotificationSettingsPage() {
       return;
     }
 
-    // Prevent turning off email notification - to be removed later
-    if (!channels.email) return
-
     setSaving(true);
+    setSaveMsg(null);
     try {
       const res = await notificationsApi.savePreferences({
         emailEnabled:    channels.email,
@@ -304,12 +361,19 @@ export function NotificationSettingsPage() {
         whatsappEnabled: channels.whatsapp,
         whatsappNumber:        channels.whatsapp ? whatsapp.trim() : undefined,
         pushEnabled:     channels.push,
+        timezone,
+        language:        alertLang,
+        quietHours:      quiet,
+        digestHour,
+        types,
       });
       const saved = (res.data?.settings ?? res.data) as INotificationSettings;
       setSettings(saved); // propagates the new configured-state to every consumer of the hook
       logger.info('[NotificationModal] Save successful:', saved);
+      setSaveMsg(t('alerts_saved'));
     } catch (err) {
       logger.error('[NotificationModal] Save failed:', err);
+      setSaveMsg(t('alerts_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -326,9 +390,9 @@ export function NotificationSettingsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Notifications</h2>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('alerts_settings_title')}</h2>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-              Choose how you want to hear from us
+              {t('alerts_settings_subtitle')}
             </p>
           </div>          
         </div>
@@ -406,6 +470,99 @@ export function NotificationSettingsPage() {
           {pushUnsupported && <PushUnsupportedBanner support={pushSupport} />}
         </div>
 
+        {/* ── When ───────────────────────────────────────────────────── */}
+        <div className="space-y-3 mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+            {t('alerts_section_when')}
+          </p>
+
+          <label className="block text-xs" style={{ color: 'var(--text-muted)' }}>
+            {t('alerts_timezone')}
+            <select
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
+              className="mt-1 w-full rounded-lg px-3 py-2 text-sm"
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            >
+              {listTimeZones(timezone).map((z) => <option key={z} value={z}>{z}</option>)}
+            </select>
+          </label>
+
+          <label className="block text-xs" style={{ color: 'var(--text-muted)' }}>
+            {t('alerts_language')}
+            <select
+              value={alertLang}
+              onChange={(e) => setAlertLang(e.target.value as Locale)}
+              className="mt-1 w-full rounded-lg px-3 py-2 text-sm"
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            >
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="sw">Kiswahili</option>
+            </select>
+          </label>
+
+          <div className="rounded-xl p-3" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{t('alerts_quiet_hours')}</p>
+              <Switch checked={quiet.enabled} onChange={() => setQuiet((q) => ({ ...q, enabled: !q.enabled }))} />
+            </div>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{t('alerts_quiet_hint')}</p>
+            {quiet.enabled && (
+              <div className="flex gap-3 mt-3">
+                <label className="flex-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+                  {t('alerts_quiet_from')}
+                  <input
+                    type="time" value={quiet.start}
+                    onChange={(e) => setQuiet((q) => ({ ...q, start: e.target.value }))}
+                    className="mt-1 w-full rounded-lg px-3 py-2 text-sm"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  />
+                </label>
+                <label className="flex-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+                  {t('alerts_quiet_to')}
+                  <input
+                    type="time" value={quiet.end}
+                    onChange={(e) => setQuiet((q) => ({ ...q, end: e.target.value }))}
+                    className="mt-1 w-full rounded-lg px-3 py-2 text-sm"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  />
+                </label>
+              </div>
+            )}
+          </div>
+
+          <label className="block text-xs" style={{ color: 'var(--text-muted)' }}>
+            {t('alerts_digest_hour')}
+            <select
+              value={digestHour}
+              onChange={(e) => setDigestHour(Number(e.target.value))}
+              className="mt-1 w-full rounded-lg px-3 py-2 text-sm"
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            >
+              {HOURS.map((h) => <option key={h} value={h}>{pad(h)}:00</option>)}
+            </select>
+            <span className="block mt-1">{t('alerts_digest_hint')}</span>
+          </label>
+        </div>
+
+        {/* ── What to send ───────────────────────────────────────────── */}
+        <div className="space-y-2 mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+            {t('alerts_section_types')}
+          </p>
+          {ALERT_TYPE_KEYS.map((key) => (
+            <div
+              key={key}
+              className="flex items-center justify-between rounded-xl px-3 py-2.5"
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
+            >
+              <span className="text-sm pr-3" style={{ color: 'var(--text-primary)' }}>{t(`alerts_type_${key}` as const)}</span>
+              <Switch checked={types[key]} onChange={() => setTypes((p) => ({ ...p, [key]: !p[key] }))} />
+            </div>
+          ))}
+        </div>
+
         {/* Footer actions */}
         <div className="flex gap-2">
           <button
@@ -415,9 +572,20 @@ export function NotificationSettingsPage() {
             className="flex-1 rounded-xl py-3 text-sm font-semibold bg-primary text-white"
             
           >
-            {saving ? 'Saving…' : 'Save preferences'}
+            {saving ? t('alerts_saving') : t('alerts_save')}
           </button>
         </div>
+        {saveMsg && <p className="text-xs mt-2 text-center" style={{ color: 'var(--text-muted)' }}>{saveMsg}</p>}
+
+        <button
+          type="button"
+          onClick={handleTest}
+          disabled={testing}
+          className="w-full mt-3 rounded-xl py-2.5 text-sm font-semibold border border-[#1e5f74] text-[#1e5f74]"
+        >
+          {testing ? t('alerts_test_sending') : t('alerts_test_button')}
+        </button>
+        {testMsg && <p className="text-xs mt-2 text-center" style={{ color: 'var(--text-muted)' }}>{testMsg}</p>}
       </div>
     </div>
   );

@@ -115,10 +115,32 @@ export interface ApiSuccess<T> {
   count?:  number;
 }
 
+export type AlertType =
+  | 'new_listing' | 'listing_change' | 'enquiry' | 'expiring'
+  | 'review' | 'agent_report' | 'demand' | 'system';
+
+export type SwitchableAlertType = Exclude<AlertType, 'system'>;
+
 export interface INotificationSettings {
   emailEnabled:    boolean,
   email:           string | undefined,
   whatsappEnabled: boolean,
   whatsappNumber:        string | undefined,
   pushEnabled:     boolean,
+  timezone?:       string,
+  language?:       'en' | 'fr' | 'sw',
+  quietHours?:     { enabled: boolean, start: string, end: string },
+  digestHour?:     number,
+  types?:          Record<SwitchableAlertType, boolean>,
+}
+
+export interface IInboxItem {
+  id:        string,
+  type:      AlertType,
+  title:     string,
+  body:      string,
+  url:       string,
+  imageUrl?: string | null,
+  createdAt: string,
+  read:      boolean,
 }

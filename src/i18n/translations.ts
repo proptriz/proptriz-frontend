@@ -390,6 +390,46 @@ export interface Translations {
   menu_faq:             string;
   menu_language:        string;
   menu_notifications:   string;
+  alerts_inbox_title: string;
+  alerts_inbox_empty: string;
+  alerts_mark_all_read: string;
+  alerts_load_more: string;
+  alerts_loading: string;
+  alerts_error: string;
+  alerts_settings_link: string;
+  alerts_just_now: string;
+  alerts_ago_min: string;
+  alerts_ago_hour: string;
+  alerts_ago_day: string;
+  alerts_link_opening: string;
+  alerts_save: string;
+  alerts_saving: string;
+  alerts_saved: string;
+  alerts_save_failed: string;
+  alerts_settings_title: string;
+  alerts_settings_subtitle: string;
+  alerts_section_when: string;
+  alerts_section_types: string;
+  alerts_timezone: string;
+  alerts_language: string;
+  alerts_quiet_hours: string;
+  alerts_quiet_hint: string;
+  alerts_quiet_from: string;
+  alerts_quiet_to: string;
+  alerts_digest_hour: string;
+  alerts_digest_hint: string;
+  alerts_test_button: string;
+  alerts_test_sending: string;
+  alerts_test_done: string;
+  alerts_test_limit: string;
+  alerts_test_failed: string;
+  alerts_type_new_listing: string;
+  alerts_type_listing_change: string;
+  alerts_type_enquiry: string;
+  alerts_type_expiring: string;
+  alerts_type_review: string;
+  alerts_type_agent_report: string;
+  alerts_type_demand: string;
 
   // ── Property details ────────────────────────────────────────────────────────
   detail_loading:       string;
@@ -963,6 +1003,46 @@ const en: Translations = {
   menu_privacy: "Privacy Policy", menu_terms: "Terms of Service",
   menu_faq: "FAQ", menu_language: "Language",
   menu_notifications: "Notifications",
+  alerts_inbox_title: "Alerts",
+  alerts_inbox_empty: "No alerts yet. New listings and enquiries will show up here.",
+  alerts_mark_all_read: "Mark all as read",
+  alerts_load_more: "Load more",
+  alerts_loading: "Loading…",
+  alerts_error: "Could not load your alerts. Try again.",
+  alerts_settings_link: "Alert settings",
+  alerts_just_now: "Just now",
+  alerts_ago_min: "{n} min ago",
+  alerts_ago_hour: "{n} h ago",
+  alerts_ago_day: "{n} d ago",
+  alerts_link_opening: "Opening…",
+  alerts_save: "Save preferences",
+  alerts_saving: "Saving…",
+  alerts_saved: "Saved",
+  alerts_save_failed: "Could not save. Try again.",
+  alerts_settings_title: "Notifications",
+  alerts_settings_subtitle: "Choose how and when you hear from us",
+  alerts_section_when: "When",
+  alerts_section_types: "What to send",
+  alerts_timezone: "Time zone",
+  alerts_language: "Alert language",
+  alerts_quiet_hours: "Quiet hours",
+  alerts_quiet_hint: "Push alerts wait until quiet hours end. Nothing is lost.",
+  alerts_quiet_from: "From",
+  alerts_quiet_to: "Until",
+  alerts_digest_hour: "Daily email time",
+  alerts_digest_hint: "Alerts you did not see on your phone are emailed once a day.",
+  alerts_test_button: "Send a test alert",
+  alerts_test_sending: "Sending…",
+  alerts_test_done: "Test sent. Check your inbox, this device and your email.",
+  alerts_test_limit: "Too many tests. Try again in an hour.",
+  alerts_test_failed: "Could not send the test.",
+  alerts_type_new_listing: "New listings matching my searches",
+  alerts_type_listing_change: "Changes to listings I follow",
+  alerts_type_enquiry: "Enquiries about my listings",
+  alerts_type_expiring: "Listings about to expire",
+  alerts_type_review: "Reviews",
+  alerts_type_agent_report: "Agent reports",
+  alerts_type_demand: "Demand in my area",
 
   detail_loading: "Loading property…", detail_error: "Couldn't load property",
   detail_go_back: "Go Back", detail_updated: "Updated",
@@ -1458,6 +1538,46 @@ const fr: Translations = {
   menu_privacy: "Politique de confidentialité", menu_terms: "Conditions d'utilisation",
   menu_faq: "FAQ", menu_language: "Langue",
   menu_notifications: "Notifications",
+  alerts_inbox_title: "Alertes",
+  alerts_inbox_empty: "Aucune alerte pour le moment. Les nouvelles annonces et demandes apparaîtront ici.",
+  alerts_mark_all_read: "Tout marquer comme lu",
+  alerts_load_more: "Voir plus",
+  alerts_loading: "Chargement…",
+  alerts_error: "Impossible de charger vos alertes. Réessayez.",
+  alerts_settings_link: "Réglages des alertes",
+  alerts_just_now: "À l'instant",
+  alerts_ago_min: "il y a {n} min",
+  alerts_ago_hour: "il y a {n} h",
+  alerts_ago_day: "il y a {n} j",
+  alerts_link_opening: "Ouverture…",
+  alerts_save: "Enregistrer",
+  alerts_saving: "Enregistrement…",
+  alerts_saved: "Enregistré",
+  alerts_save_failed: "Échec de l'enregistrement. Réessayez.",
+  alerts_settings_title: "Notifications",
+  alerts_settings_subtitle: "Choisissez comment et quand nous vous contactons",
+  alerts_section_when: "Quand",
+  alerts_section_types: "Quoi envoyer",
+  alerts_timezone: "Fuseau horaire",
+  alerts_language: "Langue des alertes",
+  alerts_quiet_hours: "Heures calmes",
+  alerts_quiet_hint: "Les notifications push attendent la fin des heures calmes. Rien n'est perdu.",
+  alerts_quiet_from: "De",
+  alerts_quiet_to: "Jusqu'à",
+  alerts_digest_hour: "Heure de l'e-mail quotidien",
+  alerts_digest_hint: "Les alertes non vues sur votre téléphone vous sont envoyées par e-mail une fois par jour.",
+  alerts_test_button: "Envoyer une alerte test",
+  alerts_test_sending: "Envoi…",
+  alerts_test_done: "Test envoyé. Vérifiez votre boîte, cet appareil et votre e-mail.",
+  alerts_test_limit: "Trop de tests. Réessayez dans une heure.",
+  alerts_test_failed: "Impossible d'envoyer le test.",
+  alerts_type_new_listing: "Nouvelles annonces correspondant à mes recherches",
+  alerts_type_listing_change: "Changements sur les annonces que je suis",
+  alerts_type_enquiry: "Demandes sur mes annonces",
+  alerts_type_expiring: "Annonces sur le point d'expirer",
+  alerts_type_review: "Avis",
+  alerts_type_agent_report: "Rapports d'agent",
+  alerts_type_demand: "Demande dans ma zone",
 
   detail_loading: "Chargement du bien…", detail_error: "Impossible de charger le bien",
   detail_go_back: "Retour", detail_updated: "Mis à jour",
@@ -1952,6 +2072,46 @@ const sw: Translations = {
   menu_privacy: "Sera ya Faragha", menu_terms: "Masharti ya Huduma",
   menu_faq: "Maswali", menu_language: "Lugha",
   menu_notifications: "Arifa",
+  alerts_inbox_title: "Arifa",
+  alerts_inbox_empty: "Hakuna arifa bado. Matangazo mapya na maswali yataonekana hapa.",
+  alerts_mark_all_read: "Weka zote kuwa zimesomwa",
+  alerts_load_more: "Pakia zaidi",
+  alerts_loading: "Inapakia…",
+  alerts_error: "Imeshindwa kupakia arifa zako. Jaribu tena.",
+  alerts_settings_link: "Mipangilio ya arifa",
+  alerts_just_now: "Sasa hivi",
+  alerts_ago_min: "dakika {n} zilizopita",
+  alerts_ago_hour: "saa {n} zilizopita",
+  alerts_ago_day: "siku {n} zilizopita",
+  alerts_link_opening: "Inafungua…",
+  alerts_save: "Hifadhi mipangilio",
+  alerts_saving: "Inahifadhi…",
+  alerts_saved: "Imehifadhiwa",
+  alerts_save_failed: "Imeshindwa kuhifadhi. Jaribu tena.",
+  alerts_settings_title: "Arifa",
+  alerts_settings_subtitle: "Chagua jinsi na wakati wa kupokea arifa",
+  alerts_section_when: "Wakati",
+  alerts_section_types: "Cha kutuma",
+  alerts_timezone: "Saa za eneo",
+  alerts_language: "Lugha ya arifa",
+  alerts_quiet_hours: "Saa za utulivu",
+  alerts_quiet_hint: "Arifa za push zinasubiri hadi saa za utulivu ziishe. Hakuna kinachopotea.",
+  alerts_quiet_from: "Kuanzia",
+  alerts_quiet_to: "Hadi",
+  alerts_digest_hour: "Saa ya barua pepe ya kila siku",
+  alerts_digest_hint: "Arifa ambazo hukuziona kwenye simu hutumwa kwa barua pepe mara moja kwa siku.",
+  alerts_test_button: "Tuma arifa ya majaribio",
+  alerts_test_sending: "Inatuma…",
+  alerts_test_done: "Jaribio limetumwa. Angalia kikasha chako, kifaa hiki na barua pepe.",
+  alerts_test_limit: "Majaribio mengi sana. Jaribu tena baada ya saa moja.",
+  alerts_test_failed: "Imeshindwa kutuma jaribio.",
+  alerts_type_new_listing: "Matangazo mapya yanayolingana na utafutaji wangu",
+  alerts_type_listing_change: "Mabadiliko kwenye matangazo ninayofuatilia",
+  alerts_type_enquiry: "Maswali kuhusu matangazo yangu",
+  alerts_type_expiring: "Matangazo yanayokaribia kuisha",
+  alerts_type_review: "Maoni",
+  alerts_type_agent_report: "Ripoti za wakala",
+  alerts_type_demand: "Mahitaji katika eneo langu",
 
   detail_loading: "Inapakia mali…", detail_error: "Imeshindwa kupakia mali",
   detail_go_back: "Rudi", detail_updated: "Imesasishwa",

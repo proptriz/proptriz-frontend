@@ -4,6 +4,7 @@ import { AppContext } from '@/context/AppContextProvider';
 import { notificationsApi } from '@/services/notificationApi';
 
 const POLL_MS = 60_000;
+const ALERTS_CHANGED_EVENT = 'proptriz:alerts-changed';
 
 /** Unread alert count for the header badge. Polls while the tab is visible. */
 export function useUnreadAlerts() {
@@ -26,7 +27,12 @@ export function useUnreadAlerts() {
     const tick = () => { if (document.visibilityState === 'visible') refresh(); };
     const timer = setInterval(tick, POLL_MS);
     document.addEventListener('visibilitychange', tick);
-    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', tick); };
+    window.addEventListener(ALERTS_CHANGED_EVENT, refresh);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', tick);
+      window.removeEventListener(ALERTS_CHANGED_EVENT, refresh);
+    };
   }, [authUser, refresh]);
 
   return { count, refresh, setCount };

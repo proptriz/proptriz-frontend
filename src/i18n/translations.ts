@@ -430,6 +430,28 @@ export interface Translations {
   alerts_type_review: string;
   alerts_type_agent_report: string;
   alerts_type_demand: string;
+  alerts_test_inbox: string;
+  alerts_test_push_sent: string;
+  alerts_test_push_off: string;
+  alerts_test_push_no_device: string;
+  alerts_test_push_held: string;
+  alerts_test_push_capped: string;
+  alerts_test_push_failed: string;
+  alerts_test_email_sent: string;
+  alerts_test_email_none: string;
+  alerts_test_email_failed: string;
+  alerts_push_unsupported: string;
+  alerts_push_blocked_title: string;
+  alerts_push_blocked_body: string;
+  alerts_push_android_webview_title: string;
+  alerts_push_android_webview_body: string;
+  alerts_push_ios_webview_title: string;
+  alerts_push_ios_webview_body: string;
+  alerts_push_ios_install_title: string;
+  alerts_push_ios_install_body: string;
+  alerts_push_not_configured: string;
+  alerts_push_dismissed: string;
+  alerts_push_failed: string;
 
   // ── Property details ────────────────────────────────────────────────────────
   detail_loading:       string;
@@ -1043,6 +1065,28 @@ const en: Translations = {
   alerts_type_review: "Reviews",
   alerts_type_agent_report: "Agent reports",
   alerts_type_demand: "Demand in my area",
+  alerts_test_inbox: "Inbox: delivered.",
+  alerts_test_push_sent: "Push: sent to your devices.",
+  alerts_test_push_off: "Push: switched off. Turn Push on above.",
+  alerts_test_push_no_device: "Push: no device registered. Turn Push on from the device you want alerts on.",
+  alerts_test_push_held: "Push: held until quiet hours end.",
+  alerts_test_push_capped: "Push: daily limit reached.",
+  alerts_test_push_failed: "Push: could not be delivered.",
+  alerts_test_email_sent: "Email: sent.",
+  alerts_test_email_none: "Email: not set up.",
+  alerts_test_email_failed: "Email: could not be sent.",
+  alerts_push_unsupported: "Push notifications aren't supported in this browser.",
+  alerts_push_blocked_title: "Push notifications are blocked",
+  alerts_push_blocked_body: "Allow notifications for this site in your browser settings, then try again.",
+  alerts_push_android_webview_title: "Limited support in Pi Browser (Android)",
+  alerts_push_android_webview_body: "Open this site in Chrome for Android to receive push alerts.",
+  alerts_push_ios_webview_title: "Not available in Pi Browser on iPhone",
+  alerts_push_ios_webview_body: "Open this site in Safari, tap Share, then Add to Home Screen, and turn Push on from there.",
+  alerts_push_ios_install_title: "Add Proptriz to your Home Screen first",
+  alerts_push_ios_install_body: "On iPhone, push works only in the installed app. In Safari tap Share, then Add to Home Screen, open Proptriz from your Home Screen and turn Push on there.",
+  alerts_push_not_configured: "Push is not set up for this site yet.",
+  alerts_push_dismissed: "Notifications were not allowed. Tap the switch again and choose Allow.",
+  alerts_push_failed: "Could not turn on push. Try again.",
 
   detail_loading: "Loading property…", detail_error: "Couldn't load property",
   detail_go_back: "Go Back", detail_updated: "Updated",
@@ -1578,6 +1622,28 @@ const fr: Translations = {
   alerts_type_review: "Avis",
   alerts_type_agent_report: "Rapports d'agent",
   alerts_type_demand: "Demande dans ma zone",
+  alerts_test_inbox: "Boîte d'alertes : livré.",
+  alerts_test_push_sent: "Push : envoyé à vos appareils.",
+  alerts_test_push_off: "Push : désactivé. Activez Push ci-dessus.",
+  alerts_test_push_no_device: "Push : aucun appareil enregistré. Activez Push depuis l'appareil où vous voulez recevoir les alertes.",
+  alerts_test_push_held: "Push : en attente de la fin des heures calmes.",
+  alerts_test_push_capped: "Push : limite quotidienne atteinte.",
+  alerts_test_push_failed: "Push : échec de la livraison.",
+  alerts_test_email_sent: "E-mail : envoyé.",
+  alerts_test_email_none: "E-mail : non configuré.",
+  alerts_test_email_failed: "E-mail : échec de l'envoi.",
+  alerts_push_unsupported: "Les notifications push ne sont pas prises en charge par ce navigateur.",
+  alerts_push_blocked_title: "Les notifications push sont bloquées",
+  alerts_push_blocked_body: "Autorisez les notifications pour ce site dans les réglages de votre navigateur, puis réessayez.",
+  alerts_push_android_webview_title: "Prise en charge limitée dans Pi Browser (Android)",
+  alerts_push_android_webview_body: "Ouvrez ce site dans Chrome pour Android afin de recevoir les alertes push.",
+  alerts_push_ios_webview_title: "Indisponible dans Pi Browser sur iPhone",
+  alerts_push_ios_webview_body: "Ouvrez ce site dans Safari, touchez Partager puis Sur l'écran d'accueil, et activez Push depuis l'application ajoutée.",
+  alerts_push_ios_install_title: "Ajoutez d'abord Proptriz à l'écran d'accueil",
+  alerts_push_ios_install_body: "Sur iPhone, le push ne fonctionne que dans l'application installée. Dans Safari, touchez Partager puis Sur l'écran d'accueil, ouvrez Proptriz depuis l'écran d'accueil et activez Push.",
+  alerts_push_not_configured: "Le push n'est pas encore configuré pour ce site.",
+  alerts_push_dismissed: "Les notifications n'ont pas été autorisées. Touchez à nouveau l'interrupteur et choisissez Autoriser.",
+  alerts_push_failed: "Impossible d'activer le push. Réessayez.",
 
   detail_loading: "Chargement du bien…", detail_error: "Impossible de charger le bien",
   detail_go_back: "Retour", detail_updated: "Mis à jour",
@@ -2112,6 +2178,28 @@ const sw: Translations = {
   alerts_type_review: "Maoni",
   alerts_type_agent_report: "Ripoti za wakala",
   alerts_type_demand: "Mahitaji katika eneo langu",
+  alerts_test_inbox: "Kikasha: imewasilishwa.",
+  alerts_test_push_sent: "Push: imetumwa kwenye vifaa vyako.",
+  alerts_test_push_off: "Push: imezimwa. Washa Push hapo juu.",
+  alerts_test_push_no_device: "Push: hakuna kifaa kilichosajiliwa. Washa Push kutoka kwenye kifaa unachotaka kupokea arifa.",
+  alerts_test_push_held: "Push: inasubiri hadi saa za utulivu ziishe.",
+  alerts_test_push_capped: "Push: kikomo cha kila siku kimefikiwa.",
+  alerts_test_push_failed: "Push: imeshindwa kuwasilishwa.",
+  alerts_test_email_sent: "Barua pepe: imetumwa.",
+  alerts_test_email_none: "Barua pepe: haijawekwa.",
+  alerts_test_email_failed: "Barua pepe: imeshindwa kutumwa.",
+  alerts_push_unsupported: "Arifa za push hazitumiki kwenye kivinjari hiki.",
+  alerts_push_blocked_title: "Arifa za push zimezuiwa",
+  alerts_push_blocked_body: "Ruhusu arifa kwa tovuti hii kwenye mipangilio ya kivinjari chako, kisha jaribu tena.",
+  alerts_push_android_webview_title: "Msaada mdogo kwenye Pi Browser (Android)",
+  alerts_push_android_webview_body: "Fungua tovuti hii kwenye Chrome ya Android ili kupokea arifa za push.",
+  alerts_push_ios_webview_title: "Haipatikani kwenye Pi Browser ya iPhone",
+  alerts_push_ios_webview_body: "Fungua tovuti hii kwenye Safari, gusa Shiriki kisha Ongeza kwenye Skrini ya Kwanza, na uwashe Push kutoka hapo.",
+  alerts_push_ios_install_title: "Ongeza Proptriz kwenye Skrini ya Kwanza kwanza",
+  alerts_push_ios_install_body: "Kwenye iPhone, push inafanya kazi tu kwenye programu iliyosakinishwa. Kwenye Safari gusa Shiriki kisha Ongeza kwenye Skrini ya Kwanza, fungua Proptriz kutoka hapo na uwashe Push.",
+  alerts_push_not_configured: "Push haijawekwa kwa tovuti hii bado.",
+  alerts_push_dismissed: "Arifa hazikuruhusiwa. Gusa swichi tena na uchague Ruhusu.",
+  alerts_push_failed: "Imeshindwa kuwasha push. Jaribu tena.",
 
   detail_loading: "Inapakia mali…", detail_error: "Imeshindwa kupakia mali",
   detail_go_back: "Rudi", detail_updated: "Imesasishwa",

@@ -38,19 +38,20 @@ const messaging = firebase.messaging();
 const ICON = "/android-chrome-192x192.png";
 const BADGE = "/favicon-32x32.png";
 
-// Only links on this site may be opened from a notification.
+// A notification can only open a page on this site. Only the path of the link
+// is used, so a link written for proptriz.com also works on a staging site.
 function safeUrl(url) {
   try {
     const target = new URL(url || "/", self.location.origin);
-    return target.origin === self.location.origin ? target.href : self.location.origin + "/";
+    return self.location.origin + target.pathname + target.search + target.hash;
   } catch (e) {
     return self.location.origin + "/";
   }
 }
 
-// Background messages. When the message carries a "notification" block the
-// Firebase SDK shows it by itself, so only data-only messages are shown here
-// (showing both would produce two notifications).
+// Background messages. The server sends data-only messages, so they are shown
+// here. If a message ever carries a "notification" block the Firebase SDK
+// shows it by itself, so it is skipped here (to avoid showing two).
 messaging.onBackgroundMessage((payload) => {
   if (payload.notification) return;
 

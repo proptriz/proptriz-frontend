@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/context/AppContextProvider';
-import { registerPushNotifications, getEnvironmentInfo, PushSupport } from '@/lib/pushNotifications';
+import { registerPush, getEnvironmentInfo, PushSupport, PushFailure } from '@/lib/pushNotifications';
 import logger from "../../logger.config.mjs";
 import { notificationsApi } from '@/services/notificationApi';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
@@ -75,58 +75,42 @@ function validateWhatsapp(value: string): string | null {
 
 // ─── Push-only banners ─────────────────────────────────────────────────────────
 
-function PushUnsupportedBanner({ support }: { support: PushSupport | null }) {
-  if (support === 'android-webview') return (
-    <div
-      className="rounded-lg p-3 mt-2 text-xs"
-      style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)' }}
-    >
-      <p className="font-medium mb-0.5" style={{ color: '#fbbf24' }}>
-        Limited support in Pi Browser (Android)
-      </p>
-      <p style={{ color: 'var(--text-muted)' }}>
-        Open this site in <strong>Chrome for Android</strong> to receive push alerts.
-      </p>
-    </div>
-  );
-
-  if (support === 'ios-webview') return (
-    <div
-      className="rounded-lg p-3 mt-2 text-xs"
-      style={{ background: 'rgba(100,100,100,0.1)', border: '1px solid var(--border)' }}
-    >
-      <p className="font-medium mb-0.5" style={{ color: 'var(--text-primary)' }}>
-        Not available in Pi Browser on iPhone
-      </p>
-      <p style={{ color: 'var(--text-muted)' }}>
-        Open this app in <strong>Safari</strong>, tap Share →{' '}
-        <strong>Add to Home Screen</strong>, then enable notifications from there.
-      </p>
-    </div>
-  );
-
+function Banner({ tone, title, body }: { tone: 'warn' | 'info' | 'error'; title?: string; body: string }) {
+  const palette = {
+    warn:  { bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.25)', title: '#fbbf24' },
+    info:  { bg: 'rgba(100,100,100,0.1)', border: 'var(--border)',         title: 'var(--text-primary)' },
+    error: { bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.25)',  title: '#f87171' },
+  }[tone];
   return (
-    <div
-      className="rounded-lg p-3 mt-2 text-xs"
-      style={{ background: 'rgba(100,100,100,0.1)', border: '1px solid var(--border)' }}
-    >
-      <p style={{ color: 'var(--text-muted)' }}>Push notifications aren't supported in this environment.</p>
+    <div className="rounded-lg p-3 mt-2 text-xs" style={{ background: palette.bg, border: `1px solid ${palette.border}` }}>
+      {title && <p className="font-medium mb-0.5" style={{ color: palette.title }}>{title}</p>}
+      <p style={{ color: 'var(--text-muted)' }}>{body}</p>
     </div>
   );
 }
 
+function PushUnsupportedBanner({ support }: { support: PushSupport | null }) {
+  const { t } = useLanguage();
+  if (support === 'android-webview')
+    return <Banner tone="warn" title={t('alerts_push_android_webview_title')} body={t('alerts_push_android_webview_body')} />;
+  if (support === 'ios-webview')
+    return <Banner tone="info" title={t('alerts_push_ios_webview_title')} body={t('alerts_push_ios_webview_body')} />;
+  if (support === 'ios-install')
+    return <Banner tone="warn" title={t('alerts_push_ios_install_title')} body={t('alerts_push_ios_install_body')} />;
+  return <Banner tone="info" body={t('alerts_push_unsupported')} />;
+}
+
 function PushBlockedBanner() {
-  return (
-    <div
-      className="rounded-lg p-3 mt-2 text-xs"
-      style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}
-    >
-      <p className="font-medium mb-0.5" style={{ color: '#f87171' }}>Push notifications are blocked</p>
-      <p style={{ color: 'var(--text-muted)' }}>
-        Update this site's notification permission to <strong>Allow</strong> in your browser settings.
-      </p>
-    </div>
-  );
+  const { t } = useLanguage();
+  return <Banner tone="error" title={t('alerts_push_blocked_title')} body={t('alerts_push_blocked_body')} />;
+}
+
+function PushErrorBanner({ reason }: { reason: PushFailure }) {
+  const { t } = useLanguage();
+  if (reason === 'blocked') return <PushBlockedBanner />;
+  if (reason === 'not_configured') return <Banner tone="warn" body={t('alerts_push_not_configured')} />;
+  if (reason === 'dismissed') return <Banner tone="info" body={t('alerts_push_dismissed')} />;
+  return <Banner tone="error" body={t('alerts_push_failed')} />;
 }
 
 // ─── Toggle switch (standalone, reusable) ──────────────────────────────────────
@@ -249,6 +233,7 @@ export function NotificationSettingsPage() {
   const [digestHour, setDigestHour] = useState(8);
   const [types, setTypes]         = useState<Record<SwitchableAlertType, boolean>>(DEFAULT_TYPES);
 
+  const [pushError, setPushError] = useState<PushFailure | null>(null);
   const [testing, setTesting]     = useState(false);
   const [testMsg, setTestMsg]     = useState<string | null>(null);
 
@@ -257,7 +242,6 @@ export function NotificationSettingsPage() {
     setPushSupport(env.support);
     if (env.support === 'supported') {
       setPushPerm(env.notificationPermission);
-      setChannels((c) => ({ ...c, push: env.notificationPermission === 'granted' }));
     } else {
       setPushPerm('unsupported');
     }
@@ -267,10 +251,14 @@ export function NotificationSettingsPage() {
   // Re-runs (idempotently) whenever `settings` is updated elsewhere, e.g. after save.
   useEffect(() => {
     if (!settings) return;
+    // Push counts as on only if this browser has permission AND the server has it switched on.
+    const env = getEnvironmentInfo();
+    const pushOn = env.support === 'supported' && env.notificationPermission === 'granted' && !!settings.pushEnabled;
     setChannels((c) => ({
       ...c,
       email:    !!settings.emailEnabled,
       whatsapp: !!settings.whatsappEnabled,
+      push:     pushOn,
     }));
     setEmail(settings.email || '');
     setWhatsapp(settings.whatsappNumber || '');
@@ -292,37 +280,45 @@ export function NotificationSettingsPage() {
 
   const togglePush = useCallback(async () => {
     if (pushUnsupported) return;
+    setPushError(null);
 
     if (channels.push) {
       setPushLoading(true);
       try {
         if (fcmToken) await notificationsApi.unregisterPushNotifications(fcmToken);
         setFcmToken(null);
+        // Save straight away: the switch itself is the setting, no extra Save press needed.
+        await notificationsApi.savePreferences({ pushEnabled: false });
         setChannels((c) => ({ ...c, push: false }));
       } catch (err) {
         logger.error('[NotificationModal] Push disable failed:', err);
+        setPushError('failed');
       } finally {
         setPushLoading(false);
       }
       return;
     }
 
-    if (pushBlocked) return;
+    if (pushBlocked) { setPushError('blocked'); return; }
     if (!authUser) return;
 
     setPushLoading(true);
     try {
-      const token = await registerPushNotifications(alertLang);
-      if (token) {
-        setFcmToken(token);
-        setChannels((c) => ({ ...c, push: true }));
+      const result = await registerPush(alertLang);
+      if (result.token) {
+        setFcmToken(result.token);
         setPushPerm('granted');
+        // Save straight away so the server knows push is on (the test alert and real alerts depend on it).
+        await notificationsApi.savePreferences({ pushEnabled: true });
+        setChannels((c) => ({ ...c, push: true }));
       } else {
         const env = getEnvironmentInfo();
         if (env.hasNotificationAPI) setPushPerm(env.notificationPermission);
+        setPushError(result.reason ?? 'failed');
       }
     } catch (err) {
       logger.error('[NotificationModal] Push enable failed:', err);
+      setPushError('failed');
     } finally {
       setPushLoading(false);
     }
@@ -336,8 +332,25 @@ export function NotificationSettingsPage() {
     setTesting(true);
     setTestMsg(null);
     try {
-      await notificationsApi.sendTestAlert();
-      setTestMsg(t('alerts_test_done'));
+      const res = await notificationsApi.sendTestAlert();
+      const { push, email } = res.data;
+      const pushLine: Record<string, string> = {
+        sent: t('alerts_test_push_sent'),
+        off: t('alerts_test_push_off'),
+        no_device: t('alerts_test_push_no_device'),
+        held: t('alerts_test_push_held'),
+        capped: t('alerts_test_push_capped'),
+        failed: t('alerts_test_push_failed'),
+      };
+      const emailLine: Record<string, string> = {
+        sent: t('alerts_test_email_sent'),
+        failed: t('alerts_test_email_failed'),
+      };
+      setTestMsg([
+        t('alerts_test_inbox'),
+        pushLine[push] ?? t('alerts_test_push_off'),
+        emailLine[email] ?? t('alerts_test_email_none'),
+      ].join(' '));
     } catch (err: any) {
       setTestMsg(err?.response?.status === 429 ? t('alerts_test_limit') : t('alerts_test_failed'));
     } finally {
@@ -463,11 +476,12 @@ export function NotificationSettingsPage() {
             disabled={pushUnsupported || (pushBlocked && !channels.push)}
             onToggle={togglePush}
           >
-            {pushBlocked && <PushBlockedBanner />}
           </ChannelCard> 
           {/* Unsupported banner sits outside the card content area so it shows
               even when the toggle itself is forced off/disabled */}
           {pushUnsupported && <PushUnsupportedBanner support={pushSupport} />}
+          {!pushUnsupported && pushBlocked && <PushBlockedBanner />}
+          {!pushUnsupported && !pushBlocked && pushError && <PushErrorBanner reason={pushError} />}
         </div>
 
         {/* ── When ───────────────────────────────────────────────────── */}

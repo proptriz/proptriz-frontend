@@ -1,7 +1,7 @@
 // src/lib/pushNotifications.ts
 
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
-import { getMessaging, onMessage, Messaging, getToken, isSupported } from "firebase/messaging";
+import { getMessaging, onMessage, Messaging, getToken, deleteToken, isSupported } from "firebase/messaging";
 import {notificationsApi} from "@/services/notificationApi";
 import logger                              from "../../logger.config.mjs";
 
@@ -15,6 +15,13 @@ const firebaseConfig = {
 };
 
 const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+
+// Remembers which Firebase project + key this browser last subscribed with. A push
+// subscription is tied to the key it was created with, so after the project or key
+// changes the old subscription is refused by the browser's push service
+// ("permission denied by the third party webpush service") until it is replaced.
+const PUSH_FINGERPRINT_KEY = 'proptriz_push_fingerprint';
+const pushFingerprint = () => `${firebaseConfig.projectId}:${VAPID_KEY}`;
 
 let app: FirebaseApp;
 let messaging: Messaging;
@@ -144,6 +151,15 @@ export async function registerPush(language?: string, silent = false): Promise<P
     const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
     await navigator.serviceWorker.ready;
 
+    // One-time reset when this browser last registered under a different project/key
+    // (or before this check existed): drop the old subscription so a fresh one is made.
+    let stored: string | null = null;
+    try { stored = localStorage.getItem(PUSH_FINGERPRINT_KEY); } catch { /* storage unavailable */ }
+    if (stored !== pushFingerprint()) {
+      try { await deleteToken(getFirebaseMessaging()); } catch { /* nothing to delete */ }
+      try { await (await registration.pushManager.getSubscription())?.unsubscribe(); } catch { /* ignore */ }
+    }
+
     const token = await getToken(getFirebaseMessaging(), {
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: registration,
@@ -155,6 +171,7 @@ export async function registerPush(language?: string, silent = false): Promise<P
     }
 
     await notificationsApi.saveTokenToServer(token, language);
+    try { localStorage.setItem(PUSH_FINGERPRINT_KEY, pushFingerprint()); } catch { /* ignore */ }
     logger.info('[Push] Registered ✓');
     return { token };
   } catch (err: any) {

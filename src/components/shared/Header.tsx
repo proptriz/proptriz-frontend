@@ -167,6 +167,19 @@ const Header: React.FC = () => {
             </Link>
           ))}
 
+          {authUser?.role === "admin" && (
+            <Link
+              href="/admin"
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#e0f0f5] transition-colors"
+            >
+              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center text-[15px] flex-shrink-0 bg-[#e0f0f5] text-[#1e5f74]">
+                🛡️
+              </div>
+              <span className="text-[13px] font-semibold text-[#111827]">Admin dashboard</span>
+            </Link>
+          )}
+
           {/* Language selector row — opens picker, shows active flag + name */}
           <button
             type="button"

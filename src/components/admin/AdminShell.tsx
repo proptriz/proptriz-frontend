@@ -27,7 +27,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
   if (authUser.role !== "admin") {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center gap-3 p-6 text-center">
+      <main className="h-screen-safe overflow-y-auto flex flex-col items-center justify-center gap-3 p-6 text-center">
         <p className="text-4xl">🔒</p>
         <h1 className="text-lg font-bold text-[#143d4d]">Admins only</h1>
         <p className="text-sm text-gray-600 max-w-sm">Your account does not have access to the admin dashboard.</p>
@@ -56,10 +56,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     </nav>
   );
 
+  // globals.css locks html/body to overflow:hidden, so the document never scrolls.
+  // The shell is exactly one viewport tall; <main> (and the sidebar) scroll inside it.
   return (
-    <div className="min-h-screen md:flex" style={{ background: "#f5f7f9" }}>
+    <div className="h-screen-safe flex flex-col md:flex-row overflow-hidden" style={{ background: "#f5f7f9" }}>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:flex-col w-60 shrink-0 border-r border-gray-200 bg-white p-4 gap-6 sticky top-0 h-screen">
+      <aside className="hidden md:flex md:flex-col w-60 shrink-0 border-r border-gray-200 bg-white p-4 gap-6 overflow-y-auto">
         <div className="flex items-center gap-2">
           <BrandLogo theme="dark" />
           <span className="text-[10px] font-bold uppercase tracking-wider text-[#164e66] bg-[#e0f0f5] rounded px-1.5 py-0.5">Admin</span>
@@ -69,7 +71,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="md:hidden sticky top-0 z-40 flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3">
+      <header className="md:hidden shrink-0 z-40 flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3">
         <span className="font-bold text-[#143d4d]">Proptriz Admin</span>
         <button
           type="button"
@@ -80,9 +82,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           {open ? "Close" : "Menu"}
         </button>
       </header>
-      {open && <div className="md:hidden bg-white border-b border-gray-200 p-3">{nav}</div>}
+      {open && <div className="md:hidden shrink-0 max-h-[60%] overflow-y-auto bg-white border-b border-gray-200 p-3">{nav}</div>}
 
-      <main className="flex-1 min-w-0 px-4 py-5 md:px-8 md:py-8 max-w-[1280px]">{children}</main>
+      <main className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden overscroll-contain" style={{ WebkitOverflowScrolling: "touch" }}>
+        <div className="px-4 py-5 md:px-8 md:py-8 pb-16 max-w-[1280px]">{children}</div>
+      </main>
     </div>
   );
 }

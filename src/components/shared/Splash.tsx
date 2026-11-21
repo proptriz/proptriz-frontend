@@ -22,6 +22,7 @@ export default function Splash({ showFooter = false }: { showFooter?: boolean })
     authenticated:          t("splash_signed_in"),
     timeout:                t("splash_timeout"),
     failed:                 t("splash_failed"),
+    suspended:              t("splash_suspended"),
   };
 
   const stageLabel = loginStage

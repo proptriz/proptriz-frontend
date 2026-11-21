@@ -345,6 +345,11 @@ export interface Translations {
   splash_signed_in:     string;
   splash_timeout:       string;
   splash_failed:        string;
+  splash_suspended:     string;
+  suspended_title:      string;
+  suspended_body:       string;
+  suspended_contact:    string;
+  suspended_ok:         string;
   splash_pi_required:   string;
   splash_pi_desc:       string;
   splash_pi_btn:        string;
@@ -998,6 +1003,11 @@ const en: Translations = {
   splash_pi_auth: "Authenticating with Pi…", splash_verifying: "Verifying identity…",
   splash_signed_in: "Signed in! Redirecting…", splash_timeout: "Connection timed out",
   splash_failed: "Login failed — please retry",
+  splash_suspended: "Account suspended",
+  suspended_title: "Your account is suspended",
+  suspended_body: "An administrator has suspended this account, so you have been signed out. You can still browse listings.",
+  suspended_contact: "If you think this is a mistake, contact us at",
+  suspended_ok: "OK",
   splash_pi_required: "Required: Pi Browser",
   splash_pi_desc: "To use your Pi Wallet and Identity, you must be browsing within the Pi Browser app.",
   splash_pi_btn: "Continue with Pi Network",
@@ -1555,6 +1565,11 @@ const fr: Translations = {
   splash_pi_auth: "Authentification avec Pi…", splash_verifying: "Vérification de l'identité…",
   splash_signed_in: "Connecté ! Redirection…", splash_timeout: "Délai de connexion dépassé",
   splash_failed: "Connexion échouée — réessayez",
+  splash_suspended: "Compte suspendu",
+  suspended_title: "Votre compte est suspendu",
+  suspended_body: "Un administrateur a suspendu ce compte, vous avez donc été déconnecté. Vous pouvez toujours consulter les annonces.",
+  suspended_contact: "Si vous pensez qu’il s’agit d’une erreur, contactez-nous à",
+  suspended_ok: "OK",
   splash_pi_required: "Requis : Pi Browser",
   splash_pi_desc: "Pour utiliser votre Pi Wallet, vous devez naviguer dans l'application Pi Browser.",
   splash_pi_btn: "Continuer avec Pi Network",
@@ -2108,6 +2123,11 @@ const sw: Translations = {
   splash_pi_auth: "Inathibitisha na Pi…", splash_verifying: "Inathibitisha utambulisho…",
   splash_signed_in: "Umeingia! Inaelekeza…", splash_timeout: "Muda wa muunganisho umeisha",
   splash_failed: "Kuingia kumeshindwa — jaribu tena",
+  splash_suspended: "Akaunti imesimamishwa",
+  suspended_title: "Akaunti yako imesimamishwa",
+  suspended_body: "Msimamizi amesimamisha akaunti hii, kwa hivyo umetolewa. Bado unaweza kuvinjari matangazo.",
+  suspended_contact: "Ikiwa unadhani ni kosa, wasiliana nasi kupitia",
+  suspended_ok: "Sawa",
   splash_pi_required: "Inahitajika: Pi Browser",
   splash_pi_desc: "Kutumia Pi Wallet yako, lazima uvinjari ndani ya programu ya Pi Browser.",
   splash_pi_btn: "Endelea na Pi Network",

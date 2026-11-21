@@ -90,6 +90,24 @@ export interface PropertyFormData {
   features: string[];
   coordinates: [number, number];
   photos: File[];
+  /** Nigeria postcode typed by the agent (optional). Sent as `postcode_input`. */
+  postcodeInput?: string;
+}
+
+/** Public view of a listing's NIPOST postcode. The full code comes from /property/:id/postcode. */
+export interface PropertyPostcode {
+  public_code?: string; // LA-11-U34-••-••
+  verified?: boolean;
+  confidence?: "high" | "medium" | "low";
+}
+
+/** State / LGA / area names for the pin (any country). NG: region = state, subregion = LGA. */
+export interface PropertyPlace {
+  country_name?: string;
+  region?: string;
+  subregion?: string;
+  area?: string;
+  verified?: boolean;
 }
 
 export interface PropertyType {
@@ -117,6 +135,10 @@ export interface PropertyType {
   review_count?: number;
   landmarks?: any[];
   status: PropertyStatusEnum; // (available, sold, unavailable, rented)
+  country?: string; // ISO 3166-1 alpha-2 of the pin
+  postcode?: PropertyPostcode; // NIPOST postcode (Nigeria only)
+  place?: PropertyPlace; // state / LGA / area names for the pin
+  match_tier?: "area" | "district" | "subregion" | "region" | "distance";
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -135,7 +157,33 @@ export interface PropertyFilterPayload {
   priceMin: number | null;
   priceMax: number | null;
   description?: string;
+  /** A postcode prefix (Nigeria) or named place chosen from the suggestions. */
+  place?: PlaceFilter;
+  /** When the chosen place has no listings, fall back to the next wider level. */
+  widen?: boolean;
 }
+
+export type PlaceTier = "area" | "district" | "subregion" | "region";
+
+export type PlaceFilter =
+  | { kind: "postcode"; code: string; tier: PlaceTier; label: string; country: "NG" }
+  | { kind: "place"; country: string; region?: string; subregion?: string; area?: string; tier: PlaceTier; label: string };
+
+/** The `applied` object returned by GET /property/all, as query params for the next page. */
+export const appliedPlaceParams = (applied?: Record<string, string | undefined | null>): Record<string, string> =>
+  Object.fromEntries(Object.entries(applied ?? {}).filter((e): e is [string, string] => typeof e[1] === "string" && e[1] !== ""));
+
+/** Query params for GET /property/all that correspond to a PlaceFilter. */
+export const placeFilterParams = (place?: PlaceFilter, widen = true): Record<string, string> => {
+  if (!place) return {};
+  const out: Record<string, string> = widen ? { widen: "1" } : {};
+  if (place.kind === "postcode") return { ...out, postcode: place.code };
+  out.place_country = place.country;
+  if (place.region) out.place_region = place.region;
+  if (place.subregion) out.place_subregion = place.subregion;
+  if (place.area) out.place_area = place.area;
+  return out;
+};
 
 
 export type WizardStep = 1 | 2 | 3;
@@ -156,4 +204,4 @@ export const AFRICA_COUNTRY_CODES =
 
 // Africa bounding box for Nominatim viewbox (west, north, east, south).
 // Keeps bounded=1 so results never escape the continent.
-export const AFRICA_VIEWBOX = "-17.5,37.5,51.5,-35.0";
+export const AFRICA_VIEWBOX = "-17.5,37.5,51.5,-35.0";

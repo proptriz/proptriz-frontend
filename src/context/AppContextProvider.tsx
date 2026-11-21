@@ -5,9 +5,12 @@ import {
   useState,
   SetStateAction,
   ReactNode,
-  useRef
+  useRef,
+  useContext,
+  useEffect,
+  useCallback
 } from 'react';
-import axiosClient, {setAuthToken} from '@/config/client';
+import axiosClient, { setAuthToken, ACCOUNT_SUSPENDED_EVENT, isAccountSuspendedError } from '@/config/client';
 import { AuthUserType,  } from '../types';
 import logger from '../../logger.config.mjs';
 import { AuthResult } from '@/config/pi';
@@ -22,7 +25,8 @@ export type PiLoginStage =
   | "backend_authenticating"
   | "authenticated"
   | "timeout"
-  | "failed";
+  | "failed"
+  | "suspended";
 
 const MAX_LOGIN_RETRIES = 3;
 const BASE_DELAY_MS = 5000; // 5s → 15s → 45s
@@ -41,6 +45,12 @@ interface IAppContextProps {
   setGoogleReady: (value: boolean) => void;
   requiresOnboarding: boolean;
   setRequiresOnboarding: (value: boolean) => void;
+  setIsNotificationConfigured: React.Dispatch<SetStateAction<boolean>>;
+  /** Clears the session here and on the server (cookie). */
+  signOut: () => Promise<void>;
+  /** True after the server said this account is suspended; drives the notice. */
+  accountSuspended: boolean;
+  dismissAccountSuspended: () => void;
 }
 
 const sleep = (ms: number) =>
@@ -84,7 +94,11 @@ const initialState: IAppContextProps = {
   googleReady: false,
   setGoogleReady: () => {},
   requiresOnboarding: false,
-  setRequiresOnboarding: () => {}
+  setRequiresOnboarding: () => {},
+  setIsNotificationConfigured: () => {},
+  signOut: async () => {},
+  accountSuspended: false,
+  dismissAccountSuspended: () => {},
 };
 
 export const AppContext = createContext<IAppContextProps>(initialState);
@@ -102,9 +116,43 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const [loginStage, setLoginStage] = useState<PiLoginStage>("");
   const [googleReady, setGoogleReady] = useState(false);
   const [requiresOnboarding, setRequiresOnboarding] = useState(false);
+  const [isNotificationConfigured, setIsNotificationConfigured] = useState(false);
+
+  const [accountSuspended, setAccountSuspended] = useState(false);
+  const suspendedHandled = useRef(false);
 
   const piSdkLoaded = useRef(false);
   const router = useRouter()
+
+  const signOut = useCallback(async () => {
+    setAuthUser(null);
+    setAuthToken("");
+    setRequiresOnboarding(false);
+    try {
+      await axiosClient.post("/users/logout"); // clears the httpOnly cookie
+    } catch (error) {
+      logger.warn("Sign-out request failed; local session cleared anyway.", error);
+    }
+  }, []);
+
+  // Any API call answered with ACCOUNT_SUSPENDED signs the person out and shows the notice.
+  useEffect(() => {
+    const onSuspended = () => {
+      setLoginStage("suspended");
+      // Several calls can fail at once (e.g. badge polling); sign out only once.
+      if (suspendedHandled.current) return;
+      suspendedHandled.current = true;
+      setAccountSuspended(true);
+      void signOut();
+    };
+    window.addEventListener(ACCOUNT_SUSPENDED_EVENT, onSuspended);
+    return () => window.removeEventListener(ACCOUNT_SUSPENDED_EVENT, onSuspended);
+  }, [signOut]);
+
+  const dismissAccountSuspended = useCallback(() => {
+    setAccountSuspended(false);
+    suspendedHandled.current = false; // a later suspended sign-in attempt shows the notice again
+  }, []);
 
   const showAlert = (message: string) => {
     setAlertMessage(message);
@@ -152,7 +200,8 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
         return true;
       }
       return false;
-    } catch {
+    } catch (error) {
+      if (isAccountSuspendedError(error)) throw error; // stop: no Pi fallback
       return false;
     }
   };
@@ -198,6 +247,8 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
       return true;
     } catch (error: any) {
+      if (isAccountSuspendedError(error)) throw error; // never retry a suspended account
+
       if (error?.message === "PI_AUTH_TIMEOUT") {
         logger.error("Pi authentication timed out.");
         setLoginStage("timeout");
@@ -217,6 +268,20 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
     setLoginStage("");
 
     try {
+      await signInWithRetries();
+    } catch (error) {
+      // Suspended: the event handler has signed out and shown the notice; nothing to retry.
+      if (isAccountSuspendedError(error)) {
+        setLoginStage("suspended");
+        return;
+      }
+      throw error;
+    } finally {
+      setIsSigningInUser(false);
+    }
+  };
+
+  const signInWithRetries = async () => {
       const autoLoggedIn = await autoLoginProcess();
       if (autoLoggedIn) {
         logger.info("Auto-login successful.");
@@ -231,6 +296,7 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
             return;
           }
         } catch (error: any) {
+          if (isAccountSuspendedError(error)) throw error;
           if (error?.message === "PI_AUTH_TIMEOUT") {
             logger.error("Stopping retries due to Pi timeout.");
             throw error;
@@ -246,16 +312,21 @@ const AppContextProvider = ({ children }: AppContextProviderProps) => {
 
       setLoginStage("failed");
       throw new Error("Login retries exhausted");
-    } finally {
-      setIsSigningInUser(false);
-    }
   };
 
   return (
-    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady, setRequiresOnboarding, requiresOnboarding }}>
+    <AppContext.Provider value={{ authUser, setAuthUser, authenticateUser, isSigningInUser, reload, setReload, showAlert, alertMessage, loginStage, googleReady, setGoogleReady, setRequiresOnboarding, requiresOnboarding, setIsNotificationConfigured, signOut, accountSuspended, dismissAccountSuspended }}>
       {children}
     </AppContext.Provider>
   );
 };
 
 export default AppContextProvider;
+
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+export function useAuth() {
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error('useAuth must be used within <AuthProvider>');
+  return ctx;
+}

@@ -345,6 +345,11 @@ export interface Translations {
   splash_signed_in:     string;
   splash_timeout:       string;
   splash_failed:        string;
+  splash_suspended:     string;
+  suspended_title:      string;
+  suspended_body:       string;
+  suspended_contact:    string;
+  suspended_ok:         string;
   splash_pi_required:   string;
   splash_pi_desc:       string;
   splash_pi_btn:        string;
@@ -389,6 +394,69 @@ export interface Translations {
   menu_terms:           string;
   menu_faq:             string;
   menu_language:        string;
+  menu_notifications:   string;
+  alerts_inbox_title: string;
+  alerts_inbox_empty: string;
+  alerts_mark_all_read: string;
+  alerts_load_more: string;
+  alerts_loading: string;
+  alerts_error: string;
+  alerts_settings_link: string;
+  alerts_just_now: string;
+  alerts_ago_min: string;
+  alerts_ago_hour: string;
+  alerts_ago_day: string;
+  alerts_link_opening: string;
+  alerts_save: string;
+  alerts_saving: string;
+  alerts_saved: string;
+  alerts_save_failed: string;
+  alerts_settings_title: string;
+  alerts_settings_subtitle: string;
+  alerts_section_when: string;
+  alerts_section_types: string;
+  alerts_timezone: string;
+  alerts_language: string;
+  alerts_quiet_hours: string;
+  alerts_quiet_hint: string;
+  alerts_quiet_from: string;
+  alerts_quiet_to: string;
+  alerts_digest_hour: string;
+  alerts_digest_hint: string;
+  alerts_test_button: string;
+  alerts_test_sending: string;
+  alerts_test_done: string;
+  alerts_test_limit: string;
+  alerts_test_failed: string;
+  alerts_type_new_listing: string;
+  alerts_type_listing_change: string;
+  alerts_type_enquiry: string;
+  alerts_type_expiring: string;
+  alerts_type_review: string;
+  alerts_type_agent_report: string;
+  alerts_type_demand: string;
+  alerts_test_inbox: string;
+  alerts_test_push_sent: string;
+  alerts_test_push_off: string;
+  alerts_test_push_no_device: string;
+  alerts_test_push_held: string;
+  alerts_test_push_capped: string;
+  alerts_test_push_failed: string;
+  alerts_test_email_sent: string;
+  alerts_test_email_none: string;
+  alerts_test_email_failed: string;
+  alerts_push_unsupported: string;
+  alerts_push_blocked_title: string;
+  alerts_push_blocked_body: string;
+  alerts_push_android_webview_title: string;
+  alerts_push_android_webview_body: string;
+  alerts_push_ios_webview_title: string;
+  alerts_push_ios_webview_body: string;
+  alerts_push_ios_install_title: string;
+  alerts_push_ios_install_body: string;
+  alerts_push_not_configured: string;
+  alerts_push_dismissed: string;
+  alerts_push_failed: string;
 
   // ── Property details ────────────────────────────────────────────────────────
   detail_loading:       string;
@@ -653,6 +721,67 @@ export interface Translations {
   privacy_s8_title:           string;
   privacy_s8_body:            string;
   privacy_s9_title:           string;
+
+  // ── Location, postcode and place search ──
+  loc_location_label: string;
+  loc_postcode_label: string;
+  loc_finding: string;
+  loc_no_postcode: string;
+  loc_no_postcode_note: string;
+  loc_verified: string;
+  loc_unverified: string;
+  loc_location_verified: string;
+  loc_location_unverified: string;
+  loc_m_from_pin: string;
+  loc_pin_matches: string;
+  loc_pin_mismatch_note: string;
+  loc_country: string;
+  loc_state: string;
+  loc_lga: string;
+  loc_county: string;
+  loc_subcounty: string;
+  loc_province: string;
+  loc_commune: string;
+  loc_region: string;
+  loc_district: string;
+  loc_area: string;
+  loc_neighbourhood: string;
+  loc_nearest: string;
+  loc_same_area: string;
+  loc_same_district: string;
+  loc_same_lga: string;
+  loc_same_state: string;
+  loc_same_neighbourhood: string;
+  loc_same_subcounty: string;
+  loc_same_county: string;
+  loc_same_commune: string;
+  loc_same_province: string;
+  loc_same_region: string;
+  loc_none_in_tier: string;
+  loc_type_instead: string;
+  loc_type_different: string;
+  loc_type_ph: string;
+  loc_type_hint: string;
+  loc_code_invalid: string;
+  loc_code_far: string;
+  loc_get_exact: string;
+  loc_full_shared: string;
+  loc_signin_reveal: string;
+  loc_exact_code: string;
+  loc_copy: string;
+  loc_copied: string;
+  filter_loc_listings: string;
+  filter_loc_listing_one: string;
+  filter_near_me: string;
+  filter_my_area: string;
+  filter_search_scope: string;
+  filter_widen_title: string;
+  filter_widen_hint: string;
+  filter_location_denied: string;
+  filter_my_area_fail: string;
+  place_showing_wider: string;
+  place_none: string;
+  place_clear: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -874,6 +1003,11 @@ const en: Translations = {
   splash_pi_auth: "Authenticating with Pi…", splash_verifying: "Verifying identity…",
   splash_signed_in: "Signed in! Redirecting…", splash_timeout: "Connection timed out",
   splash_failed: "Login failed — please retry",
+  splash_suspended: "Account suspended",
+  suspended_title: "Your account is suspended",
+  suspended_body: "An administrator has suspended this account, so you have been signed out. You can still browse listings.",
+  suspended_contact: "If you think this is a mistake, contact us at",
+  suspended_ok: "OK",
   splash_pi_required: "Required: Pi Browser",
   splash_pi_desc: "To use your Pi Wallet and Identity, you must be browsing within the Pi Browser app.",
   splash_pi_btn: "Continue with Pi Network",
@@ -900,6 +1034,69 @@ const en: Translations = {
   menu_list_property: "List New Property", menu_become_agent: "Become an Agent",
   menu_privacy: "Privacy Policy", menu_terms: "Terms of Service",
   menu_faq: "FAQ", menu_language: "Language",
+  menu_notifications: "Notifications",
+  alerts_inbox_title: "Alerts",
+  alerts_inbox_empty: "No alerts yet. New listings and enquiries will show up here.",
+  alerts_mark_all_read: "Mark all as read",
+  alerts_load_more: "Load more",
+  alerts_loading: "Loading…",
+  alerts_error: "Could not load your alerts. Try again.",
+  alerts_settings_link: "Alert settings",
+  alerts_just_now: "Just now",
+  alerts_ago_min: "{n} min ago",
+  alerts_ago_hour: "{n} h ago",
+  alerts_ago_day: "{n} d ago",
+  alerts_link_opening: "Opening…",
+  alerts_save: "Save preferences",
+  alerts_saving: "Saving…",
+  alerts_saved: "Saved",
+  alerts_save_failed: "Could not save. Try again.",
+  alerts_settings_title: "Notifications",
+  alerts_settings_subtitle: "Choose how and when you hear from us",
+  alerts_section_when: "When",
+  alerts_section_types: "What to send",
+  alerts_timezone: "Time zone",
+  alerts_language: "Alert language",
+  alerts_quiet_hours: "Quiet hours",
+  alerts_quiet_hint: "Push alerts wait until quiet hours end. Nothing is lost.",
+  alerts_quiet_from: "From",
+  alerts_quiet_to: "Until",
+  alerts_digest_hour: "Daily email time",
+  alerts_digest_hint: "Alerts you did not see on your phone are emailed once a day.",
+  alerts_test_button: "Send a test alert",
+  alerts_test_sending: "Sending…",
+  alerts_test_done: "Test sent. Check your inbox, this device and your email.",
+  alerts_test_limit: "Too many tests. Try again in an hour.",
+  alerts_test_failed: "Could not send the test.",
+  alerts_type_new_listing: "New listings matching my searches",
+  alerts_type_listing_change: "Changes to listings I follow",
+  alerts_type_enquiry: "Enquiries about my listings",
+  alerts_type_expiring: "Listings about to expire",
+  alerts_type_review: "Reviews",
+  alerts_type_agent_report: "Agent reports",
+  alerts_type_demand: "Demand in my area",
+  alerts_test_inbox: "Inbox: delivered.",
+  alerts_test_push_sent: "Push: sent to your devices.",
+  alerts_test_push_off: "Push: switched off. Turn Push on above.",
+  alerts_test_push_no_device: "Push: no device registered. Turn Push on from the device you want alerts on.",
+  alerts_test_push_held: "Push: held until quiet hours end.",
+  alerts_test_push_capped: "Push: daily limit reached.",
+  alerts_test_push_failed: "Push: could not be delivered.",
+  alerts_test_email_sent: "Email: sent.",
+  alerts_test_email_none: "Email: not set up.",
+  alerts_test_email_failed: "Email: could not be sent.",
+  alerts_push_unsupported: "Push notifications aren't supported in this browser.",
+  alerts_push_blocked_title: "Push notifications are blocked",
+  alerts_push_blocked_body: "Allow notifications for this site in your browser settings, then try again.",
+  alerts_push_android_webview_title: "Limited support in Pi Browser (Android)",
+  alerts_push_android_webview_body: "Open this site in Chrome for Android to receive push alerts.",
+  alerts_push_ios_webview_title: "Not available in Pi Browser on iPhone",
+  alerts_push_ios_webview_body: "Open this site in Safari, tap Share, then Add to Home Screen, and turn Push on from there.",
+  alerts_push_ios_install_title: "Add Proptriz to your Home Screen first",
+  alerts_push_ios_install_body: "On iPhone, push works only in the installed app. In Safari tap Share, then Add to Home Screen, open Proptriz from your Home Screen and turn Push on there.",
+  alerts_push_not_configured: "Push is not set up for this site yet.",
+  alerts_push_dismissed: "Notifications were not allowed. Tap the switch again and choose Allow.",
+  alerts_push_failed: "Could not turn on push. Try again.",
 
   detail_loading: "Loading property…", detail_error: "Couldn't load property",
   detail_go_back: "Go Back", detail_updated: "Updated",
@@ -1081,6 +1278,67 @@ const en: Translations = {
   privacy_s8_title: "8. Security",
   privacy_s8_body: "We implement technical and organizational safeguards including encryption, secure hosting, and access controls. However, no system is completely secure.",
   privacy_s9_title: "9. Contact Us",
+
+  // ── Location, postcode and place search ──
+  loc_location_label: "Location",
+  loc_postcode_label: "Nigeria postcode",
+  loc_finding: "Checking this pin…",
+  loc_no_postcode: "No postcode at this spot yet",
+  loc_no_postcode_note: "No postcode at this spot? Keep going. Your listing is published as “Unverified” and we check again later.",
+  loc_verified: "Verified",
+  loc_unverified: "Unverified",
+  loc_location_verified: "Location verified",
+  loc_location_unverified: "Location unverified",
+  loc_m_from_pin: "{n} m from pin",
+  loc_pin_matches: "Pin matches address",
+  loc_pin_mismatch_note: "The pin is in {place}, but the address doesn’t mention it. Add the area name or move the pin. You can still publish.",
+  loc_country: "Country",
+  loc_state: "State",
+  loc_lga: "LGA",
+  loc_county: "County",
+  loc_subcounty: "Sub-county",
+  loc_province: "Province",
+  loc_commune: "Commune",
+  loc_region: "Region",
+  loc_district: "District",
+  loc_area: "Area",
+  loc_neighbourhood: "Neighbourhood",
+  loc_nearest: "Nearest",
+  loc_same_area: "Same area",
+  loc_same_district: "Same district",
+  loc_same_lga: "Same LGA",
+  loc_same_state: "Same state",
+  loc_same_neighbourhood: "Same neighbourhood",
+  loc_same_subcounty: "Same sub-county",
+  loc_same_county: "Same county",
+  loc_same_commune: "Same commune",
+  loc_same_province: "Same province",
+  loc_same_region: "Same region",
+  loc_none_in_tier: "No other listings here yet.",
+  loc_type_instead: "Type the postcode instead",
+  loc_type_different: "Know a different postcode? Type it",
+  loc_type_ph: "e.g. LA 11 U34 ZR 63",
+  loc_type_hint: "Leave empty to use the postcode found from your pin.",
+  loc_code_invalid: "This postcode doesn’t exist. Check the code.",
+  loc_code_far: "Valid code, but not near your pin. Move the pin or check the code.",
+  loc_get_exact: "Get exact address",
+  loc_full_shared: "The full postcode is shared once you contact the agent.",
+  loc_signin_reveal: "Sign in, then contact the agent to see the full postcode.",
+  loc_exact_code: "Exact building code",
+  loc_copy: "Copy postcode",
+  loc_copied: "Copied",
+  filter_loc_listings: "{n} listings",
+  filter_loc_listing_one: "1 listing",
+  filter_near_me: "Near me",
+  filter_my_area: "My area",
+  filter_search_scope: "Search in",
+  filter_widen_title: "If nothing matches",
+  filter_widen_hint: "Show the next wider level instead",
+  filter_location_denied: "Allow location access to use this.",
+  filter_my_area_fail: "Couldn’t work out your area. Sign in and try again, or type a place.",
+  place_showing_wider: "Nothing in {place} yet. Showing: {tier}.",
+  place_none: "No listings in {place} yet.",
+  place_clear: "Clear location",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1307,6 +1565,11 @@ const fr: Translations = {
   splash_pi_auth: "Authentification avec Pi…", splash_verifying: "Vérification de l'identité…",
   splash_signed_in: "Connecté ! Redirection…", splash_timeout: "Délai de connexion dépassé",
   splash_failed: "Connexion échouée — réessayez",
+  splash_suspended: "Compte suspendu",
+  suspended_title: "Votre compte est suspendu",
+  suspended_body: "Un administrateur a suspendu ce compte, vous avez donc été déconnecté. Vous pouvez toujours consulter les annonces.",
+  suspended_contact: "Si vous pensez qu’il s’agit d’une erreur, contactez-nous à",
+  suspended_ok: "OK",
   splash_pi_required: "Requis : Pi Browser",
   splash_pi_desc: "Pour utiliser votre Pi Wallet, vous devez naviguer dans l'application Pi Browser.",
   splash_pi_btn: "Continuer avec Pi Network",
@@ -1333,6 +1596,69 @@ const fr: Translations = {
   menu_list_property: "Ajouter un bien", menu_become_agent: "Devenir agent",
   menu_privacy: "Politique de confidentialité", menu_terms: "Conditions d'utilisation",
   menu_faq: "FAQ", menu_language: "Langue",
+  menu_notifications: "Notifications",
+  alerts_inbox_title: "Alertes",
+  alerts_inbox_empty: "Aucune alerte pour le moment. Les nouvelles annonces et demandes apparaîtront ici.",
+  alerts_mark_all_read: "Tout marquer comme lu",
+  alerts_load_more: "Voir plus",
+  alerts_loading: "Chargement…",
+  alerts_error: "Impossible de charger vos alertes. Réessayez.",
+  alerts_settings_link: "Réglages des alertes",
+  alerts_just_now: "À l'instant",
+  alerts_ago_min: "il y a {n} min",
+  alerts_ago_hour: "il y a {n} h",
+  alerts_ago_day: "il y a {n} j",
+  alerts_link_opening: "Ouverture…",
+  alerts_save: "Enregistrer",
+  alerts_saving: "Enregistrement…",
+  alerts_saved: "Enregistré",
+  alerts_save_failed: "Échec de l'enregistrement. Réessayez.",
+  alerts_settings_title: "Notifications",
+  alerts_settings_subtitle: "Choisissez comment et quand nous vous contactons",
+  alerts_section_when: "Quand",
+  alerts_section_types: "Quoi envoyer",
+  alerts_timezone: "Fuseau horaire",
+  alerts_language: "Langue des alertes",
+  alerts_quiet_hours: "Heures calmes",
+  alerts_quiet_hint: "Les notifications push attendent la fin des heures calmes. Rien n'est perdu.",
+  alerts_quiet_from: "De",
+  alerts_quiet_to: "Jusqu'à",
+  alerts_digest_hour: "Heure de l'e-mail quotidien",
+  alerts_digest_hint: "Les alertes non vues sur votre téléphone vous sont envoyées par e-mail une fois par jour.",
+  alerts_test_button: "Envoyer une alerte test",
+  alerts_test_sending: "Envoi…",
+  alerts_test_done: "Test envoyé. Vérifiez votre boîte, cet appareil et votre e-mail.",
+  alerts_test_limit: "Trop de tests. Réessayez dans une heure.",
+  alerts_test_failed: "Impossible d'envoyer le test.",
+  alerts_type_new_listing: "Nouvelles annonces correspondant à mes recherches",
+  alerts_type_listing_change: "Changements sur les annonces que je suis",
+  alerts_type_enquiry: "Demandes sur mes annonces",
+  alerts_type_expiring: "Annonces sur le point d'expirer",
+  alerts_type_review: "Avis",
+  alerts_type_agent_report: "Rapports d'agent",
+  alerts_type_demand: "Demande dans ma zone",
+  alerts_test_inbox: "Boîte d'alertes : livré.",
+  alerts_test_push_sent: "Push : envoyé à vos appareils.",
+  alerts_test_push_off: "Push : désactivé. Activez Push ci-dessus.",
+  alerts_test_push_no_device: "Push : aucun appareil enregistré. Activez Push depuis l'appareil où vous voulez recevoir les alertes.",
+  alerts_test_push_held: "Push : en attente de la fin des heures calmes.",
+  alerts_test_push_capped: "Push : limite quotidienne atteinte.",
+  alerts_test_push_failed: "Push : échec de la livraison.",
+  alerts_test_email_sent: "E-mail : envoyé.",
+  alerts_test_email_none: "E-mail : non configuré.",
+  alerts_test_email_failed: "E-mail : échec de l'envoi.",
+  alerts_push_unsupported: "Les notifications push ne sont pas prises en charge par ce navigateur.",
+  alerts_push_blocked_title: "Les notifications push sont bloquées",
+  alerts_push_blocked_body: "Autorisez les notifications pour ce site dans les réglages de votre navigateur, puis réessayez.",
+  alerts_push_android_webview_title: "Prise en charge limitée dans Pi Browser (Android)",
+  alerts_push_android_webview_body: "Ouvrez ce site dans Chrome pour Android afin de recevoir les alertes push.",
+  alerts_push_ios_webview_title: "Indisponible dans Pi Browser sur iPhone",
+  alerts_push_ios_webview_body: "Ouvrez ce site dans Safari, touchez Partager puis Sur l'écran d'accueil, et activez Push depuis l'application ajoutée.",
+  alerts_push_ios_install_title: "Ajoutez d'abord Proptriz à l'écran d'accueil",
+  alerts_push_ios_install_body: "Sur iPhone, le push ne fonctionne que dans l'application installée. Dans Safari, touchez Partager puis Sur l'écran d'accueil, ouvrez Proptriz depuis l'écran d'accueil et activez Push.",
+  alerts_push_not_configured: "Le push n'est pas encore configuré pour ce site.",
+  alerts_push_dismissed: "Les notifications n'ont pas été autorisées. Touchez à nouveau l'interrupteur et choisissez Autoriser.",
+  alerts_push_failed: "Impossible d'activer le push. Réessayez.",
 
   detail_loading: "Chargement du bien…", detail_error: "Impossible de charger le bien",
   detail_go_back: "Retour", detail_updated: "Mis à jour",
@@ -1513,6 +1839,67 @@ const fr: Translations = {
   privacy_s8_title: "8. Sécurité",
   privacy_s8_body: "Nous mettons en œuvre des mesures techniques et organisationnelles incluant le chiffrement, l'hébergement sécurisé et les contrôles d'accès. Cependant, aucun système n'est totalement sécurisé.",
   privacy_s9_title: "9. Nous contacter",
+
+  // ── Location, postcode and place search ──
+  loc_location_label: "Emplacement",
+  loc_postcode_label: "Code postal du Nigeria",
+  loc_finding: "Vérification du repère…",
+  loc_no_postcode: "Pas encore de code postal à cet endroit",
+  loc_no_postcode_note: "Pas de code postal ici ? Continuez. Votre annonce est publiée comme « Non vérifié » et nous revérifions plus tard.",
+  loc_verified: "Vérifié",
+  loc_unverified: "Non vérifié",
+  loc_location_verified: "Emplacement vérifié",
+  loc_location_unverified: "Emplacement non vérifié",
+  loc_m_from_pin: "à {n} m du repère",
+  loc_pin_matches: "Le repère correspond à l’adresse",
+  loc_pin_mismatch_note: "Le repère se trouve à {place}, mais l’adresse ne le mentionne pas. Ajoutez le nom du quartier ou déplacez le repère. Vous pouvez quand même publier.",
+  loc_country: "Pays",
+  loc_state: "État",
+  loc_lga: "LGA (collectivité locale)",
+  loc_county: "Comté",
+  loc_subcounty: "Sous-comté",
+  loc_province: "Province",
+  loc_commune: "Commune",
+  loc_region: "Région",
+  loc_district: "District",
+  loc_area: "Zone",
+  loc_neighbourhood: "Quartier",
+  loc_nearest: "Les plus proches",
+  loc_same_area: "Même zone",
+  loc_same_district: "Même district",
+  loc_same_lga: "Même LGA",
+  loc_same_state: "Même État",
+  loc_same_neighbourhood: "Même quartier",
+  loc_same_subcounty: "Même sous-comté",
+  loc_same_county: "Même comté",
+  loc_same_commune: "Même commune",
+  loc_same_province: "Même province",
+  loc_same_region: "Même région",
+  loc_none_in_tier: "Aucune autre annonce ici pour l’instant.",
+  loc_type_instead: "Saisir plutôt le code postal",
+  loc_type_different: "Vous connaissez un autre code postal ? Saisissez-le",
+  loc_type_ph: "ex. LA 11 U34 ZR 63",
+  loc_type_hint: "Laissez vide pour utiliser le code postal trouvé à partir du repère.",
+  loc_code_invalid: "Ce code postal n’existe pas. Vérifiez le code.",
+  loc_code_far: "Code valide, mais éloigné du repère. Déplacez le repère ou vérifiez le code.",
+  loc_get_exact: "Obtenir l’adresse exacte",
+  loc_full_shared: "Le code postal complet est partagé une fois l’agent contacté.",
+  loc_signin_reveal: "Connectez-vous, puis contactez l’agent pour voir le code postal complet.",
+  loc_exact_code: "Code exact du bâtiment",
+  loc_copy: "Copier le code postal",
+  loc_copied: "Copié",
+  filter_loc_listings: "{n} annonces",
+  filter_loc_listing_one: "1 annonce",
+  filter_near_me: "Près de moi",
+  filter_my_area: "Ma zone",
+  filter_search_scope: "Rechercher dans",
+  filter_widen_title: "Si rien ne correspond",
+  filter_widen_hint: "Afficher le niveau plus large suivant",
+  filter_location_denied: "Autorisez l’accès à la position pour utiliser cette option.",
+  filter_my_area_fail: "Impossible de déterminer votre zone. Connectez-vous et réessayez, ou saisissez un lieu.",
+  place_showing_wider: "Rien à {place} pour l’instant. Affichage : {tier}.",
+  place_none: "Aucune annonce à {place} pour l’instant.",
+  place_clear: "Effacer le lieu",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1736,6 +2123,11 @@ const sw: Translations = {
   splash_pi_auth: "Inathibitisha na Pi…", splash_verifying: "Inathibitisha utambulisho…",
   splash_signed_in: "Umeingia! Inaelekeza…", splash_timeout: "Muda wa muunganisho umeisha",
   splash_failed: "Kuingia kumeshindwa — jaribu tena",
+  splash_suspended: "Akaunti imesimamishwa",
+  suspended_title: "Akaunti yako imesimamishwa",
+  suspended_body: "Msimamizi amesimamisha akaunti hii, kwa hivyo umetolewa. Bado unaweza kuvinjari matangazo.",
+  suspended_contact: "Ikiwa unadhani ni kosa, wasiliana nasi kupitia",
+  suspended_ok: "Sawa",
   splash_pi_required: "Inahitajika: Pi Browser",
   splash_pi_desc: "Kutumia Pi Wallet yako, lazima uvinjari ndani ya programu ya Pi Browser.",
   splash_pi_btn: "Endelea na Pi Network",
@@ -1765,6 +2157,69 @@ const sw: Translations = {
   menu_list_property: "Ongeza Mali", menu_become_agent: "Kuwa Wakala",
   menu_privacy: "Sera ya Faragha", menu_terms: "Masharti ya Huduma",
   menu_faq: "Maswali", menu_language: "Lugha",
+  menu_notifications: "Arifa",
+  alerts_inbox_title: "Arifa",
+  alerts_inbox_empty: "Hakuna arifa bado. Matangazo mapya na maswali yataonekana hapa.",
+  alerts_mark_all_read: "Weka zote kuwa zimesomwa",
+  alerts_load_more: "Pakia zaidi",
+  alerts_loading: "Inapakia…",
+  alerts_error: "Imeshindwa kupakia arifa zako. Jaribu tena.",
+  alerts_settings_link: "Mipangilio ya arifa",
+  alerts_just_now: "Sasa hivi",
+  alerts_ago_min: "dakika {n} zilizopita",
+  alerts_ago_hour: "saa {n} zilizopita",
+  alerts_ago_day: "siku {n} zilizopita",
+  alerts_link_opening: "Inafungua…",
+  alerts_save: "Hifadhi mipangilio",
+  alerts_saving: "Inahifadhi…",
+  alerts_saved: "Imehifadhiwa",
+  alerts_save_failed: "Imeshindwa kuhifadhi. Jaribu tena.",
+  alerts_settings_title: "Arifa",
+  alerts_settings_subtitle: "Chagua jinsi na wakati wa kupokea arifa",
+  alerts_section_when: "Wakati",
+  alerts_section_types: "Cha kutuma",
+  alerts_timezone: "Saa za eneo",
+  alerts_language: "Lugha ya arifa",
+  alerts_quiet_hours: "Saa za utulivu",
+  alerts_quiet_hint: "Arifa za push zinasubiri hadi saa za utulivu ziishe. Hakuna kinachopotea.",
+  alerts_quiet_from: "Kuanzia",
+  alerts_quiet_to: "Hadi",
+  alerts_digest_hour: "Saa ya barua pepe ya kila siku",
+  alerts_digest_hint: "Arifa ambazo hukuziona kwenye simu hutumwa kwa barua pepe mara moja kwa siku.",
+  alerts_test_button: "Tuma arifa ya majaribio",
+  alerts_test_sending: "Inatuma…",
+  alerts_test_done: "Jaribio limetumwa. Angalia kikasha chako, kifaa hiki na barua pepe.",
+  alerts_test_limit: "Majaribio mengi sana. Jaribu tena baada ya saa moja.",
+  alerts_test_failed: "Imeshindwa kutuma jaribio.",
+  alerts_type_new_listing: "Matangazo mapya yanayolingana na utafutaji wangu",
+  alerts_type_listing_change: "Mabadiliko kwenye matangazo ninayofuatilia",
+  alerts_type_enquiry: "Maswali kuhusu matangazo yangu",
+  alerts_type_expiring: "Matangazo yanayokaribia kuisha",
+  alerts_type_review: "Maoni",
+  alerts_type_agent_report: "Ripoti za wakala",
+  alerts_type_demand: "Mahitaji katika eneo langu",
+  alerts_test_inbox: "Kikasha: imewasilishwa.",
+  alerts_test_push_sent: "Push: imetumwa kwenye vifaa vyako.",
+  alerts_test_push_off: "Push: imezimwa. Washa Push hapo juu.",
+  alerts_test_push_no_device: "Push: hakuna kifaa kilichosajiliwa. Washa Push kutoka kwenye kifaa unachotaka kupokea arifa.",
+  alerts_test_push_held: "Push: inasubiri hadi saa za utulivu ziishe.",
+  alerts_test_push_capped: "Push: kikomo cha kila siku kimefikiwa.",
+  alerts_test_push_failed: "Push: imeshindwa kuwasilishwa.",
+  alerts_test_email_sent: "Barua pepe: imetumwa.",
+  alerts_test_email_none: "Barua pepe: haijawekwa.",
+  alerts_test_email_failed: "Barua pepe: imeshindwa kutumwa.",
+  alerts_push_unsupported: "Arifa za push hazitumiki kwenye kivinjari hiki.",
+  alerts_push_blocked_title: "Arifa za push zimezuiwa",
+  alerts_push_blocked_body: "Ruhusu arifa kwa tovuti hii kwenye mipangilio ya kivinjari chako, kisha jaribu tena.",
+  alerts_push_android_webview_title: "Msaada mdogo kwenye Pi Browser (Android)",
+  alerts_push_android_webview_body: "Fungua tovuti hii kwenye Chrome ya Android ili kupokea arifa za push.",
+  alerts_push_ios_webview_title: "Haipatikani kwenye Pi Browser ya iPhone",
+  alerts_push_ios_webview_body: "Fungua tovuti hii kwenye Safari, gusa Shiriki kisha Ongeza kwenye Skrini ya Kwanza, na uwashe Push kutoka hapo.",
+  alerts_push_ios_install_title: "Ongeza Proptriz kwenye Skrini ya Kwanza kwanza",
+  alerts_push_ios_install_body: "Kwenye iPhone, push inafanya kazi tu kwenye programu iliyosakinishwa. Kwenye Safari gusa Shiriki kisha Ongeza kwenye Skrini ya Kwanza, fungua Proptriz kutoka hapo na uwashe Push.",
+  alerts_push_not_configured: "Push haijawekwa kwa tovuti hii bado.",
+  alerts_push_dismissed: "Arifa hazikuruhusiwa. Gusa swichi tena na uchague Ruhusu.",
+  alerts_push_failed: "Imeshindwa kuwasha push. Jaribu tena.",
 
   detail_loading: "Inapakia mali…", detail_error: "Imeshindwa kupakia mali",
   detail_go_back: "Rudi", detail_updated: "Imesasishwa",
@@ -1945,6 +2400,67 @@ const sw: Translations = {
   privacy_s8_title: "8. Usalama",
   privacy_s8_body: "Tunatekeleza ulinzi wa kiufundi na wa shirika ikiwemo usimbuaji, uhifadhi salama na udhibiti wa ufikiaji. Hata hivyo, hakuna mfumo unaokuwa salama kabisa.",
   privacy_s9_title: "9. Wasiliana Nasi",
+
+  // ── Location, postcode and place search ──
+  loc_location_label: "Mahali",
+  loc_postcode_label: "Msimbo wa posta wa Nigeria",
+  loc_finding: "Inakagua alama…",
+  loc_no_postcode: "Bado hakuna msimbo wa posta mahali hapa",
+  loc_no_postcode_note: "Hakuna msimbo wa posta hapa? Endelea. Tangazo lako litachapishwa kama “Haijathibitishwa” na tutakagua tena baadaye.",
+  loc_verified: "Imethibitishwa",
+  loc_unverified: "Haijathibitishwa",
+  loc_location_verified: "Mahali pamethibitishwa",
+  loc_location_unverified: "Mahali hapajathibitishwa",
+  loc_m_from_pin: "mita {n} kutoka kwenye alama",
+  loc_pin_matches: "Alama inalingana na anwani",
+  loc_pin_mismatch_note: "Alama iko {place}, lakini anwani haitaji eneo hilo. Ongeza jina la eneo au sogeza alama. Bado unaweza kuchapisha.",
+  loc_country: "Nchi",
+  loc_state: "Jimbo",
+  loc_lga: "LGA (serikali ya mtaa)",
+  loc_county: "Kaunti",
+  loc_subcounty: "Kaunti ndogo",
+  loc_province: "Mkoa",
+  loc_commune: "Komuni",
+  loc_region: "Mkoa",
+  loc_district: "Wilaya",
+  loc_area: "Eneo",
+  loc_neighbourhood: "Mtaa",
+  loc_nearest: "Karibu zaidi",
+  loc_same_area: "Eneo hilohilo",
+  loc_same_district: "Wilaya hiyohiyo",
+  loc_same_lga: "LGA hiyohiyo",
+  loc_same_state: "Jimbo hilohilo",
+  loc_same_neighbourhood: "Mtaa huohuo",
+  loc_same_subcounty: "Kaunti ndogo hiyohiyo",
+  loc_same_county: "Kaunti hiyohiyo",
+  loc_same_commune: "Komuni hiyohiyo",
+  loc_same_province: "Mkoa huohuo",
+  loc_same_region: "Mkoa huohuo",
+  loc_none_in_tier: "Bado hakuna matangazo mengine hapa.",
+  loc_type_instead: "Andika msimbo wa posta badala yake",
+  loc_type_different: "Unajua msimbo mwingine wa posta? Uandike",
+  loc_type_ph: "mf. LA 11 U34 ZR 63",
+  loc_type_hint: "Acha wazi ili kutumia msimbo wa posta uliopatikana kutoka kwenye alama yako.",
+  loc_code_invalid: "Msimbo huu wa posta haupo. Kagua msimbo.",
+  loc_code_far: "Msimbo ni sahihi, lakini hauko karibu na alama yako. Sogeza alama au kagua msimbo.",
+  loc_get_exact: "Pata anwani kamili",
+  loc_full_shared: "Msimbo kamili wa posta hutolewa ukishawasiliana na wakala.",
+  loc_signin_reveal: "Ingia, kisha wasiliana na wakala ili kuona msimbo kamili wa posta.",
+  loc_exact_code: "Msimbo kamili wa jengo",
+  loc_copy: "Nakili msimbo wa posta",
+  loc_copied: "Imenakiliwa",
+  filter_loc_listings: "matangazo {n}",
+  filter_loc_listing_one: "tangazo 1",
+  filter_near_me: "Karibu nami",
+  filter_my_area: "Eneo langu",
+  filter_search_scope: "Tafuta katika",
+  filter_widen_title: "Kama hakuna kinacholingana",
+  filter_widen_hint: "Onyesha kiwango kipana kinachofuata",
+  filter_location_denied: "Ruhusu ufikiaji wa mahali ili kutumia hii.",
+  filter_my_area_fail: "Imeshindikana kutambua eneo lako. Ingia ujaribu tena, au andika mahali.",
+  place_showing_wider: "Bado hakuna kitu {place}. Inaonyesha: {tier}.",
+  place_none: "Bado hakuna matangazo {place}.",
+  place_clear: "Ondoa mahali",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

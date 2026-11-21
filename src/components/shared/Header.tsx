@@ -9,6 +9,7 @@ import Image from "next/image";
 import { BrandLogo } from "@/components/shared/BrandLogo";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { LOCALE_META } from "@/i18n/translations";
+import { useUnreadAlerts } from "@/hooks/useUnreadAlerts";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { authUser }            = useContext(AppContext);
   const { t, locale, openPicker } = useLanguage();
+  const { count: unreadAlerts } = useUnreadAlerts();
 
   // Menu items — labels come from the translation table.
   // The Language entry also shows the active locale flag + name for instant
@@ -24,6 +26,8 @@ const Header: React.FC = () => {
     { icon: "✏️", labelKey: "menu_edit_profile"  as const, link: "/profile/edit",         action: undefined          },
     { icon: "🏠", labelKey: "menu_list_property" as const, link: "/property/add",          action: undefined          },
     { icon: "🤝", labelKey: "menu_become_agent"  as const, link: "#",  action: undefined          },
+    { icon: "🔔", labelKey: "alerts_inbox_title" as const, link: "/notifications",         action: undefined          },
+    { icon: "⚙️", labelKey: "menu_notifications" as const, link: "/profile/notifications", action: undefined      },
     { icon: "🔒", labelKey: "menu_privacy"       as const, link: "/privacy-policy",        action: undefined          },
     { icon: "📋", labelKey: "menu_terms"         as const, link: "/terms-of-service",      action: undefined          },
     { icon: "❓", labelKey: "menu_faq"           as const, link: "/profile/faq",           action: undefined          },
@@ -59,6 +63,28 @@ const Header: React.FC = () => {
                 {locale.toUpperCase()}
               </span>
             </button>
+
+            {/* Alerts bell with unread badge (signed-in only) */}
+            {authUser && (
+              <Link
+                href="/notifications"
+                className="relative w-9 h-9 rounded-full flex items-center justify-center
+                           text-white text-base bg-white/15 border border-white/25
+                           hover:bg-white/25 active:scale-95"
+                aria-label={t("alerts_inbox_title")}
+              >
+                🔔
+                {unreadAlerts > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full
+                               bg-[#f0a500] text-[#143d4d] text-[10px] font-bold
+                               flex items-center justify-center"
+                  >
+                    {unreadAlerts > 99 ? "99+" : unreadAlerts}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Hamburger menu button */}
             <button
@@ -140,6 +166,19 @@ const Header: React.FC = () => {
               </span>
             </Link>
           ))}
+
+          {authUser?.role === "admin" && (
+            <Link
+              href="/admin"
+              onClick={() => setShowMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#e0f0f5] transition-colors"
+            >
+              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center text-[15px] flex-shrink-0 bg-[#e0f0f5] text-[#1e5f74]">
+                🛡️
+              </div>
+              <span className="text-[13px] font-semibold text-[#111827]">Admin dashboard</span>
+            </Link>
+          )}
 
           {/* Language selector row — opens picker, shows active flag + name */}
           <button

@@ -8,6 +8,8 @@ import { ToastContainer } from "react-toastify";
 import GoogleScriptLoader from "@/components/GoogleScriptLoader";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import LanguagePickerModal  from "@/components/LanguagePickerModal";
+import PushBootstrap from "@/components/PushBootstrap";
+import AccountSuspendedNotice from "@/components/AccountSuspendedNotice";
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -138,10 +140,14 @@ export default function RootLayout({
         <LanguageProvider>
           <AppContextProvider>
             <GoogleScriptLoader />
+            <PushBootstrap />
             {children}
 
             {/* Language picker modal — available everywhere via useLanguage().openPicker() */}
             <LanguagePickerModal />
+
+            {/* Explains a sign-out caused by a suspended account */}
+            <AccountSuspendedNotice />
 
             <ToastContainer
               position="bottom-center"
